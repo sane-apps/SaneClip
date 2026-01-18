@@ -1,6 +1,6 @@
 # SaneClip Roadmap
 
-## Current Version: 1.0.1
+## Current Version: 1.1
 
 ### ✅ Shipped
 - [x] Menu bar app with clipboard icon

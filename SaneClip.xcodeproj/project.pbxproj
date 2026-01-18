@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		31AE3F98F164FB0ECD0829BD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6E5B3959F17D55FF5C7F90E6 /* Assets.xcassets */; };
 		5ED4D24BD177013CA44D2963 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74750429D17786620EF008E /* main.swift */; };
+		60E0917C7EE6C533E0E339D6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E0713E5848E1A9394B7528D /* SettingsView.swift */; };
 		7C2DB9FDEE7F3D537CF02CA1 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 0668E59A15F0F31C5BE746B0 /* KeyboardShortcuts */; };
 		8B41EC7476C54EDF1695272D /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C104FF18269706174A84ADDF /* Sparkle */; };
 		B3761DF4123417A5EA8C0DF3 /* SaneClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FFF4DCFB95C5B26D00A640F /* SaneClipApp.swift */; };
@@ -27,6 +28,7 @@
 
 /* Begin PBXFileReference section */
 		14D0EBBF195245B8CE7ECF07 /* SaneClip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SaneClip.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6E0713E5848E1A9394B7528D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		6E5B3959F17D55FF5C7F90E6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		71B639CB4375AE4479924B74 /* SaneClipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipTests.swift; sourceTree = "<group>"; };
 		7C13160E8B6EC2A2DB6B0BB5 /* SaneClipTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SaneClipTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,9 +94,18 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		A8D8AAF79390D8CCEB64615E /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				6E0713E5848E1A9394B7528D /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		D9D0EFB2C3ADEBAA6D5BF62C /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				A8D8AAF79390D8CCEB64615E /* Settings */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -199,6 +210,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		5CC7E86915A9DEDF13CC7A72 /* Run SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -231,6 +243,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B3761DF4123417A5EA8C0DF3 /* SaneClipApp.swift in Sources */,
+				60E0917C7EE6C533E0E339D6 /* SettingsView.swift in Sources */,
 				5ED4D24BD177013CA44D2963 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

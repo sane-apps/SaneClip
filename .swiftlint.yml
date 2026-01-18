@@ -1,0 +1,6 @@
+excluded:
+  - build
+  - .build
+  - DerivedData
+  - SourcePackages
+  - Pods

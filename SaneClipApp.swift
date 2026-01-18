@@ -1,15 +1,56 @@
 import SwiftUI
 import AppKit
 import KeyboardShortcuts
+import Sparkle
+import LocalAuthentication
 import os.log
 
 private let appLogger = Logger(subsystem: "com.saneclip.app", category: "App")
+
+// MARK: - Update Service
+
+@MainActor
+class UpdateService: NSObject, ObservableObject {
+    static let shared = UpdateService()
+
+    private var updaterController: SPUStandardUpdaterController?
+
+    override init() {
+        super.init()
+        self.updaterController = SPUStandardUpdaterController(
+            startingUpdater: true,
+            updaterDelegate: nil,
+            userDriverDelegate: nil
+        )
+        appLogger.info("Sparkle updater initialized")
+    }
+
+    func checkForUpdates() {
+        appLogger.info("User triggered check for updates")
+        updaterController?.checkForUpdates(nil)
+    }
+
+    var automaticallyChecksForUpdates: Bool {
+        get { updaterController?.updater.automaticallyChecksForUpdates ?? false }
+        set { updaterController?.updater.automaticallyChecksForUpdates = newValue }
+    }
+}
 
 // MARK: - Keyboard Shortcuts Extension
 
 extension KeyboardShortcuts.Name {
     static let showClipboardHistory = Self("showClipboardHistory")
     static let pasteAsPlainText = Self("pasteAsPlainText")
+    // Quick paste shortcuts for items 1-9
+    static let pasteItem1 = Self("pasteItem1")
+    static let pasteItem2 = Self("pasteItem2")
+    static let pasteItem3 = Self("pasteItem3")
+    static let pasteItem4 = Self("pasteItem4")
+    static let pasteItem5 = Self("pasteItem5")
+    static let pasteItem6 = Self("pasteItem6")
+    static let pasteItem7 = Self("pasteItem7")
+    static let pasteItem8 = Self("pasteItem8")
+    static let pasteItem9 = Self("pasteItem9")
 }
 
 // MARK: - AppDelegate
@@ -19,9 +60,16 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
     private var clipboardManager: ClipboardManager!
+    private var updateService: UpdateService!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         appLogger.info("SaneClip starting...")
+
+        // Initialize update service (Sparkle)
+        updateService = UpdateService.shared
+
+        // Apply dock visibility setting (must happen early)
+        _ = SettingsModel.shared
 
         // Initialize clipboard manager
         clipboardManager = ClipboardManager()
@@ -30,10 +78,24 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "doc.on.clipboard", accessibilityDescription: "SaneClip")
+            // Use SF Symbol - guaranteed to work perfectly in menu bar
+            button.image = NSImage(systemSymbolName: "clipboard.fill", accessibilityDescription: "SaneClip")
             button.action = #selector(togglePopover)
             button.target = self
+            // Right-click menu
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
+
+        // Create right-click context menu
+        let menu = NSMenu()
+        menu.addItem(NSMenuItem(title: "Show History", action: #selector(togglePopover), keyEquivalent: ""))
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem(title: "Clear History", action: #selector(clearHistoryFromMenu), keyEquivalent: ""))
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ","))
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem(title: "Quit SaneClip", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        statusItem.menu = nil // We'll show it manually on right-click
 
         // Create popover
         popover = NSPopover()
@@ -50,6 +112,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setupKeyboardShortcuts() {
+        // Set defaults if not configured
+        setDefaultShortcutsIfNeeded()
+
+        // Register handlers
         KeyboardShortcuts.onKeyUp(for: .showClipboardHistory) { [weak self] in
             Task { @MainActor in
                 self?.togglePopover()
@@ -61,18 +127,174 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
                 self?.clipboardManager.pasteAsPlainText()
             }
         }
+
+        // Quick paste shortcuts 1-9
+        let shortcuts: [KeyboardShortcuts.Name] = [
+            .pasteItem1, .pasteItem2, .pasteItem3, .pasteItem4, .pasteItem5,
+            .pasteItem6, .pasteItem7, .pasteItem8, .pasteItem9
+        ]
+        for (index, shortcut) in shortcuts.enumerated() {
+            KeyboardShortcuts.onKeyUp(for: shortcut) { [weak self] in
+                Task { @MainActor in
+                    self?.clipboardManager.pasteItemAt(index: index)
+                }
+            }
+        }
+    }
+
+    private func setDefaultShortcutsIfNeeded() {
+        // Show clipboard history: Cmd+Shift+V
+        if KeyboardShortcuts.getShortcut(for: .showClipboardHistory) == nil {
+            KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .shift]), for: .showClipboardHistory)
+            appLogger.info("Set default shortcut: Cmd+Shift+V for clipboard history")
+        }
+
+        // Paste as plain text: Cmd+Shift+Option+V
+        if KeyboardShortcuts.getShortcut(for: .pasteAsPlainText) == nil {
+            KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .shift, .option]), for: .pasteAsPlainText)
+            appLogger.info("Set default shortcut: Cmd+Shift+Option+V for paste as plain text")
+        }
+
+        // Quick paste shortcuts: Cmd+Ctrl+1 through 9
+        let keys: [KeyboardShortcuts.Key] = [.one, .two, .three, .four, .five, .six, .seven, .eight, .nine]
+        let shortcuts: [KeyboardShortcuts.Name] = [
+            .pasteItem1, .pasteItem2, .pasteItem3, .pasteItem4, .pasteItem5,
+            .pasteItem6, .pasteItem7, .pasteItem8, .pasteItem9
+        ]
+        for (key, shortcut) in zip(keys, shortcuts) {
+            if KeyboardShortcuts.getShortcut(for: shortcut) == nil {
+                KeyboardShortcuts.setShortcut(.init(key, modifiers: [.command, .control]), for: shortcut)
+            }
+        }
+    }
+
+    @objc private func clearHistoryFromMenu() {
+        clipboardManager.clearHistory()
+    }
+
+    @objc private func openSettings() {
+        SettingsWindowController.open()
+    }
+
+    // MARK: - Biometric Authentication
+
+    private func authenticateWithBiometrics(completion: @escaping (Bool) -> Void) {
+        let context = LAContext()
+        var error: NSError?
+
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            context.evaluatePolicy(
+                .deviceOwnerAuthenticationWithBiometrics,
+                localizedReason: "Authenticate to view clipboard history"
+            ) { success, _ in
+                DispatchQueue.main.async {
+                    completion(success)
+                }
+            }
+        } else {
+            // No biometrics available, allow access
+            completion(true)
+        }
     }
 
     @MainActor
     @objc private func togglePopover() {
         guard let button = statusItem.button else { return }
 
+        // Check if right-click
+        if let event = NSApp.currentEvent, event.type == .rightMouseUp {
+            showContextMenu()
+            return
+        }
+
         if popover.isShown {
             popover.performClose(nil)
         } else {
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-            popover.contentViewController?.view.window?.makeKey()
+            // Check if Touch ID is required
+            if SettingsModel.shared.requireTouchID {
+                authenticateWithBiometrics { [weak self] success in
+                    if success {
+                        self?.showPopoverAtButton()
+                    }
+                }
+            } else {
+                showPopoverAtButton()
+            }
         }
+    }
+
+    private func showPopoverAtButton() {
+        guard let button = statusItem.button,
+              let buttonWindow = button.window else { return }
+
+        let buttonRect = button.convert(button.bounds, to: nil)
+        let screenRect = buttonWindow.convertToScreen(buttonRect)
+
+        // Position popover at the button's location
+        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+
+        // Force correct positioning if needed
+        if let popoverWindow = popover.contentViewController?.view.window {
+            let popoverSize = popoverWindow.frame.size
+            let newOrigin = NSPoint(
+                x: screenRect.midX - popoverSize.width / 2,
+                y: screenRect.minY - popoverSize.height
+            )
+            popoverWindow.setFrameOrigin(newOrigin)
+            popoverWindow.makeKey()
+        }
+    }
+
+    private func showContextMenu() {
+        guard let button = statusItem.button else { return }
+
+        let menu = NSMenu()
+        menu.addItem(NSMenuItem(title: "Show History", action: #selector(showPopover), keyEquivalent: ""))
+        menu.addItem(NSMenuItem.separator())
+
+        // Add recent items
+        let recentItems = Array(clipboardManager.history.prefix(5))
+        if !recentItems.isEmpty {
+            for (index, item) in recentItems.enumerated() {
+                let menuItem = NSMenuItem(
+                    title: String(item.preview.prefix(40)) + (item.preview.count > 40 ? "..." : ""),
+                    action: #selector(pasteFromMenu(_:)),
+                    keyEquivalent: ""
+                )
+                menuItem.tag = index
+                menuItem.target = self
+                menu.addItem(menuItem)
+            }
+            menu.addItem(NSMenuItem.separator())
+        }
+
+        menu.addItem(NSMenuItem(title: "Clear History", action: #selector(clearHistoryFromMenu), keyEquivalent: ""))
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ","))
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem(title: "Quit SaneClip", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+
+        statusItem.menu = menu
+        button.performClick(nil)
+        statusItem.menu = nil
+    }
+
+    @objc private func showPopover() {
+        // Check if Touch ID is required
+        if SettingsModel.shared.requireTouchID {
+            authenticateWithBiometrics { [weak self] success in
+                if success {
+                    self?.showPopoverAtButton()
+                }
+            }
+        } else {
+            showPopoverAtButton()
+        }
+    }
+
+    @objc private func pasteFromMenu(_ sender: NSMenuItem) {
+        let index = sender.tag
+        clipboardManager.pasteItemAt(index: index)
     }
 }
 
@@ -82,9 +304,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 @Observable
 class ClipboardManager {
     var history: [ClipboardItem] = []
+    var pinnedItems: [ClipboardItem] = []
     private var lastChangeCount: Int = 0
+    private var lastClipboardContent: String?
+    private var lastCopyTime: Date?
     private var timer: Timer?
-    private let maxHistorySize = 50
+    private var maxHistorySize: Int { SettingsModel.shared.maxHistorySize }
     private let logger = Logger(subsystem: "com.saneclip.app", category: "ClipboardManager")
 
     init() {
@@ -106,11 +331,36 @@ class ClipboardManager {
         guard pasteboard.changeCount != lastChangeCount else { return }
         lastChangeCount = pasteboard.changeCount
 
+        // Privacy: Check if previous item was cleared quickly (password manager behavior)
+        // Only if "Protect passwords" setting is enabled
+        if SettingsModel.shared.protectPasswords,
+           let lastContent = lastClipboardContent,
+           let lastTime = lastCopyTime,
+           Date().timeIntervalSince(lastTime) < 3.0 {
+            // Previous item was cleared within 3 seconds - likely a password manager
+            // Remove it from history if it exists
+            history.removeAll { item in
+                if case .text(let str) = item.content {
+                    return str == lastContent
+                }
+                return false
+            }
+            logger.debug("Removed quick-cleared item (likely password)")
+        }
+
         // Get clipboard content
         if let string = pasteboard.string(forType: .string), !string.isEmpty {
+            lastClipboardContent = string
+            lastCopyTime = Date()
             addItem(ClipboardItem(content: .text(string)))
         } else if let image = NSImage(pasteboard: pasteboard) {
+            lastClipboardContent = nil
+            lastCopyTime = nil
             addItem(ClipboardItem(content: .image(image)))
+        } else {
+            // Clipboard was cleared
+            lastClipboardContent = nil
+            lastCopyTime = nil
         }
     }
 
@@ -154,9 +404,12 @@ class ClipboardManager {
             history.insert(item, at: 0)
         }
 
-        // Simulate Cmd+V
+        // Play a short, sweet click sound
+        NSSound(named: .init("Tink"))?.play()
+
+        // Simulate Cmd+V with longer delay to let popover close
         Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(100))
+            try? await Task.sleep(for: .milliseconds(200))
             self.simulatePaste()
         }
     }
@@ -185,12 +438,31 @@ class ClipboardManager {
 
     func delete(item: ClipboardItem) {
         history.removeAll { $0.id == item.id }
+        pinnedItems.removeAll { $0.id == item.id }
         saveHistory()
     }
 
     func clearHistory() {
         history.removeAll()
         saveHistory()
+    }
+
+    func pasteItemAt(index: Int) {
+        guard index < history.count else { return }
+        paste(item: history[index])
+    }
+
+    func togglePin(item: ClipboardItem) {
+        if pinnedItems.contains(where: { $0.id == item.id }) {
+            pinnedItems.removeAll { $0.id == item.id }
+        } else {
+            pinnedItems.insert(item, at: 0)
+        }
+        saveHistory()
+    }
+
+    func isPinned(_ item: ClipboardItem) -> Bool {
+        pinnedItems.contains { $0.id == item.id }
     }
 
     // MARK: - Persistence
@@ -266,6 +538,18 @@ struct ClipboardItem: Identifiable {
             return "[Image]"
         }
     }
+
+    var stats: String {
+        switch content {
+        case .text(let string):
+            let chars = string.count
+            let words = string.split { $0.isWhitespace || $0.isNewline }.count
+            return "\(chars) chars · \(words) words"
+        case .image(let image):
+            let size = image.size
+            return "\(Int(size.width))×\(Int(size.height))"
+        }
+    }
 }
 
 enum ClipboardContent {
@@ -286,15 +570,26 @@ struct ClipboardHistoryView: View {
     @State private var searchText = ""
 
     var filteredHistory: [ClipboardItem] {
-        if searchText.isEmpty {
-            return clipboardManager.history
-        }
-        return clipboardManager.history.filter { item in
+        let items = searchText.isEmpty ? clipboardManager.history : clipboardManager.history.filter { item in
             if case .text(let string) = item.content {
                 return string.localizedCaseInsensitiveContains(searchText)
             }
             return false
         }
+        // Filter out pinned items from main list (they show in pinned section)
+        return items.filter { !clipboardManager.isPinned($0) }
+    }
+
+    var filteredPinned: [ClipboardItem] {
+        guard searchText.isEmpty else {
+            return clipboardManager.pinnedItems.filter { item in
+                if case .text(let string) = item.content {
+                    return string.localizedCaseInsensitiveContains(searchText)
+                }
+                return false
+            }
+        }
+        return clipboardManager.pinnedItems
     }
 
     var body: some View {
@@ -319,18 +614,33 @@ struct ClipboardHistoryView: View {
             Divider()
 
             // History list
-            if filteredHistory.isEmpty {
+            if filteredHistory.isEmpty && filteredPinned.isEmpty {
                 ContentUnavailableView(
                     searchText.isEmpty ? "No Clipboard History" : "No Results",
-                    systemImage: searchText.isEmpty ? "doc.on.clipboard" : "magnifyingglass",
+                    systemImage: searchText.isEmpty ? "clipboard" : "magnifyingglass",
                     description: Text(searchText.isEmpty ? "Copy something to see it here" : "Try a different search")
                 )
             } else {
-                List(filteredHistory) { item in
-                    ClipboardItemRow(item: item) {
-                        clipboardManager.paste(item: item)
-                    } onDelete: {
-                        clipboardManager.delete(item: item)
+                List {
+                    // Pinned section
+                    if !filteredPinned.isEmpty {
+                        Section("Pinned") {
+                            ForEach(filteredPinned) { item in
+                                ClipboardItemRow(item: item, isPinned: true, clipboardManager: clipboardManager)
+                            }
+                        }
+                    }
+
+                    // Recent section
+                    Section(filteredPinned.isEmpty ? "" : "Recent") {
+                        ForEach(Array(filteredHistory.enumerated()), id: \.element.id) { index, item in
+                            ClipboardItemRow(
+                                item: item,
+                                isPinned: false,
+                                clipboardManager: clipboardManager,
+                                shortcutHint: index < 9 ? "⌘⌃\(index + 1)" : nil
+                            )
+                        }
                     }
                 }
                 .listStyle(.plain)
@@ -341,17 +651,23 @@ struct ClipboardHistoryView: View {
             // Footer
             HStack {
                 Text("\(clipboardManager.history.count) items")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.subheadline)
+                    .foregroundStyle(.primary.opacity(0.85))
 
                 Spacer()
+
+                Button(action: { SettingsWindowController.open() }) {
+                    Image(systemName: "gear")
+                }
+                .buttonStyle(.plain)
+                .help("Settings")
 
                 Button("Clear All") {
                     clipboardManager.clearHistory()
                 }
                 .buttonStyle(.plain)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(.subheadline)
+                .foregroundStyle(.primary.opacity(0.85))
             }
             .padding(8)
         }
@@ -360,37 +676,122 @@ struct ClipboardHistoryView: View {
 
 struct ClipboardItemRow: View {
     let item: ClipboardItem
-    let onPaste: () -> Void
-    let onDelete: () -> Void
+    let isPinned: Bool
+    let clipboardManager: ClipboardManager
+    var shortcutHint: String? = nil
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var accentColor: Color {
+        isPinned
+            ? .orange
+            : Color(red: 0.0, green: 0.6, blue: 1.0)
+    }
+
+    private var cardBackground: Color {
+        colorScheme == .dark
+            ? Color.white.opacity(0.06)
+            : Color.black.opacity(0.03)
+    }
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(item.preview)
-                    .lineLimit(2)
-                    .font(.body)
+        HStack(spacing: 0) {
+            // Accent bar on left
+            RoundedRectangle(cornerRadius: 2)
+                .fill(accentColor)
+                .frame(width: 3)
 
-                Text(item.timestamp, style: .relative)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            HStack(spacing: 8) {
+                // Pin indicator
+                if isPinned {
+                    Image(systemName: "pin.fill")
+                        .font(.caption2)
+                        .foregroundStyle(.orange)
+                }
+
+                // Content & metadata stacked
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(item.preview)
+                        .lineLimit(2)
+                        .font(.system(.callout, weight: .medium))
+                        .foregroundStyle(.primary)
+
+                    // Compact metadata inline
+                    HStack(spacing: 6) {
+                        Text(item.stats)
+                            .font(.caption)
+                            .foregroundStyle(.primary.opacity(0.85))
+
+                        Text("·")
+                            .font(.caption)
+                            .foregroundStyle(.primary.opacity(0.5))
+
+                        Text(item.timestamp, style: .relative)
+                            .font(.caption)
+                            .foregroundStyle(.primary.opacity(0.85))
+
+                        if let hint = shortcutHint {
+                            Spacer()
+                            Text(hint)
+                                .font(.system(.caption2, design: .monospaced))
+                                .foregroundStyle(.primary.opacity(0.55))
+                        }
+                    }
+                }
+
+                Spacer(minLength: 4)
+
+                // Paste button - dramatic press feedback
+                Button(action: { clipboardManager.paste(item: item) }) {
+                    Image(systemName: "doc.on.doc.fill")
+                        .font(.system(size: 18))
+                        .foregroundStyle(accentColor)
+                }
+                .buttonStyle(PasteButtonStyle(accentColor: accentColor))
+                .help("Paste")
             }
-
-            Spacer()
-
-            Button(action: onPaste) {
-                Image(systemName: "doc.on.doc")
-            }
-            .buttonStyle(.plain)
-            .help("Paste")
+            .padding(.vertical, 6)
+            .padding(.leading, 10)
+            .padding(.trailing, 6)
         }
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(cardBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(accentColor.opacity(0.2), lineWidth: 1)
+        )
         .contentShape(Rectangle())
         .onTapGesture(count: 2) {
-            onPaste()
+            clipboardManager.paste(item: item)
         }
         .contextMenu {
-            Button("Paste") { onPaste() }
+            Button("Paste") { clipboardManager.paste(item: item) }
             Divider()
-            Button("Delete", role: .destructive) { onDelete() }
+            Button(isPinned ? "Unpin" : "Pin") {
+                clipboardManager.togglePin(item: item)
+            }
+            Divider()
+            Button("Delete", role: .destructive) { clipboardManager.delete(item: item) }
         }
+    }
+}
+
+// MARK: - Paste Button Style with Dramatic Press Feedback
+
+struct PasteButtonStyle: ButtonStyle {
+    let accentColor: Color
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(6)
+            .background(
+                Circle()
+                    .fill(configuration.isPressed ? accentColor : accentColor.opacity(0.15))
+            )
+            .foregroundStyle(configuration.isPressed ? .white : accentColor)
+            .scaleEffect(configuration.isPressed ? 0.75 : 1.0)
+            .shadow(color: configuration.isPressed ? accentColor.opacity(0.6) : .clear, radius: 8)
+            .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
     }
 }

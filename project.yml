@@ -122,6 +122,7 @@ targets:
             echo "warning: SwiftLint not installed"
           fi
         name: Run SwiftLint
+        basedOnDependencyAnalysis: false
 
   SaneClipTests:
     type: bundle.unit-test

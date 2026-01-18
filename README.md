@@ -44,15 +44,15 @@ Built with SwiftUI. Looks right at home on Sonoma, Sequoia, and Tahoe.
 
 ## Installation
 
-### Homebrew (Recommended)
+### Direct Download (Recommended)
+
+Download the latest DMG from [saneclip.com](https://saneclip.com) — **$5 one-time, free updates for life.**
+
+### Homebrew
 
 ```bash
 brew install stephanjoseph/saneclip/saneclip
 ```
-
-### Direct Download
-
-Download the latest DMG from [saneclip.com](https://saneclip.com) — $5 one-time purchase.
 
 ---
 

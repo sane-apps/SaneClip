@@ -1,0 +1,13 @@
+# Demo Clipboard Items for Screenshots
+# Mix of work, personal, funny - 10 items
+
+Meeting at 3pm - don't forget to bring the quarterly report!
+SELECT * FROM orders WHERE status = 'pending' LIMIT 100;
+https://www.youtube.com/watch?v=dQw4w9WgXcQ
+Mom's birthday is March 15th - get flowers!!
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG8x...
+Why do programmers prefer dark mode? Because light attracts bugs.
+export API_KEY="sk_live_abc123def456"
+Pick up milk, eggs, bread, and that weird cheese Sarah likes
+git push origin main --force (just kidding, never do this)
+border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);

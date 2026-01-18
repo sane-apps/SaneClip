@@ -197,14 +197,14 @@ struct GeneralSettingsView: View {
                         .frame(width: 140)
                     }
                     CompactDivider()
-                    CompactToggle(label: "Play sounds", isOn: Binding(
+                    CompactToggle(label: "Play sound when copying", isOn: Binding(
                         get: { settings.playSounds },
                         set: { settings.playSounds = $0 }
                     ))
                 }
 
                 CompactSection("Security") {
-                    CompactToggle(label: "Ignore password manager copies", isOn: Binding(
+                    CompactToggle(label: "Detect & skip passwords", isOn: Binding(
                         get: { settings.protectPasswords },
                         set: { newValue in
                             if newValue {
@@ -361,7 +361,7 @@ struct ExcludedAppsInline: View {
             // Subtitle
             if excludedApps.isEmpty {
                 HStack {
-                    Text("No apps excluded. Clips from all apps will be saved.")
+                    Text("Click \"Add App\" to exclude from clipboard history")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                     Spacer()

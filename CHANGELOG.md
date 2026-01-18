@@ -23,7 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - **Smarter time display** — Compact format (41s → 15m → 2h → 3d)
 - **Compact stats** — Shows "21w · 350c" instead of verbose text
 - **Aligned metadata** — Fixed-width columns for cleaner visual scanning
-- **Renamed setting** — "Protect passwords" → "Ignore password manager copies" for clarity
+- **Renamed setting** — "Protect passwords" → "Detect & skip passwords" for clarity
 
 ### Fixed
 - **Metadata no longer wraps** — Single-line metadata regardless of content length

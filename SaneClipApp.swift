@@ -116,7 +116,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
         // Create popover
         popover = NSPopover()
-        popover.contentSize = NSSize(width: 320, height: 400)
+        popover.contentSize = NSSize(width: 320, height: 500)
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(
             rootView: ClipboardHistoryView(clipboardManager: clipboardManager)

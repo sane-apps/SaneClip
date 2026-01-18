@@ -30,7 +30,7 @@
           <li><strong>Smarter time display</strong> - Compact format (41s, 15m, 2h, 3d)</li>
           <li><strong>Compact stats</strong> - Shows "21w · 350c" instead of verbose text</li>
           <li><strong>Aligned metadata</strong> - Fixed-width columns for cleaner visual scanning</li>
-          <li><strong>Renamed setting</strong> - "Ignore password manager copies" for clarity</li>
+          <li><strong>Renamed setting</strong> - "Detect & skip passwords" for clarity</li>
         </ul>
         <h3>Bug Fixes</h3>
         <ul>
@@ -40,8 +40,8 @@
       <pubDate>Sat, 18 Jan 2026 06:21:00 -0500</pubDate>
       <enclosure
         url="https://saneclip.com/releases/SaneClip-1.1.dmg"
-        sparkle:edSignature="KZJJy/9RhRzIsVE657MqtWBwef2M/ZzHFwwjHET1UStOqigRiGXPtR8JmygNkwMYSrb2GGz1MOSROhy7gsi9Cg=="
-        length="2031914"
+        sparkle:edSignature="RSfKn9TH87Lhvh5SsWJBd9evYzJYRnQysC25jrJNleZx2DdBSLzrO8y+98TF16uwdcBOgq22ZRVjzozdXmPrCQ=="
+        length="2031832"
         type="application/octet-stream" />
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
     </item>

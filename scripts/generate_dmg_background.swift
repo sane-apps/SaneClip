@@ -76,7 +76,49 @@ subTitle.draw(in: subTitleRect, withAttributes: subTitleAttributes)
 // Reset shadow for other elements if needed, but keeping it for arrow is fine
 // context.setShadow(offset: .zero, blur: 0, color: nil)
 
-// 3. Draw Arrow
+// 3. Draw Applications Folder Icon (visible against dark background)
+// Position: 500, 220 from top (center of icon) -> 500, 180 from bottom
+let folderCenterX: CGFloat = 500
+let folderCenterY: CGFloat = 180
+let folderSize: CGFloat = 80
+
+// Draw folder shape with light gray/white outline
+let folderPath = CGMutablePath()
+
+// Folder body - rounded rectangle
+let folderBodyRect = CGRect(
+    x: folderCenterX - folderSize/2,
+    y: folderCenterY - folderSize/2.5,
+    width: folderSize,
+    height: folderSize * 0.65
+)
+folderPath.addRoundedRect(in: folderBodyRect, cornerWidth: 6, cornerHeight: 6)
+
+// Folder tab at top
+let tabWidth = folderSize * 0.4
+let tabHeight: CGFloat = 12
+let tabRect = CGRect(
+    x: folderCenterX - folderSize/2 + 8,
+    y: folderCenterY + folderSize * 0.15,
+    width: tabWidth,
+    height: tabHeight
+)
+folderPath.addRoundedRect(in: tabRect, cornerWidth: 3, cornerHeight: 3)
+
+context.addPath(folderPath)
+// Subtle fill
+let folderFillColor = NSColor(white: 0.25, alpha: 1.0)
+context.setFillColor(folderFillColor.cgColor)
+context.fillPath()
+
+// Draw outline
+context.addPath(folderPath)
+let folderStrokeColor = NSColor(white: 0.6, alpha: 1.0)
+context.setStrokeColor(folderStrokeColor.cgColor)
+context.setLineWidth(2.0)
+context.strokePath()
+
+// 4. Draw Arrow (between app icon and folder)
 // Positions from release.sh: App (160, 220), Link (500, 220)
 // Center Y is 220 from top -> 180 from bottom.
 
@@ -108,7 +150,7 @@ context.setShadow(offset: .zero, blur: 8, color: arrowColor.withAlphaComponent(0
 
 context.strokePath()
 
-// 4. Save Image
+// 5. Save Image
 guard let image = context.makeImage() else {
     print("Failed to create image")
     exit(1)

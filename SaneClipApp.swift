@@ -62,6 +62,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     private var clipboardManager: ClipboardManager!
     private var updateService: UpdateService!
 
+    /// Track when user last authenticated with Touch ID (grace period)
+    private var lastAuthenticationTime: Date?
+    private let authGracePeriod: TimeInterval = 30.0  // seconds - stays unlocked for 30s
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         appLogger.info("SaneClip starting...")
 
@@ -212,9 +216,20 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         } else {
             // Check if Touch ID is required
             if SettingsModel.shared.requireTouchID {
-                authenticateWithBiometrics { [weak self] success in
-                    if success {
-                        self?.showPopoverAtButton()
+                // Check if within grace period
+                if let lastAuth = lastAuthenticationTime,
+                   Date().timeIntervalSince(lastAuth) < authGracePeriod {
+                    // Within grace period, no auth needed
+                    showPopoverAtButton()
+                } else {
+                    authenticateWithBiometrics { [weak self] success in
+                        if success {
+                            self?.lastAuthenticationTime = Date()
+                            // Small delay to let Touch ID dialog fully dismiss
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                self?.showPopoverAtButton()
+                            }
+                        }
                     }
                 }
             } else {
@@ -282,9 +297,20 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     @objc private func showPopover() {
         // Check if Touch ID is required
         if SettingsModel.shared.requireTouchID {
-            authenticateWithBiometrics { [weak self] success in
-                if success {
-                    self?.showPopoverAtButton()
+            // Check if within grace period
+            if let lastAuth = lastAuthenticationTime,
+               Date().timeIntervalSince(lastAuth) < authGracePeriod {
+                // Within grace period, no auth needed
+                showPopoverAtButton()
+            } else {
+                authenticateWithBiometrics { [weak self] success in
+                    if success {
+                        self?.lastAuthenticationTime = Date()
+                        // Small delay to let Touch ID dialog fully dismiss
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                            self?.showPopoverAtButton()
+                        }
+                    }
                 }
             }
         } else {

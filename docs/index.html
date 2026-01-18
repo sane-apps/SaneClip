@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SaneClip — Clipboard Manager for macOS with Touch ID</title>
-    <meta name="description" content="A beautiful, secure clipboard manager for macOS with Touch ID protection. Access your clipboard history instantly with keyboard shortcuts. Free and open source.">
-    <meta name="keywords" content="clipboard manager, macos, clipboard history, touch id, paste, copy, mac clipboard, clipboard app, pasteboard, copy paste manager, macos sequoia, free clipboard manager">
+    <meta name="description" content="A beautiful, secure clipboard manager for macOS with Touch ID protection. Access your clipboard history instantly with keyboard shortcuts.">
+    <meta name="keywords" content="clipboard manager, macos, clipboard history, touch id, paste, copy, mac clipboard, clipboard app, pasteboard, copy paste manager, macos sequoia, best clipboard manager">
     <meta name="author" content="Stephan Joseph">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0099ff">
@@ -23,7 +23,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://saneclip.com/">
     <meta property="og:title" content="SaneClip — Clipboard Manager for macOS with Touch ID">
-    <meta property="og:description" content="Beautiful clipboard history with Touch ID protection. Access everything you've copied with lightning-fast keyboard shortcuts. Free and open source.">
+    <meta property="og:description" content="Beautiful clipboard history with Touch ID protection. Access everything you've copied with lightning-fast keyboard shortcuts.">
     <meta property="og:image" content="https://saneclip.com/images/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -34,7 +34,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://saneclip.com/">
     <meta name="twitter:title" content="SaneClip — Clipboard Manager for macOS with Touch ID">
-    <meta name="twitter:description" content="Beautiful clipboard history with Touch ID protection. Free and open source.">
+    <meta name="twitter:description" content="Beautiful clipboard history with Touch ID protection. Access everything you've copied with lightning-fast keyboard shortcuts.">
     <meta name="twitter:image" content="https://saneclip.com/images/og-image.png">
 
     <!-- Structured Data - Software Application -->
@@ -45,10 +45,10 @@
         "name": "SaneClip",
         "description": "A beautiful, secure clipboard manager for macOS with Touch ID protection. Access your clipboard history instantly with keyboard shortcuts.",
         "applicationCategory": "UtilitiesApplication",
-        "operatingSystem": "macOS 15 Sequoia or later",
+        "operatingSystem": "macOS 14 Sonoma or later",
         "offers": {
             "@type": "Offer",
-            "price": "0",
+            "price": "5",
             "priceCurrency": "USD"
         },
         "aggregateRating": {
@@ -61,8 +61,8 @@
             "name": "Stephan Joseph",
             "url": "https://github.com/stephanjoseph"
         },
-        "downloadUrl": "https://github.com/stephanjoseph/SaneClip/releases/latest",
-        "softwareVersion": "1.0.0",
+        "downloadUrl": "https://sanebar.lemonsqueezy.com/checkout/buy/e0d71010-bd20-49b6-b841-5522b39df95f",
+        "softwareVersion": "1.0.1",
         "releaseNotes": "Initial release with clipboard history, Touch ID protection, keyboard shortcuts, and pin functionality.",
         "screenshot": "https://saneclip.com/images/screenshot.png",
         "featureList": [
@@ -71,8 +71,7 @@
             "Keyboard Shortcuts (Cmd+Shift+V, Cmd+1-9)",
             "Pin Important Items",
             "100% On-Device Privacy",
-            "Native macOS Design",
-            "Free and Open Source"
+            "Native macOS Design"
         ]
     }
     </script>
@@ -199,6 +198,25 @@
 
         .nav-links a:hover {
             color: var(--text-primary);
+        }
+
+        .nav-links a.btn-primary {
+            color: #ffffff;
+        }
+
+        .nav-links a.btn-primary:hover {
+            color: #ffffff;
+        }
+
+        .btn-donate {
+            padding: 10px 20px !important;
+            color: #ffffff !important;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-donate svg {
+            margin-right: 6px;
         }
 
         /* Buttons */
@@ -335,12 +353,12 @@
 
         /* Hero Screenshot */
         .hero-screenshot {
-            max-width: 700px;
+            max-width: 480px;
             margin: 0 auto;
-            border-radius: 20px;
+            border-radius: 16px;
             overflow: hidden;
             box-shadow:
-                0 30px 60px -15px rgba(0, 0, 0, 0.5),
+                0 20px 40px -10px rgba(0, 0, 0, 0.4),
                 0 0 0 1px var(--border-subtle);
         }
 
@@ -678,6 +696,239 @@
         }
 
         /* Responsive */
+        /* Lightbox Modal */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 80%;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            font-size: 40px;
+            color: white;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .lightbox-close:hover {
+            opacity: 1;
+        }
+
+        #lightbox-caption {
+            color: var(--text-secondary);
+            margin-top: 20px;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        /* Clickable Feature Cards */
+        a.feature-card {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            cursor: pointer;
+        }
+
+        a.feature-card h3 {
+            color: var(--text-primary);
+        }
+
+        /* Comparison Table */
+        .comparison {
+            padding: 100px 0;
+        }
+
+        .comparison-table-wrapper {
+            overflow-x: auto;
+            margin: 0 -24px;
+            padding: 0 24px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            min-width: 700px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 16px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .comparison-table th.highlight-col {
+            background: linear-gradient(180deg, rgba(0, 153, 255, 0.15) 0%, rgba(0, 153, 255, 0.05) 100%);
+            color: var(--accent);
+        }
+
+        .comparison-table td.highlight-col {
+            background: rgba(0, 153, 255, 0.05);
+        }
+
+        .comparison-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .feature-name {
+            text-align: left !important;
+            min-width: 200px;
+        }
+
+        .feature-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .feature-desc {
+            display: block;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .check {
+            color: var(--success);
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .cross {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        /* Support Section */
+        .support {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .support-subtitle {
+            font-style: italic;
+            max-width: 500px;
+            margin: 0 auto 32px;
+        }
+
+        .github-sponsor-btn {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 32px;
+            background: linear-gradient(135deg, #ea4aaa 0%, #db61a2 100%);
+            border: none;
+        }
+
+        .github-sponsor-btn:hover {
+            background: linear-gradient(135deg, #f06bc4 0%, #ea4aaa 100%);
+            transform: translateY(-2px);
+        }
+
+        .crypto-addresses {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            display: block;
+        }
+
+        .crypto-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .crypto-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .crypto-logo {
+            flex-shrink: 0;
+            border-radius: 50%;
+        }
+
+        .crypto-addr {
+            background: var(--bg-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            text-align: left;
+            word-break: break-all;
+            border: 1px solid transparent;
+        }
+
+        .crypto-btc:hover .crypto-addr {
+            background: rgba(247, 147, 26, 0.2);
+            color: #F7931A;
+            border-color: #F7931A;
+        }
+
+        .crypto-sol:hover .crypto-addr {
+            background: rgba(153, 69, 255, 0.2);
+            color: #9945FF;
+            border-color: #9945FF;
+        }
+
+        .crypto-zec:hover .crypto-addr {
+            background: rgba(244, 183, 40, 0.2);
+            color: #F4B728;
+            border-color: #F4B728;
+        }
+
+        .crypto-hint {
+            font-size: 0.95rem;
+            color: var(--accent);
+            font-weight: 500;
+            margin-top: 12px;
+        }
+
         @media (max-width: 600px) {
             .nav-links {
                 display: none;
@@ -703,6 +954,13 @@
 <body>
     <div class="gradient-bg"></div>
 
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightbox-img" src="" alt="Screenshot">
+        <p id="lightbox-caption"></p>
+    </div>
+
     <nav>
         <div class="container">
             <a href="#" class="logo">
@@ -711,8 +969,14 @@
             </a>
             <div class="nav-links">
                 <a href="#features">Features</a>
-                <a href="#download">Download</a>
+                <a href="#compare">Compare</a>
                 <a href="https://github.com/stephanjoseph/SaneClip">GitHub</a>
+                <a href="#support" class="btn btn-primary btn-donate">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#ef4444" stroke="#ffffff" stroke-width="1.5">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    Donate
+                </a>
             </div>
         </div>
     </nav>
@@ -729,71 +993,33 @@
                 <div class="free-badge">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/>
-                        <path d="M9 12l2 2 4-4"/>
+                        <path d="M12 6v6l4 2"/>
                     </svg>
-                    Free & Open Source
+                    macOS Sonoma+
                 </div>
             </div>
             <h1 class="animate-in delay-2">A <em>Sane</em> Clipboard Manager</h1>
             <p class="subtitle animate-in delay-3">Beautiful clipboard history with <em>Touch ID protection</em>. Access everything you've copied with lightning-fast keyboard shortcuts.</p>
             <div class="cta-buttons animate-in delay-4">
-                <a href="https://github.com/stephanjoseph/SaneClip/releases/latest/download/SaneClip-1.0.0.dmg" class="btn btn-primary">
+                <a href="https://sanebar.lemonsqueezy.com/checkout/buy/e0d71010-bd20-49b6-b841-5522b39df95f" class="btn btn-primary">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                         <polyline points="7 10 12 15 17 10"/>
                         <line x1="12" y1="15" x2="12" y2="3"/>
                     </svg>
-                    Download Free
+                    Download — $5
                 </a>
                 <a href="https://github.com/stephanjoseph/SaneClip" class="btn btn-secondary">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                     </svg>
-                    View Source
+                    Help Build It
                 </a>
             </div>
 
-            <!-- Demo Preview -->
-            <div class="demo-preview animate-in delay-5">
-                <div class="demo-item pinned">
-                    <div class="demo-item-content">
-                        <div class="demo-item-text">ssh-rsa AAAAB3NzaC1yc2EA...</div>
-                        <div class="demo-item-meta">247 chars · 1 word · 2h ago</div>
-                    </div>
-                    <div class="demo-item-shortcut">&#8984;1</div>
-                    <div class="demo-item-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="demo-item">
-                    <div class="demo-item-content">
-                        <div class="demo-item-text">https://github.com/stephanjoseph/SaneClip</div>
-                        <div class="demo-item-meta">45 chars · 1 word · 5m ago</div>
-                    </div>
-                    <div class="demo-item-shortcut">&#8984;2</div>
-                    <div class="demo-item-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="demo-item">
-                    <div class="demo-item-content">
-                        <div class="demo-item-text">Meeting notes from today's standup...</div>
-                        <div class="demo-item-meta">156 chars · 28 words · 12m ago</div>
-                    </div>
-                    <div class="demo-item-shortcut">&#8984;3</div>
-                    <div class="demo-item-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                        </svg>
-                    </div>
-                </div>
+            <!-- Demo Preview - Actual Screenshot -->
+            <div class="hero-screenshot animate-in delay-5">
+                <img src="images/screenshot-popover.png" alt="SaneClip clipboard history">
             </div>
         </div>
     </section>
@@ -804,7 +1030,7 @@
             <p class="section-subtitle">A clipboard manager that respects your privacy and stays out of your way.</p>
             <div class="feature-grid">
                 <!-- Touch ID Lock - THE unique feature -->
-                <div class="feature-card featured">
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-popover.png', 'Touch ID Protection — Biometric security for your clipboard history')" class="feature-card featured">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -813,10 +1039,10 @@
                     </div>
                     <h3>Touch ID Protection</h3>
                     <p>Lock your clipboard history with <strong>biometric authentication</strong>. Keep sensitive data like passwords and keys protected.</p>
-                </div>
+                </a>
 
                 <!-- Keyboard Shortcuts -->
-                <div class="feature-card">
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-shortcuts.png', 'Lightning Shortcuts — Global hotkeys for instant access')" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
@@ -825,10 +1051,10 @@
                     </div>
                     <h3>Lightning Shortcuts</h3>
                     <p><strong>&#8984;Shift+V</strong> opens history. <strong>&#8984;1-9</strong> pastes instantly. No mouse needed—your hands stay on the keyboard.</p>
-                </div>
+                </a>
 
                 <!-- Pin Items -->
-                <div class="feature-card">
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-pinned.png', 'Pin Important Items — Keep frequently-used text always accessible')" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="17" x2="12" y2="22"></line>
@@ -837,10 +1063,10 @@
                     </div>
                     <h3>Pin Important Items</h3>
                     <p>Keep SSH keys, code snippets, and frequently-used text always accessible. Pinned items never expire.</p>
-                </div>
+                </a>
 
                 <!-- Unlimited History -->
-                <div class="feature-card">
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-popover.png', 'Unlimited History — Everything you copy, organized and searchable')" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -849,10 +1075,10 @@
                     </div>
                     <h3>Unlimited History</h3>
                     <p>Stores everything you copy, with smart word and character counts. Find that code snippet from last week instantly.</p>
-                </div>
+                </a>
 
                 <!-- Beautiful UI -->
-                <div class="feature-card">
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-settings.png', 'Native macOS Design — Glass effects and dark mode support')" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="13.5" cy="6.5" r="0.5"></circle>
@@ -864,10 +1090,10 @@
                     </div>
                     <h3>Native macOS Design</h3>
                     <p>Glass effects, smooth animations, and dark mode support. Looks like it belongs on your Mac because it does.</p>
-                </div>
+                </a>
 
                 <!-- Privacy -->
-                <div class="feature-card">
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-settings.png', 'Private by Design — 100% on-device, zero network calls')" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -876,36 +1102,144 @@
                     </div>
                     <h3>Private by Design</h3>
                     <p><strong>100% on-device.</strong> No cloud sync. No analytics. No network calls. Your clipboard stays on your Mac.</p>
-                </div>
+                </a>
             </div>
         </div>
     </section>
 
-    <section class="download" id="download">
+    <section class="comparison" id="compare">
         <div class="container">
-            <div class="download-card">
-                <h2>Get SaneClip</h2>
-                <p>macOS 15 Sequoia or later. Free forever.</p>
-                <div class="download-options">
-                    <a href="https://github.com/stephanjoseph/SaneClip/releases/latest/download/SaneClip-1.0.0.dmg" class="btn btn-primary">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7 10 12 15 17 10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                        Download DMG
-                    </a>
-                    <p class="download-option-subtext">Notarized and signed by Apple.</p>
+            <h2 class="section-title">How SaneClip Stacks Up</h2>
+            <p class="section-subtitle">We built what we wished existed. Here's how it compares.</p>
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th class="highlight-col">SaneClip</th>
+                            <th>Paste</th>
+                            <th>Maccy</th>
+                            <th>Pastebot</th>
+                            <th>CopyClip</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- UNIQUE TO SANECLIP -->
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">Touch ID Lock</span>
+                                <span class="feature-desc">Biometric protection for history</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">Native SwiftUI</span>
+                                <span class="feature-desc">Built for macOS 14+</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                        </tr>
+                        <!-- COMMON FEATURES -->
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">Pin Items</span>
+                                <span class="feature-desc">Keep favorites always accessible</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">Keyboard Shortcuts</span>
+                                <span class="feature-desc">Global hotkeys for access</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">Quick Paste (⌘1-9)</span>
+                                <span class="feature-desc">Instant paste by number</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                        </tr>
+                        <!-- TRUST & VALUE -->
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">100% Private</span>
+                                <span class="feature-desc">No network calls, no analytics</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">Price</span>
+                                <span class="feature-desc">One-time purchase</span>
+                            </td>
+                            <td class="highlight-col"><strong>$5</strong></td>
+                            <td>$30/yr</td>
+                            <td>Free</td>
+                            <td>$13</td>
+                            <td>Free</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
 
-                    <div class="download-divider">
-                        <span>or</span>
+    <section class="support" id="support">
+        <div class="container">
+            <h2 class="section-title">Support SaneClip</h2>
+            <p class="section-subtitle support-subtitle">
+                I build apps because I love building things that work well.<br>
+                If SaneClip saves you time, consider buying me a coffee.<br><br>
+                <span>Thank you. — Stephan</span>
+            </p>
+            <a href="https://github.com/sponsors/stephanjoseph" class="btn btn-primary github-sponsor-btn" target="_blank" rel="noopener">
+                <svg height="16" viewBox="0 0 16 16" width="16" fill="currentColor" style="margin-right: 8px;">
+                    <path d="M4.25 2.5c-1.336 0-2.75 1.164-2.75 3 0 2.15 1.58 4.144 3.365 5.682A20.565 20.565 0 008 13.393a20.561 20.561 0 003.135-2.211C12.92 9.644 14.5 7.65 14.5 5.5c0-1.836-1.414-3-2.75-3-1.373 0-2.609.986-3.029 2.456a.75.75 0 01-1.442 0C6.859 3.486 5.623 2.5 4.25 2.5zM8 14.25l-.345.666-.002-.001-.006-.003-.018-.01a7.643 7.643 0 01-.31-.17 22.075 22.075 0 01-3.434-2.414C2.045 10.731 0 8.35 0 5.5 0 2.836 2.086 1 4.25 1 5.797 1 7.153 1.802 8 3.02 8.847 1.802 10.203 1 11.75 1 13.914 1 16 2.836 16 5.5c0 2.85-2.045 5.231-3.885 6.818a22.08 22.08 0 01-3.744 2.584l-.018.01-.006.003h-.002L8 14.25z"/>
+                </svg>
+                Sponsor on GitHub
+            </a>
+            <div class="crypto-addresses">
+                <div class="crypto-grid">
+                    <div class="crypto-item crypto-btc">
+                        <img class="crypto-logo" src="https://cdn.jsdelivr.net/gh/spothq/cryptocurrency-icons@master/svg/color/btc.svg" alt="BTC" width="24" height="24">
+                        <code class="crypto-addr" onclick="copyToClipboard(this)">3Go9nJu3dj2qaa4EAYXrTsTf5AnhcrPQke</code>
                     </div>
-
-                    <p class="download-option-text">Install with Homebrew</p>
-                    <div class="brew-command">
-                        <code>brew install stephanjoseph/saneclip/saneclip</code>
+                    <div class="crypto-item crypto-sol">
+                        <img class="crypto-logo" src="https://cryptologos.cc/logos/solana-sol-logo.svg" alt="SOL" width="24" height="24">
+                        <code class="crypto-addr" onclick="copyToClipboard(this)">FBvU83GUmwEYk3HMwZh3GBorGvrVVWSPb8VLCKeLiWZZ</code>
+                    </div>
+                    <div class="crypto-item crypto-zec">
+                        <img class="crypto-logo" src="https://cdn.jsdelivr.net/gh/spothq/cryptocurrency-icons@master/svg/color/zec.svg" alt="ZEC" width="24" height="24">
+                        <code class="crypto-addr" onclick="copyToClipboard(this)">t1PaQ7LSoRDVvXLaQTWmy5tKUAiKxuE9hBN</code>
                     </div>
                 </div>
+                <p class="crypto-hint">Click any address to copy</p>
             </div>
         </div>
     </section>
@@ -921,5 +1255,39 @@
             <p class="footer-copy">&copy; 2026 SaneClip</p>
         </div>
     </footer>
+
+    <script>
+        // Lightbox Modal for feature cards
+        function openLightbox(src, caption) {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            const cap = document.getElementById('lightbox-caption');
+            img.src = src;
+            cap.textContent = caption || '';
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close lightbox with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+
+        // Copy crypto address to clipboard
+        function copyToClipboard(el) {
+            navigator.clipboard.writeText(el.textContent);
+            const orig = el.textContent;
+            el.textContent = 'Copied!';
+            setTimeout(() => el.textContent = orig, 1500);
+        }
+    </script>
 </body>
 </html>

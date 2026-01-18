@@ -68,7 +68,6 @@ brew install stephanjoseph/saneclip/saneclip
 SaneClip is **privacy-first**:
 
 - ✅ All data stays on your Mac
-- ✅ No cloud sync (yet)
 - ✅ No analytics or telemetry
 - ✅ Open source — verify yourself
 

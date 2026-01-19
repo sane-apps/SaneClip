@@ -7,7 +7,7 @@ cask "saneclip" do
   desc "Beautiful clipboard manager for macOS with Touch ID protection"
   homepage "https://saneclip.com"
 
-  depends_on macos: ">= :sonoma"
+  depends_on macos: ">= :sequoia"
 
   app "SaneClip.app"
 

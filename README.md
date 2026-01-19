@@ -48,6 +48,7 @@ See which app each clip came from with its icon. Know if that text came from Sla
 - **Duplicate detection** — Identical clips automatically consolidate
 - **Paste count badges** — Track how many times you've used each item
 - **Compact timestamps** — See "2h" or "3d" instead of verbose dates
+- **URL tracking stripping** — Auto-removes utm_*, fbclid, gclid from copied URLs
 
 ### ⚙️ Customization
 - **Menu bar icon styles** — Choose between List or Minimal
@@ -55,7 +56,7 @@ See which app each clip came from with its icon. Know if that text came from Sla
 - **History size** — Control how many clips to keep
 
 ### 🎨 Native macOS Design
-Built with SwiftUI. Looks right at home on Sonoma, Sequoia, and Tahoe. Auto-updates via Sparkle.
+Built with SwiftUI. Glass material effects, hover highlighting, and content-type icons. Looks right at home on Sequoia and beyond. Auto-updates via Sparkle.
 
 ### 🖱️ Click to Paste
 Single-click any item to paste instantly. Right-click for more options (Pin, Delete, Paste as Plain Text).
@@ -78,7 +79,7 @@ brew install stephanjoseph/saneclip/saneclip
 
 ## Requirements
 
-- **macOS 14.0** (Sonoma) or later
+- **macOS 15.0** (Sequoia) or later
 - Apple Silicon Mac (M1+)
 
 ---

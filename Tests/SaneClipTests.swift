@@ -65,4 +65,22 @@ struct SaneClipTests {
         // Restore original state
         settings.excludedApps = originalExcluded
     }
+
+    @Test("URL tracking parameters are stripped")
+    func urlTrackingParamsStripped() {
+        let urlWithTracking = "https://example.com/page?utm_source=newsletter&utm_medium=email&real_param=keep&fbclid=abc123"
+        let cleaned = ClipboardItem.stripTrackingParams(from: urlWithTracking)
+        
+        #expect(cleaned == "https://example.com/page?real_param=keep")
+        #expect(!cleaned.contains("utm_"))
+        #expect(!cleaned.contains("fbclid"))
+    }
+
+    @Test("Clean URL remains unchanged")
+    func cleanUrlUnchanged() {
+        let cleanUrl = "https://example.com/page?id=123&name=test"
+        let result = ClipboardItem.stripTrackingParams(from: cleanUrl)
+        
+        #expect(result == cleanUrl)
+    }
 }

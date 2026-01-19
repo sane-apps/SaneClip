@@ -90,12 +90,17 @@ targets:
         LSUIElement: true
         LSApplicationCategoryType: "public.app-category.productivity"
         NSAppleEventsUsageDescription: "SaneClip needs to paste clipboard content to other applications."
+        # Sparkle Auto-Update Configuration (CRITICAL - was missing!)
+        SUFeedURL: "https://saneclip.com/appcast.xml"
+        SUPublicEDKey: "QwXgCpqQfcdZJ6BIzLRrBmn2D7cwkNbaniuIkm/DJyQ="
+        SUEnableAutomaticChecks: true
+        SUEnableSystemProfiling: false
     settings:
       base:
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "1.0.0"
-        CURRENT_PROJECT_VERSION: "1"
+        MARKETING_VERSION: "1.1"
+        CURRENT_PROJECT_VERSION: "3"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0

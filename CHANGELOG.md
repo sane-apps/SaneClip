@@ -17,6 +17,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - **Paste count badges** — Track how many times each item was pasted
 - **Menu bar icon options** — Choose between List and Minimal icon styles
 - **Sound effects toggle** — Optional paste confirmation sounds (opt-in)
+- **URL tracking stripping** — Automatically removes utm_*, fbclid, gclid from copied URLs
+- **Pinned items persistence** — Pinned items survive app restart
+- **Hover highlighting** — Visual feedback with glass material effect on hover
+- **Content-type icons** — Link, code, or text icons for faster visual scanning
 
 ### Changed
 - **Security-by-default** — Authentication now required to reduce any security setting

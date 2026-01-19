@@ -9,7 +9,7 @@
     <item>
       <title>Version 1.1</title>
       <link>https://saneclip.com</link>
-      <sparkle:version>2</sparkle:version>
+      <sparkle:version>3</sparkle:version>
       <sparkle:shortVersionString>1.1</sparkle:shortVersionString>
       <description><![CDATA[
         <h2>SaneClip 1.1 - Phase 1 Polish</h2>
@@ -28,7 +28,7 @@
         <ul>
           <li><strong>Security-by-default</strong> - Authentication required to reduce security settings</li>
           <li><strong>Smarter time display</strong> - Compact format (41s, 15m, 2h, 3d)</li>
-          <li><strong>Compact stats</strong> - Shows "21w · 350c" instead of verbose text</li>
+          <li><strong>Compact stats</strong> - Shows "wd · ch" format for word and character counts</li>
           <li><strong>Aligned metadata</strong> - Fixed-width columns for cleaner visual scanning</li>
           <li><strong>Renamed setting</strong> - "Detect & skip passwords" for clarity</li>
         </ul>

@@ -12,10 +12,14 @@
 - [x] Paste count badge — Show how many times each item was pasted
 - [x] Security-by-default — Auth required to reduce any security setting
 
-## Next: v1.1 Polish
-- [ ] Improved onboarding — First-launch tutorial
-- [ ] Menu bar icon options — Multiple icon styles
-- [ ] Sound effects toggle
+## ✅ Done (v1.1)
+- [x] Improved onboarding — First-launch tutorial
+- [x] Menu bar icon options — Multiple icon styles
+- [x] Sound effects toggle
+- [x] Hover highlighting with glass effect
+- [x] Content-type icons (link/code/text)
+- [x] URL tracking parameter stripping (utm_*, fbclid, etc.)
+- [x] Pinned items persistence
 
 ## Improvements to Carry Back to SaneBar
 

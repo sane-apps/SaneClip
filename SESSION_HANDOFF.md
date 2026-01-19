@@ -17,10 +17,22 @@
 - Code detection with monospaced font
 - Stats now show 'wd' and 'ch' for clarity
 - Added 'Paste as Plain Text' to context menu
+- **Hover highlighting** - Cards brighten, scale, and show pointer cursor on hover
+- **Content-type icons** - Link, code, or text icon for faster scanning
+- **Glass material background** - Modern macOS material blur effect
+
+### Smart Features
+- **URL tracking stripping** - Auto-removes utm_*, fbclid, gclid, etc. from URLs
+- **Pinned items persistence** - Pinned items survive app restart
+
+### Release Prep
+- Updated `MARKETING_VERSION` to 1.1 with build 3
+- Fixed appcast.xml (build numbers, stats description)
+- Updated documentation (TODO.md, ROADMAP.md)
 
 ## Current State
 
-**Security audit complete. UI refreshed.** Ready for release.
+**Version 1.1 ready for release.** All features verified ✅
 
 ## Pending Tasks
 
@@ -29,10 +41,9 @@
 - Need new screenshots showing:
   - Clean row design (no document icon)
   - "wd · ch" stats format
-  - Single-click interaction
+  - Hover highlighting effect
 
 ### Other
-- Verify appcast.xml is current before release
 - Consider adding unit tests for `ClipboardManager`
 
 ## Bundle IDs (DO NOT CONFUSE)

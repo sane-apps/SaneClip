@@ -93,10 +93,21 @@ class ClipboardManager {
         
         // 5. Get Content
         if let string = pasteboard.string(forType: .string), !string.isEmpty {
-            lastClipboardContent = string
+            // Strip tracking parameters from URLs
+            let processedString: String
+            if string.hasPrefix("http://") || string.hasPrefix("https://") {
+                processedString = ClipboardItem.stripTrackingParams(from: string)
+                if processedString != string {
+                    logger.debug("Stripped tracking params from URL")
+                }
+            } else {
+                processedString = string
+            }
+            
+            lastClipboardContent = processedString
             lastCopyTime = Date()
             addItem(ClipboardItem(
-                content: .text(string),
+                content: .text(processedString),
                 sourceAppBundleID: sourceAppBundleID,
                 sourceAppName: sourceAppName
             ))
@@ -247,8 +258,11 @@ class ClipboardManager {
 
         do {
             let data = try JSONEncoder().encode(textItems)
-            // TODO: Encryption could be added here
             try data.write(to: historyFileURL, options: [.atomic, .completeFileProtection])
+            
+            // Save pinned item IDs separately
+            let pinnedIDs = pinnedItems.map { $0.id.uuidString }
+            UserDefaults.standard.set(pinnedIDs, forKey: "pinnedItemIDs")
         } catch {
             logger.error("Failed to save history: \(error.localizedDescription)")
         }
@@ -269,6 +283,12 @@ class ClipboardManager {
                     sourceAppName: $0.sourceAppName,
                     pasteCount: $0.pasteCount
                 )
+            }
+            
+            // Restore pinned items from saved IDs
+            if let pinnedIDs = UserDefaults.standard.stringArray(forKey: "pinnedItemIDs") {
+                let pinnedUUIDs = Set(pinnedIDs.compactMap { UUID(uuidString: $0) })
+                pinnedItems = history.filter { pinnedUUIDs.contains($0.id) }
             }
         } catch {
             logger.error("Failed to load history: \(error.localizedDescription)")

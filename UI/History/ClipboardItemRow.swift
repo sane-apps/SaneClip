@@ -16,10 +16,12 @@ struct ClipboardItemRow: View {
     }
 
     private var cardBackground: Color {
-        if isSelected {
+        // Hover and selection both use the same subtle highlight
+        // Selection is distinguished by border, not fill
+        if isHovering || isSelected {
             return colorScheme == .dark
-                ? Color.accentColor.opacity(0.25)
-                : Color.accentColor.opacity(0.15)
+                ? Color.white.opacity(0.12)
+                : Color.black.opacity(0.06)
         }
         return colorScheme == .dark
             ? Color.white.opacity(0.06)
@@ -30,12 +32,26 @@ struct ClipboardItemRow: View {
     private var itemFont: Font {
         item.isCode ? .system(.callout, design: .monospaced) : .system(.callout, weight: .medium)
     }
+    
+    // Content-type icon for faster visual scanning
+    @ViewBuilder
+    private var contentTypeIcon: some View {
+        if case .image = item.content {
+            Image(systemName: "photo")
+        } else if item.isURL {
+            Image(systemName: "link")
+        } else if item.isCode {
+            Image(systemName: "curlybraces")
+        } else {
+            Image(systemName: "text.alignleft")
+        }
+    }
 
     var body: some View {
         HStack(spacing: 0) {
-            // Accent bar on left
+            // Accent bar on left (subtle, 65% opacity)
             RoundedRectangle(cornerRadius: 2)
-                .fill(accentColor)
+                .fill(accentColor.opacity(0.65))
                 .frame(width: 3)
 
             HStack(alignment: .top, spacing: 8) {
@@ -49,10 +65,18 @@ struct ClipboardItemRow: View {
 
                 // Content & metadata stacked
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(item.preview)
-                        .lineLimit(3) // Increased from 2
-                        .font(itemFont)
-                        .foregroundStyle(.primary)
+                    HStack(alignment: .top, spacing: 6) {
+                        // Content-type icon for faster scanning
+                        contentTypeIcon
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .frame(width: 14)
+                        
+                        Text(item.preview)
+                            .lineLimit(3)
+                            .font(itemFont)
+                            .foregroundStyle(.primary)
+                    }
 
                     // Metadata line - fixed columns for alignment
                     HStack(spacing: 12) { // Increased spacing
@@ -109,13 +133,14 @@ struct ClipboardItemRow: View {
                 Spacer(minLength: 4)
 
             }
-            .padding(.vertical, 10)
+            .padding(.vertical, 12)
             .padding(.leading, 10)
             .padding(.trailing, 8)
         }
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(cardBackground)
+                .fill(.ultraThinMaterial)
+                .opacity(isHovering || isSelected ? 1.0 : 0.7)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 10)
@@ -125,7 +150,16 @@ struct ClipboardItemRow: View {
         .onTapGesture {
             clipboardManager.paste(item: item)
         }
-        .onHover { isHovering = $0 }
+        .onHover { hovering in
+            isHovering = hovering
+            if hovering {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pop()
+            }
+        }
+        .scaleEffect(isHovering ? 1.01 : 1.0)
+        .animation(.easeOut(duration: 0.15), value: isHovering)
         .contextMenu {
             Button("Paste") { clipboardManager.paste(item: item) }
             Button("Paste as Plain Text") { clipboardManager.pasteAsPlainText() }

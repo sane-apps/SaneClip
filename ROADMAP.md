@@ -126,7 +126,7 @@
 
 ## Technical Notes
 
-- macOS 14.0+ (Sonoma) — supports M1+
+- macOS 15.0+ (Sequoia) — Apple Silicon only
 - Swift 5.9+ with `@Observable`
 - SwiftUI for all UI
 - KeyboardShortcuts package

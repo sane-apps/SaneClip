@@ -35,15 +35,22 @@
         <h3>Bug Fixes</h3>
         <ul>
           <li><strong>Metadata no longer wraps</strong> - Single-line metadata regardless of content length</li>
+          <li><strong>Pinned items now persist</strong> - Pinned items survive app restart</li>
+        </ul>
+        <h3>UI/UX</h3>
+        <ul>
+          <li><strong>URL tracking stripping</strong> - Auto-removes utm_*, fbclid, gclid from URLs</li>
+          <li><strong>Hover highlighting</strong> - Glass material effect with animation on hover</li>
+          <li><strong>Content-type icons</strong> - Link, code, or text icons for faster scanning</li>
         </ul>
       ]]></description>
-      <pubDate>Sat, 18 Jan 2026 06:21:00 -0500</pubDate>
+      <pubDate>Sun, 19 Jan 2026 17:20:00 -0500</pubDate>
       <enclosure
         url="https://saneclip.com/releases/SaneClip-1.1.dmg"
         sparkle:edSignature="RSfKn9TH87Lhvh5SsWJBd9evYzJYRnQysC25jrJNleZx2DdBSLzrO8y+98TF16uwdcBOgq22ZRVjzozdXmPrCQ=="
-        length="2031832"
+        length="2026112"
         type="application/octet-stream" />
-      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
     </item>
 
     <item>

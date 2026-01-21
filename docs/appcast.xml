@@ -46,7 +46,7 @@
       ]]></description>
       <pubDate>Sun, 19 Jan 2026 17:20:00 -0500</pubDate>
       <enclosure
-        url="https://saneclip.com/releases/SaneClip-1.1.dmg"
+        url="https://github.com/sane-apps/SaneClip/releases/download/v1.1/SaneClip-1.1.dmg"
         sparkle:edSignature="RSfKn9TH87Lhvh5SsWJBd9evYzJYRnQysC25jrJNleZx2DdBSLzrO8y+98TF16uwdcBOgq22ZRVjzozdXmPrCQ=="
         length="2026112"
         type="application/octet-stream" />
@@ -72,7 +72,7 @@
       ]]></description>
       <pubDate>Sat, 18 Jan 2026 00:00:00 -0500</pubDate>
       <enclosure
-        url="https://saneclip.com/releases/SaneClip-1.0.1.dmg"
+        url="https://github.com/sane-apps/SaneClip/releases/download/v1.0.1/SaneClip-1.0.1.dmg"
         length="2037860"
         type="application/octet-stream" />
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>

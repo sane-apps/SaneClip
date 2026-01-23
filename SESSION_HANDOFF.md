@@ -1,6 +1,36 @@
-# Session Handoff - 2026-01-19
+# Session Handoff - 2026-01-23
 
-## Completed This Session
+> **Navigation**
+> | Bugs | Features | How to Work | Releases | Testimonials |
+> |------|----------|-------------|----------|--------------|
+> | [BUG_TRACKING.md](BUG_TRACKING.md) | [marketing/feature-requests.md](marketing/feature-requests.md) | [DEVELOPMENT.md](DEVELOPMENT.md) | [CHANGELOG.md](CHANGELOG.md) | [marketing/testimonials.md](marketing/testimonials.md) |
+
+---
+
+## 🧪 PRIORITY: Test Cloudflare Sparkle Updates
+
+**Why here:** SaneClip has no active users = safe to test. SaneBar has paying customers.
+
+**Goal:** Verify Sparkle auto-updates work from Cloudflare R2 before switching SaneBar production.
+
+**Test plan:**
+1. Upload old SaneClip DMG to R2 bucket (`sanebar-downloads` or new bucket)
+2. Create SaneClip appcast pointing to Cloudflare
+3. Install old version locally
+4. Trigger "Check for Updates"
+5. Verify download + signature verification + install works
+6. If success → switch SaneBar appcast to Cloudflare, delete GitHub releases
+
+**Infrastructure (already built for SaneBar):**
+- R2 bucket: `sanebar-downloads`
+- Worker: `dist.sanebar.com`
+- Can reuse or create `dist.saneclip.com`
+
+---
+
+## Previous Session (2026-01-19)
+
+### Completed
 
 ### Security Audit & Fixes
 - Added transient/concealed clipboard type detection (password protection)
@@ -45,6 +75,11 @@
 
 ### Other
 - Consider adding unit tests for `ClipboardManager`
+
+## Key Documentation
+- `APP_STORE_CHECKLIST.md`: Guide for dual distribution (App Store + Website).
+- `TODO.md`: Current tasks and recent completions.
+- `ROADMAP.md`: Future feature planning.
 
 ## Bundle IDs (DO NOT CONFUSE)
 

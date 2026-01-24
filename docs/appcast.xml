@@ -12,14 +12,14 @@
       <sparkle:version>4</sparkle:version>
       <sparkle:shortVersionString>1.2</sparkle:shortVersionString>
       <description><![CDATA[
-        <h2>SaneClip 1.2 - Cloudflare Distribution Test</h2>
-        <p>Testing Cloudflare R2 hosted updates.</p>
+        <h2>SaneClip 1.2 - Sparkle Update Test</h2>
+        <p>Testing notarized Sparkle updates with GitHub releases.</p>
       ]]></description>
-      <pubDate>Sat, 24 Jan 2026 12:00:00 -0500</pubDate>
+      <pubDate>Fri, 24 Jan 2026 12:23:00 -0500</pubDate>
       <enclosure
-        url="https://dist.saneclip.com/updates/SaneClip-1.2.dmg"
-        sparkle:edSignature="4NSvUZ3J/jvV4J+phUUojnHjp9StNrw0WLT6srDO0M+GmtL9Flyno8B/v2aZsFn+PiTkUSUUkevONd1RkGA9Dw=="
-        length="3009870"
+        url="https://github.com/sane-apps/SaneClip/releases/download/v1.2/SaneClip-1.2.dmg"
+        sparkle:edSignature="SiluSWGtijarKMxFtcJn4uvBb38K/cQbS7aoa/nT/V9qq03KR5OqeN6FZLoZZJqwJwo+9sy3kqcrj19ldXO3Cw=="
+        length="2698628"
         type="application/octet-stream" />
       <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
     </item>

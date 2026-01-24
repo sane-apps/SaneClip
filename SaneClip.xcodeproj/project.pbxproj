@@ -10,7 +10,6 @@
 		07EBD6613F07245138A3332A /* TextTransformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEA795AFED8797FFAE0DD3E /* TextTransformService.swift */; };
 		08715A357C7F5B1C693B5C47 /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = DE1B3E95AFE08432850B538B /* CLAUDE.md */; };
 		08F6A8051E9A68AE694F95A3 /* SyncSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF5998D0EE9CA458C07F45B /* SyncSettingsView.swift */; };
-		1033B5592D687F6077B29D45 /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 83ACDDF3F3B7B8AF3C87E8A0 /* CLAUDE.md */; };
 		113E5DCC28CDB39825FDF84D /* PinnedClipsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A06A5E6F4A48C14D539ABD91 /* PinnedClipsWidget.swift */; };
 		14416464FDEC646CB5F437DB /* SharedClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB6B85899467ECE68DDCE6E /* SharedClipboardItem.swift */; };
 		1504813C73E5700C5BB876DE /* SettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = A942FCE8A60E673C341FFB02 /* SettingsTab.swift */; };
@@ -58,7 +57,6 @@
 		DE0D1479DE595F1FA651F71F /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
 		E4BBDD04577B7398507E9597 /* ClipboardItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35354A7D3201B61455110B3F /* ClipboardItemCell.swift */; };
 		E536D1C7BAF4008597CEBB54 /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 3F1B86A6C77CFF7FA0AAD10A /* CLAUDE.md */; };
-		E790A1A02C4EB43DDF65EF66 /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 8D6DECBC4411B421EFDB7847 /* CLAUDE.md */; };
 		EE198F1A5CB7D4A9EBDA28AE /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7166C4C34DA291C4BEB4A3BB /* CloudKitSyncService.swift */; };
 		FB023FB9283A573C5E3BD4CB /* ClipboardItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352F7E56F26119F6981AEFB2 /* ClipboardItemRow.swift */; };
 /* End PBXBuildFile section */
@@ -146,8 +144,6 @@
 		7C6448822D405CC78AFFF787 /* SensitiveDataDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensitiveDataDetector.swift; sourceTree = "<group>"; };
 		7D5C28D690980C222E8B0E03 /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		817694FD0F55D259B3F10FDA /* SaneClipWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipWidgets.swift; sourceTree = "<group>"; };
-		83ACDDF3F3B7B8AF3C87E8A0 /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
-		8D6DECBC4411B421EFDB7847 /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
 		8FFF4DCFB95C5B26D00A640F /* SaneClipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipApp.swift; sourceTree = "<group>"; };
 		9371FC1CADBC7CB49A105A80 /* SnippetsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetsSettingsView.swift; sourceTree = "<group>"; };
 		9381D3ACF3CE661318DF305D /* WebhookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookService.swift; sourceTree = "<group>"; };
@@ -211,7 +207,6 @@
 		2903BE47BFFB504888D19856 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				8D6DECBC4411B421EFDB7847 /* CLAUDE.md */,
 				D10F261894209685FFC6BF8E /* ClipboardHistoryViewModel.swift */,
 				35354A7D3201B61455110B3F /* ClipboardItemCell.swift */,
 				AA6709551974949109A6A239 /* EmptyStateView.swift */,
@@ -392,7 +387,6 @@
 		E2FA8B6080FA528017F8B223 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				83ACDDF3F3B7B8AF3C87E8A0 /* CLAUDE.md */,
 				61392CF56C24077C8FD681EE /* Info.plist */,
 				2FA17931D596332935591539 /* SaneClipIOS.entitlements */,
 				5ECEE64E98BCC2FC7D58874A /* SaneClipIOSApp.swift */,
@@ -493,7 +487,6 @@
 			buildConfigurationList = 42581E2479786B73F3F53A6B /* Build configuration list for PBXNativeTarget "SaneClipIOS" */;
 			buildPhases = (
 				1E2A161CC75AA8E7514EB9C7 /* Sources */,
-				FBAE4074C0CA19FA004BF6BD /* Resources */,
 				127440FBA2DFFC86A28382F6 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -614,15 +607,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3817DA763CFB9E32801AE3F2 /* CLAUDE.md in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FBAE4074C0CA19FA004BF6BD /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				1033B5592D687F6077B29D45 /* CLAUDE.md in Resources */,
-				E790A1A02C4EB43DDF65EF66 /* CLAUDE.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -907,6 +891,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -915,6 +900,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ios.widgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -1120,6 +1106,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -1128,6 +1115,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ios.widgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -1248,6 +1236,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgetsDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -1256,6 +1245,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.ios.widgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;

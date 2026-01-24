@@ -228,7 +228,9 @@ targets:
     deploymentTarget:
       iOS: 26.0
     sources:
-      - iOS
+      - path: iOS
+        excludes:
+          - "**/CLAUDE.md"
       - path: Shared
         excludes:
           - "**/CLAUDE.md"
@@ -299,6 +301,8 @@ targets:
       base:
         PRODUCT_NAME: SaneClipIOSWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.widgets
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 26.0
         TARGETED_DEVICE_FAMILY: "1,2"

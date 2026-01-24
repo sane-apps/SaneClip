@@ -152,6 +152,19 @@ Enable in Settings → Sync. Requires iCloud account.
 
 ---
 
+### macOS Widgets
+
+Add SaneClip widgets to your desktop or Notification Center for quick access:
+
+| Widget | Sizes | Description |
+|--------|-------|-------------|
+| **Recent Clips** | Small, Medium | Shows your 3-5 most recent clipboard items |
+| **Pinned Clips** | Small, Medium | Quick access to your pinned favorites |
+
+Widgets automatically update when you copy new content. Add via right-click desktop → Edit Widgets → SaneClip.
+
+---
+
 ### Data Management
 
 #### 📤 Export History

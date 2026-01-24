@@ -2,6 +2,7 @@ import SwiftUI
 import AppKit
 import os.log
 import Combine
+import WidgetKit
 
 @MainActor
 @Observable
@@ -505,8 +506,66 @@ class ClipboardManager {
             // Save pinned item IDs separately
             let pinnedIDs = pinnedItems.map { $0.id.uuidString }
             UserDefaults.standard.set(pinnedIDs, forKey: "pinnedItemIDs")
+
+            // Update widget data
+            updateWidgetData()
         } catch {
             logger.error("Failed to save history: \(error.localizedDescription)")
+        }
+    }
+
+    // MARK: - Widget Support
+
+    /// Updates widget data in the shared App Group container
+    private func updateWidgetData() {
+        // Convert history items to widget format
+        let recentWidgetItems = history.prefix(10).map { item in
+            WidgetClipboardItem(
+                id: item.id,
+                preview: item.preview,
+                timestamp: item.timestamp,
+                isPinned: isPinned(item),
+                sourceAppName: item.sourceAppName,
+                contentType: widgetContentType(for: item)
+            )
+        }
+
+        // Convert pinned items to widget format
+        let pinnedWidgetItems = pinnedItems.map { item in
+            WidgetClipboardItem(
+                id: item.id,
+                preview: item.preview,
+                timestamp: item.timestamp,
+                isPinned: true,
+                sourceAppName: item.sourceAppName,
+                contentType: widgetContentType(for: item)
+            )
+        }
+
+        let container = WidgetDataContainer(
+            recentItems: Array(recentWidgetItems),
+            pinnedItems: pinnedWidgetItems,
+            lastUpdated: Date()
+        )
+
+        do {
+            try container.save()
+            // Tell WidgetKit to reload
+            WidgetCenter.shared.reloadAllTimelines()
+            logger.debug("Updated widget data with \(recentWidgetItems.count) recent, \(pinnedWidgetItems.count) pinned items")
+        } catch {
+            logger.warning("Failed to update widget data: \(error.localizedDescription)")
+        }
+    }
+
+    private func widgetContentType(for item: ClipboardItem) -> WidgetClipboardItem.ContentType {
+        switch item.content {
+        case .text:
+            if item.isURL { return .url }
+            if item.isCode { return .code }
+            return .text
+        case .image:
+            return .image
         }
     }
 

@@ -59,6 +59,7 @@ schemes:
       targets:
         SaneClip: all
         SaneClipTests: [test]
+        SaneClipWidgets: all
     test:
       targets:
         - SaneClipTests
@@ -89,6 +90,9 @@ targets:
     dependencies:
       - package: KeyboardShortcuts
       - package: Sparkle
+      - target: SaneClipWidgets
+        embed: true
+        codeSign: true
     info:
       path: SaneClip/Info.plist
       properties:
@@ -164,3 +168,41 @@ targets:
           CODE_SIGN_IDENTITY: "Apple Development"
         Release:
           CODE_SIGN_IDENTITY: "Apple Development"
+
+  SaneClipWidgets:
+    type: app-extension
+    platform: macOS
+    bundleId: com.saneclip.app.widgets
+    deploymentTarget:
+      macOS: 15.0
+    sources:
+      - Widgets
+      - path: Core/Models/WidgetClipboardItem.swift
+    info:
+      path: Widgets/Info.plist
+      properties:
+        CFBundleDisplayName: SaneClip Widgets
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_NAME: SaneClipWidgets
+        PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
+        SWIFT_VERSION: 6.0
+        DEVELOPMENT_TEAM: M78L6FXD48
+        CODE_SIGN_STYLE: Manual
+        SKIP_INSTALL: YES
+        LD_RUNPATH_SEARCH_PATHS: "@executable_path/../Frameworks @executable_path/../../../../Frameworks"
+      configs:
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.widgets
+          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgetsDebug.entitlements
+        Release:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
+          CODE_SIGN_IDENTITY: "Developer ID Application: Stephan Joseph (M78L6FXD48)"
+          CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
+        Release-AppStore:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements

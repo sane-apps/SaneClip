@@ -35,6 +35,20 @@
                ReferencedContainer = "container:SaneClip.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "355299070BFB55028AA7532C"
+               BuildableName = "SaneClipWidgets.appex"
+               BlueprintName = "SaneClipWidgets"
+               ReferencedContainer = "container:SaneClip.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

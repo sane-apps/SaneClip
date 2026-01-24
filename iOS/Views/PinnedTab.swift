@@ -17,18 +17,22 @@ struct PinnedTab: View {
                 } else {
                     List {
                         ForEach(viewModel.filteredPinned(searchText)) { item in
-                            ClipboardItemCell(item: item, showPin: true)
+                            ClipboardItemCell(item: item, isPinned: true)
+                                .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
                                 .swipeActions(edge: .trailing) {
                                     Button {
                                         viewModel.copyToClipboard(item)
                                     } label: {
                                         Label("Copy", systemImage: "doc.on.doc")
                                     }
-                                    .tint(.blue)
+                                    .tint(Color.clipBlue)
                                 }
                         }
                     }
                     .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                     .searchable(text: $searchText, prompt: "Search pinned")
                 }
             }
@@ -41,6 +45,7 @@ struct PinnedTab: View {
                         }
                     } label: {
                         Image(systemName: "arrow.clockwise")
+                            .foregroundStyle(Color.pinnedOrange)
                     }
                     .disabled(viewModel.isLoading)
                 }
@@ -49,6 +54,7 @@ struct PinnedTab: View {
                 await viewModel.refresh()
             }
         }
+        .tint(Color.pinnedOrange)
     }
 }
 

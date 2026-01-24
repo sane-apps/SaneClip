@@ -17,18 +17,22 @@ struct HistoryTab: View {
                 } else {
                     List {
                         ForEach(viewModel.filteredHistory(searchText)) { item in
-                            ClipboardItemCell(item: item)
+                            ClipboardItemCell(item: item, isPinned: false)
+                                .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
                                 .swipeActions(edge: .trailing) {
                                     Button {
                                         viewModel.copyToClipboard(item)
                                     } label: {
                                         Label("Copy", systemImage: "doc.on.doc")
                                     }
-                                    .tint(.blue)
+                                    .tint(Color.clipBlue)
                                 }
                         }
                     }
                     .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                     .searchable(text: $searchText, prompt: "Search clips")
                 }
             }
@@ -41,6 +45,7 @@ struct HistoryTab: View {
                         }
                     } label: {
                         Image(systemName: "arrow.clockwise")
+                            .foregroundStyle(Color.clipBlue)
                     }
                     .disabled(viewModel.isLoading)
                 }
@@ -49,6 +54,7 @@ struct HistoryTab: View {
                 await viewModel.refresh()
             }
         }
+        .tint(Color.clipBlue)
     }
 }
 

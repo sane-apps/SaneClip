@@ -235,6 +235,7 @@ targets:
         excludes:
           - "**/CLAUDE.md"
       - path: Core/Models/WidgetClipboardItem.swift
+      - path: Core/BrandColors.swift
     dependencies:
       - target: SaneClipIOSWidgets
         embed: true

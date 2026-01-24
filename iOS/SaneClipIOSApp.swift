@@ -8,6 +8,7 @@ struct SaneClipIOSApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(viewModel)
+                .tint(Color.clipBlue)
         }
     }
 }

@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Settings tab for iOS app
+/// Settings tab for iOS app with brand styling
 struct SettingsTab: View {
     @EnvironmentObject var viewModel: ClipboardHistoryViewModel
 
@@ -11,13 +11,14 @@ struct SettingsTab: View {
                 Section {
                     HStack {
                         Label("Last Synced", systemImage: "arrow.triangle.2.circlepath")
+                            .foregroundStyle(Color.clipBlue)
                         Spacer()
                         if let lastSync = viewModel.lastSyncTime {
                             Text(lastSync, style: .relative)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.textStone)
                         } else {
                             Text("Never")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.textStone)
                         }
                     }
 
@@ -31,6 +32,7 @@ struct SettingsTab: View {
                             Spacer()
                             if viewModel.isLoading {
                                 ProgressView()
+                                    .tint(Color.clipBlue)
                             }
                         }
                     }
@@ -43,9 +45,10 @@ struct SettingsTab: View {
                 Section {
                     HStack {
                         Label("Version", systemImage: "info.circle")
+                            .foregroundStyle(Color.clipBlue)
                         Spacer()
                         Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.textStone)
                     }
 
                     Link(destination: URL(string: "https://saneclip.com")!) {
@@ -66,7 +69,7 @@ struct SettingsTab: View {
                             .font(.headline)
                         Text("View and copy your clipboard history synced from your Mac. Items copied here are added to your Mac's clipboard history.")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.textStone)
                     }
                     .padding(.vertical, 4)
                 } header: {
@@ -75,6 +78,7 @@ struct SettingsTab: View {
             }
             .navigationTitle("Settings")
         }
+        .tint(Color.clipBlue)
     }
 }
 

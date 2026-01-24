@@ -1,16 +1,17 @@
 import SwiftUI
 
-/// Reusable empty state view
+/// Reusable empty state view with brand styling
 struct EmptyStateView: View {
     let icon: String
     let title: String
     let message: String
+    var accentColor: Color = Color.clipBlue
 
     var body: some View {
         VStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.system(size: 48))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(accentColor.opacity(0.4))
 
             Text(title)
                 .font(.headline)
@@ -18,7 +19,7 @@ struct EmptyStateView: View {
 
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.textStone)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
         }

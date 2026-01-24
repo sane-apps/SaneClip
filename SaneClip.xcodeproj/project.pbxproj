@@ -36,6 +36,7 @@
 		7C2DB9FDEE7F3D537CF02CA1 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 0668E59A15F0F31C5BE746B0 /* KeyboardShortcuts */; };
 		7E6E29E295A478AD08C4DB0E /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73D02F6E4DBB9312E67A0AD /* ClipboardManager.swift */; };
 		88429CF77152B054F581B567 /* WebhookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9381D3ACF3CE661318DF305D /* WebhookService.swift */; };
+		8941A3DAF4AF4FC8A5F19C3F /* BrandColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5449565520B6E5CF68C78D6B /* BrandColors.swift */; };
 		8B41EC7476C54EDF1695272D /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C104FF18269706174A84ADDF /* Sparkle */; };
 		8B91331218ABFBC1D64F05B7 /* SavedClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576DAA4FC86516A7F31F8B5F /* SavedClipboardItem.swift */; };
 		8D5889EE4B31459E191B26C8 /* URLSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32272353D437FBA78581647 /* URLSchemeHandler.swift */; };
@@ -658,6 +659,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8941A3DAF4AF4FC8A5F19C3F /* BrandColors.swift in Sources */,
 				16E6BC9DF90696A302EEA73C /* ClipboardHistoryViewModel.swift in Sources */,
 				E4BBDD04577B7398507E9597 /* ClipboardItemCell.swift in Sources */,
 				DD741ED4E799B3DE999D2A65 /* EmptyStateView.swift in Sources */,

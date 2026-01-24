@@ -180,7 +180,7 @@ struct SnippetEditorSheet: View {
     @State private var shortcut: String = ""
 
     private var snippet: Snippet? {
-        if case .edit(let s) = mode { return s }
+        if case .edit(let existingSnippet) = mode { return existingSnippet }
         return nil
     }
 
@@ -282,11 +282,11 @@ struct SnippetEditorSheet: View {
         .padding()
         .frame(minWidth: 500, minHeight: 450)
         .onAppear {
-            if let s = snippet {
-                name = s.name
-                template = s.template
-                category = s.category ?? ""
-                shortcut = s.shortcut ?? ""
+            if let existingSnippet = snippet {
+                name = existingSnippet.name
+                template = existingSnippet.template
+                category = existingSnippet.category ?? ""
+                shortcut = existingSnippet.shortcut ?? ""
             }
         }
     }

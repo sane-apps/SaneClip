@@ -95,6 +95,11 @@ targets:
         LSUIElement: true
         LSApplicationCategoryType: "public.app-category.productivity"
         NSAppleEventsUsageDescription: "SaneClip needs to paste clipboard content to other applications."
+        # URL Scheme (Phase 3)
+        CFBundleURLTypes:
+          - CFBundleURLName: "SaneClip URL Scheme"
+            CFBundleURLSchemes:
+              - saneclip
         # Sparkle Auto-Update Configuration (CRITICAL - was missing!)
         SUFeedURL: "https://saneclip.com/appcast.xml"
         SUPublicEDKey: "QwXgCpqQfcdZJ6BIzLRrBmn2D7cwkNbaniuIkm/DJyQ="

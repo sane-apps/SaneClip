@@ -215,4 +215,98 @@ struct SaneClipTests {
         rules.normalizeLineEndings = originalLineEndings
         rules.lowercaseURLs = originalLowercase
     }
+
+    // MARK: - Sensitive Data Detection Tests (Phase 3)
+
+    @Test("Detects valid credit card numbers with Luhn validation")
+    func testCreditCardDetection() {
+        let detector = SensitiveDataDetector.shared
+
+        // Valid Visa test number
+        let validCard = "4111 1111 1111 1111"
+        let detected = detector.detect(in: validCard)
+        #expect(detected.contains(.creditCard))
+
+        // Invalid number (fails Luhn)
+        let invalidCard = "4111 1111 1111 1112"
+        let notDetected = detector.detect(in: invalidCard)
+        #expect(!notDetected.contains(.creditCard))
+    }
+
+    @Test("Detects SSN patterns")
+    func testSSNDetection() {
+        let detector = SensitiveDataDetector.shared
+
+        // Standard format with dashes
+        let ssn = "My SSN is 123-45-6789"
+        let detected = detector.detect(in: ssn)
+        #expect(detected.contains(.ssn))
+
+        // Plain numbers need context
+        let plainSSN = "SSN: 123456789"
+        let plainDetected = detector.detect(in: plainSSN)
+        #expect(plainDetected.contains(.ssn))
+    }
+
+    @Test("Detects common API key patterns")
+    func testAPIKeyDetection() {
+        let detector = SensitiveDataDetector.shared
+
+        // OpenAI key pattern
+        let openAI = "sk-abc123def456ghi789jkl012mno345pqr678"
+        #expect(detector.detect(in: openAI).contains(.apiKey))
+
+        // GitHub PAT pattern
+        let github = "ghp_abcdefghijklmnopqrstuvwxyz1234567890"
+        #expect(detector.detect(in: github).contains(.apiKey))
+
+        // AWS Access Key ID
+        let aws = "AKIAIOSFODNN7EXAMPLE"
+        #expect(detector.detect(in: aws).contains(.apiKey))
+    }
+
+    @Test("Detects password patterns")
+    func testPasswordDetection() {
+        let detector = SensitiveDataDetector.shared
+
+        let passwordAssignment = "password: mySecretPass123"
+        #expect(detector.detect(in: passwordAssignment).contains(.password))
+
+        let pwdEquals = "pwd=supersecret"
+        #expect(detector.detect(in: pwdEquals).contains(.password))
+    }
+
+    @Test("Detects private key blocks")
+    func testPrivateKeyDetection() {
+        let detector = SensitiveDataDetector.shared
+
+        let rsaKey = """
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEowIBAAKCAQEA...
+        -----END RSA PRIVATE KEY-----
+        """
+        #expect(detector.detect(in: rsaKey).contains(.privateKey))
+
+        let sshKey = "-----BEGIN OPENSSH PRIVATE KEY-----"
+        #expect(detector.detect(in: sshKey).contains(.privateKey))
+    }
+
+    @Test("Detects email addresses")
+    func testEmailDetection() {
+        let detector = SensitiveDataDetector.shared
+
+        let email = "Contact me at john.doe@example.com for more info"
+        #expect(detector.detect(in: email).contains(.email))
+    }
+
+    @Test("No false positives on normal text")
+    func testNoFalsePositives() {
+        let detector = SensitiveDataDetector.shared
+
+        let normalText = "Hello, this is a normal message with no sensitive data."
+        #expect(detector.detect(in: normalText).isEmpty)
+
+        let shortNumbers = "My phone is 555-1234"
+        #expect(!detector.detect(in: shortNumbers).contains(.creditCard))
+    }
 }

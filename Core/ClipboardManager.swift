@@ -5,6 +5,7 @@ import Combine
 
 @MainActor
 @Observable
+// swiftlint:disable:next type_body_length
 class ClipboardManager {
     static var shared: ClipboardManager!
 
@@ -459,7 +460,7 @@ class ClipboardManager {
         return appFolder.appendingPathComponent("history.json")
     }
 
-    private func saveHistory() {
+    func saveHistory() {
         // Only save text items (images are too large)
         let textItems = history.compactMap { item -> SavedClipboardItem? in
             if case .text(let string) = item.content {

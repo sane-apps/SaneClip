@@ -59,7 +59,7 @@
         "author": {
             "@type": "Person",
             "name": "Stephan Joseph",
-            "url": "https://github.com/stephanjoseph"
+            "url": "https://github.com/sane-apps"
         },
         "downloadUrl": "https://sanebar.lemonsqueezy.com/checkout/buy/e0d71010-bd20-49b6-b841-5522b39df95f",
         "softwareVersion": "1.1",
@@ -85,7 +85,7 @@
         "url": "https://saneclip.com",
         "logo": "https://saneclip.com/images/icon.png",
         "sameAs": [
-            "https://github.com/stephanjoseph/SaneClip"
+            "https://github.com/sane-apps/SaneClip"
         ]
     }
     </script>
@@ -181,6 +181,21 @@
             width: 32px;
             height: 32px;
             border-radius: 8px;
+        }
+
+        .logo-family {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 1px solid var(--border);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .logo-family:hover {
+            color: var(--accent);
         }
 
         .nav-links {
@@ -653,12 +668,118 @@
             color: var(--accent);
         }
 
+        /* Cross-Sell Section */
+        .more-apps {
+            padding: 80px 0;
+            background: linear-gradient(180deg, transparent, rgba(0, 153, 255, 0.03));
+        }
+
+        .more-apps h2 {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .more-apps-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+            font-size: 1.1rem;
+        }
+
+        .more-apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .app-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            display: block;
+        }
+
+        .app-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .app-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+
+        .app-card-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .app-card-tagline {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .app-card-cta {
+            color: var(--accent);
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .app-card:hover .app-card-cta {
+            gap: 10px;
+        }
+
+        .more-apps-hub {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .more-apps-hub a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .more-apps-hub a:hover {
+            color: var(--accent);
+        }
+
         /* Footer */
         footer {
             padding: 60px 0 40px;
             border-top: 1px solid var(--border-subtle);
             text-align: center;
             background: linear-gradient(180deg, transparent, rgba(0,0,0,0.2));
+        }
+
+        .footer-quote {
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            opacity: 0.85;
         }
 
         .footer-privacy {
@@ -967,10 +1088,11 @@
                 <img src="images/icon.png" alt="SaneClip">
                 SaneClip
             </a>
+            <a href="https://saneapps.com" class="logo-family">Part of the SaneApps family</a>
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#compare">Compare</a>
-                <a href="https://github.com/stephanjoseph/SaneClip">GitHub</a>
+                <a href="https://github.com/sane-apps/SaneClip">GitHub</a>
                 <a href="#support" class="btn btn-primary btn-donate">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="#ef4444" stroke="#ffffff" stroke-width="1.5">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -1009,7 +1131,7 @@
                     </svg>
                     Download — $5
                 </a>
-                <a href="https://github.com/stephanjoseph/SaneClip" class="btn btn-secondary">
+                <a href="https://github.com/sane-apps/SaneClip" class="btn btn-secondary">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                     </svg>
@@ -1102,6 +1224,56 @@
                     </div>
                     <h3>Private by Design</h3>
                     <p><strong>100% on-device.</strong> No cloud sync. No analytics. No network calls. Your clipboard stays on your Mac.</p>
+                </a>
+
+                <!-- Text Transforms -->
+                <a href="javascript:void(0)" class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                            <line x1="9" y1="20" x2="15" y2="20"></line>
+                            <line x1="12" y1="4" x2="12" y2="20"></line>
+                        </svg>
+                    </div>
+                    <h3>Text Transforms</h3>
+                    <p>Right-click to paste as <strong>UPPERCASE</strong>, lowercase, Title Case, or trimmed. Transform text on the fly.</p>
+                </a>
+
+                <!-- Paste Stack -->
+                <a href="javascript:void(0)" class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="4" width="16" height="6" rx="1"></rect>
+                            <rect x="4" y="14" width="16" height="6" rx="1"></rect>
+                        </svg>
+                    </div>
+                    <h3>Paste Stack</h3>
+                    <p>Queue multiple items, then paste them in order with <strong>⌘⌃V</strong>. Perfect for filling forms or batch operations.</p>
+                </a>
+
+                <!-- Auto-Expire -->
+                <a href="javascript:void(0)" class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Auto-Expire</h3>
+                    <p>Automatically clean old items after 1 hour, 24 hours, or 7 days. <strong>Pinned items never expire.</strong></p>
+                </a>
+
+                <!-- Export History -->
+                <a href="javascript:void(0)" class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <h3>Export History</h3>
+                    <p>Export your clipboard history to JSON with timestamps, paste counts, and source apps. <strong>Your data, your way.</strong></p>
                 </a>
             </div>
         </div>
@@ -1249,7 +1421,7 @@
             <p class="section-subtitle support-subtitle">
                 I build apps because I love building things that work well.<br>
                 If SaneClip saves you time, consider buying me a coffee.<br><br>
-                <span>Thank you. — Stephan</span>
+                <span>Thank you. — Mr. Sane</span>
             </p>
             <a href="https://github.com/sponsors/stephanjoseph" class="btn btn-primary github-sponsor-btn" target="_blank" rel="noopener">
                 <svg height="16" viewBox="0 0 16 16" width="16" fill="currentColor" style="margin-right: 8px;">
@@ -1277,15 +1449,45 @@
         </div>
     </section>
 
+    <section class="more-apps">
+        <div class="container">
+            <h2 class="section-title">More from Sane Apps</h2>
+            <p class="more-apps-subtitle">Privacy-first Mac utilities that don't suck</p>
+            <div class="more-apps-grid">
+                <a href="https://sanebar.com" class="app-card">
+                    <div class="app-card-header">
+                        <img src="images/sanebar-icon.png" alt="SaneBar" class="app-card-icon">
+                        <div class="app-card-name">SaneBar</div>
+                    </div>
+                    <p class="app-card-tagline">The privacy-first menu bar manager. Hide clutter, lock sensitive icons behind Touch ID.</p>
+                    <span class="app-card-cta">Learn more →</span>
+                </a>
+                <a href="https://sanehosts.com" class="app-card">
+                    <div class="app-card-header">
+                        <img src="images/sanehosts-icon.png" alt="SaneHosts" class="app-card-icon">
+                        <div class="app-card-name">SaneHosts</div>
+                    </div>
+                    <p class="app-card-tagline">Manage your /etc/hosts with a beautiful GUI. Block ads and trackers at the system level.</p>
+                    <span class="app-card-cta">Learn more →</span>
+                </a>
+            </div>
+            <div class="more-apps-hub">
+                <a href="https://saneapps.com">See all apps at saneapps.com →</a>
+            </div>
+        </div>
+    </section>
+
     <footer>
         <div class="container">
+            <p class="footer-quote">"For God has not given us a spirit of fear, but of power, love, and a sound mind." — 2 Timothy 1:7</p>
             <p class="footer-privacy"><strong>0% Telemetry</strong>. <strong>0% Cloud</strong>. <strong>100% On-Device</strong>.</p>
             <div class="footer-links">
-                <a href="https://github.com/stephanjoseph/SaneClip">GitHub</a>
-                <a href="https://github.com/stephanjoseph/SaneClip/issues">Support</a>
-                <a href="https://github.com/stephanjoseph/SaneClip/blob/main/LICENSE">MIT License</a>
+                <a href="https://github.com/sane-apps/SaneClip">GitHub</a>
+                <a href="https://github.com/sane-apps/SaneClip/issues">Support</a>
+                <a href="https://github.com/sane-apps/SaneClip/blob/main/LICENSE">MIT License</a>
             </div>
-            <p class="footer-copy">&copy; 2026 SaneClip</p>
+            <p class="footer-copy">Made with care by Mr. Sane · &copy; 2026 SaneClip</p>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 12px;">"Built for a Sound Mind" · <a href="https://saneapps.com" style="color: var(--text-secondary);">saneapps.com</a></p>
         </div>
     </footer>
 

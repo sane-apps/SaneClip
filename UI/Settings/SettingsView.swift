@@ -18,7 +18,6 @@ struct SettingsView: View {
         case general = "General"
         case shortcuts = "Shortcuts"
         case snippets = "Snippets"
-        case sync = "Sync"
         case storage = "Storage"
         case about = "About"
 
@@ -54,9 +53,6 @@ struct SettingsView: View {
                 case .snippets:
                     SnippetsSettingsView()
                         .padding(20)
-                case .sync:
-                    SyncSettingsView()
-                        .padding(20)
                 case .storage:
                     StorageStatsView()
                         .padding(20)
@@ -76,7 +72,6 @@ struct SettingsView: View {
         case .general: return "gear"
         case .shortcuts: return "keyboard"
         case .snippets: return "text.quote"
-        case .sync: return "icloud"
         case .storage: return "chart.pie"
         case .about: return "info.circle"
         }
@@ -87,7 +82,6 @@ struct SettingsView: View {
         case .general: return .textStone
         case .shortcuts: return .clipBlue
         case .snippets: return .green
-        case .sync: return .blue
         case .storage: return .pinnedOrange
         case .about: return .brandSilver
         }

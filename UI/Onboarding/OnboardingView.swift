@@ -30,6 +30,8 @@ struct OnboardingView: View {
                 }
             }
             .padding(.bottom, 20)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Page \(currentPage + 1) of 3")
 
             // Bottom Controls
             HStack {
@@ -39,6 +41,7 @@ struct OnboardingView: View {
                     }
                     .buttonStyle(.plain)
                     .foregroundStyle(.secondary)
+                    .accessibilityHint("Skip setup and start using SaneClip immediately")
 
                     Spacer()
 
@@ -48,6 +51,7 @@ struct OnboardingView: View {
                         }
                     }
                     .buttonStyle(.borderedProminent)
+                    .accessibilityHint("Continue to next setup step")
                 } else {
                     Spacer()
                     Button("Start Using SaneClip") {
@@ -55,6 +59,7 @@ struct OnboardingView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
+                    .accessibilityHint("Complete setup and open SaneClip")
                 }
             }
             .padding(.horizontal, 40)
@@ -79,9 +84,9 @@ struct OnboardingBackground: View {
 
             LinearGradient(
                 colors: [
-                    Color.blue.opacity(0.08),
+                    Color.clipBlue.opacity(0.08),
                     Color.purple.opacity(0.05),
-                    Color.blue.opacity(0.03)
+                    Color.clipBlue.opacity(0.03)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing

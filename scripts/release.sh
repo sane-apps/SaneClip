@@ -353,12 +353,12 @@ log_info "========================================"
 log_info "DMG: ${FINAL_DMG}"
 log_info "Version: ${VERSION}"
 
-# Generate hashes for Homebrew
+# Generate release verification info
 SHA256=$(shasum -a 256 "${FINAL_DMG}" | awk '{print $1}')
 echo ""
-echo -e "${GREEN}Homebrew Cask info:${NC}"
-echo "version \"${VERSION}\""
-echo "sha256 \"${SHA256}\""
+echo -e "${GREEN}Release Info:${NC}"
+echo "Version: ${VERSION}"
+echo "SHA256: ${SHA256}"
 
 log_info ""
 log_info "To test: open \"${FINAL_DMG}\""

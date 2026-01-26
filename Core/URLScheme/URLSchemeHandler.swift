@@ -5,7 +5,6 @@ import AppKit
 extension Notification.Name {
     static let openSearchWithQuery = Notification.Name("SaneClipOpenSearchWithQuery")
     static let triggerExport = Notification.Name("SaneClipTriggerExport")
-    static let triggerSync = Notification.Name("SaneClipTriggerSync")
     static let showHistory = Notification.Name("SaneClipShowHistory")
     static let pasteAtIndex = Notification.Name("SaneClipPasteAtIndex")
 }
@@ -16,7 +15,6 @@ extension Notification.Name {
 /// - saneclip://paste?index=N - Paste item at index N
 /// - saneclip://search?q=QUERY - Open search with query
 /// - saneclip://export - Trigger history export
-/// - saneclip://sync - Trigger iCloud sync (Phase 3)
 /// - saneclip://history - Show history window
 /// - saneclip://clear - Clear history (with confirmation)
 /// - saneclip://snippet?name=NAME - Paste snippet by name
@@ -50,8 +48,6 @@ final class URLSchemeHandler {
             return handleSearch(url)
         case "export":
             return handleExport()
-        case "sync":
-            return handleSync()
         case "history":
             return handleShowHistory()
         case "clear":
@@ -104,13 +100,6 @@ final class URLSchemeHandler {
     /// saneclip://export
     private func handleExport() -> Bool {
         NotificationCenter.default.post(name: .triggerExport, object: nil)
-        return true
-    }
-
-    /// Triggers iCloud sync
-    /// saneclip://sync
-    private func handleSync() -> Bool {
-        NotificationCenter.default.post(name: .triggerSync, object: nil)
         return true
     }
 

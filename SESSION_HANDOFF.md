@@ -1,4 +1,4 @@
-# Session Handoff - 2026-01-24
+# Session Handoff - 2026-01-25 6:50 PM
 
 > **Navigation**
 > | Bugs | Features | How to Work | Releases | Testimonials |
@@ -7,107 +7,81 @@
 
 ---
 
-## Current Status (2026-01-24)
+## Completed This Session
 
-### Build Status
-- **macOS: All 23 tests passing**
-- **iOS: Build succeeds, app runs on simulator**
+### 1. Removed CloudKit/iCloud Sync Completely
+**Rationale:** Apple's Developer ID + CloudKit provisioning is broken/painful. Days wasted on portal configuration issues. Feature undermines privacy-first local approach anyway.
 
-### Completed Phases
+**Files Removed:**
+- `Core/Sync/CloudKitSyncService.swift`
+- `Core/Sync/` folder
+- `Core/Encryption/EncryptionService.swift`
+- `Core/Encryption/` folder
+- `UI/Settings/SyncSettingsView.swift`
 
-| Phase | Version | Features | Commit |
-|-------|---------|----------|--------|
-| Phase 2 | v1.5 | 9 Power User features | `e1eeb60` |
-| Phase 3 | v2.0 | 8 Pro features (security, sync, automation) | `00f805c`, `7b87296` |
-| Phase 4 | v3.0 | macOS Widgets, iOS App, iOS Widgets | `64e1cc6`, `70a778f`, `8cc8dd7` |
+**Files Modified:**
+- `SaneClip/SaneClip.entitlements` - Removed all iCloud entitlements
+- `Widgets/SaneClipWidgets.entitlements` - Removed iCloud entitlements
+- `SaneClipApp.swift` - Removed sync observers and handleSyncedItems method
+- `Core/URLScheme/URLSchemeHandler.swift` - Removed sync URL scheme handler
+- `Core/ClipboardManager.swift` - Removed addSyncedItem method
+- `UI/Settings/SettingsView.swift` - Removed Sync tab
+- `ROADMAP.md` - Removed iCloud Sync from Phase 3, changed to "100% Local" in comparison
 
-### Phase 4 Complete
-
-| Feature | Status | Notes |
-|---------|--------|-------|
-| macOS Widgets | ✅ Complete | Recent Clips, Pinned Clips |
-| Shared Data Layer | ✅ Complete | SharedClipboardItem model |
-| iOS Companion App | ✅ Complete | History, Pinned, Settings tabs |
-| iOS Widgets | ✅ Complete | Recent and Pinned widgets |
-| Team Features | ❌ Removed | User rejected (ongoing costs) |
-
----
-
-## iOS Companion App (Jan 24)
-
-### Files Created
-- `iOS/SaneClipIOSApp.swift` - App entry point with TabView
-- `iOS/Views/HistoryTab.swift` - History list view
-- `iOS/Views/PinnedTab.swift` - Pinned items view
-- `iOS/Views/SettingsTab.swift` - Settings with sync status
-- `iOS/Views/ClipboardHistoryViewModel.swift` - View model
-- `iOS/Views/ClipboardItemCell.swift` - Reusable item cell
-- `iOS/Views/EmptyStateView.swift` - Empty state component
-- `iOS/Info.plist` - iOS app Info.plist
-- `iOS/SaneClipIOS.entitlements` - Release entitlements
-- `iOS/SaneClipIOSDebug.entitlements` - Debug entitlements
-- `iOSWidgets/SaneClipIOSWidgets.swift` - Widget bundle
-- `iOSWidgets/RecentClipsIOSWidget.swift` - Recent clips widget
-- `iOSWidgets/PinnedClipsIOSWidget.swift` - Pinned clips widget
-- `iOSWidgets/Info.plist` - Widget extension Info.plist
-- `iOSWidgets/SaneClipIOSWidgets.entitlements` - Release entitlements
-- `iOSWidgets/SaneClipIOSWidgetsDebug.entitlements` - Debug entitlements
-- `Shared/Models/SharedClipboardItem.swift` - Cross-platform model
-
-### iOS App Architecture
-- **Entry:** `SaneClipIOSApp` with TabView
-- **Tabs:** History, Pinned, Settings
-- **Data:** Reads from App Group shared container written by macOS app
-- **Sync:** Views CloudKit-synced items from Mac
-
-### Bundle IDs
-
-| Target | Debug | Release |
-|--------|-------|---------|
-| SaneClip | `com.saneclip.dev` | `com.saneclip.app` |
-| SaneClipWidgets | `com.saneclip.dev.widgets` | `com.saneclip.app.widgets` |
-| SaneClipIOS | `com.saneclip.dev.ios` | `com.saneclip.app.ios` |
-| SaneClipIOSWidgets | `com.saneclip.dev.ios.widgets` | `com.saneclip.app.ios.widgets` |
+### 2. Fixed Orphaned Subagent Memory Issue
+- Identified `--resume` subagent processes eating 2GB+ RAM
+- Updated `~/.claude/CLAUDE.md` with smarter cleanup script that only kills true orphans
+- Filed GitHub issue: https://github.com/anthropics/claude-code/issues/20874
 
 ---
 
-## Portal Setup Required
+## Build Status
 
-### CloudKit (Phase 3)
-- Container: `iCloud.com.saneclip.app`
-- Must be created in Apple Developer portal before Release builds
+**Release build: PASSING**
 
-### App Group (Phase 4)
-- Group: `group.com.saneclip.app`
-- Must be registered in Apple Developer portal for Release builds
-- Used by macOS app, macOS widgets, iOS app, iOS widgets
+```bash
+xcodebuild -scheme SaneClip -configuration Release -arch arm64 build
+```
+
+---
+
+## Version Info
+- Current version in project.yml: 1.2 (build 4)
+- Ready for notarization and distribution
 
 ---
 
 ## Quick Commands
 
 ```bash
-# macOS (after XcodeBuildMCP defaults set)
-build_macos
-test_macos
+# Build Release
+xcodebuild -scheme SaneClip -configuration Release -arch arm64 build
 
-# iOS (requires iOS 26.2 SDK)
-mcp__XcodeBuildMCP__session-set-defaults scheme: SaneClipIOS simulatorName: "iPhone 17 Pro"
-build_sim
-build_run_sim
+# Upload DMG to R2
+CF_TOKEN=$(security find-generic-password -s cloudflare -a api_token -w)
+CF_ACCOUNT="2c267ab06352ba2522114c3081a8c5fa"
+curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets/sanebar-downloads/objects/{filename}.dmg" \
+  -H "Authorization: Bearer $CF_TOKEN" \
+  --data-binary @/path/to/file.dmg
 
-# Regenerate project after changes
-xcodegen generate
+# Notarize
+xcrun notarytool submit /path/to/app.dmg --keychain-profile "notarytool" --wait
+xcrun stapler staple /path/to/app.dmg
 ```
 
 ---
 
-## Roadmap Status
+## What's NOT Changing
+- Touch ID protection still works
+- All clipboard features intact
+- Widgets work (just no iCloud sync)
+- Everything stays 100% local
 
-**Implemented:**
-- Phase 2: Extended transforms, snippets, filters, rules, export/import, storage stats
-- Phase 3: CloudKit sync, encryption, sensitive data detection, auto-purge, App Intents, URL scheme
-- Phase 4: macOS widgets, iOS companion app, iOS widgets
+---
 
-**Not Implementing:**
-- Team Features (user rejected - ongoing hosting costs)
+## Next Steps
+1. Create DMG for v1.2
+2. Notarize
+3. Upload to Cloudflare R2
+4. Update appcast
+5. Test Sparkle update flow

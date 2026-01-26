@@ -174,28 +174,6 @@ class ClipboardManager {
         logger.debug("Added clipboard item, history count: \(self.history.count)")
     }
 
-    /// Adds an item received from iCloud sync
-    /// Items are inserted in chronological order based on timestamp
-    func addSyncedItem(_ item: ClipboardItem) {
-        // Don't add if duplicate content already exists
-        if history.contains(where: { $0.contentHash == item.contentHash }) {
-            logger.debug("Skipping synced item - duplicate content")
-            return
-        }
-
-        // Find the correct position based on timestamp
-        let insertIndex = history.firstIndex { $0.timestamp < item.timestamp } ?? history.count
-        history.insert(item, at: insertIndex)
-
-        // Trim to max size
-        if history.count > maxHistorySize {
-            history = Array(history.prefix(maxHistorySize))
-        }
-
-        saveHistory()
-        logger.debug("Added synced item at index \(insertIndex), history count: \(self.history.count)")
-    }
-
     func paste(item: ClipboardItem) {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()

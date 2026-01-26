@@ -76,43 +76,49 @@ struct ClipboardItem: Identifiable {
     /// Simple heuristic to detect if content is code
     var isCode: Bool {
         guard case .text(let string) = content else { return false }
-        let codeIndicators = ["func ", "var ", "let ", "import ", "class ", "struct ", "def ", "package ", "{", "}", ";", "=>", "return"]
+        let codeIndicators = [
+            "func ", "var ", "let ", "import ", "class ", "struct ",
+            "def ", "package ", "{", "}", ";", "=>", "return"
+        ]
         let lines = string.components(separatedBy: .newlines)
-        
+
         // If it's multi-line and contains indicators
         if lines.count > 1 {
             let matches = codeIndicators.filter { string.contains($0) }.count
             return matches >= 2
         }
-        
+
         // Single line code often has specific chars
         return string.contains(";") || string.contains("{") || string.contains("()")
     }
-    
+
     /// Detect if content is a URL
     var isURL: Bool {
         guard case .text(let string) = content else { return false }
         let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.hasPrefix("http://") || trimmed.hasPrefix("https://") || trimmed.hasPrefix("www.")
     }
-    
+
     /// Strip tracking parameters from URL (utm_*, fbclid, gclid, etc.)
     static func stripTrackingParams(from urlString: String) -> String {
         guard var components = URLComponents(string: urlString.trimmingCharacters(in: .whitespacesAndNewlines)) else {
             return urlString
         }
-        
-        let trackingPrefixes = ["utm_", "fbclid", "gclid", "ref_", "mc_", "yclid", "msclkid", "_ga", "_gl", "igshid", "s_kwcid"]
-        
+
+        let trackingPrefixes = [
+            "utm_", "fbclid", "gclid", "ref_", "mc_",
+            "yclid", "msclkid", "_ga", "_gl", "igshid", "s_kwcid"
+        ]
+
         components.queryItems = components.queryItems?.filter { item in
             !trackingPrefixes.contains(where: { item.name.lowercased().hasPrefix($0) || item.name.lowercased() == $0 })
         }
-        
+
         // Remove empty query string
         if components.queryItems?.isEmpty == true {
             components.queryItems = nil
         }
-        
+
         return components.string ?? urlString
     }
 

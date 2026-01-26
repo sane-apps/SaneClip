@@ -8,7 +8,7 @@ Thanks for your interest in contributing to SaneClip! This document explains how
 
 ```bash
 # Clone the repo
-git clone https://github.com/stephanjoseph/SaneClip.git
+git clone https://github.com/sane-apps/SaneClip.git
 cd SaneClip
 
 # Open in Xcode
@@ -37,7 +37,6 @@ SaneClip/
 │   └── Settings/           # Settings window views
 ├── docs/                   # Website (GitHub Pages)
 ├── marketing/              # Screenshots and assets
-├── homebrew/               # Homebrew cask formula
 └── scripts/                # Build automation
 ```
 
@@ -78,7 +77,7 @@ struct ClipboardItemRow: View {
 
 ### Before You Start
 
-1. Check [GitHub Issues](https://github.com/stephanjoseph/SaneClip/issues) for existing discussions
+1. Check [GitHub Issues](https://github.com/sane-apps/SaneClip/issues) for existing discussions
 2. For significant changes, open an issue first to discuss the approach
 3. Check the [ROADMAP.md](ROADMAP.md) for planned features
 
@@ -162,7 +161,7 @@ This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). Please be r
 
 ## Questions?
 
-- Open a [GitHub Issue](https://github.com/stephanjoseph/SaneClip/issues)
+- Open a [GitHub Issue](https://github.com/sane-apps/SaneClip/issues)
 - Check the [Roadmap](ROADMAP.md) for feature status
 
 Thank you for contributing!

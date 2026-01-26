@@ -63,12 +63,6 @@
 
 *Target: Q2 2026*
 
-### iCloud Sync
-- [ ] **Cross-device sync** — Sync history across Macs via iCloud
-- [ ] **End-to-end encryption** — AES-256 encrypted sync
-- [ ] **Conflict resolution** — Smart merge for simultaneous edits
-- [ ] **Selective sync** — Choose what syncs vs. stays local
-
 ### Privacy & Security
 - [ ] **Sensitive data detection** — Auto-detect credit cards, SSNs, API keys
 - [ ] **Auto-purge rules** — Delete sensitive items after X minutes
@@ -107,7 +101,7 @@
 | Native SwiftUI | ✅ | ❌ | ✅ | ❌ |
 | Keyboard-first | ✅ | ❌ | ✅ | ✅ |
 | Pin items | ✅ | ✅ | ❌ | ✅ |
-| iCloud sync | 🔜 | ✅ | ❌ | ❌ |
+| 100% Local | ✅ | ❌ | ✅ | ❌ |
 | Open source | ✅ | ❌ | ✅ | ❌ |
 | One-time purchase | ✅ | ❌ | ✅ | ❌ |
 | Privacy-first | ✅ | ❌ | ✅ | ❌ |
@@ -118,8 +112,7 @@
 
 - **Website**: [saneclip.com](https://saneclip.com)
 - **Purchase**: $5 via Lemon Squeezy
-- **Source**: [GitHub](https://github.com/stephanjoseph/SaneClip) (open source)
-- **Homebrew**: `brew install stephanjoseph/saneclip/saneclip`
+- **Source**: [GitHub](https://github.com/sane-apps/SaneClip) (open source)
 - **Updates**: Sparkle (automatic)
 
 ---

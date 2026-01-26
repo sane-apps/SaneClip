@@ -119,15 +119,15 @@ targets:
               - saneclip
         # Sparkle Auto-Update Configuration (CRITICAL - was missing!)
         SUFeedURL: "https://saneclip.com/appcast.xml"
-        SUPublicEDKey: "QwXgCpqQfcdZJ6BIzLRrBmn2D7cwkNbaniuIkm/DJyQ="
+        SUPublicEDKey: "7Pl/8cwfb2vm4Dm65AByslkMCScLJ9tbGlwGGx81qYU="
         SUEnableAutomaticChecks: true
         SUEnableSystemProfiling: false
     settings:
       base:
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "1.1"
-        CURRENT_PROJECT_VERSION: "3"
+        MARKETING_VERSION: "1.2"
+        CURRENT_PROJECT_VERSION: "4"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -146,6 +146,7 @@ targets:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
           CODE_SIGN_IDENTITY: "Developer ID Application: Stephan Joseph (M78L6FXD48)"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClip.entitlements
+          PROVISIONING_PROFILE_SPECIFIER: "SaneClip Developer ID"
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
           CODE_SIGN_IDENTITY: "Apple Distribution"
@@ -201,6 +202,8 @@ targets:
       base:
         PRODUCT_NAME: SaneClipWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
+        MARKETING_VERSION: "1.2"
+        CURRENT_PROJECT_VERSION: "4"
         SWIFT_VERSION: 6.0
         DEVELOPMENT_TEAM: M78L6FXD48
         CODE_SIGN_STYLE: Manual
@@ -215,6 +218,7 @@ targets:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
           CODE_SIGN_IDENTITY: "Developer ID Application: Stephan Joseph (M78L6FXD48)"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
+          PROVISIONING_PROFILE_SPECIFIER: "SaneClip Widgets Developer ID"
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
           CODE_SIGN_IDENTITY: "Apple Distribution"

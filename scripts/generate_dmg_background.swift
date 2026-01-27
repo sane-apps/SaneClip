@@ -4,164 +4,108 @@ import Cocoa
 import CoreGraphics
 import UniformTypeIdentifiers
 
-// Configuration
-let width = 660
-let height = 400
-let scale: CGFloat = 2.0 // Retina support
-let outputPath = "scripts/dmg-resources/dmg-background.png"
+// Configuration - must match create-dmg --window-size exactly
+// Background fills the OUTER window bounds (600x400 includes title bar)
+// Title bar is ~28pt on modern macOS, so top 28px should be solid bg color
+let widthPt = 600
+let heightPt = 400
+let outputDir = "scripts/dmg-resources"
 
-// Create context
-let colorSpace = CGColorSpaceCreateDeviceRGB()
-let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)
-let context = CGContext(
-    data: nil,
-    width: Int(CGFloat(width) * scale),
-    height: Int(CGFloat(height) * scale),
-    bitsPerComponent: 8,
-    bytesPerRow: 0,
-    space: colorSpace,
-    bitmapInfo: bitmapInfo.rawValue
-)!
+// Icon positions from create-dmg (in points, origin top-left of window)
+let appIconX = 150
+let dropLinkX = 450
+let iconFinderY = 190  // from top
+let iconSize = 100     // --icon-size
 
-// Scale for Retina
-context.scaleBy(x: scale, y: scale)
+func generateBackground(scaleFactor: Int, outputPath: String, dpi: Int) {
+    let w = widthPt * scaleFactor
+    let h = heightPt * scaleFactor
+    let sf = CGFloat(scaleFactor)
 
-// 1. Fill Background
-// Dark Navy matching app icon style (approx #141A2E)
-let backgroundColor = NSColor(red: 0.08, green: 0.10, blue: 0.18, alpha: 1.0)
-context.setFillColor(backgroundColor.cgColor)
-context.fill(CGRect(x: 0, y: 0, width: width, height: height))
+    // Convert icon positions to pixel coords (CG origin = bottom-left)
+    let dropXpx = CGFloat(dropLinkX) * sf
+    let appXpx = CGFloat(appIconX) * sf
+    let iconYpx = CGFloat(heightPt - iconFinderY) * sf
+    let iconSzPx = CGFloat(iconSize) * sf
 
-// 2. Draw "Install SaneClip" Text
-let title = "SaneClip" as NSString
-let subTitle = "Drag to Applications to install" as NSString
+    // Create bitmap context
+    let colorSpace = CGColorSpaceCreateDeviceRGB()
+    guard let ctx = CGContext(
+        data: nil, width: w, height: h,
+        bitsPerComponent: 8, bytesPerRow: 0, space: colorSpace,
+        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+    ) else {
+        print("Failed to create context for \(scaleFactor)x")
+        exit(1)
+    }
 
-let titleFont = NSFont.systemFont(ofSize: 36, weight: .bold)
-let subTitleFont = NSFont.systemFont(ofSize: 14, weight: .medium)
-let textColor = NSColor.white
+    // 1. Fill background - dark navy matching app icon
+    ctx.setFillColor(NSColor(red: 0.08, green: 0.09, blue: 0.14, alpha: 1.0).cgColor)
+    ctx.fill(CGRect(x: 0, y: 0, width: w, height: h))
 
-let titleAttributes: [NSAttributedString.Key: Any] = [
-    .font: titleFont,
-    .foregroundColor: textColor
-]
-let subTitleAttributes: [NSAttributedString.Key: Any] = [
-    .font: subTitleFont,
-    .foregroundColor: NSColor(white: 0.8, alpha: 1.0)
-]
+    // 2. Subtle gradient
+    let gradColors = [
+        CGColor(red: 1, green: 1, blue: 1, alpha: 0.03),
+        CGColor(red: 0, green: 0, blue: 0, alpha: 0)
+    ]
+    if let grad = CGGradient(colorsSpace: colorSpace, colors: gradColors as CFArray, locations: [0, 1]) {
+        ctx.drawLinearGradient(grad,
+            start: CGPoint(x: CGFloat(w) / 2, y: CGFloat(h)),
+            end: CGPoint(x: CGFloat(w) / 2, y: 0), options: [])
+    }
 
-let titleSize = title.size(withAttributes: titleAttributes)
-let subTitleSize = subTitle.size(withAttributes: subTitleAttributes)
+    // 3. Arrow
+    let arrowStart = appXpx + 62 * sf
+    let arrowEnd = dropXpx - 62 * sf
+    let headSz: CGFloat = 14 * sf
 
-// Draw Title centered horizontally, near top
-// Add shadow for better contrast/depth
-context.setShadow(offset: CGSize(width: 0, height: -2), blur: 4, color: NSColor.black.withAlphaComponent(0.3).cgColor)
+    let line = CGMutablePath()
+    line.move(to: CGPoint(x: arrowStart, y: iconYpx))
+    line.addLine(to: CGPoint(x: arrowEnd, y: iconYpx))
 
-let titleRect = CGRect(
-    x: (CGFloat(width) - titleSize.width) / 2.0,
-    y: CGFloat(height) - 80, // Top area
-    width: titleSize.width,
-    height: titleSize.height
-)
-title.draw(in: titleRect, withAttributes: titleAttributes)
+    let head = CGMutablePath()
+    head.move(to: CGPoint(x: arrowEnd - headSz, y: iconYpx + headSz * 0.6))
+    head.addLine(to: CGPoint(x: arrowEnd, y: iconYpx))
+    head.addLine(to: CGPoint(x: arrowEnd - headSz, y: iconYpx - headSz * 0.6))
 
-// Draw Subtitle below title
-let subTitleRect = CGRect(
-    x: (CGFloat(width) - subTitleSize.width) / 2.0,
-    y: CGFloat(height) - 110,
-    width: subTitleSize.width,
-    height: subTitleSize.height
-)
-subTitle.draw(in: subTitleRect, withAttributes: subTitleAttributes)
+    let arrowColor = NSColor(red: 0.0, green: 0.6, blue: 1.0, alpha: 0.7).cgColor
+    ctx.setShadow(offset: .zero, blur: 10 * sf, color: NSColor(red: 0, green: 0.6, blue: 1, alpha: 0.4).cgColor)
+    ctx.setStrokeColor(arrowColor)
+    ctx.setLineWidth(3 * sf)
+    ctx.setLineCap(.round)
+    ctx.setLineJoin(.round)
+    ctx.addPath(line); ctx.strokePath()
+    ctx.addPath(head); ctx.strokePath()
 
-// Reset shadow for other elements if needed, but keeping it for arrow is fine
-// context.setShadow(offset: .zero, blur: 0, color: nil)
+    // 7. Save PNG with specified DPI
+    guard let cgImage = ctx.makeImage() else {
+        print("Failed to create image"); exit(1)
+    }
 
-// 3. Draw Applications Folder Icon (visible against dark background)
-// Position: 500, 220 from top (center of icon) -> 500, 180 from bottom
-let folderCenterX: CGFloat = 500
-let folderCenterY: CGFloat = 180
-let folderSize: CGFloat = 80
+    let destURL = URL(fileURLWithPath: outputPath) as CFURL
+    guard let dest = CGImageDestinationCreateWithURL(destURL, UTType.png.identifier as CFString, 1, nil) else {
+        print("Failed to create destination"); exit(1)
+    }
 
-// Draw folder shape with light gray/white outline
-let folderPath = CGMutablePath()
+    let props: [CFString: Any] = [
+        kCGImagePropertyDPIWidth: Double(dpi),
+        kCGImagePropertyDPIHeight: Double(dpi)
+    ]
+    CGImageDestinationAddImage(dest, cgImage, props as CFDictionary)
 
-// Folder body - rounded rectangle
-let folderBodyRect = CGRect(
-    x: folderCenterX - folderSize/2,
-    y: folderCenterY - folderSize/2.5,
-    width: folderSize,
-    height: folderSize * 0.65
-)
-folderPath.addRoundedRect(in: folderBodyRect, cornerWidth: 6, cornerHeight: 6)
-
-// Folder tab at top
-let tabWidth = folderSize * 0.4
-let tabHeight: CGFloat = 12
-let tabRect = CGRect(
-    x: folderCenterX - folderSize/2 + 8,
-    y: folderCenterY + folderSize * 0.15,
-    width: tabWidth,
-    height: tabHeight
-)
-folderPath.addRoundedRect(in: tabRect, cornerWidth: 3, cornerHeight: 3)
-
-context.addPath(folderPath)
-// Subtle fill
-let folderFillColor = NSColor(white: 0.25, alpha: 1.0)
-context.setFillColor(folderFillColor.cgColor)
-context.fillPath()
-
-// Draw outline
-context.addPath(folderPath)
-let folderStrokeColor = NSColor(white: 0.6, alpha: 1.0)
-context.setStrokeColor(folderStrokeColor.cgColor)
-context.setLineWidth(2.0)
-context.strokePath()
-
-// 4. Draw Arrow (between app icon and folder)
-// Positions from release.sh: App (160, 220), Link (500, 220)
-// Center Y is 220 from top -> 180 from bottom.
-
-let startX: CGFloat = 210 // Start after App Icon
-let endX: CGFloat = 450   // End before App Drop Link
-let yPos: CGFloat = 180
-
-let arrowPath = CGMutablePath()
-arrowPath.move(to: CGPoint(x: startX, y: yPos))
-arrowPath.addLine(to: CGPoint(x: endX, y: yPos))
-
-// Arrow head
-let arrowHeadSize: CGFloat = 12
-arrowPath.move(to: CGPoint(x: endX - arrowHeadSize, y: yPos + arrowHeadSize/2.0))
-arrowPath.addLine(to: CGPoint(x: endX, y: yPos))
-arrowPath.addLine(to: CGPoint(x: endX - arrowHeadSize, y: yPos - arrowHeadSize/2.0))
-
-context.addPath(arrowPath)
-
-// Cyan accent color
-let arrowColor = NSColor(red: 0.35, green: 0.70, blue: 0.85, alpha: 1.0)
-context.setStrokeColor(arrowColor.cgColor)
-context.setLineWidth(4.0)
-context.setLineCap(.round)
-context.setLineJoin(.round)
-
-// Add specific shadow for arrow (glow effect)
-context.setShadow(offset: .zero, blur: 8, color: arrowColor.withAlphaComponent(0.5).cgColor)
-
-context.strokePath()
-
-// 5. Save Image
-guard let image = context.makeImage() else {
-    print("Failed to create image")
-    exit(1)
+    guard CGImageDestinationFinalize(dest) else {
+        print("Failed to save \(outputPath)"); exit(1)
+    }
+    print("  \(scaleFactor)x: \(w)x\(h)px @ \(dpi)dpi → \(outputPath)")
 }
 
-let destURL = URL(fileURLWithPath: outputPath)
-let destination = CGImageDestinationCreateWithURL(destURL as CFURL, UTType.png.identifier as CFString, 1, nil)!
-CGImageDestinationAddImage(destination, image, nil)
-if CGImageDestinationFinalize(destination) {
-    print("Generated premium DMG background at \(outputPath)")
-} else {
-    print("Failed to save image")
-    exit(1)
-}
+// Generate 1x (72 DPI) and 2x (144 DPI)
+print("Generating DMG backgrounds...")
+let bg1x = "\(outputDir)/dmg-background.png"
+let bg2x = "\(outputDir)/dmg-background@2x.png"
+
+generateBackground(scaleFactor: 1, outputPath: bg1x, dpi: 72)
+generateBackground(scaleFactor: 2, outputPath: bg2x, dpi: 144)
+
+print("Done. Bundle into TIFF with:")
+print("  tiffutil -cathidpicheck \(bg1x) \(bg2x) -out \(outputDir)/dmg-background.tiff")

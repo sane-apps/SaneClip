@@ -3,8 +3,11 @@
 
 import AppKit
 import Foundation
+import CoreGraphics
+import UniformTypeIdentifiers
 
-// Generate app icons matching SaneBar's dark navy + cyan glow style
+// Generate app icons matching marketing design: cyan outline clipboard with neon glow
+// Output: opaque full-square PNGs (no alpha, no squircle — macOS applies its own mask)
 let sizes: [(name: String, size: Int)] = [
     ("icon_16x16", 16),
     ("icon_16x16@2x", 32),
@@ -19,6 +22,13 @@ let sizes: [(name: String, size: Int)] = [
 ]
 
 let outputDir = "Resources/Assets.xcassets/AppIcon.appiconset"
+
+// Colors matching marketing icon
+let darkNavy = NSColor(red: 0.08, green: 0.09, blue: 0.14, alpha: 1.0)
+let midNavy = NSColor(red: 0.10, green: 0.13, blue: 0.22, alpha: 1.0)
+let cyanBright = NSColor(red: 0.30, green: 0.90, blue: 1.0, alpha: 1.0)
+let cyanMid = NSColor(red: 0.20, green: 0.70, blue: 0.85, alpha: 1.0)
+let cyanDeep = NSColor(red: 0.10, green: 0.50, blue: 0.70, alpha: 1.0)
 
 func createIcon(size: Int) -> NSBitmapImageRep {
     let rep = NSBitmapImageRep(
@@ -38,87 +48,169 @@ func createIcon(size: Int) -> NSBitmapImageRep {
     NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
 
     let rect = NSRect(x: 0, y: 0, width: size, height: size)
-    let sizeF = CGFloat(size)
+    let s = CGFloat(size)
 
-    // SaneBar-style dark navy gradient background
-    let darkNavy = NSColor(red: 0.08, green: 0.10, blue: 0.18, alpha: 1.0)
-    let midNavy = NSColor(red: 0.12, green: 0.15, blue: 0.25, alpha: 1.0)
-
-    // Fill with dark base
+    // === BACKGROUND ===
+    // Full-square dark navy base
     darkNavy.setFill()
     rect.fill()
 
-    // Add subtle lighter center gradient
-    let centerGradient = NSGradient(colors: [
-        midNavy.withAlphaComponent(0.8),
+    // Subtle radial glow behind clipboard area
+    let bgGradient = NSGradient(colors: [
+        midNavy.withAlphaComponent(0.7),
         darkNavy.withAlphaComponent(0.0)
     ])!
-    let gradientPath = NSBezierPath(ovalIn: rect.insetBy(dx: -sizeF * 0.2, dy: -sizeF * 0.2))
-    centerGradient.draw(in: gradientPath, relativeCenterPosition: NSPoint(x: 0, y: 0))
+    let bgGlowRect = rect.insetBy(dx: -s * 0.05, dy: -s * 0.05)
+    bgGradient.draw(in: NSBezierPath(ovalIn: bgGlowRect), relativeCenterPosition: NSPoint(x: 0, y: 0.05))
 
-    // Cyan accent color (matching SaneBar's glow)
-    let cyanGlow = NSColor(red: 0.35, green: 0.70, blue: 0.85, alpha: 1.0)
+    // === CLIPBOARD GEOMETRY ===
+    let clipW = s * 0.52
+    let clipH = s * 0.58
+    let clipX = (s - clipW) / 2
+    let clipY = (s - clipH) / 2 - s * 0.03
+    let clipRect = NSRect(x: clipX, y: clipY, width: clipW, height: clipH)
+    let clipRadius = s * 0.045
 
-    // Draw clipboard shape
-    let clipboardWidth = sizeF * 0.5
-    let clipboardHeight = sizeF * 0.6
-    let clipX = (sizeF - clipboardWidth) / 2
-    let clipY = (sizeF - clipboardHeight) / 2 - sizeF * 0.02
+    let strokeW = max(s * 0.028, 1.5)
 
-    let clipboardRect = NSRect(x: clipX, y: clipY, width: clipboardWidth, height: clipboardHeight)
-    let clipRadius = sizeF * 0.04
+    // === GLOW EFFECT (multiple soft layers) ===
+    // Wide outer glow
+    for i in stride(from: 6, through: 1, by: -1) {
+        let spread = CGFloat(i) * s * 0.018
+        let alpha = 0.06 * (1.0 / CGFloat(i))
+        cyanDeep.withAlphaComponent(alpha).setStroke()
+        let glowRect = clipRect.insetBy(dx: -spread, dy: -spread)
+        let glowPath = NSBezierPath(roundedRect: glowRect, xRadius: clipRadius + spread * 0.4, yRadius: clipRadius + spread * 0.4)
+        glowPath.lineWidth = strokeW + spread * 1.5
+        glowPath.stroke()
+    }
 
-    // Glow effect (draw larger blurred version behind)
-    let glowColor = cyanGlow.withAlphaComponent(0.4)
-    glowColor.setFill()
-    let glowRect = clipboardRect.insetBy(dx: -sizeF * 0.03, dy: -sizeF * 0.03)
-    let glowPath = NSBezierPath(roundedRect: glowRect, xRadius: clipRadius * 1.5, yRadius: clipRadius * 1.5)
-    glowPath.fill()
+    // Medium glow (brighter)
+    for i in stride(from: 3, through: 1, by: -1) {
+        let spread = CGFloat(i) * s * 0.008
+        let alpha = 0.15 * (1.0 / CGFloat(i))
+        cyanBright.withAlphaComponent(alpha).setStroke()
+        let glowRect = clipRect.insetBy(dx: -spread, dy: -spread)
+        let glowPath = NSBezierPath(roundedRect: glowRect, xRadius: clipRadius + spread * 0.3, yRadius: clipRadius + spread * 0.3)
+        glowPath.lineWidth = strokeW * 2.0
+        glowPath.stroke()
+    }
 
-    // Main clipboard body
-    cyanGlow.setFill()
-    let clipPath = NSBezierPath(roundedRect: clipboardRect, xRadius: clipRadius, yRadius: clipRadius)
-    clipPath.fill()
+    // === CLIPBOARD OUTLINE ===
+    // Base stroke (deeper cyan)
+    cyanMid.setStroke()
+    let clipPath = NSBezierPath(roundedRect: clipRect, xRadius: clipRadius, yRadius: clipRadius)
+    clipPath.lineWidth = strokeW
+    clipPath.stroke()
 
-    // Clipboard clip at top
-    let clipTabWidth = sizeF * 0.2
-    let clipTabHeight = sizeF * 0.08
-    let clipTabX = (sizeF - clipTabWidth) / 2
-    let clipTabY = clipY + clipboardHeight - clipTabHeight * 0.5
-    let clipTabRect = NSRect(x: clipTabX, y: clipTabY, width: clipTabWidth, height: clipTabHeight)
-    let clipTabPath = NSBezierPath(roundedRect: clipTabRect, xRadius: sizeF * 0.02, yRadius: sizeF * 0.02)
-    clipTabPath.fill()
+    // Bright highlight stroke on top
+    cyanBright.setStroke()
+    let brightPath = NSBezierPath(roundedRect: clipRect, xRadius: clipRadius, yRadius: clipRadius)
+    brightPath.lineWidth = strokeW * 0.5
+    brightPath.stroke()
 
-    // Dark lines on clipboard (representing text/content)
-    let lineColor = darkNavy
-    lineColor.setFill()
+    // === CLIP TAB ===
+    let tabW = s * 0.24
+    let tabH = s * 0.10
+    let tabX = (s - tabW) / 2
+    let tabY = clipY + clipH - tabH * 0.45
+    let tabRect = NSRect(x: tabX, y: tabY, width: tabW, height: tabH)
+    let tabRadius = s * 0.028
 
-    let lineHeight = sizeF * 0.025
-    let lineSpacing = sizeF * 0.06
-    let lineInset = sizeF * 0.08
-    let lineStartY = clipY + clipboardHeight * 0.6
+    // Tab glow
+    cyanDeep.withAlphaComponent(0.2).setStroke()
+    let tabGlowPath = NSBezierPath(roundedRect: tabRect.insetBy(dx: -s * 0.01, dy: -s * 0.01), xRadius: tabRadius + s * 0.005, yRadius: tabRadius + s * 0.005)
+    tabGlowPath.lineWidth = strokeW * 2
+    tabGlowPath.stroke()
 
-    for i in 0..<3 {
-        let lineWidth = i == 2 ? clipboardWidth * 0.5 : clipboardWidth - lineInset * 2
+    // Tab fill (dark, slightly lighter than background)
+    NSColor(red: 0.10, green: 0.12, blue: 0.20, alpha: 1.0).setFill()
+    NSBezierPath(roundedRect: tabRect, xRadius: tabRadius, yRadius: tabRadius).fill()
+
+    // Tab outline
+    cyanMid.setStroke()
+    let tabOutline = NSBezierPath(roundedRect: tabRect, xRadius: tabRadius, yRadius: tabRadius)
+    tabOutline.lineWidth = strokeW * 0.8
+    tabOutline.stroke()
+
+    // Bright tab highlight
+    cyanBright.withAlphaComponent(0.7).setStroke()
+    let tabBright = NSBezierPath(roundedRect: tabRect, xRadius: tabRadius, yRadius: tabRadius)
+    tabBright.lineWidth = strokeW * 0.35
+    tabBright.stroke()
+
+    // Circle hole in tab
+    let holeSize = s * 0.038
+    let holeX = (s - holeSize) / 2
+    let holeY = tabY + (tabH - holeSize) / 2
+    let holeRect = NSRect(x: holeX, y: holeY, width: holeSize, height: holeSize)
+
+    cyanMid.withAlphaComponent(0.8).setStroke()
+    let holePath = NSBezierPath(ovalIn: holeRect)
+    holePath.lineWidth = strokeW * 0.6
+    holePath.stroke()
+
+    // === TEXT LINES (cyan on dark) ===
+    let lineH = max(s * 0.024, 1.0)
+    let lineSpacing = s * 0.065
+    let lineInset = s * 0.10
+    let lineStartY = clipY + clipH * 0.52
+
+    for i in 0..<4 {
+        let lineW = i == 3 ? clipW * 0.45 : clipW - lineInset * 2
         let lineX = clipX + lineInset
         let lineY = lineStartY - CGFloat(i) * lineSpacing
-        let lineRect = NSRect(x: lineX, y: lineY, width: lineWidth, height: lineHeight)
-        let linePath = NSBezierPath(roundedRect: lineRect, xRadius: lineHeight / 2, yRadius: lineHeight / 2)
-        linePath.fill()
+        let lineRect = NSRect(x: lineX, y: lineY, width: lineW, height: lineH)
+
+        // Line glow
+        cyanBright.withAlphaComponent(0.12).setFill()
+        let lineGlowRect = lineRect.insetBy(dx: -s * 0.005, dy: -s * 0.005)
+        NSBezierPath(roundedRect: lineGlowRect, xRadius: lineH, yRadius: lineH).fill()
+
+        // Line fill
+        cyanMid.withAlphaComponent(0.85).setFill()
+        NSBezierPath(roundedRect: lineRect, xRadius: lineH / 2, yRadius: lineH / 2).fill()
     }
 
     NSGraphicsContext.restoreGraphicsState()
     return rep
 }
 
-// Generate all sizes
+// Generate all sizes, flatten to opaque output
 for (name, size) in sizes {
     let rep = createIcon(size: size)
-    if let pngData = rep.representation(using: .png, properties: [:]) {
-        let url = URL(fileURLWithPath: "\(outputDir)/\(name).png")
-        try? pngData.write(to: url)
-        print("Generated: \(name).png (\(size)x\(size))")
+
+    // Flatten onto opaque CGContext (no alpha in final PNG)
+    let cs = CGColorSpaceCreateDeviceRGB()
+    guard let opaqueCtx = CGContext(
+        data: nil, width: size, height: size,
+        bitsPerComponent: 8, bytesPerRow: 0, space: cs,
+        bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+    ) else {
+        print("FAIL: \(name) opaque context"); continue
     }
+
+    // Fill with dark navy background
+    opaqueCtx.setFillColor(CGColor(red: 0.08, green: 0.09, blue: 0.14, alpha: 1.0))
+    opaqueCtx.fill(CGRect(x: 0, y: 0, width: size, height: size))
+
+    // Composite icon drawing on top
+    if let cgImg = rep.cgImage {
+        opaqueCtx.draw(cgImg, in: CGRect(x: 0, y: 0, width: size, height: size))
+    }
+
+    // Save as opaque PNG
+    guard let finalImage = opaqueCtx.makeImage() else {
+        print("FAIL: \(name) makeImage"); continue
+    }
+
+    let url = URL(fileURLWithPath: "\(outputDir)/\(name).png") as CFURL
+    guard let dest = CGImageDestinationCreateWithURL(url, UTType.png.identifier as CFString, 1, nil) else {
+        print("FAIL: \(name) dest"); continue
+    }
+    CGImageDestinationAddImage(dest, finalImage, nil)
+    CGImageDestinationFinalize(dest)
+    print("Generated: \(name).png (\(size)x\(size)) [opaque]")
 }
 
 // Update Contents.json
@@ -141,4 +233,4 @@ let contentsJson = """
 """
 
 try? contentsJson.write(toFile: "\(outputDir)/Contents.json", atomically: true, encoding: .utf8)
-print("Done! SaneBar-style icons generated.")
+print("Done! Marketing-style icons generated (opaque, full-square, no white border).")

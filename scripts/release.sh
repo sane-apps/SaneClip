@@ -197,9 +197,11 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Clean up previous builds
-log_info "Cleaning previous build artifacts..."
-rm -rf "${BUILD_DIR}"
+# Clean up previous builds (skip if reusing existing archive)
+if [ "$SKIP_BUILD" = false ]; then
+    log_info "Cleaning previous build artifacts..."
+    rm -rf "${BUILD_DIR}"
+fi
 mkdir -p "${BUILD_DIR}"
 mkdir -p "${RELEASE_DIR}"
 
@@ -243,6 +245,13 @@ cat > "${BUILD_DIR}/ExportOptions.plist" << EOF
     <string>manual</string>
     <key>signingCertificate</key>
     <string>Developer ID Application</string>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>com.saneclip.app</key>
+        <string>SaneClip Developer ID</string>
+        <key>com.saneclip.app.widgets</key>
+        <string>SaneClip Widgets Developer ID</string>
+    </dict>
 </dict>
 </plist>
 EOF
@@ -281,31 +290,45 @@ log_info "Version: ${VERSION} (${BUILD_NUMBER})"
 # Create DMG
 DMG_NAME="${APP_NAME}-${VERSION}"
 DMG_PATH="${BUILD_DIR}/${DMG_NAME}.dmg"
-DMG_BACKGROUND="${PROJECT_ROOT}/scripts/dmg-resources/dmg-background.png"
+DMG_BACKGROUND="${PROJECT_ROOT}/scripts/dmg-resources/dmg-background.tiff"
 
 # Generate DMG background
 log_info "Generating DMG background..."
 if [ -f "${PROJECT_ROOT}/scripts/generate_dmg_background.swift" ]; then
     swift "${PROJECT_ROOT}/scripts/generate_dmg_background.swift"
+    # Bundle 1x + 2x into multi-resolution TIFF for Retina support
+    BG_1X="${PROJECT_ROOT}/scripts/dmg-resources/dmg-background.png"
+    BG_2X="${PROJECT_ROOT}/scripts/dmg-resources/dmg-background@2x.png"
+    if [ -f "${BG_1X}" ] && [ -f "${BG_2X}" ]; then
+        tiffutil -cathidpicheck "${BG_1X}" "${BG_2X}" -out "${DMG_BACKGROUND}"
+        log_info "Created multi-resolution TIFF background"
+    fi
 fi
+
+# Remove old DMG if it exists (create-dmg won't overwrite)
+rm -f "${DMG_PATH}"
 
 log_info "Creating DMG..."
 
-# Use create-dmg for professional installer appearance (no custom background)
+# Use create-dmg for professional installer appearance
 if command -v create-dmg >/dev/null 2>&1; then
     log_info "Using create-dmg..."
-    create-dmg \
-        --volname "${APP_NAME}" \
-        --window-pos 200 120 \
-        --window-size 540 380 \
-        --icon-size 128 \
-        --icon "${APP_NAME}.app" 140 200 \
-        --app-drop-link 400 200 \
-        --hide-extension "${APP_NAME}.app" \
-        --no-internet-enable \
-        "${DMG_PATH}" \
-        "${APP_PATH}"
-elif command -v create-dmg >/dev/null 2>&1; then
+    DMG_ARGS=(
+        --volname "${APP_NAME}"
+        --volicon "${APP_PATH}/Contents/Resources/AppIcon.icns"
+        --window-pos 200 120
+        --window-size 600 428
+        --icon-size 100
+        --icon "${APP_NAME}.app" 150 190
+        --app-drop-link 450 190
+        --hide-extension "${APP_NAME}.app"
+        --no-internet-enable
+    )
+    # NOTE: Do NOT use --background with dark images.
+    # Finder renders icon labels in black on custom dark backgrounds, making them unreadable.
+    # Omitting --background lets Finder use its default, which adapts to light/dark mode correctly.
+    create-dmg "${DMG_ARGS[@]}" "${DMG_PATH}" "${APP_PATH}"
+else
     # Fallback to basic hdiutil if create-dmg not available
     log_warn "create-dmg not found, using basic DMG creation..."
     DMG_TEMP="${BUILD_DIR}/dmg_temp"
@@ -318,6 +341,14 @@ elif command -v create-dmg >/dev/null 2>&1; then
         -ov -format UDZO \
         "${DMG_PATH}"
     rm -rf "${DMG_TEMP}"
+fi
+
+# Set DMG file icon (makes it look beautiful in Finder)
+# Use opaque full-square icon for DMG file icon (NOT marketing image — it has alpha/squircle → white border)
+DMG_ICON_SOURCE="${PROJECT_ROOT}/Resources/Assets.xcassets/AppIcon.appiconset/icon_512x512@2x.png"
+if [ -f "${DMG_ICON_SOURCE}" ] && [ -f "${PROJECT_ROOT}/scripts/set_dmg_icon.swift" ]; then
+    log_info "Setting DMG file icon..."
+    swift "${PROJECT_ROOT}/scripts/set_dmg_icon.swift" "${DMG_ICON_SOURCE}" "${DMG_PATH}"
 fi
 
 # Sign DMG

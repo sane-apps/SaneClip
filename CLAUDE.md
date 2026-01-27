@@ -76,6 +76,16 @@ mcp__plugin_claude-mem_mcp-search__search query: "topic" project: "SaneClip"
 
 ---
 
+## DMG & Icon Rules (CRITICAL)
+
+**App Icons:** Must be FULL SQUARE canvases — no squircle, no drop shadow baked in. macOS applies its own squircle mask. Use `CGImageAlphaInfo.noneSkipLast` for opaque output. See `scripts/generate_icon.swift`.
+
+**DMG Background:** Do NOT use `create-dmg --background` with dark images — Finder renders icon labels in black, unreadable. Omit `--background` entirely; Finder's default adapts to user's light/dark mode with correct text contrast.
+
+**Full details:** Serena memory `dmg-icon-and-background-lessons`
+
+---
+
 ## Full Documentation
 
 - **[DEVELOPMENT.md](DEVELOPMENT.md)** - Complete SOP with 12 rules, research protocol, circuit breaker

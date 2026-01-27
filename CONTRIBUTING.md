@@ -35,7 +35,7 @@ SaneClip/
 ├── SaneClipApp.swift       # Main app, AppDelegate, ClipboardManager
 ├── UI/
 │   └── Settings/           # Settings window views
-├── docs/                   # Website (GitHub Pages)
+├── docs/                   # Website (Cloudflare Pages)
 ├── marketing/              # Screenshots and assets
 └── scripts/                # Build automation
 ```

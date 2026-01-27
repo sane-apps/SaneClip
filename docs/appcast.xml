@@ -7,6 +7,37 @@
     <language>en</language>
 
     <item>
+      <title>Version 1.3</title>
+      <link>https://saneclip.com</link>
+      <sparkle:version>5</sparkle:version>
+      <sparkle:shortVersionString>1.3</sparkle:shortVersionString>
+      <description><![CDATA[
+        <h2>SaneClip 1.3</h2>
+        <h3>Improvements</h3>
+        <ul>
+          <li><strong>New app icon</strong> - Redesigned opaque icon with proper dark background for crisp display in Dock and Finder</li>
+          <li><strong>DMG installer</strong> - Clean layout with correct icon rendering</li>
+          <li><strong>Default keyboard shortcuts</strong> - Sensible defaults configured out of the box</li>
+          <li><strong>Trust line</strong> - "Made with ❤️ in 🇺🇸 · 100% On-Device · No Analytics" in About</li>
+          <li><strong>2D menu bar icons</strong> - Cleaner, simpler icon style</li>
+        </ul>
+        <h3>Under the Hood</h3>
+        <ul>
+          <li><strong>App Store preparation</strong> - Conditional compilation for dual distribution</li>
+          <li><strong>Privacy manifest</strong> - Apple-required API usage declarations</li>
+          <li><strong>Secure distribution</strong> - All updates served from Cloudflare R2</li>
+        </ul>
+      ]]></description>
+      <pubDate>Mon, 27 Jan 2026 01:25:00 -0500</pubDate>
+      <enclosure
+        url="https://dist.saneclip.com/updates/SaneClip-1.3.dmg"
+        sparkle:edSignature="9FVFsH9jrCZBEv3bbgwA/eZnwqtp37AOcqS/2wC+hDsB0GimgndU9MeCkUb3KwcQ5yQdG+x8gszEDq7kZNHlAQ=="
+        length="2452458"
+        type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+    </item>
+
+    <item>
       <title>Version 1.2</title>
       <link>https://saneclip.com</link>
       <sparkle:version>4</sparkle:version>

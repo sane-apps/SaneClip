@@ -144,7 +144,7 @@ targets:
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipDebug.entitlements
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-          CODE_SIGN_IDENTITY: "Developer ID Application: Stephan Joseph (M78L6FXD48)"
+          CODE_SIGN_IDENTITY: "Developer ID Application"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClip.entitlements
           PROVISIONING_PROFILE_SPECIFIER: "SaneClip Developer ID"
         Release-AppStore:
@@ -231,7 +231,7 @@ targets:
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgetsDebug.entitlements
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
-          CODE_SIGN_IDENTITY: "Developer ID Application: Stephan Joseph (M78L6FXD48)"
+          CODE_SIGN_IDENTITY: "Developer ID Application"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
           PROVISIONING_PROFILE_SPECIFIER: "SaneClip Widgets Developer ID"
         Release-AppStore:

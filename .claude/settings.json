@@ -20,36 +20,13 @@
       "Bash(killall:*)",
       "Bash(pgrep:*)",
       "Bash(pkill:*)",
-      "mcp__memory__*",
+      "Bash(ruby:*)",
+      "Bash(/opt/homebrew/opt/ruby/bin/*:*)",
       "mcp__apple-docs__*",
       "mcp__context7__*",
       "mcp__github__*",
       "mcp__XcodeBuildMCP__*",
       "mcp__macos-automator__*"
-    ]
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -f ~/.claude/hooks/session_start.sh ] && ~/.claude/hooks/session_start.sh || true",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -f ~/.claude/hooks/session_stop.sh ] && ~/.claude/hooks/session_stop.sh || true",
-            "timeout": 5
-          }
-        ]
-      }
     ]
   },
   "enabledPlugins": {

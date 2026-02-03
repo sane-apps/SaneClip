@@ -44,7 +44,7 @@
       <sparkle:shortVersionString>1.2</sparkle:shortVersionString>
       <description><![CDATA[
         <h2>SaneClip 1.2 - Sparkle Update Test</h2>
-        <p>Testing notarized Sparkle updates with GitHub releases.</p>
+        <p>Testing notarized Sparkle updates via Cloudflare R2 distribution.</p>
       ]]></description>
       <pubDate>Fri, 24 Jan 2026 12:23:00 -0500</pubDate>
       <enclosure

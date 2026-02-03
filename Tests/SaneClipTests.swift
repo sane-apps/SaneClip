@@ -309,4 +309,5 @@ struct SaneClipTests {
         let shortNumbers = "My phone is 555-1234"
         #expect(!detector.detect(in: shortNumbers).contains(.creditCard))
     }
+
 }

@@ -20,10 +20,10 @@ struct SnippetsSettingsView: View {
                 TextField("Search snippets...", text: $searchText)
                     .textFieldStyle(.plain)
                 if !searchText.isEmpty {
-                    Button(action: { searchText = "" }) {
+                    Button(action: { searchText = "" }, label: {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundStyle(.secondary)
-                    }
+                    })
                     .buttonStyle(.plain)
                 }
             }
@@ -75,9 +75,9 @@ struct SnippetsSettingsView: View {
 
                 Spacer()
 
-                Button(action: { showAddSheet = true }) {
+                Button(action: { showAddSheet = true }, label: {
                     Label("Add Snippet", systemImage: "plus")
-                }
+                })
                 .buttonStyle(.plain)
             }
             .padding(8)

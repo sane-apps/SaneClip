@@ -32,5 +32,4 @@ saneloop-archive/
 # Keep these (committed)
 !rules/
 !settings.json
-!CLAUDE.md
 !SESSION_HANDOFF.md

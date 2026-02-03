@@ -9,6 +9,27 @@ extension Notification.Name {
     static let pasteAtIndex = Notification.Name("SaneClipPasteAtIndex")
 }
 
+/// Parsed URL scheme command for testability
+enum URLSchemeCommand: Equatable {
+    case paste(index: Int)
+    case search(query: String)
+    case export
+    case history
+    case clear
+    case snippet(name: String, values: [String: String])
+    case copy(text: String)
+
+    /// Whether this command modifies clipboard or triggers paste (destructive)
+    var requiresConfirmation: Bool {
+        switch self {
+        case .copy, .paste, .snippet, .clear:
+            return true
+        case .search, .export, .history:
+            return false
+        }
+    }
+}
+
 /// Handles saneclip:// URL scheme commands
 ///
 /// Supported URLs:
@@ -18,6 +39,7 @@ extension Notification.Name {
 /// - saneclip://history - Show history window
 /// - saneclip://clear - Clear history (with confirmation)
 /// - saneclip://snippet?name=NAME - Paste snippet by name
+/// - saneclip://copy?text=TEXT - Copy text to clipboard
 @MainActor
 final class URLSchemeHandler {
 
@@ -26,120 +48,155 @@ final class URLSchemeHandler {
 
     private init() {}
 
+    // MARK: - Command Parsing (Pure, Testable)
+
+    /// Parses a URL into a typed command. Returns nil for invalid URLs.
+    /// Nonisolated because this is pure logic with no side effects.
+    nonisolated static func parseCommand(_ url: URL) -> URLSchemeCommand? {
+        guard url.scheme == "saneclip", let host = url.host else { return nil }
+
+        switch host.lowercased() {
+        case "paste":
+            guard let indexString = url.queryValue(for: "index"),
+                  let index = Int(indexString), index >= 0 else { return nil }
+            return .paste(index: index)
+
+        case "search":
+            guard let query = url.queryValue(for: "q"), !query.isEmpty else { return nil }
+            return .search(query: query)
+
+        case "export":
+            return .export
+
+        case "history":
+            return .history
+
+        case "clear":
+            return .clear
+
+        case "snippet":
+            guard let name = url.queryValue(for: "name"), !name.isEmpty else { return nil }
+            // Collect placeholder values from query params
+            var values: [String: String] = [:]
+            if let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+               let queryItems = components.queryItems {
+                for item in queryItems where item.name != "name" {
+                    if let value = item.value {
+                        values[item.name] = value
+                    }
+                }
+            }
+            return .snippet(name: name, values: values)
+
+        case "copy":
+            guard let text = url.queryValue(for: "text"), !text.isEmpty else { return nil }
+            return .copy(text: text)
+
+        default:
+            return nil
+        }
+    }
+
+    // MARK: - Confirmation Dialog
+
+    /// Shows a confirmation dialog for external URL scheme requests.
+    /// Returns true if the user confirmed.
+    private func showConfirmation(title: String, message: String, confirmTitle: String = "Allow") -> Bool {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = message
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: confirmTitle)
+        alert.addButton(withTitle: "Cancel")
+        return alert.runModal() == .alertFirstButtonReturn
+    }
+
+    // MARK: - Handle URL
+
     /// Handles an incoming URL scheme request
     /// - Parameter url: The URL to handle
     /// - Returns: True if the URL was handled successfully
     @discardableResult
     func handle(_ url: URL) -> Bool {
-        guard url.scheme == "saneclip" else {
-            print("URLSchemeHandler: Invalid scheme \(url.scheme ?? "nil")")
+        guard let command = Self.parseCommand(url) else {
+            print("URLSchemeHandler: Invalid or unrecognized URL: \(url)")
             return false
         }
 
-        guard let host = url.host else {
-            print("URLSchemeHandler: No host in URL")
-            return false
-        }
-
-        switch host.lowercased() {
-        case "paste":
-            return handlePaste(url)
-        case "search":
-            return handleSearch(url)
-        case "export":
+        switch command {
+        case .paste(let index):
+            return handlePaste(index: index)
+        case .search(let query):
+            return handleSearch(query: query)
+        case .export:
             return handleExport()
-        case "history":
+        case .history:
             return handleShowHistory()
-        case "clear":
+        case .clear:
             return handleClear()
-        case "snippet":
-            return handleSnippet(url)
-        case "copy":
-            return handleCopy(url)
-        default:
-            print("URLSchemeHandler: Unknown command '\(host)'")
-            return false
+        case .snippet(let name, let values):
+            return handleSnippet(name: name, values: values)
+        case .copy(let text):
+            return handleCopy(text: text)
         }
     }
 
     // MARK: - Command Handlers
 
-    /// Pastes item at specified index
-    /// saneclip://paste?index=0
-    private func handlePaste(_ url: URL) -> Bool {
-        guard let indexString = url.queryValue(for: "index"),
-              let index = Int(indexString),
-              let clipboardManager = ClipboardManager.shared else {
-            print("URLSchemeHandler: Invalid paste index")
-            return false
-        }
-
+    /// Pastes item at specified index (requires confirmation)
+    private func handlePaste(index: Int) -> Bool {
+        guard let clipboardManager = ClipboardManager.shared else { return false }
         guard index >= 0, index < clipboardManager.history.count else {
             print("URLSchemeHandler: Index \(index) out of bounds")
             return false
         }
 
         let item = clipboardManager.history[index]
+        let preview = String(item.preview.prefix(60))
+
+        guard showConfirmation(
+            title: "External Paste Request",
+            message: "An external source wants to paste item #\(index + 1):\n\n\"\(preview)\""
+        ) else { return false }
+
         clipboardManager.paste(item: item)
         return true
     }
 
     /// Opens search with specified query
-    /// saneclip://search?q=keyword
-    private func handleSearch(_ url: URL) -> Bool {
-        guard let query = url.queryValue(for: "q"), !query.isEmpty else {
-            print("URLSchemeHandler: Missing search query")
-            return false
-        }
-
+    private func handleSearch(query: String) -> Bool {
         NotificationCenter.default.post(name: .openSearchWithQuery, object: query)
         return true
     }
 
     /// Triggers history export
-    /// saneclip://export
     private func handleExport() -> Bool {
         NotificationCenter.default.post(name: .triggerExport, object: nil)
         return true
     }
 
     /// Shows history window
-    /// saneclip://history
     private func handleShowHistory() -> Bool {
         NotificationCenter.default.post(name: .showHistory, object: nil)
         return true
     }
 
     /// Clears history with confirmation
-    /// saneclip://clear
     private func handleClear() -> Bool {
-        guard let clipboardManager = ClipboardManager.shared else {
-            return false
-        }
+        guard let clipboardManager = ClipboardManager.shared else { return false }
 
-        // Show confirmation alert
-        let alert = NSAlert()
-        alert.messageText = "Clear Clipboard History?"
-        alert.informativeText = "This will permanently delete all clipboard history except pinned items."
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: "Clear")
-        alert.addButton(withTitle: "Cancel")
+        guard showConfirmation(
+            title: "Clear Clipboard History?",
+            message: "An external source wants to clear all clipboard history. This will permanently delete all items except pinned ones.",
+            confirmTitle: "Clear"
+        ) else { return false }
 
-        if alert.runModal() == .alertFirstButtonReturn {
-            clipboardManager.clearHistory()
-            return true
-        }
-        return false
+        clipboardManager.clearHistory()
+        return true
     }
 
-    /// Pastes snippet by name
-    /// saneclip://snippet?name=My%20Snippet
-    private func handleSnippet(_ url: URL) -> Bool {
-        guard let name = url.queryValue(for: "name"), !name.isEmpty else {
-            print("URLSchemeHandler: Missing snippet name")
-            return false
-        }
-
+    /// Pastes snippet by name (requires confirmation)
+    private func handleSnippet(name: String, values: [String: String]) -> Bool {
         let snippetManager = SnippetManager.shared
 
         guard let snippet = snippetManager.snippets.first(where: {
@@ -149,16 +206,20 @@ final class URLSchemeHandler {
             return false
         }
 
-        // Check for placeholder values in URL
-        var values: [String: String] = [:]
+        // Merge placeholder values from URL
+        var mergedValues = values
         let placeholders = snippetManager.extractPlaceholders(from: snippet.template)
-        for placeholder in placeholders {
-            if let value = url.queryValue(for: placeholder) {
-                values[placeholder] = value
-            }
+        for placeholder in placeholders where mergedValues[placeholder] == nil {
+            mergedValues[placeholder] = ""
         }
 
-        let expanded = snippetManager.expand(snippet: snippet, values: values)
+        let expanded = snippetManager.expand(snippet: snippet, values: mergedValues)
+        let preview = String(expanded.prefix(60))
+
+        guard showConfirmation(
+            title: "External Snippet Request",
+            message: "An external source wants to paste snippet \"\(name)\":\n\n\"\(preview)\""
+        ) else { return false }
 
         // Set to clipboard and paste
         let pasteboard = NSPasteboard.general
@@ -179,13 +240,14 @@ final class URLSchemeHandler {
         return true
     }
 
-    /// Copies text directly to clipboard
-    /// saneclip://copy?text=Hello%20World
-    private func handleCopy(_ url: URL) -> Bool {
-        guard let text = url.queryValue(for: "text"), !text.isEmpty else {
-            print("URLSchemeHandler: Missing text to copy")
-            return false
-        }
+    /// Copies text directly to clipboard (requires confirmation)
+    private func handleCopy(text: String) -> Bool {
+        let preview = String(text.prefix(60))
+
+        guard showConfirmation(
+            title: "External Copy Request",
+            message: "An external source wants to replace your clipboard with:\n\n\"\(preview)\""
+        ) else { return false }
 
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()

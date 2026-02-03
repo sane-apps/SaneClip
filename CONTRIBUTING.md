@@ -11,11 +11,11 @@ Thanks for your interest in contributing to SaneClip! This document explains how
 git clone https://github.com/sane-apps/SaneClip.git
 cd SaneClip
 
-# Open in Xcode
-open SaneClip.xcodeproj
+# Build + test (preferred)
+./scripts/SaneMaster.rb verify
 
-# Build and run
-⌘R
+# Launch
+./scripts/SaneMaster.rb launch
 ```
 
 ---
@@ -27,6 +27,7 @@ open SaneClip.xcodeproj
 - **macOS 14.0+** (Sonoma or later)
 - **Xcode 16+**
 - Apple Silicon Mac (M1/M2/M3/M4)
+- **XcodeGen** (SaneMaster runs it when needed)
 
 ### Project Structure
 
@@ -86,8 +87,9 @@ struct ClipboardItemRow: View {
 1. **Fork** the repository
 2. **Create a branch** from `main` (e.g., `feature/my-feature` or `fix/issue-123`)
 3. **Make your changes** following the coding standards
-4. **Test thoroughly** — especially clipboard operations and Touch ID
-5. **Submit a PR** with:
+4. **Run tests**: `./scripts/SaneMaster.rb verify`
+5. **Test thoroughly** — especially clipboard operations and Touch ID
+6. **Submit a PR** with:
    - Clear description of what changed and why
    - Reference to any related issues
    - Screenshots for UI changes

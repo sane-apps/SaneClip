@@ -1,0 +1,50 @@
+# SaneProcess compliance manifest
+name: SaneClip
+type: macos_app
+scheme: SaneClip
+project: SaneClip.xcodeproj
+bundle_id: com.saneclip.app
+
+build:
+  xcodegen: true
+
+release:
+  dist_host: dist.saneclip.com
+  site_host: saneclip.com
+  r2_bucket: sanebar-downloads
+  use_sparkle: true
+  min_system_version: "15.0"
+  dmg:
+    file_icon: Resources/Assets.xcassets/AppIcon.appiconset/icon_512x512@2x.png
+    window_size: "600 428"
+    app_icon_pos: "150 190"
+    drop_pos: "450 190"
+    no_internet_enable: true
+  export:
+    profiles:
+      - "com.saneclip.app:SaneClip Developer ID"
+      - "com.saneclip.app.widgets:SaneClip Widgets Developer ID"
+
+commands:
+  verify: ./scripts/SaneMaster.rb verify
+  test_mode: ./scripts/SaneMaster.rb tm
+  lint: ./scripts/SaneMaster.rb lint
+  clean: ./scripts/SaneMaster.rb clean
+  launch: ./scripts/SaneMaster.rb launch
+  logs: ./scripts/SaneMaster.rb logs
+
+docs:
+  - CLAUDE.md
+  - README.md
+  - DEVELOPMENT.md
+  - ARCHITECTURE.md
+  - SESSION_HANDOFF.md
+
+mcps:
+  - apple-docs
+  - context7
+  - github
+  - XcodeBuildMCP
+
+website: true
+website_domain: saneclip.com

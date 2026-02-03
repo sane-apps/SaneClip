@@ -66,11 +66,12 @@ actor WebhookService {
     private let maxHistorySize = 50
 
     private init() {
-        // Load config synchronously at init
+        // Load config synchronously at init (with Keychain secret migration)
         self.config = Self.loadConfigFromDisk()
     }
 
-    /// Loads config from disk (nonisolated for init)
+    /// Loads config from disk, merging secret from Keychain.
+    /// Auto-migrates plaintext secrets from JSON to Keychain on first load.
     private nonisolated static func loadConfigFromDisk() -> WebhookConfig? {
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let configURL = appSupport
@@ -79,10 +80,44 @@ actor WebhookService {
 
         do {
             let data = try Data(contentsOf: configURL)
-            return try JSONDecoder().decode(WebhookConfig.self, from: data)
+            var config = try JSONDecoder().decode(WebhookConfig.self, from: data)
+
+            // Migration: if secret is in JSON, move to Keychain and re-save clean JSON
+            if let plaintextSecret = config.secret, !plaintextSecret.isEmpty {
+                KeychainHelper.save(string: plaintextSecret, account: KeychainHelper.webhookSecretAccount)
+                config.secret = nil
+                // Re-save JSON without secret
+                if let cleanData = try? JSONEncoder().encode(config) {
+                    try? cleanData.write(to: configURL, options: .atomic)
+                }
+            }
+
+            // Merge secret from Keychain
+            config.secret = KeychainHelper.loadString(account: KeychainHelper.webhookSecretAccount)
+
+            return config
         } catch {
             return nil
         }
+    }
+
+    // MARK: - HTTPS Enforcement
+
+    /// Validates that an endpoint uses HTTPS.
+    /// Localhost/loopback addresses are exempt (development use).
+    static func isSecureEndpoint(_ url: URL) -> Bool {
+        guard let scheme = url.scheme?.lowercased() else { return false }
+
+        // Only allow http and https schemes
+        guard scheme == "http" || scheme == "https" else { return false }
+
+        // HTTPS is always allowed
+        if scheme == "https" { return true }
+
+        // HTTP is only allowed for localhost/loopback
+        guard let host = url.host?.lowercased() else { return false }
+        let loopbackHosts: Set<String> = ["localhost", "127.0.0.1", "::1"]
+        return loopbackHosts.contains(host)
     }
 
     // MARK: - Configuration
@@ -92,10 +127,24 @@ actor WebhookService {
         config
     }
 
-    /// Updates the webhook configuration
-    func updateConfig(_ newConfig: WebhookConfig?) {
-        config = newConfig
-        saveConfig()
+    /// Updates the webhook configuration.
+    /// Rejects insecure (non-HTTPS) endpoints.
+    func updateConfig(_ newConfig: WebhookConfig?) throws {
+        if let newConfig, newConfig.enabled {
+            guard Self.isSecureEndpoint(newConfig.endpoint) else {
+                throw WebhookError.insecureEndpoint
+            }
+        }
+
+        // Save secret to Keychain, strip from JSON config
+        if let secret = newConfig?.secret, !secret.isEmpty {
+            KeychainHelper.save(string: secret, account: KeychainHelper.webhookSecretAccount)
+        }
+
+        var configToSave = newConfig
+        configToSave?.secret = nil
+        config = newConfig  // Keep full config in memory (with secret)
+        saveConfig(configToSave)
     }
 
     /// Tests the webhook configuration by sending a test payload
@@ -188,6 +237,18 @@ actor WebhookService {
                 error: WebhookError.notConfigured,
                 timestamp: Date()
             )
+        }
+
+        // Belt-and-suspenders: reject insecure endpoints at send time too
+        guard Self.isSecureEndpoint(config.endpoint) else {
+            let result = WebhookDeliveryResult(
+                success: false,
+                statusCode: nil,
+                error: WebhookError.insecureEndpoint,
+                timestamp: Date()
+            )
+            recordDelivery(result)
+            return result
         }
 
         var lastError: Error?
@@ -293,10 +354,11 @@ actor WebhookService {
         return appFolder.appendingPathComponent("webhook_config.json")
     }
 
-    private func saveConfig() {
+    /// Saves config JSON to disk (secret should already be stripped)
+    private func saveConfig(_ configToSave: WebhookConfig?) {
         do {
-            if let config {
-                let data = try JSONEncoder().encode(config)
+            if let configToSave {
+                let data = try JSONEncoder().encode(configToSave)
                 try data.write(to: configFileURL)
             } else {
                 try? FileManager.default.removeItem(at: configFileURL)
@@ -314,6 +376,7 @@ enum WebhookError: Error, LocalizedError {
     case notConfigured
     case deliveryFailed
     case invalidResponse
+    case insecureEndpoint
 
     var errorDescription: String? {
         switch self {
@@ -323,6 +386,8 @@ enum WebhookError: Error, LocalizedError {
             return "Failed to deliver webhook after retries"
         case .invalidResponse:
             return "Invalid response from webhook endpoint"
+        case .insecureEndpoint:
+            return "Webhook endpoint must use HTTPS (localhost is exempt for development)"
         }
     }
 }

@@ -228,6 +228,7 @@ Configure programmatically via `WebhookService`. UI settings panel planned for f
 ## Installation
 
 Download the latest DMG from [saneclip.com](https://saneclip.com) — **$5 one-time, free updates for life.**
+DMGs are hosted on Cloudflare (not attached to GitHub releases).
 
 ---
 
@@ -275,15 +276,13 @@ See [PRIVACY.md](PRIVACY.md) for details.
 git clone https://github.com/sane-apps/SaneClip.git
 cd SaneClip
 
-# Generate Xcode project (requires XcodeGen)
-xcodegen generate
+# Build + test (preferred)
+./scripts/SaneMaster.rb verify
 
-# Open in Xcode
-open SaneClip.xcodeproj
-
-# Build and run
-⌘R
+# Launch
+./scripts/SaneMaster.rb launch
 ```
+SaneMaster runs XcodeGen when needed; only run `xcodegen generate` manually if you add files and want to refresh immediately.
 
 See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed setup and [CONTRIBUTING.md](CONTRIBUTING.md) for coding standards.
 

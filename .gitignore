@@ -46,6 +46,11 @@ releases/
 .cursor/settings.json
 .vscode/settings.json
 
+# Node/Wrangler
+node_modules/
+.wrangler/
+.serena/
+
 # Images in root (keep assets)
 /*.png
 /*.jpg

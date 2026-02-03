@@ -57,6 +57,15 @@ class SettingsModel {
         }
     }
 
+    /// Encrypt clipboard history at rest using AES-GCM
+    var encryptHistory: Bool {
+        didSet {
+            UserDefaults.standard.set(encryptHistory, forKey: "encryptHistory")
+            // Re-save history to apply encryption/decryption change
+            ClipboardManager.shared?.saveHistory()
+        }
+    }
+
     func isAppExcluded(_ bundleID: String?) -> Bool {
         guard let bundleID = bundleID else { return false }
         return excludedApps.contains(bundleID)
@@ -81,6 +90,7 @@ class SettingsModel {
         self.playSounds = UserDefaults.standard.object(forKey: "playSounds") as? Bool ?? false
         self.menuBarIcon = UserDefaults.standard.object(forKey: "menuBarIcon") as? String ?? "list.clipboard.fill"
         self.autoExpireHours = UserDefaults.standard.object(forKey: "autoExpireHours") as? Int ?? 0
+        self.encryptHistory = UserDefaults.standard.object(forKey: "encryptHistory") as? Bool ?? true
         applyDockVisibility()
     }
 
@@ -116,6 +126,7 @@ class SettingsModel {
             "playSounds": playSounds,
             "menuBarIcon": menuBarIcon,
             "autoExpireHours": autoExpireHours,
+            "encryptHistory": encryptHistory,
             // Include clipboard rules
             "rules": [
                 "stripTrackingParams": ClipboardRulesManager.shared.stripTrackingParams,
@@ -162,6 +173,9 @@ class SettingsModel {
         }
         if let value = settings["autoExpireHours"] as? Int {
             autoExpireHours = value
+        }
+        if let value = settings["encryptHistory"] as? Bool {
+            encryptHistory = value
         }
 
         // Apply clipboard rules if present

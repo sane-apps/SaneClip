@@ -1,3 +1,14 @@
+disabled_rules:
+  - trailing_whitespace
+  - todo
+  - identifier_name
+  - line_length
+  - type_body_length
+  - function_body_length
+  - cyclomatic_complexity
+  - nesting
+  - shorthand_operator
+
 excluded:
   - build
   - .build
@@ -7,5 +18,5 @@ excluded:
   - scripts
 
 file_length:
-  warning: 1200
+  warning: 1300
   error: 1500

@@ -67,25 +67,15 @@ Real failures from past sessions. Don't repeat them.
 
 1. **Read Rule #0 first** (Section "The Rules") - It's about HOW to use all other rules
 2. **All files stay in project** - NEVER write files outside `~/SaneApps/apps/SaneClip/` unless user explicitly requests it
-3. **Use XcodeBuildMCP for builds** - Set session defaults, then use `build_macos`, `test_macos`
+3. **Use SaneMaster for builds/tests** - never raw `xcodebuild`
 4. **Self-rate after every task** - Rate yourself 1-10 on SOP adherence (see Self-Rating section)
-
-**XcodeBuildMCP Session Defaults (set at session start):**
-```
-mcp__XcodeBuildMCP__session-set-defaults:
-  projectPath: ~/SaneApps/apps/SaneClip/SaneClip.xcodeproj
-  scheme: SaneClip
-  arch: arm64
-```
-
-Then use: `build_macos`, `test_macos`, `build_run_macos`
 
 **Key Commands:**
 ```bash
 xcodegen generate              # After creating new files
-build_macos                    # Build via XcodeBuildMCP
-test_macos                     # Run tests via XcodeBuildMCP
-build_run_macos                # Build and launch
+./scripts/SaneMaster.rb verify # Build + tests
+./scripts/SaneMaster.rb test_mode  # Build + launch + logs
+./scripts/SaneMaster.rb logs --follow
 ```
 
 ---
@@ -125,7 +115,7 @@ DON'T: Ship with failing tests
 
 ### #5: USE PROJECT TOOLS
 
-DO: Use `xcodegen generate` after new files, XcodeBuildMCP for builds
+DO: Use `xcodegen generate` after new files, then `./scripts/SaneMaster.rb verify`
 DON'T: Use raw xcodebuild without understanding project config
 
 ### #6: BUILD, KILL, LAUNCH, LOG
@@ -134,8 +124,7 @@ DO: Run full sequence after every code change
 DON'T: Skip steps or assume it works
 
 ```bash
-killall SaneClip 2>/dev/null; sleep 1
-build_run_macos  # Or xcodebuild + open
+./scripts/SaneMaster.rb test_mode  # Kill → Build → Launch → Logs
 ```
 
 ### #7: NO TEST? NO REST
@@ -235,8 +224,7 @@ After research, present findings in this format:
 ...
 
 ### Verification
-- [ ] build_macos passes
-- [ ] test_macos passes
+- [ ] ./scripts/SaneMaster.rb verify passes
 - [ ] Manual test: [specific check]
 ```
 
@@ -326,9 +314,8 @@ Approve?
   - Tests/[TestFile].swift: `test[FeatureName]()`
 
 [Rule #6: FULL CYCLE] - Verify fixes:
-  - `build_macos` (XcodeBuildMCP)
-  - `killall -9 SaneClip`
-  - `build_run_macos`
+  - `./scripts/SaneMaster.rb verify`
+  - `./scripts/SaneMaster.rb test_mode`
   - Manual: [specific check]
 
 [Rule #4: GREEN BEFORE DONE] - All tests pass before claiming complete
@@ -387,7 +374,7 @@ mcp__macos-automator__get_scripting_tips search_term: "menu bar"
 mcp__macos-automator__execute_script kb_script_id: "..."
 ```
 
-XcodeBuildMCP simulator tools are for iOS only - they don't work for macOS menu bar apps.
+Use SaneMaster for macOS builds/tests. XcodeBuildMCP simulator tools are iOS-only.
 
 ## Dependencies
 
@@ -402,7 +389,7 @@ XcodeBuildMCP simulator tools are for iOS only - they don't work for macOS menu 
 
 | Need | Check |
 |------|-------|
-| Build/test commands | XcodeBuildMCP (see defaults above) |
+| Build/test commands | `./scripts/SaneMaster.rb verify` |
 | Project structure | `project.yml` (XcodeGen config) |
 | Past bugs/learnings | Sane-Mem MCP: `mcp__plugin_claude-mem_mcp-search__search` |
 | Touch ID/security | `Core/ClipboardManager.swift` (authentication logic) |
@@ -427,14 +414,16 @@ XcodeBuildMCP simulator tools are for iOS only - they don't work for macOS menu 
 ## Release Process
 
 ```bash
-# 1. Build release
-xcodebuild -project SaneClip.xcodeproj -scheme SaneClip -configuration Release archive
+# 1. Build, sign, notarize, create DMG (unified SaneProcess script)
+./scripts/SaneMaster.rb release
 
-# 2. Notarize (uses keychain profile)
-xcrun notarytool submit SaneClip.dmg --keychain-profile "notarytool" --wait
+# 2. Upload DMG to Cloudflare R2 (the only hosted DMG)
+npx wrangler r2 object put sanebar-downloads/SaneClip-X.Y.Z.dmg \
+  --file=releases/SaneClip-X.Y.Z.dmg --content-type="application/octet-stream" --remote
 
-# 3. Staple
-xcrun stapler staple SaneClip.dmg
+# 3. Update appcast.xml (Sparkle)
+# (Use the project-specific post-release process if present)
 ```
 
 **Remember:** Release uses `com.saneclip.app` bundle ID. Debug uses `com.saneclip.dev`.
+**Note:** We do NOT host DMGs on GitHub Releases. Cloudflare R2 + `dist.saneclip.com` is the source of truth.

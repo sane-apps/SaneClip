@@ -17,7 +17,7 @@ class ClipboardManager {
     private var lastChangeCount: Int = 0
     private var lastClipboardContent: String?
     private var lastCopyTime: Date?
-    nonisolated(unsafe) private var timer: Timer?
+    private var timer: Timer?
     private var maxHistorySize: Int { SettingsModel.shared.maxHistorySize }
     private let logger = Logger(subsystem: "com.saneclip.app", category: "ClipboardManager")
 
@@ -40,11 +40,6 @@ class ClipboardManager {
         lastChangeCount = NSPasteboard.general.changeCount
         startMonitoring()
         loadHistory()
-    }
-
-    deinit {
-        timer?.invalidate()
-        timer = nil
     }
 
     private func startMonitoring() {
@@ -424,8 +419,17 @@ class ClipboardManager {
             .appendingPathComponent("history.json")
 
         guard FileManager.default.fileExists(atPath: historyURL.path),
-              let data = try? Data(contentsOf: historyURL),
-              let items = try? JSONDecoder().decode([SavedClipboardItem].self, from: data) else {
+              var data = try? Data(contentsOf: historyURL) else {
+            return nil
+        }
+
+        // Auto-detect encrypted vs plaintext
+        if HistoryEncryption.isEncrypted(data) {
+            guard let decrypted = try? HistoryEncryption.decrypt(data) else { return nil }
+            data = decrypted
+        }
+
+        guard let items = try? JSONDecoder().decode([SavedClipboardItem].self, from: data) else {
             return nil
         }
 
@@ -478,7 +482,13 @@ class ClipboardManager {
         }
 
         do {
-            let data = try JSONEncoder().encode(textItems)
+            var data = try JSONEncoder().encode(textItems)
+
+            // Encrypt if setting is enabled
+            if SettingsModel.shared.encryptHistory {
+                data = try HistoryEncryption.encrypt(data)
+            }
+
             try data.write(to: historyFileURL, options: [.atomic, .completeFileProtection])
 
             // Save pinned item IDs separately
@@ -551,7 +561,13 @@ class ClipboardManager {
         guard FileManager.default.fileExists(atPath: historyFileURL.path) else { return }
 
         do {
-            let data = try Data(contentsOf: historyFileURL)
+            var data = try Data(contentsOf: historyFileURL)
+
+            // Auto-detect encrypted vs plaintext for seamless migration
+            if HistoryEncryption.isEncrypted(data) {
+                data = try HistoryEncryption.decrypt(data)
+            }
+
             let items = try JSONDecoder().decode([SavedClipboardItem].self, from: data)
             history = items.map {
                 ClipboardItem(

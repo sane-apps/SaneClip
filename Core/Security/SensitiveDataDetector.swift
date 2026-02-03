@@ -175,10 +175,8 @@ final class SensitiveDataDetector: Sendable {
             #"(?:api[_-]?key|apikey|api_secret|apisecret)\s*[=:]\s*['\"]?[a-zA-Z0-9_-]{20,}['\"]?"#
         ]
 
-        for pattern in patterns {
-            if text.range(of: pattern, options: [.regularExpression, .caseInsensitive]) != nil {
-                return true
-            }
+        for pattern in patterns where text.range(of: pattern, options: [.regularExpression, .caseInsensitive]) != nil {
+            return true
         }
 
         return false
@@ -195,10 +193,8 @@ final class SensitiveDataDetector: Sendable {
             #"(?:password|passwd|pwd)[\s]*is[\s]+[^\s]{4,}"#
         ]
 
-        for pattern in patterns {
-            if text.range(of: pattern, options: [.regularExpression, .caseInsensitive]) != nil {
-                return true
-            }
+        for pattern in patterns where text.range(of: pattern, options: [.regularExpression, .caseInsensitive]) != nil {
+            return true
         }
 
         return false

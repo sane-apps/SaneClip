@@ -147,8 +147,10 @@ struct GeneralSettingsView: View {
                             } else {
                                 // Turning OFF - always requires auth
                                 let reason = "Authenticate to allow password manager copies in history"
-                                authenticateForSecurityChange(reason: reason) {
-                                    settings.protectPasswords = false
+                                Task { @MainActor in
+                                    if await authenticateForSecurityChange(reason: reason) {
+                                        settings.protectPasswords = false
+                                    }
                                 }
                             }
                         }
@@ -163,13 +165,34 @@ struct GeneralSettingsView: View {
                                 settings.requireTouchID = true
                             } else {
                                 // Turning OFF - always requires auth
-                                authenticateForSecurityChange(reason: "Authenticate to disable Touch ID protection") {
-                                    settings.requireTouchID = false
+                                Task { @MainActor in
+                                    if await authenticateForSecurityChange(reason: "Authenticate to disable Touch ID protection") {
+                                        settings.requireTouchID = false
+                                    }
                                 }
                             }
                         }
                     ))
                     .disabled(isAuthenticating)
+                    CompactDivider()
+                    CompactToggle(label: "Encrypt history at rest", isOn: Binding(
+                        get: { settings.encryptHistory },
+                        set: { newValue in
+                            if newValue {
+                                // Turning ON encryption - no auth needed
+                                settings.encryptHistory = true
+                            } else {
+                                // Turning OFF encryption - requires auth
+                                Task { @MainActor in
+                                    if await authenticateForSecurityChange(reason: "Authenticate to disable history encryption") {
+                                        settings.encryptHistory = false
+                                    }
+                                }
+                            }
+                        }
+                    ))
+                    .disabled(isAuthenticating)
+                    .help("Encrypts clipboard history on disk using AES-256-GCM")
                     CompactDivider()
                     ExcludedAppsInline(
                         excludedApps: Binding(
@@ -177,7 +200,13 @@ struct GeneralSettingsView: View {
                             set: { settings.excludedApps = $0 }
                         ),
                         requireAuthForRemoval: true,
-                        authenticate: authenticateForSecurityChange
+                        authenticate: { reason, onSuccess in
+                            Task { @MainActor in
+                                if await authenticateForSecurityChange(reason: reason) {
+                                    onSuccess()
+                                }
+                            }
+                        }
                     )
                 }
 
@@ -303,7 +332,8 @@ struct GeneralSettingsView: View {
         launchAtLogin = (status == .enabled)
     }
 
-    private func authenticateForSecurityChange(reason: String, onSuccess: @escaping () -> Void) {
+    @MainActor
+    private func authenticateForSecurityChange(reason: String) async -> Bool {
         isAuthenticating = true
         let context = LAContext()
         var error: NSError?
@@ -313,17 +343,17 @@ struct GeneralSettingsView: View {
             ? .deviceOwnerAuthenticationWithBiometrics
             : .deviceOwnerAuthentication
 
-        context.evaluatePolicy(
-            policy,
-            localizedReason: reason
-        ) { success, _ in
-            DispatchQueue.main.async {
-                if success {
-                    onSuccess()
-                }
-                isAuthenticating = false
+        let success = await withCheckedContinuation { continuation in
+            context.evaluatePolicy(
+                policy,
+                localizedReason: reason
+            ) { didSucceed, _ in
+                continuation.resume(returning: didSucceed)
             }
         }
+
+        isAuthenticating = false
+        return success
     }
 
     private func exportHistory() {

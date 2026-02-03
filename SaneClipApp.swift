@@ -69,16 +69,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     private var updateService: UpdateService!
     #endif
     private var onboardingWindow: NSWindow?
-    nonisolated(unsafe) private var menuBarIconObserver: NSObjectProtocol?
-
     /// Track when user last authenticated with Touch ID (grace period)
     private var lastAuthenticationTime: Date?
     private let authGracePeriod: TimeInterval = 30.0  // seconds - stays unlocked for 30s
 
     deinit {
-        if let observer = menuBarIconObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
+        NotificationCenter.default.removeObserver(self, name: .menuBarIconChanged, object: nil)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -110,16 +106,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // Listen for icon changes
-        menuBarIconObserver = NotificationCenter.default.addObserver(
-            forName: .menuBarIconChanged,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            if let iconName = notification.object as? String,
-               let button = self?.statusItem.button {
-                button.image = NSImage(systemSymbolName: iconName, accessibilityDescription: "SaneClip")
-            }
-        }
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleMenuBarIconChanged(_:)),
+            name: .menuBarIconChanged,
+            object: nil
+        )
 
         // Create right-click context menu
         let menu = NSMenu()
@@ -260,7 +252,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Biometric Authentication
 
-    private func authenticateWithBiometrics(completion: @escaping (Bool) -> Void) {
+    private func authenticateWithBiometrics(completion: @escaping @Sendable (Bool) -> Void) {
         let context = LAContext()
         var error: NSError?
 
@@ -281,7 +273,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     @objc private func togglePopover() {
-        guard let button = statusItem.button else { return }
+        guard statusItem.button != nil else { return }
 
         // Check if right-click
         if let event = NSApp.currentEvent, event.type == .rightMouseUp {
@@ -301,12 +293,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
                     showPopoverAtButton()
                 } else {
                     authenticateWithBiometrics { [weak self] success in
-                        if success {
+                        guard success else { return }
+                        Task { @MainActor in
                             self?.lastAuthenticationTime = Date()
                             // Small delay to let Touch ID dialog fully dismiss
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                                self?.showPopoverAtButton()
-                            }
+                            try? await Task.sleep(nanoseconds: 150_000_000)
+                            self?.showPopoverAtButton()
                         }
                     }
                 }
@@ -392,12 +384,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
                 showPopoverAtButton()
             } else {
                 authenticateWithBiometrics { [weak self] success in
-                    if success {
+                    guard success else { return }
+                    Task { @MainActor in
                         self?.lastAuthenticationTime = Date()
                         // Small delay to let Touch ID dialog fully dismiss
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                            self?.showPopoverAtButton()
-                        }
+                        try? await Task.sleep(nanoseconds: 150_000_000)
+                        self?.showPopoverAtButton()
                     }
                 }
             }
@@ -409,5 +401,19 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     @objc private func pasteFromMenu(_ sender: NSMenuItem) {
         let index = sender.tag
         clipboardManager.pasteItemAt(index: index)
+    }
+
+    @objc private func handleMenuBarIconChanged(_ notification: Notification) {
+        guard let iconName = notification.object as? String,
+              let button = statusItem.button else { return }
+        button.image = NSImage(systemSymbolName: iconName, accessibilityDescription: "SaneClip")
+    }
+
+    // MARK: - URL Scheme Handling
+
+    func application(_ application: NSApplication, open urls: [URL]) {
+        for url in urls {
+            URLSchemeHandler.shared.handle(url)
+        }
     }
 }

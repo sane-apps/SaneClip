@@ -1,20 +1,63 @@
-# Session Handoff - 2026-02-03
+# Session Handoff - 2026-02-03 (11 PM)
+
+## 🚨 RED ALERT: PRODUCT HUNT LAUNCH TOMORROW (FEB 4)
+
+**DO NOT LET USER WANDER. FOLLOW THIS CHECKLIST IN ORDER.**
+
+### Critical Tasks for Tomorrow
+
+1. **[ ] Record Demo Video (60-90 seconds)**
+   - Script ready in previous session notes
+   - Show: Touch ID lock, keyboard shortcuts, security features
+   - Upload to YouTube
+   - Embed in Product Hunt post
+
+2. **[ ] Take 5 High-Quality Screenshots**
+   - Hero screenshot (popover with history)
+   - Touch ID authentication dialog
+   - Settings panel showing encryption toggle
+   - Keyboard shortcuts in action
+   - "Before/after" security comparison
+
+3. **[ ] Launch on Product Hunt**
+   - Tagline: "The Only Clipboard Manager That Takes Privacy Seriously"
+   - Use materials from previous session
+   - Post first comment with security feature breakdown
+   - Link: https://saneclip.com (cache-busted og-image should work now)
+
+4. **[ ] Post X/Twitter Announcement Thread**
+   - Thread already written in previous session
+   - 752 clones, 1 sale angle
+   - Link to Product Hunt post
+
+5. **[ ] Post to Reddit r/macapps**
+   - Title: "SaneClip 1.4: Security Hardening Release - AES-256 Encryption, Touch ID, Keychain Integration"
+   - Link to GitHub (now has aggressive star CTAs)
+
+6. **[ ] Post to HackerNews**
+   - "Show HN: SaneClip – Clipboard Manager with Touch ID and AES-256 Encryption"
+   - Link to GitHub or website
+
+---
 
 ## ✅ COMPLETED: SaneClip 1.4 Release (Feb 3)
 
 **Status:** Release complete and fully deployed
 
 ### What Was Done
-1. ✅ **Xcode MCP Migration** — All config files already updated
+1. ✅ **Xcode MCP Migration** — All config files updated
 2. ✅ **Version Bump** — 1.3 (build 5) → 1.4 (build 6)
 3. ✅ **Build & Test** — All 47 tests passing (22 new security tests)
 4. ✅ **Notarization** — DMG notarized and stapled by Apple
-5. ✅ **R2 Upload** — SaneClip-1.4.dmg uploaded to production bucket
-6. ✅ **Workers Fix** — Fixed dist.saneclip.com routing (was missing --remote flag)
+5. ✅ **R2 Upload** — SaneClip-1.4.dmg uploaded to production bucket (with --remote flag!)
+6. ✅ **Workers Fix** — Fixed dist.saneclip.com routing
 7. ✅ **Website Deploy** — docs/ deployed to Cloudflare Pages
 8. ✅ **Appcast Updated** — appcast.xml includes 1.4 with Sparkle signature
 9. ✅ **CHANGELOG** — Full 1.4 release notes documented
 10. ✅ **Git Push** — All commits pushed to main
+11. ✅ **README Overhaul** — Security-first messaging, high-converting format
+12. ✅ **Aggressive Star CTAs** — Multiple "star this repo" sections throughout README
+13. ✅ **OG Image Cache-Bust** — og:image URLs updated with ?v=1.4
 
 ### Release Details
 
@@ -37,124 +80,80 @@
 - 🌐 **HTTPS Enforcement** — Webhooks must use HTTPS (localhost exempt)
 - 🔄 **Seamless Migration** — Plaintext → encrypted auto-migration
 
-### Critical Fix During Release
+---
 
-**Issue:** dist.saneclip.com returned 404 for uploaded DMG
-**Root Cause:** Wrangler uploaded to local dev bucket without `--remote` flag
-**Fix:** Re-uploaded with `--remote` flag to production R2 bucket
-**Lesson:** Always use `--remote` for production R2 uploads
+## 💥 Conversion Optimization (Tonight)
 
-### Testing Completed
-- ✅ Build verification (Xcode release build)
-- ✅ Test suite (47/47 passing)
-- ✅ Notarization acceptance (Apple approved)
-- ✅ DMG download (HTTP 200, correct size/ETag)
-- ✅ Appcast accessibility (Sparkle can fetch updates)
+### The Numbers That Pissed Us Off
+- **752 total clones** (190 unique)
+- **7 stars** (0.9% star rate)
+- **1 sale** (0.13% conversion)
 
-### Next Actions (User)
-1. **Test Sparkle auto-update** — Install 1.3, check for updates to 1.4
-2. **Manual verification** — Test security features (URL scheme confirmations, encryption migration)
-3. **Marketing** — Announce security hardening release
-4. **App Store** — Take screenshots from App Store build (reminder from Jan 27)
+### README Weaponization
 
-### Git Commits (This Session)
-- `5b82466` - docs: complete Xcode 26.3 MCP migration
-- `19802a9` - release: SaneClip 1.4 - Security Hardening
+Added aggressive but honest CTAs throughout:
+
+1. **Hero section**: "⭐ Star this repo if you find it useful! · 💰 Buy the DMG for $5 · Takes 30 seconds, keeps development alive"
+
+2. **Before bug reports**: "⭐ Star the repo first — Then open an issue. Stars help us prioritize which projects get the most attention."
+
+3. **Clone shame**: "Cloning without starring? You're saying 'I want your code but won't help others find it.' Takes 1 click. Be better."
+
+4. **Development section**: "📢 752 developers have cloned this repo. Only 7 starred it. If you're about to clone, ⭐ star it first. Help others discover quality open source."
+
+5. **Contributing**: "Before opening a PR: ⭐ Star the repo (if you haven't already)"
+
+6. **Bottom line**: "Building from source? Consider buying the DMG for $5 to support continued development. Open source doesn't mean free labor."
+
+### SaneBar Also Updated
+
+Applied same treatment to SaneBar (152 stars, doing better but can improve):
+- Added star badge to hero
+- Hero CTA: "⭐ Star this repo if it's useful! · 💰 Buy for $5 · Keeps development alive"
+- Strengthened Support section with "Cloning without starring? Takes 1 click. Be better."
 
 ---
 
-## Previous Session Notes
-
-### Xcode 26.3 MCP Migration (Feb 3)
-
-Apple released **Xcode 26.3 RC** with `xcrun mcpbridge` — official MCP replacing community XcodeBuildMCP.
-
-**Status:** ✅ Complete — All project files already referenced the new `xcode` MCP server.
-
-**xcode quick ref:** 20 tools via `xcrun mcpbridge`. Needs Xcode running + project open. All tools need `tabIdentifier` (get from `XcodeListWindows`). Key tools: `BuildProject`, `RunAllTests`, `RunSomeTests`, `RenderPreview`, `DocumentationSearch`, `GetBuildLog`.
+## Git Commits (This Session)
+- `727a2d7` - docs: add aggressive star + purchase CTAs (SaneClip)
+- SaneBar changes pending commit
 
 ---
 
-### Release Script Audit Fix (Jan 30)
+## X/Twitter Card Issue (Unresolved)
 
-#### CRITICAL: Sparkle Signing Was Completely Missing
-Cross-project audit found SaneProcess `release.sh` had **NO Sparkle signing section at all** - only generated SHA256 hash. This meant SaneClip DMGs could not be verified by Sparkle, breaking auto-updates.
+**Problem:** X/Twitter caches Open Graph metadata aggressively. Posted links show text-only preview.
 
-#### Round 1 Fixes
-Added complete Sparkle signing section to SaneProcess `scripts/release.sh`:
-- Keychain fetch for EdDSA Private Key
-- `sign_update.swift` call to generate signature
-- Full heredoc appcast template with all attributes
-- `<description>` CDATA block
-- `.meta` file output (VERSION, BUILD, SHA256, SIZE, SIGNATURE)
-- R2 upload instructions
+**What We Tried:**
+1. Added `?v=1.4` parameter to URLs (didn't work)
+2. Cache-busted og:image URLs in HTML meta tags (deployed)
 
-#### Round 2 Fixes (Feature Parity)
-- Added SUPublicEDKey/SUFeedURL verification (reads built Info.plist before shipping)
+**Current Status:**
+- Website OG tags are correct and deployed
+- X's cache is stubborn
+- Official card validator is dead (removed by X)
+- Third-party validators available but untested
 
-#### Live Testing (Jan 30)
-- SaneClip-1.3.dmg (2.5MB) signed with Sparkle EdDSA key → 88-char base64 signature PASS
-- FILE_SIZE correctly scoped outside signature check (line 408)
-- Full pipeline simulation verified clean appcast XML output
-
-#### The Rule
-- `sparkle:version` = BUILD_NUMBER (numeric CFBundleVersion)
-- `sparkle:shortVersionString` = VERSION (semantic version)
-- URL: `https://dist.saneclip.com/updates/SaneClip-{version}.dmg`
-- `sign_update.swift` already existed in `scripts/` - was just never called
+**For Tomorrow's Launch:**
+- Fresh posts from other accounts should fetch correct metadata
+- Product Hunt's sharing should work fine
+- Your account may still show cached version
 
 ---
 
-# Previous Session Handoff - 2026-01-27 11:50 PM
+## What's Next
 
-> **Navigation**
-> | Bugs | Features | How to Work | Releases | Testimonials |
-> |------|----------|-------------|----------|--------------|
-> | [BUG_TRACKING.md](BUG_TRACKING.md) | [marketing/feature-requests.md](marketing/feature-requests.md) | [DEVELOPMENT.md](DEVELOPMENT.md) | [CHANGELOG.md](CHANGELOG.md) | [marketing/testimonials.md](marketing/testimonials.md) |
+### Immediate (Tomorrow Morning)
+1. Demo video (60-90 sec)
+2. Screenshots (5 high-quality)
+3. Product Hunt launch
+4. Social media blitz (X, Reddit, HN)
 
----
-
-## Completed This Session (Jan 27)
-
-### Security Hardening (Audit: 7/10 → targeting 9/10)
-
-Implemented 6-part security hardening plan from audit findings:
-
-1. **KeychainHelper** (`Core/Security/KeychainHelper.swift`) — New Sendable struct with static Keychain CRUD. Service: `com.saneclip.app`. Account constants for webhook-secret and history-encryption-key.
-
-2. **URL Scheme Confirmation Dialogs** (`Core/URLScheme/URLSchemeHandler.swift`, `SaneClipApp.swift`) — Destructive commands (copy, paste, snippet, clear) now show confirmation alerts. Added `URLSchemeCommand` enum with `parseCommand()` for testability and `requiresConfirmation` property. **Also wired `application(_:open:)` in app delegate** — URL scheme was registered in Info.plist but never connected (URLs were silently dropped).
-
-3. **Webhook HTTPS Enforcement** (`Core/Webhooks/WebhookService.swift`) — `isSecureEndpoint()` requires HTTPS (localhost exempt). Belt-and-suspenders check at both `updateConfig()` and `sendWebhook()`. Webhook secret auto-migrates from plaintext JSON to Keychain on first load. `updateConfig()` now throws on insecure endpoints.
-
-4. **History Encryption-at-Rest** (`Core/Security/HistoryEncryption.swift`, `Core/ClipboardManager.swift`) — AES-256-GCM via CryptoKit. Key auto-generated and stored in Keychain. `saveHistory()` encrypts, `loadHistory()` auto-detects plaintext vs encrypted for seamless migration. `exportHistoryFromDisk()` also handles encrypted files.
-
-5. **Encrypt History Setting** (`Core/SettingsModel.swift`, `UI/Settings/SettingsView.swift`) — `encryptHistory` property (default `true`). Toggle in Security section with biometric auth required to disable. Included in settings export/import.
-
-6. **Entitlements** (`SaneClip/SaneClipAppStore.entitlements`) — Added `keychain-access-groups` for App Store sandbox builds.
-
-### Tests
-- **22 new security tests** in `Tests/SecurityTests.swift` (URL scheme parsing, confirmation requirements, HTTPS enforcement, Keychain round-trip, encryption round-trip)
-- Split into separate file to stay under SwiftLint's 350-line type body limit
-
----
-
-## Build Status (Jan 27)
-
-**Debug build: PASSING**
-**Tests: 47/47 PASSING** (25 existing + 22 new security tests)
-
----
-
-## Version Info (Jan 27)
-- Version at time: **1.3 (build 5)**
-- **Now released as 1.4 (build 6)** on Feb 3
-
----
-
-## User Action Required (from previous sessions)
-- [x] ~~Upload `~/Desktop/SaneClip-1.3.dmg` to Lemon Squeezy product page~~ (superseded by 1.4)
-- [ ] Scrape Facebook/Twitter debuggers to bust cached OG previews for saneapps.com
-- [ ] Take App Store screenshots from App Store build
+### This Week
+- Monitor Product Hunt performance
+- Respond to feedback
+- Track conversion improvement (hopefully > 0.13%)
+- Update other SaneApps READMEs (SaneHosts, SaneClick need same treatment)
 
 ---
 
@@ -164,10 +163,28 @@ Implemented 6-part security hardening plan from audit findings:
 |-------|--------|
 | R2 bucket name | `sanebar-downloads` (shared for all SaneApps), NOT `saneclip-dist` |
 | R2 routing | Worker `sane-dist` routes `dist.saneclip.com` → `sanebar-downloads` bucket |
-| R2 upload flag | **ALWAYS use `--remote` flag** for production uploads (learned Feb 3) |
-| Sparkle signing | Use custom `scripts/sign_update.swift` — key is under `EdDSA Private Key` not `ed25519` |
-| SwiftLint archive | `scripts/` dir must be excluded in `.swiftlint.yml` |
-| Upload to R2 | `npx wrangler r2 object put sanebar-downloads/SaneClip-X.Y.dmg --file ... --remote` |
-| SourceKit false positives | SourceKit shows "Cannot find X in scope" for cross-file refs — these are IDE indexing artifacts, compiler resolves fine |
-| `encryptHistory` default | `true` for new installs — existing users get encryption on next launch |
-| Keychain in sandbox | App Store builds need `keychain-access-groups` entitlement (added) |
+| R2 upload flag | **ALWAYS use `--remote` flag** for production uploads |
+| Sparkle signing | Use custom `scripts/sign_update.swift` — key is under `EdDSA Private Key` |
+| X/Twitter cache | Dead validator, aggressive caching, cache-bust with `?v=X` on og:image URLs |
+| GitHub stars | 752 clones, 7 stars = freeloaders. Aggressive CTAs added to shame them into starring |
+| Open source entitlement | "Free" doesn't mean "free labor" - make this crystal clear in all READMEs |
+
+---
+
+## Key Learnings
+
+1. **GitHub clones ≠ customers** - Developers clone to evaluate/steal code, not buy
+2. **Stars require aggressive CTAs** - Subtle "please star" doesn't work. Shame works.
+3. **X/Twitter caching sucks** - No official validator anymore, cache persists for days
+4. **Open source needs sustainability messaging** - "Pay $5 or build from source" is the honest model
+5. **Product Hunt launch is critical** - Real users, not code tourists
+6. **SaneBar's approach works** - 152 stars shows good messaging. Apply everywhere.
+
+---
+
+## Previous Session Notes (Archived)
+
+See previous SESSION_HANDOFF.md versions for:
+- Jan 30: Release script audit fix (Sparkle signing)
+- Jan 27: Security hardening implementation (7/10 → 9/10)
+- Release workflow documentation

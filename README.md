@@ -318,7 +318,7 @@ Before opening a PR:
 - 🐛 [Report a Bug](https://github.com/sane-apps/SaneClip/issues/new?template=bug_report.md)
 - 💡 [Request a Feature](https://github.com/sane-apps/SaneClip/issues/new?template=feature_request.md)
 
-**Cloning without starring?** You're saying "I want your code but won't help others find it." Takes 1 click. Be better.
+**Cloning without starring?** For real bro? Gimme that star!
 
 ---
 

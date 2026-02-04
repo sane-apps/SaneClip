@@ -38,6 +38,14 @@
    - "Show HN: SaneClip – Clipboard Manager with Touch ID and AES-256 Encryption"
    - Link to GitHub or website
 
+7. **[ ] GitHub Outreach Campaign**
+   - See GITHUB_OUTREACH_STRATEGY.md
+   - Pull forkers/watchers/issue authors who didn't star
+   - Find their repos, draft personalized comments
+   - "Saw you forked SaneBar - how's it working? Drop a star! ⭐"
+   - Target: 10 personalized comments/day
+   - ALWAYS disclose you're the dev
+
 ---
 
 ## ✅ COMPLETED: SaneClip 1.4 Release (Feb 3)

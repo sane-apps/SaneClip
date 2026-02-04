@@ -41,16 +41,11 @@ Full philosophy: ~/SaneApps/meta/Brand/NORTH_STAR.md
 ## Quick Start
 
 ```
-# Set XcodeBuildMCP defaults (once per session)
-mcp__XcodeBuildMCP__session-set-defaults:
-  projectPath: ~/SaneApps/apps/SaneClip/SaneClip.xcodeproj
-  scheme: SaneClip
-  arch: arm64
-
-# Then use:
-build_macos        # Build
-test_macos         # Run tests
-build_run_macos    # Build and launch
+# Xcode Tools (official MCP)
+mcp__xcode__XcodeListWindows
+mcp__xcode__BuildProject     # Build
+mcp__xcode__RunAllTests      # Run tests
+mcp__xcode__RenderPreview    # SwiftUI previews
 ```
 
 ---

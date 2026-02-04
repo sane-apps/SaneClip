@@ -374,7 +374,7 @@ mcp__macos-automator__get_scripting_tips search_term: "menu bar"
 mcp__macos-automator__execute_script kb_script_id: "..."
 ```
 
-Use SaneMaster for macOS builds/tests. XcodeBuildMCP simulator tools are iOS-only.
+Use SaneMaster for macOS builds/tests. Xcode Tools MCP handles build/test/preview; use macos-automator for real UI.
 
 ## Dependencies
 

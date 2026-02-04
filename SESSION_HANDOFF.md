@@ -39,7 +39,7 @@
    - Link to GitHub or website
 
 7. **[ ] GitHub Outreach Campaign**
-   - See GITHUB_OUTREACH_STRATEGY.md
+   - See ~/.claude/GITHUB_OUTREACH_STRATEGY.md (global strategy)
    - Pull forkers/watchers/issue authors who didn't star
    - Find their repos, draft personalized comments
    - "Saw you forked SaneBar - how's it working? Drop a star! ⭐"

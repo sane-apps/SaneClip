@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [1.4] - 2026-02-03
+
+### Security Enhancements
+- **Keychain Integration** — All secrets (webhook keys, encryption keys) now stored securely in macOS Keychain
+- **History Encryption-at-Rest** — AES-256-GCM encryption for clipboard history (enabled by default)
+- **URL Scheme Confirmation** — Destructive commands (copy, paste, clear) require user confirmation
+- **HTTPS Enforcement** — Webhooks must use HTTPS (localhost exempt for testing)
+- **Seamless Migration** — Existing plaintext data auto-migrates to encrypted format on first launch
+
+### Technical
+- New `KeychainHelper` with Sendable conformance for secure credential storage
+- New `HistoryEncryption` service using CryptoKit AES-GCM
+- Enhanced `URLSchemeHandler` with command parsing and confirmation requirements
+- App Store sandbox keychain-access-groups entitlement added
+- 22 new security tests (47 total tests, all passing)
+
+### Testing
+- URL scheme security validation
+- Keychain round-trip verification
+- Encryption/decryption integrity checks
+- HTTPS enforcement validation
+
+---
+
 ## [1.2] - 2026-01-25
 
 ### Removed

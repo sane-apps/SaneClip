@@ -7,6 +7,38 @@
     <language>en</language>
 
     <item>
+      <title>Version 1.4</title>
+      <link>https://saneclip.com</link>
+      <sparkle:version>6</sparkle:version>
+      <sparkle:shortVersionString>1.4</sparkle:shortVersionString>
+      <description><![CDATA[
+        <h2>SaneClip 1.4 - Security Hardening</h2>
+        <h3>Security Enhancements</h3>
+        <ul>
+          <li><strong>Keychain Integration</strong> - All secrets (webhook keys, encryption keys) now stored securely in macOS Keychain</li>
+          <li><strong>History Encryption-at-Rest</strong> - AES-256-GCM encryption for clipboard history (enabled by default)</li>
+          <li><strong>URL Scheme Confirmation</strong> - Destructive commands (copy, paste, clear) require user confirmation</li>
+          <li><strong>HTTPS Enforcement</strong> - Webhooks must use HTTPS (localhost exempt for testing)</li>
+          <li><strong>Seamless Migration</strong> - Existing plaintext data auto-migrates to encrypted format on first launch</li>
+        </ul>
+        <h3>Technical</h3>
+        <ul>
+          <li>New KeychainHelper with Sendable conformance for secure credential storage</li>
+          <li>New HistoryEncryption service using CryptoKit AES-GCM</li>
+          <li>Enhanced URLSchemeHandler with command parsing and confirmation requirements</li>
+          <li>47 tests passing (22 new security tests added)</li>
+        </ul>
+      ]]></description>
+      <pubDate>Mon, 03 Feb 2026 20:05:00 -0500</pubDate>
+      <enclosure
+        url="https://dist.saneclip.com/updates/SaneClip-1.4.dmg"
+        sparkle:edSignature="opEhZGHtZgwTiHXRt63XW/QiO/Ft8gorj0djRIez7v++32gT6rG0hAQzgHXfI8ziJQSv2opQjcz9wv6Uay+TAg=="
+        length="2850157"
+        type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+    </item>
+
+    <item>
       <title>Version 1.3</title>
       <link>https://saneclip.com</link>
       <sparkle:version>5</sparkle:version>

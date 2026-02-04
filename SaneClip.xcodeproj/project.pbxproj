@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -134,14 +134,14 @@
 		592FBED989BC40A70F0B5060 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		5ECEE64E98BCC2FC7D58874A /* SaneClipIOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipIOSApp.swift; sourceTree = "<group>"; };
 		61392CF56C24077C8FD681EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		62E89830225CCA642CD2D752 /* SaneClipIOSWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SaneClipIOSWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		6785DC91231845BA4B10499F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		62E89830225CCA642CD2D752 /* SaneClipIOSWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SaneClipIOSWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		6785DC91231845BA4B10499F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		6CAE73B92B88E86164C13BE4 /* PinnedClipsIOSWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedClipsIOSWidget.swift; sourceTree = "<group>"; };
 		6E0713E5848E1A9394B7528D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		6E5B3959F17D55FF5C7F90E6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		71B639CB4375AE4479924B74 /* SaneClipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipTests.swift; sourceTree = "<group>"; };
 		7B181DC2ABBFC0F6C29A7CB9 /* AutoPurgeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoPurgeService.swift; sourceTree = "<group>"; };
-		7B6E13A4E249D85E296D3A5C /* SaneClipIOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SaneClipIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7B6E13A4E249D85E296D3A5C /* SaneClip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SaneClip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BEA795AFED8797FFAE0DD3E /* TextTransformService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTransformService.swift; sourceTree = "<group>"; };
 		7C13160E8B6EC2A2DB6B0BB5 /* SaneClipTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SaneClipTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C6448822D405CC78AFFF787 /* SensitiveDataDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensitiveDataDetector.swift; sourceTree = "<group>"; };
@@ -268,7 +268,7 @@
 			isa = PBXGroup;
 			children = (
 				14D0EBBF195245B8CE7ECF07 /* SaneClip.app */,
-				7B6E13A4E249D85E296D3A5C /* SaneClipIOS.app */,
+				7B6E13A4E249D85E296D3A5C /* SaneClip.app */,
 				62E89830225CCA642CD2D752 /* SaneClipIOSWidgets.appex */,
 				7C13160E8B6EC2A2DB6B0BB5 /* SaneClipTests.xctest */,
 				09C2D5E2943BC51ED6D88512 /* SaneClipWidgets.appex */,
@@ -487,7 +487,7 @@
 			packageProductDependencies = (
 			);
 			productName = SaneClipIOS;
-			productReference = 7B6E13A4E249D85E296D3A5C /* SaneClipIOS.app */;
+			productReference = 7B6E13A4E249D85E296D3A5C /* SaneClip.app */;
 			productType = "com.apple.product-type.application";
 		};
 		F4822D70D6EC34E3F92050C1 /* SaneClipIOSWidgets */ = {
@@ -515,7 +515,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					355299070BFB55028AA7532C = {
 						DevelopmentTeam = M78L6FXD48;
@@ -553,7 +553,6 @@
 				FF4FB157E962C62A4042BD35 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				9B9B0D09FDAE079B73A7A0CB /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -782,9 +781,11 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -799,6 +800,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -814,7 +816,6 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = M78L6FXD48;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -863,9 +864,11 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -887,6 +890,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -902,7 +906,6 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -924,14 +927,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Widgets/SaneClipWidgets.entitlements;
-				CODE_SIGN_IDENTITY = "Developer ID Application: Stephan Joseph (M78L6FXD48)";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = M78L6FXD48;
+				CURRENT_PROJECT_VERSION = 6;
+				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Widgets/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 1.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip Widgets Developer ID";
@@ -978,9 +984,11 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -995,6 +1003,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -1011,7 +1020,6 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -1031,15 +1039,16 @@
 		7DB276C762F0B10F39DE682F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				AUTOMATION_APPLE_EVENTS = YES;
 				CODE_SIGN_ENTITLEMENTS = SaneClip/SaneClip.entitlements;
-				CODE_SIGN_IDENTITY = "Developer ID Application: Stephan Joseph (M78L6FXD48)";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = M78L6FXD48;
+				CURRENT_PROJECT_VERSION = 6;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SaneClip/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1047,7 +1056,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip Developer ID";
@@ -1060,15 +1069,16 @@
 		8BBC3246D221BD28E92945B7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				AUTOMATION_APPLE_EVENTS = YES;
 				CODE_SIGN_ENTITLEMENTS = SaneClip/SaneClipDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = M78L6FXD48;
+				CURRENT_PROJECT_VERSION = 6;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SaneClip/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1076,7 +1086,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = macosx;
@@ -1088,15 +1098,15 @@
 		980353CD513BAEA7BEC43D24 /* Release-AppStore */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				AUTOMATION_APPLE_EVENTS = YES;
 				CODE_SIGN_ENTITLEMENTS = SaneClip/SaneClipAppStore.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = M78L6FXD48;
+				CURRENT_PROJECT_VERSION = 6;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SaneClip/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1104,7 +1114,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				OTHER_SWIFT_FLAGS = "-D APP_STORE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -1121,7 +1131,6 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1147,7 +1156,6 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -1172,7 +1180,6 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -1195,7 +1202,6 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = M78L6FXD48;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1214,7 +1220,6 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = M78L6FXD48;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1233,11 +1238,13 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = M78L6FXD48;
+				CURRENT_PROJECT_VERSION = 6;
 				INFOPLIST_FILE = Widgets/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 1.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;
@@ -1253,7 +1260,6 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1278,11 +1284,14 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = M78L6FXD48;
+				CURRENT_PROJECT_VERSION = 6;
+				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Widgets/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 1.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;

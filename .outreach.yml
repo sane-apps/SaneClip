@@ -1,0 +1,43 @@
+# SaneClip Outreach Configuration
+
+project_name: SaneClip
+github_repo: sane-apps/SaneClip
+lemon_squeezy_product_id: null  # TBD
+
+# Known non-issues (don't flag these)
+known_facts:
+  - "Lemon Squeezy bounce emails are normal (test mode)"
+
+# Active launches (check status on each run)
+launches: []
+
+# Competitor issues we've already responded to
+competitor_responses: []
+
+# Influencer outreach tracking
+influencer_outreach:
+  sent: []
+  considering: []
+
+# Active customer conversations
+customer_conversations: []
+
+# Keywords for competitor scanning
+competitors:
+  - "macpaste"
+  - "paste"
+  - "clipboard manager"
+  - "clipboard history"
+  - "macos clipboard"
+
+# X/Twitter search keywords (for outreach skill)
+x_search_keywords:
+  - "clipboard manager macos"
+  - "clipboard history app"
+  - "macpaste alternative"
+  - "paste app alternative"
+
+# X/Twitter draft templates
+x_tweet_drafts:
+  - "SaneClip: Privacy-first clipboard manager. Touch ID protected, AES-256 encrypted, 100% on-device. No cloud, no tracking."
+  - "Just shipped SaneClip 1.4: Military-grade encryption for your clipboard history. Keychain integration, URL scheme confirmations, HTTPS webhooks."

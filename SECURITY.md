@@ -38,7 +38,7 @@ SaneClip includes several security features:
 If you discover a security vulnerability, please:
 
 1. **Do NOT** open a public GitHub issue
-2. Email security concerns to: [security@saneapps.com](mailto:security@saneapps.com)
+2. Email security concerns to: [hi@saneapps.com](mailto:hi@saneapps.com)
 3. Include:
    - Description of the vulnerability
    - Steps to reproduce

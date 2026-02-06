@@ -15,7 +15,8 @@ release:
   use_sparkle: true
   min_system_version: "15.0"
   dmg:
-    file_icon: Resources/Assets.xcassets/AppIcon.appiconset/icon_512x512@2x.png
+    volume_icon: Resources/DMGIcon.icns
+    file_icon: Resources/DMGIcon.icns
     window_size: "600 428"
     app_icon_pos: "150 190"
     drop_pos: "450 190"

@@ -61,6 +61,7 @@
 		E536D1C7BAF4008597CEBB54 /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 3F1B86A6C77CFF7FA0AAD10A /* CLAUDE.md */; };
 		F5163A69E164634BA8652A30 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6785DC91231845BA4B10499F /* PrivacyInfo.xcprivacy */; };
 		FB023FB9283A573C5E3BD4CB /* ClipboardItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352F7E56F26119F6981AEFB2 /* ClipboardItemRow.swift */; };
+		FF00AA11BB22CC33DD44EE55 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6E5B3959F17D55FF5C7F90E6 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -476,6 +477,7 @@
 			buildConfigurationList = 42581E2479786B73F3F53A6B /* Build configuration list for PBXNativeTarget "SaneClipIOS" */;
 			buildPhases = (
 				1E2A161CC75AA8E7514EB9C7 /* Sources */,
+				EE11DD22CC33BB44AA556677 /* Resources */,
 				127440FBA2DFFC86A28382F6 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -596,6 +598,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				3817DA763CFB9E32801AE3F2 /* CLAUDE.md in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EE11DD22CC33BB44AA556677 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF00AA11BB22CC33DD44EE55 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

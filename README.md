@@ -219,7 +219,7 @@ See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) for full details.
 
 **Download the latest DMG from [saneclip.com](https://saneclip.com) — $5 one-time purchase, free updates for life.**
 
-DMGs are hosted on Cloudflare (not attached to GitHub releases).
+DMGs are hosted on Cloudflare (not attached to GitHub releases). **Sparkle auto-updates** keep you current — once installed, updates are delivered automatically.
 
 ### Requirements
 
@@ -227,7 +227,7 @@ DMGs are hosted on Cloudflare (not attached to GitHub releases).
 - macOS 15.0 (Sequoia) or later
 - Apple Silicon Mac (M1+)
 
-**iOS App (Coming Soon):**
+**iOS Companion App:**
 - iOS 18.0 or later
 - iPhone or iPad
 
@@ -322,15 +322,13 @@ Before opening a PR:
 
 ---
 
-## 📱 iOS Companion App (Coming Soon)
+## 📱 iOS Companion App
 
 View your clipboard history on iPhone and iPad:
 
 - **History Tab** — Browse recent clips shared via App Groups
 - **Pinned Tab** — Quick access to your favorites
 - **iOS Widgets** — Recent and Pinned clips for Home Screen and Lock Screen
-
-*iOS app is in development. Currently works with shared App Groups for widget data.*
 
 ---
 

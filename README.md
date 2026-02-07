@@ -84,7 +84,7 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 - **⌘⇧V** — Open clipboard history
 - **⌘⌃1-9** — Paste items 1-9 instantly
 - **⌘⇧⌥V** — Paste as plain text
-- **⌘⌃V** — Paste from stack (queue mode)
+- **⌘⌃V** — Paste from stack (oldest or newest first — configurable in Settings)
 - **↑↓ or j/k** — Navigate through history
 
 ### Smart Snippets

@@ -18,6 +18,9 @@ struct SettingsView: View {
         case general = "General"
         case shortcuts = "Shortcuts"
         case snippets = "Snippets"
+        #if ENABLE_SYNC
+            case sync = "Sync"
+        #endif
         case storage = "Storage"
         case about = "About"
 
@@ -53,6 +56,10 @@ struct SettingsView: View {
                 case .snippets:
                     SnippetsSettingsView()
                         .padding(20)
+                #if ENABLE_SYNC
+                    case .sync:
+                        SyncSettingsView()
+                #endif
                 case .storage:
                     StorageStatsView()
                         .padding(20)
@@ -72,6 +79,9 @@ struct SettingsView: View {
         case .general: "gear"
         case .shortcuts: "keyboard"
         case .snippets: "text.quote"
+        #if ENABLE_SYNC
+            case .sync: "arrow.triangle.2.circlepath.icloud"
+        #endif
         case .storage: "chart.pie"
         case .about: "info.circle"
         }
@@ -82,6 +92,9 @@ struct SettingsView: View {
         case .general: .textStone
         case .shortcuts: .clipBlue
         case .snippets: .green
+        #if ENABLE_SYNC
+            case .sync: .cyan
+        #endif
         case .storage: .pinnedOrange
         case .about: .brandSilver
         }

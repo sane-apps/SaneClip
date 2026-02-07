@@ -44,9 +44,12 @@
 		8D5889EE4B31459E191B26C8 /* URLSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32272353D437FBA78581647 /* URLSchemeHandler.swift */; };
 		95711D419E5C0F66ED022198 /* SaneClipIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305BB1EB756CA0FC1DAAFFAD /* SaneClipIntents.swift */; };
 		959A8C26A75136D338B643F4 /* PinnedClipsIOSWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CAE73B92B88E86164C13BE4 /* PinnedClipsIOSWidget.swift */; };
+		97C7F0E599822C25790FE644 /* SyncConflictResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098AA40BC8DC5C2501EECC1C /* SyncConflictResolver.swift */; };
 		9ABA34BEB2F16A4A3646750C /* StorageStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE7465DE4D6ABC7FA43FECC8 /* StorageStatsView.swift */; };
+		A1E34C40B6B4693E554DB614 /* SharedClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB6B85899467ECE68DDCE6E /* SharedClipboardItem.swift */; };
 		A2DA6F029DD4A6EEEA2396AF /* RecentClipsIOSWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19827830127FF21617618069 /* RecentClipsIOSWidget.swift */; };
 		B3761DF4123417A5EA8C0DF3 /* SaneClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FFF4DCFB95C5B26D00A640F /* SaneClipApp.swift */; };
+		C122DD15A6F4D4806FA7D39F /* SyncDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D786C9674AE3DE8113632A /* SyncDataModel.swift */; };
 		C856E4EE52C74475EE8D8CB3 /* SaneClipWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817694FD0F55D259B3F10FDA /* SaneClipWidgets.swift */; };
 		CB3014779A5B0642D1441ADD /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
 		CBB9469D4E19146B9AE85BEB /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
@@ -60,10 +63,12 @@
 		DD741ED4E799B3DE999D2A65 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6709551974949109A6A239 /* EmptyStateView.swift */; };
 		DE0D1479DE595F1FA651F71F /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
 		DFC8A7437D713D82B5224D1E /* HistoryEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82FA89438430FB80B145A7C5 /* HistoryEncryption.swift */; };
+		E1F118A7B4867A2E6F26A819 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1808F717600EB63D59B347DB /* SyncCoordinator.swift */; };
 		E4BBDD04577B7398507E9597 /* ClipboardItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35354A7D3201B61455110B3F /* ClipboardItemCell.swift */; };
 		E536D1C7BAF4008597CEBB54 /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 3F1B86A6C77CFF7FA0AAD10A /* CLAUDE.md */; };
 		F5163A69E164634BA8652A30 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6785DC91231845BA4B10499F /* PrivacyInfo.xcprivacy */; };
 		FB023FB9283A573C5E3BD4CB /* ClipboardItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352F7E56F26119F6981AEFB2 /* ClipboardItemRow.swift */; };
+		FDD144B1AFB419C804989B70 /* SyncSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08983A3D7903ACF79993349 /* SyncSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -116,10 +121,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		098AA40BC8DC5C2501EECC1C /* SyncConflictResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncConflictResolver.swift; sourceTree = "<group>"; };
 		09C2D5E2943BC51ED6D88512 /* SaneClipWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SaneClipWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		14D0EBBF195245B8CE7ECF07 /* SaneClip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SaneClip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1775AC6444F4E26AD66FA435 /* SecurityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityTests.swift; sourceTree = "<group>"; };
 		17C9815342518E615ADBC5A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		1808F717600EB63D59B347DB /* SyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCoordinator.swift; sourceTree = "<group>"; };
 		18ED2363F109AC56BCE47BE7 /* PinnedTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTab.swift; sourceTree = "<group>"; };
 		197F40B4EAA11C09CD1A5801 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		19827830127FF21617618069 /* RecentClipsIOSWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentClipsIOSWidget.swift; sourceTree = "<group>"; };
@@ -163,6 +170,7 @@
 		A942FCE8A60E673C341FFB02 /* SettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTab.swift; sourceTree = "<group>"; };
 		AA6709551974949109A6A239 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		AD5C75ADF36A7D05AEEFAE0C /* DMGIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = DMGIcon.icns; sourceTree = "<group>"; };
+		B08983A3D7903ACF79993349 /* SyncSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSettingsView.swift; sourceTree = "<group>"; };
 		B6FBE5E8C8A623FA0C27ECBE /* SnippetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetManager.swift; sourceTree = "<group>"; };
 		B74750429D17786620EF008E /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		B84FF9114238C97C3AA6182A /* SaneClipIOSWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipIOSWidgets.entitlements; sourceTree = "<group>"; };
@@ -172,6 +180,7 @@
 		CE95B8CE57324347C7B10C45 /* HistoryTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTab.swift; sourceTree = "<group>"; };
 		D10F261894209685FFC6BF8E /* ClipboardHistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryViewModel.swift; sourceTree = "<group>"; };
 		D3D14834E50FCC1F8B8C59CD /* SaneClipWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipWidgets.entitlements; sourceTree = "<group>"; };
+		D3D786C9674AE3DE8113632A /* SyncDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncDataModel.swift; sourceTree = "<group>"; };
 		D73D02F6E4DBB9312E67A0AD /* ClipboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardManager.swift; sourceTree = "<group>"; };
 		DD2BF58DEC0153C26EA351A8 /* SaneClipIOSWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipIOSWidgets.swift; sourceTree = "<group>"; };
 		DE1B3E95AFE08432850B538B /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
@@ -239,6 +248,7 @@
 				8963796CABEF00573B399B2C /* Intents */,
 				01121E53FCA5AD4EBABF86B1 /* Models */,
 				903C3BC12BB2E45AD8A34011 /* Security */,
+				C0DBDA2E36872AC2C4583362 /* Sync */,
 				A34F8DDA889A2E5A4E7DF589 /* URLScheme */,
 				771DF3F953E6CCFB00E1CBD5 /* Webhooks */,
 			);
@@ -368,6 +378,17 @@
 				4BCD829890D1F0F66702EC52 /* SaneClipIOSWidgetsDebug.entitlements */,
 			);
 			path = iOSWidgets;
+			sourceTree = "<group>";
+		};
+		C0DBDA2E36872AC2C4583362 /* Sync */ = {
+			isa = PBXGroup;
+			children = (
+				098AA40BC8DC5C2501EECC1C /* SyncConflictResolver.swift */,
+				1808F717600EB63D59B347DB /* SyncCoordinator.swift */,
+				D3D786C9674AE3DE8113632A /* SyncDataModel.swift */,
+				B08983A3D7903ACF79993349 /* SyncSettingsView.swift */,
+			);
+			path = Sync;
 			sourceTree = "<group>";
 		};
 		D9D0EFB2C3ADEBAA6D5BF62C /* UI */ = {
@@ -721,10 +742,15 @@
 				D0121F4D70D88480A053611D /* SensitiveDataDetector.swift in Sources */,
 				33E5382D17E0E77A658BF322 /* SettingsModel.swift in Sources */,
 				60E0917C7EE6C533E0E339D6 /* SettingsView.swift in Sources */,
+				A1E34C40B6B4693E554DB614 /* SharedClipboardItem.swift in Sources */,
 				521359361BE56A852162DBE5 /* Snippet.swift in Sources */,
 				DAB08CE697B1C069882BF53B /* SnippetManager.swift in Sources */,
 				2F9FE50868BCF18EF02A4A1E /* SnippetsSettingsView.swift in Sources */,
 				9ABA34BEB2F16A4A3646750C /* StorageStatsView.swift in Sources */,
+				97C7F0E599822C25790FE644 /* SyncConflictResolver.swift in Sources */,
+				E1F118A7B4867A2E6F26A819 /* SyncCoordinator.swift in Sources */,
+				C122DD15A6F4D4806FA7D39F /* SyncDataModel.swift in Sources */,
+				FDD144B1AFB419C804989B70 /* SyncSettingsView.swift in Sources */,
 				07EBD6613F07245138A3332A /* TextTransformService.swift in Sources */,
 				8D5889EE4B31459E191B26C8 /* URLSchemeHandler.swift in Sources */,
 				88429CF77152B054F581B567 /* WebhookService.swift in Sources */,
@@ -1125,7 +1151,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.4;
-				OTHER_SWIFT_FLAGS = "-D APP_STORE";
+				OTHER_SWIFT_FLAGS = "-D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = macosx;

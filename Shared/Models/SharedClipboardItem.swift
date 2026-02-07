@@ -1,5 +1,9 @@
 import Foundation
 
+#if os(macOS)
+    import AppKit
+#endif
+
 /// Platform-agnostic clipboard content for cross-platform sync
 enum SharedClipboardContent: Codable, Sendable {
     case text(String)
@@ -35,10 +39,10 @@ enum SharedClipboardContent: Codable, Sendable {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         switch self {
-        case .text(let string):
+        case let .text(string):
             try container.encode("text", forKey: .type)
             try container.encode(string, forKey: .text)
-        case .imageData(let data, let width, let height):
+        case let .imageData(data, width, height):
             try container.encode("image", forKey: .type)
             try container.encode(data, forKey: .imageData)
             try container.encode(width, forKey: .width)
@@ -81,7 +85,7 @@ struct SharedClipboardItem: Identifiable, Codable, Sendable {
     /// Text preview for display
     var preview: String {
         switch content {
-        case .text(let string):
+        case let .text(string):
             let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
             let singleLine = trimmed.replacingOccurrences(
                 of: "\\s+",
@@ -99,7 +103,7 @@ struct SharedClipboardItem: Identifiable, Codable, Sendable {
 
     /// Check if content is a URL
     var isURL: Bool {
-        guard case .text(let string) = content else { return false }
+        guard case let .text(string) = content else { return false }
         let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
         let range = NSRange(string.startIndex..., in: string)
         let matches = detector?.numberOfMatches(in: string, options: [], range: range) ?? 0
@@ -108,7 +112,7 @@ struct SharedClipboardItem: Identifiable, Codable, Sendable {
 
     /// Check if content looks like code
     var isCode: Bool {
-        guard case .text(let string) = content else { return false }
+        guard case let .text(string) = content else { return false }
         let codeIndicators = [
             "func ", "class ", "struct ", "enum ", "import ",
             "def ", "return ", "if ", "for ", "while ",
@@ -117,6 +121,21 @@ struct SharedClipboardItem: Identifiable, Codable, Sendable {
         ]
         return codeIndicators.contains { string.contains($0) }
     }
+
+    #if os(macOS)
+        /// Convert to macOS-native ClipboardContent
+        var macOSContent: ClipboardContent {
+            switch content {
+            case let .text(string):
+                return .text(string)
+            case let .imageData(data, _, _):
+                if let image = NSImage(data: data) {
+                    return .image(image)
+                }
+                return .text("[Image load failed]")
+            }
+        }
+    #endif
 
     /// Relative time for display
     var relativeTime: String {

@@ -167,6 +167,20 @@ class ClipboardManager {
         }
 
         saveHistory()
+
+        #if ENABLE_SYNC
+            // Queue the new item for iCloud sync
+            let shared = SharedClipboardItem(
+                id: item.id,
+                content: item.sharedContent,
+                timestamp: item.timestamp,
+                sourceAppBundleID: item.sourceAppBundleID,
+                sourceAppName: item.sourceAppName,
+                pasteCount: item.pasteCount
+            )
+            SyncCoordinator.shared.queueItemForSync(shared)
+        #endif
+
         let currentCount = history.count
         logger.debug("Added clipboard item, history count: \(currentCount)")
     }
@@ -371,7 +385,38 @@ class ClipboardManager {
         history.removeAll { $0.id == item.id }
         pinnedItems.removeAll { $0.id == item.id }
         saveHistory()
+
+        #if ENABLE_SYNC
+            SyncCoordinator.shared.queueDeleteForSync(itemID: item.id)
+        #endif
     }
+
+    // MARK: - Sync Support
+
+    #if ENABLE_SYNC
+        /// Insert an item received from iCloud sync (no re-sync trigger)
+        func insertSyncedItem(_ item: ClipboardItem) {
+            // Don't add duplicates
+            guard !history.contains(where: { $0.id == item.id }) else { return }
+            history.insert(item, at: 0)
+
+            // Trim to max size
+            if history.count > maxHistorySize {
+                history = Array(history.prefix(maxHistorySize))
+            }
+
+            saveHistory()
+            logger.debug("Inserted synced item: \(item.id)")
+        }
+
+        /// Delete an item received from iCloud sync (no re-sync trigger)
+        func deleteSyncedItem(_ itemID: UUID) {
+            history.removeAll { $0.id == itemID }
+            pinnedItems.removeAll { $0.id == itemID }
+            saveHistory()
+            logger.debug("Deleted synced item: \(itemID)")
+        }
+    #endif
 
     func clearHistory() {
         history.removeAll()

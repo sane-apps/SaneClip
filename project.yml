@@ -99,6 +99,9 @@ targets:
       - path: UI
         excludes:
           - "**/CLAUDE.md"
+      - path: Shared
+        excludes:
+          - "**/CLAUDE.md"
       - Resources
     dependencies:
       - package: KeyboardShortcuts
@@ -151,7 +154,7 @@ targets:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
           CODE_SIGN_IDENTITY: "Apple Distribution"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipAppStore.entitlements
-          OTHER_SWIFT_FLAGS: "-D APP_STORE"
+          OTHER_SWIFT_FLAGS: "-D APP_STORE -D ENABLE_SYNC"
     postCompileScripts:
       - script: |
           if which swiftlint >/dev/null; then

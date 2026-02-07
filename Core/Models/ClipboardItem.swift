@@ -33,7 +33,8 @@ struct ClipboardItem: Identifiable {
     /// Get the app icon for the source app
     var sourceAppIcon: NSImage? {
         guard let bundleID = sourceAppBundleID,
-              let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) else {
+              let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)
+        else {
             return nil
         }
         return NSWorkspace.shared.icon(forFile: appURL.path)
@@ -41,16 +42,16 @@ struct ClipboardItem: Identifiable {
 
     var contentHash: String {
         switch content {
-        case .text(let string):
-            return "text:\(string.hashValue)"
-        case .image(let image):
-            return "image:\(image.tiffRepresentation?.hashValue ?? 0)"
+        case let .text(string):
+            "text:\(string.hashValue)"
+        case let .image(image):
+            "image:\(image.tiffRepresentation?.hashValue ?? 0)"
         }
     }
 
     var preview: String {
         switch content {
-        case .text(let string):
+        case let .text(string):
             let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
             if trimmed.count > 100 {
                 return String(trimmed.prefix(100)) + "..."
@@ -63,11 +64,11 @@ struct ClipboardItem: Identifiable {
 
     var stats: String {
         switch content {
-        case .text(let string):
+        case let .text(string):
             let words = string.split { $0.isWhitespace || $0.isNewline }.count
             let chars = string.count
             return "\(words)wd · \(chars)ch"
-        case .image(let image):
+        case let .image(image):
             let size = image.size
             return "\(Int(size.width))×\(Int(size.height))"
         }
@@ -75,7 +76,7 @@ struct ClipboardItem: Identifiable {
 
     /// Simple heuristic to detect if content is code
     var isCode: Bool {
-        guard case .text(let string) = content else { return false }
+        guard case let .text(string) = content else { return false }
         let codeIndicators = [
             "func ", "var ", "let ", "import ", "class ", "struct ",
             "def ", "package ", "{", "}", ";", "=>", "return"
@@ -94,7 +95,7 @@ struct ClipboardItem: Identifiable {
 
     /// Detect if content is a URL
     var isURL: Bool {
-        guard case .text(let string) = content else { return false }
+        guard case let .text(string) = content else { return false }
         let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.hasPrefix("http://") || trimmed.hasPrefix("https://") || trimmed.hasPrefix("www.")
     }
@@ -120,6 +121,21 @@ struct ClipboardItem: Identifiable {
         }
 
         return components.string ?? urlString
+    }
+
+    /// Convert to platform-agnostic SharedClipboardContent for sync
+    var sharedContent: SharedClipboardContent {
+        switch content {
+        case let .text(string):
+            return .text(string)
+        case let .image(image):
+            if let tiffData = image.tiffRepresentation,
+               let bitmap = NSBitmapImageRep(data: tiffData),
+               let pngData = bitmap.representation(using: .png, properties: [:]) {
+                return .imageData(pngData, width: Int(image.size.width), height: Int(image.size.height))
+            }
+            return .text("[Image conversion failed]")
+        }
     }
 
     /// Compact time ago string with smart scaling

@@ -3,12 +3,19 @@ import SwiftUI
 @main
 struct SaneClipIOSApp: App {
     @StateObject private var viewModel = ClipboardHistoryViewModel()
+    @AppStorage("hasCompletedOnboardingIOS") private var hasCompletedOnboarding = false
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(viewModel)
                 .tint(Color.clipBlue)
+                .fullScreenCover(isPresented: Binding(
+                    get: { !hasCompletedOnboarding },
+                    set: { if $0 { hasCompletedOnboarding = false } }
+                )) {
+                    OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
+                }
         }
     }
 }

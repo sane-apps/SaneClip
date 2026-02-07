@@ -140,6 +140,27 @@ struct GeneralSettingsView: View {
                         get: { settings.pasteStackReversed },
                         set: { settings.pasteStackReversed = $0 }
                     ))
+                    CompactDivider()
+                    CompactRow("Default paste mode") {
+                        Picker("", selection: Binding(
+                            get: { SettingsModel.shared.defaultPasteMode },
+                            set: { SettingsModel.shared.defaultPasteMode = $0 }
+                        )) {
+                            ForEach(PasteMode.allCases, id: \.self) { mode in
+                                Text(mode.rawValue).tag(mode)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .frame(width: 240)
+                    }
+                    HStack {
+                        Spacer()
+                        Text(SettingsModel.shared.defaultPasteMode.description)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 8)
                 }
 
                 CompactSection("Security") {
@@ -631,6 +652,10 @@ struct ShortcutsSettingsView: View {
                     CompactDivider()
                     CompactRow("Paste from Stack") {
                         KeyboardShortcuts.Recorder(for: .pasteFromStack)
+                    }
+                    CompactDivider()
+                    CompactRow("Smart Paste") {
+                        KeyboardShortcuts.Recorder(for: .pasteSmartMode)
                     }
                 }
 

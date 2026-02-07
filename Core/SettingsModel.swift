@@ -1,6 +1,21 @@
 import Combine
 import SwiftUI
 
+/// Default paste mode when pasting from history
+enum PasteMode: String, CaseIterable {
+    case standard = "Standard"
+    case plain = "Plain Text"
+    case smart = "Smart"
+
+    var description: String {
+        switch self {
+        case .standard: "Paste with original formatting"
+        case .plain: "Always strip formatting"
+        case .smart: "Auto-detect: code→plain, URL→cleaned, else→standard"
+        }
+    }
+}
+
 @MainActor
 @Observable
 class SettingsModel {
@@ -73,6 +88,13 @@ class SettingsModel {
         }
     }
 
+    /// Default paste mode for history items
+    var defaultPasteMode: PasteMode {
+        didSet {
+            UserDefaults.standard.set(defaultPasteMode.rawValue, forKey: "defaultPasteMode")
+        }
+    }
+
     func isAppExcluded(_ bundleID: String?) -> Bool {
         guard let bundleID else { return false }
         return excludedApps.contains(bundleID)
@@ -99,6 +121,7 @@ class SettingsModel {
         autoExpireHours = UserDefaults.standard.object(forKey: "autoExpireHours") as? Int ?? 0
         encryptHistory = UserDefaults.standard.object(forKey: "encryptHistory") as? Bool ?? true
         pasteStackReversed = UserDefaults.standard.object(forKey: "pasteStackReversed") as? Bool ?? false
+        defaultPasteMode = PasteMode(rawValue: UserDefaults.standard.string(forKey: "defaultPasteMode") ?? "") ?? .standard
         applyDockVisibility()
     }
 
@@ -136,6 +159,7 @@ class SettingsModel {
             "autoExpireHours": autoExpireHours,
             "encryptHistory": encryptHistory,
             "pasteStackReversed": pasteStackReversed,
+            "defaultPasteMode": defaultPasteMode.rawValue,
             // Include clipboard rules
             "rules": [
                 "stripTrackingParams": ClipboardRulesManager.shared.stripTrackingParams,
@@ -188,6 +212,10 @@ class SettingsModel {
         }
         if let value = settings["pasteStackReversed"] as? Bool {
             pasteStackReversed = value
+        }
+        if let value = settings["defaultPasteMode"] as? String,
+           let mode = PasteMode(rawValue: value) {
+            defaultPasteMode = mode
         }
 
         // Apply clipboard rules if present

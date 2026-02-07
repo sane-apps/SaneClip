@@ -1,8 +1,8 @@
-import SwiftUI
 import AppKit
 import KeyboardShortcuts
+import SwiftUI
 #if !APP_STORE
-import Sparkle
+    import Sparkle
 #endif
 import LocalAuthentication
 import os.log
@@ -10,34 +10,35 @@ import os.log
 private let appLogger = Logger(subsystem: "com.saneclip.app", category: "App")
 
 #if !APP_STORE
-// MARK: - Update Service
 
-@MainActor
-class UpdateService: NSObject, ObservableObject {
-    static let shared = UpdateService()
+    // MARK: - Update Service
 
-    private var updaterController: SPUStandardUpdaterController?
+    @MainActor
+    class UpdateService: NSObject, ObservableObject {
+        static let shared = UpdateService()
 
-    override init() {
-        super.init()
-        self.updaterController = SPUStandardUpdaterController(
-            startingUpdater: true,
-            updaterDelegate: nil,
-            userDriverDelegate: nil
-        )
-        appLogger.info("Sparkle updater initialized")
+        private var updaterController: SPUStandardUpdaterController?
+
+        override init() {
+            super.init()
+            updaterController = SPUStandardUpdaterController(
+                startingUpdater: true,
+                updaterDelegate: nil,
+                userDriverDelegate: nil
+            )
+            appLogger.info("Sparkle updater initialized")
+        }
+
+        func checkForUpdates() {
+            appLogger.info("User triggered check for updates")
+            updaterController?.checkForUpdates(nil)
+        }
+
+        var automaticallyChecksForUpdates: Bool {
+            get { updaterController?.updater.automaticallyChecksForUpdates ?? false }
+            set { updaterController?.updater.automaticallyChecksForUpdates = newValue }
+        }
     }
-
-    func checkForUpdates() {
-        appLogger.info("User triggered check for updates")
-        updaterController?.checkForUpdates(nil)
-    }
-
-    var automaticallyChecksForUpdates: Bool {
-        get { updaterController?.updater.automaticallyChecksForUpdates ?? false }
-        set { updaterController?.updater.automaticallyChecksForUpdates = newValue }
-    }
-}
 #endif
 
 // MARK: - Keyboard Shortcuts Extension
@@ -46,6 +47,7 @@ extension KeyboardShortcuts.Name {
     static let showClipboardHistory = Self("showClipboardHistory", default: .init(.v, modifiers: [.command, .shift]))
     static let pasteAsPlainText = Self("pasteAsPlainText", default: .init(.v, modifiers: [.command, .shift, .option]))
     static let pasteFromStack = Self("pasteFromStack", default: .init(.v, modifiers: [.command, .control]))
+    static let pasteSmartMode = Self("pasteSmartMode", default: .init(.v, modifiers: [.command, .shift, .control]))
     // Quick paste shortcuts for items 1-9
     static let pasteItem1 = Self("pasteItem1", default: .init(.one, modifiers: [.command, .control]))
     static let pasteItem2 = Self("pasteItem2", default: .init(.two, modifiers: [.command, .control]))
@@ -66,23 +68,23 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     private var popover: NSPopover!
     private var clipboardManager: ClipboardManager!
     #if !APP_STORE
-    private var updateService: UpdateService!
+        private var updateService: UpdateService!
     #endif
     private var onboardingWindow: NSWindow?
     /// Track when user last authenticated with Touch ID (grace period)
     private var lastAuthenticationTime: Date?
-    private let authGracePeriod: TimeInterval = 30.0  // seconds - stays unlocked for 30s
+    private let authGracePeriod: TimeInterval = 30.0 // seconds - stays unlocked for 30s
 
     deinit {
         NotificationCenter.default.removeObserver(self, name: .menuBarIconChanged, object: nil)
     }
 
-    func applicationDidFinishLaunching(_ notification: Notification) {
+    func applicationDidFinishLaunching(_: Notification) {
         appLogger.info("SaneClip starting...")
 
         #if !APP_STORE
-        // Initialize update service (Sparkle)
-        updateService = UpdateService.shared
+            // Initialize update service (Sparkle)
+            updateService = UpdateService.shared
         #endif
 
         // Apply dock visibility setting (must happen early)
@@ -135,7 +137,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem.separator())
 
         let quitItem = NSMenuItem(
-            title: "Quit SaneClip", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+            title: "Quit SaneClip", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"
+        )
         menu.addItem(quitItem)
         statusItem.menu = nil // We'll show it manually on right-click
 
@@ -198,6 +201,13 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
+        KeyboardShortcuts.onKeyUp(for: .pasteSmartMode) { [weak self] in
+            Task { @MainActor in
+                guard let item = self?.clipboardManager.history.first else { return }
+                self?.clipboardManager.pasteSmartMode(item: item)
+            }
+        }
+
         // Quick paste shortcuts 1-9
         let shortcuts: [KeyboardShortcuts.Name] = [
             .pasteItem1, .pasteItem2, .pasteItem3, .pasteItem4, .pasteItem5,
@@ -229,6 +239,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         if KeyboardShortcuts.getShortcut(for: .pasteFromStack) == nil {
             KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .control]), for: .pasteFromStack)
             appLogger.info("Set default shortcut: Cmd+Ctrl+V for paste from stack")
+        }
+
+        // Smart paste: Cmd+Shift+Ctrl+V
+        if KeyboardShortcuts.getShortcut(for: .pasteSmartMode) == nil {
+            KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .shift, .control]), for: .pasteSmartMode)
+            appLogger.info("Set default shortcut: Cmd+Shift+Ctrl+V for smart paste")
         }
 
         // Quick paste shortcuts: Cmd+Ctrl+1 through 9
@@ -353,6 +369,30 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(NSMenuItem.separator())
         }
 
+        // Snippets submenu
+        let snippetsMenu = NSMenu()
+        let snippetsItem = NSMenuItem(title: "Snippets", action: nil, keyEquivalent: "")
+        let recentSnippets = Array(SnippetManager.shared.snippets.prefix(10))
+        if !recentSnippets.isEmpty {
+            for (index, snippet) in recentSnippets.enumerated() {
+                let snippetMenuItem = NSMenuItem(
+                    title: snippet.name,
+                    action: #selector(pasteSnippetFromMenu(_:)),
+                    keyEquivalent: ""
+                )
+                snippetMenuItem.tag = index
+                snippetMenuItem.target = self
+                snippetsMenu.addItem(snippetMenuItem)
+            }
+        } else {
+            let emptyItem = NSMenuItem(title: "No snippets", action: nil, keyEquivalent: "")
+            emptyItem.isEnabled = false
+            snippetsMenu.addItem(emptyItem)
+        }
+        snippetsItem.submenu = snippetsMenu
+        menu.addItem(snippetsItem)
+        menu.addItem(NSMenuItem.separator())
+
         let clearItem = NSMenuItem(title: "Clear History", action: #selector(clearHistoryFromMenu), keyEquivalent: "")
         clearItem.target = self
         menu.addItem(clearItem)
@@ -366,7 +406,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem.separator())
 
         let quit = NSMenuItem(
-            title: "Quit SaneClip", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+            title: "Quit SaneClip", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"
+        )
         menu.addItem(quit)
 
         statusItem.menu = menu
@@ -403,6 +444,21 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         clipboardManager.pasteItemAt(index: index)
     }
 
+    @objc private func pasteSnippetFromMenu(_ sender: NSMenuItem) {
+        let index = sender.tag
+        let snippets = SnippetManager.shared.snippets
+        guard index < snippets.count else { return }
+        let snippet = snippets[index]
+
+        // If snippet has user placeholders, just copy the template
+        // (full placeholder UI would require a sheet - keep it simple for context menu)
+        if SnippetManager.shared.hasUserPlaceholders(snippet: snippet) {
+            clipboardManager.pasteSnippet(snippet)
+        } else {
+            clipboardManager.pasteSnippet(snippet)
+        }
+    }
+
     @objc private func handleMenuBarIconChanged(_ notification: Notification) {
         guard let iconName = notification.object as? String,
               let button = statusItem.button else { return }
@@ -411,7 +467,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - URL Scheme Handling
 
-    func application(_ application: NSApplication, open urls: [URL]) {
+    func application(_: NSApplication, open urls: [URL]) {
         for url in urls {
             URLSchemeHandler.shared.handle(url)
         }

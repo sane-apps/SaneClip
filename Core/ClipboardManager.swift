@@ -236,6 +236,51 @@ class ClipboardManager {
         }
     }
 
+    /// Smart paste: auto-selects paste behavior based on content type
+    /// - Code → plain text (preserves indentation, strips rich formatting)
+    /// - URL → cleaned URL with tracking params stripped
+    /// - Everything else → standard paste
+    func pasteSmartMode(item: ClipboardItem) {
+        if item.isCode {
+            pasteAsPlainText(item: item)
+        } else if item.isURL, case let .text(urlString) = item.content {
+            let cleaned = ClipboardItem.stripTrackingParams(from: urlString)
+            let pasteboard = NSPasteboard.general
+            pasteboard.clearContents()
+            pasteboard.setString(cleaned, forType: .string)
+
+            if let index = history.firstIndex(where: { $0.id == item.id }) {
+                var updatedItem = history.remove(at: index)
+                updatedItem.pasteCount += 1
+                history.insert(updatedItem, at: 0)
+                saveHistory()
+            }
+
+            if SettingsModel.shared.playSounds {
+                NSSound(named: .init("Pop"))?.play()
+            }
+
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(200))
+                self.simulatePaste()
+            }
+        } else {
+            paste(item: item)
+        }
+    }
+
+    /// Paste using the user's default paste mode preference
+    func pasteWithDefaultMode(item: ClipboardItem) {
+        switch SettingsModel.shared.defaultPasteMode {
+        case .standard:
+            paste(item: item)
+        case .plain:
+            pasteAsPlainText(item: item)
+        case .smart:
+            pasteSmartMode(item: item)
+        }
+    }
+
     /// Paste item with a text transformation applied
     func pasteWithTransform(item: ClipboardItem, transform: TextTransform) {
         guard case let .text(string) = item.content else { return }
@@ -252,6 +297,26 @@ class ClipboardManager {
             history.insert(updatedItem, at: 0)
             saveHistory()
         }
+
+        if SettingsModel.shared.playSounds {
+            NSSound(named: .init("Pop"))?.play()
+        }
+
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(200))
+            self.simulatePaste()
+        }
+    }
+
+    /// Paste an expanded snippet to the active application
+    func pasteSnippet(_ snippet: Snippet, values: [String: String] = [:]) {
+        let expanded = SnippetManager.shared.expand(snippet: snippet, values: values)
+
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(expanded, forType: .string)
+
+        SnippetManager.shared.incrementUseCount(for: snippet)
 
         if SettingsModel.shared.playSounds {
             NSSound(named: .init("Pop"))?.play()

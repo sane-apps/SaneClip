@@ -1,9 +1,9 @@
 # Feature Requests - SaneClip
 
 > **Navigation**
-> | Session | Bugs | How to Work | Releases | Testimonials |
-> |---------|------|-------------|----------|--------------|
-> | [../SESSION_HANDOFF.md](../SESSION_HANDOFF.md) | [../BUG_TRACKING.md](../BUG_TRACKING.md) | [../DEVELOPMENT.md](../DEVELOPMENT.md) | [../CHANGELOG.md](../CHANGELOG.md) | [testimonials.md](testimonials.md) |
+> | Session | How to Work | Releases | Testimonials |
+> |---------|-------------|----------|--------------|
+> | [../SESSION_HANDOFF.md](../SESSION_HANDOFF.md) | [../DEVELOPMENT.md](../DEVELOPMENT.md) | [../CHANGELOG.md](../CHANGELOG.md) | [testimonials.md](testimonials.md) |
 
 ---
 

@@ -1,7 +1,7 @@
-import SwiftUI
 import AppKit
-import os.log
 import Combine
+import os.log
+import SwiftUI
 import WidgetKit
 
 @MainActor
@@ -92,21 +92,22 @@ class ClipboardManager {
             !isPinned(item) && item.timestamp < cutoff
         }
 
-        if history.count < beforeCount {
+        let afterCount = history.count
+        if afterCount < beforeCount {
             saveHistory()
-            logger.debug("Cleaned up \(beforeCount - self.history.count) expired items")
+            logger.debug("Cleaned up \(beforeCount - afterCount) expired items")
         }
     }
 
     private func isExcludedApp(bundleID: String?, name: String?) -> Bool {
-        guard let bundleID = bundleID else { return false }
+        guard let bundleID else { return false }
 
         if SettingsModel.shared.isAppExcluded(bundleID) {
             logger.debug("Skipping clipboard from excluded app: \(name ?? "unknown")")
             return true
         }
 
-        if SettingsModel.shared.protectPasswords && ignoredBundleIDs.contains(bundleID) {
+        if SettingsModel.shared.protectPasswords, ignoredBundleIDs.contains(bundleID) {
             logger.debug("Skipping clipboard from known password manager: \(bundleID)")
             return true
         }
@@ -166,7 +167,8 @@ class ClipboardManager {
         }
 
         saveHistory()
-        logger.debug("Added clipboard item, history count: \(self.history.count)")
+        let currentCount = history.count
+        logger.debug("Added clipboard item, history count: \(currentCount)")
     }
 
     func paste(item: ClipboardItem) {
@@ -174,9 +176,9 @@ class ClipboardManager {
         pasteboard.clearContents()
 
         switch item.content {
-        case .text(let string):
+        case let .text(string):
             pasteboard.setString(string, forType: .string)
-        case .image(let image):
+        case let .image(image):
             if let tiffData = image.tiffRepresentation {
                 pasteboard.setData(tiffData, forType: .tiff)
             }
@@ -210,7 +212,7 @@ class ClipboardManager {
 
     /// Paste item as plain text (strips formatting)
     func pasteAsPlainText(item: ClipboardItem) {
-        guard case .text(let string) = item.content else { return }
+        guard case let .text(string) = item.content else { return }
 
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
@@ -236,7 +238,7 @@ class ClipboardManager {
 
     /// Paste item with a text transformation applied
     func pasteWithTransform(item: ClipboardItem, transform: TextTransform) {
-        guard case .text(let string) = item.content else { return }
+        guard case let .text(string) = item.content else { return }
 
         let transformed = transform.apply(to: string)
         let pasteboard = NSPasteboard.general
@@ -271,10 +273,14 @@ class ClipboardManager {
         }
     }
 
-    /// Paste the next item from the stack (FIFO - first in, first out)
+    /// Paste the next item from the stack (FIFO or LIFO based on settings)
     func pasteFromStack() {
-        guard let item = pasteStack.first else { return }
-        pasteStack.removeFirst()
+        guard !pasteStack.isEmpty else { return }
+        let item: ClipboardItem = if SettingsModel.shared.pasteStackReversed {
+            pasteStack.removeLast()
+        } else {
+            pasteStack.removeFirst()
+        }
         paste(item: item)
     }
 
@@ -327,9 +333,9 @@ class ClipboardManager {
         pasteboard.clearContents()
 
         switch item.content {
-        case .text(let string):
+        case let .text(string):
             pasteboard.setString(string, forType: .string)
-        case .image(let image):
+        case let .image(image):
             if let tiffData = image.tiffRepresentation {
                 pasteboard.setData(tiffData, forType: .tiff)
             }
@@ -381,7 +387,7 @@ class ClipboardManager {
     /// Export history to JSON data
     func exportHistory() -> Data? {
         let formatter = ISO8601DateFormatter()
-        let pinnedIDs = Set(pinnedItems.map { $0.id })
+        let pinnedIDs = Set(pinnedItems.map(\.id))
         let exportItems = history.compactMap { item -> [String: Any]? in
             var dict: [String: Any] = [
                 "id": item.id.uuidString,
@@ -389,7 +395,7 @@ class ClipboardManager {
                 "pasteCount": item.pasteCount
             ]
 
-            if case .text(let string) = item.content {
+            if case let .text(string) = item.content {
                 dict["text"] = string
             } else {
                 // Skip images in export
@@ -419,7 +425,8 @@ class ClipboardManager {
             .appendingPathComponent("history.json")
 
         guard FileManager.default.fileExists(atPath: historyURL.path),
-              var data = try? Data(contentsOf: historyURL) else {
+              var data = try? Data(contentsOf: historyURL)
+        else {
             return nil
         }
 
@@ -468,7 +475,7 @@ class ClipboardManager {
     func saveHistory() {
         // Only save text items (images are too large)
         let textItems = history.compactMap { item -> SavedClipboardItem? in
-            if case .text(let string) = item.content {
+            if case let .text(string) = item.content {
                 return SavedClipboardItem(
                     id: item.id,
                     text: string,
@@ -492,7 +499,7 @@ class ClipboardManager {
             try data.write(to: historyFileURL, options: [.atomic, .completeFileProtection])
 
             // Save pinned item IDs separately
-            let pinnedIDs = pinnedItems.map { $0.id.uuidString }
+            let pinnedIDs = pinnedItems.map(\.id.uuidString)
             UserDefaults.standard.set(pinnedIDs, forKey: "pinnedItemIDs")
 
             // Update widget data
@@ -599,9 +606,9 @@ class ClipboardManager {
 
         var errorDescription: String? {
             switch self {
-            case .invalidFormat: return "Invalid file format"
-            case .readFailed: return "Could not read file"
-            case .decodeFailed: return "Could not decode history data"
+            case .invalidFormat: "Invalid file format"
+            case .readFailed: "Could not read file"
+            case .decodeFailed: "Could not decode history data"
             }
         }
     }
@@ -637,7 +644,7 @@ class ClipboardManager {
 
         if merge {
             // Skip items with existing IDs
-            let existingIDs = Set(history.map { $0.id })
+            let existingIDs = Set(history.map(\.id))
             let newItems = importedItems.filter { !existingIDs.contains($0.id) }
             history.append(contentsOf: newItems)
             // Sort by timestamp, newest first
@@ -648,7 +655,7 @@ class ClipboardManager {
         } else {
             // Replace entire history
             history = importedItems
-            pinnedItems = []  // Clear pins since items are new
+            pinnedItems = [] // Clear pins since items are new
             saveHistory()
             logger.info("Replaced history with \(importedItems.count) imported items")
             return importedItems.count

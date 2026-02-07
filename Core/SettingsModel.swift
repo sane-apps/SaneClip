@@ -1,5 +1,5 @@
-import SwiftUI
 import Combine
+import SwiftUI
 
 @MainActor
 @Observable
@@ -43,6 +43,13 @@ class SettingsModel {
         }
     }
 
+    /// Paste stack order: false = FIFO (oldest first), true = LIFO (newest first)
+    var pasteStackReversed: Bool {
+        didSet {
+            UserDefaults.standard.set(pasteStackReversed, forKey: "pasteStackReversed")
+        }
+    }
+
     var menuBarIcon: String {
         didSet {
             UserDefaults.standard.set(menuBarIcon, forKey: "menuBarIcon")
@@ -67,7 +74,7 @@ class SettingsModel {
     }
 
     func isAppExcluded(_ bundleID: String?) -> Bool {
-        guard let bundleID = bundleID else { return false }
+        guard let bundleID else { return false }
         return excludedApps.contains(bundleID)
     }
 
@@ -82,15 +89,16 @@ class SettingsModel {
     }
 
     init() {
-        self.maxHistorySize = UserDefaults.standard.object(forKey: "maxHistorySize") as? Int ?? 50
-        self.showInDock = UserDefaults.standard.object(forKey: "showInDock") as? Bool ?? true
-        self.protectPasswords = UserDefaults.standard.object(forKey: "protectPasswords") as? Bool ?? true
-        self.requireTouchID = UserDefaults.standard.object(forKey: "requireTouchID") as? Bool ?? false
-        self.excludedApps = UserDefaults.standard.object(forKey: "excludedApps") as? [String] ?? []
-        self.playSounds = UserDefaults.standard.object(forKey: "playSounds") as? Bool ?? false
-        self.menuBarIcon = UserDefaults.standard.object(forKey: "menuBarIcon") as? String ?? "list.clipboard.fill"
-        self.autoExpireHours = UserDefaults.standard.object(forKey: "autoExpireHours") as? Int ?? 0
-        self.encryptHistory = UserDefaults.standard.object(forKey: "encryptHistory") as? Bool ?? true
+        maxHistorySize = UserDefaults.standard.object(forKey: "maxHistorySize") as? Int ?? 50
+        showInDock = UserDefaults.standard.object(forKey: "showInDock") as? Bool ?? true
+        protectPasswords = UserDefaults.standard.object(forKey: "protectPasswords") as? Bool ?? true
+        requireTouchID = UserDefaults.standard.object(forKey: "requireTouchID") as? Bool ?? false
+        excludedApps = UserDefaults.standard.object(forKey: "excludedApps") as? [String] ?? []
+        playSounds = UserDefaults.standard.object(forKey: "playSounds") as? Bool ?? false
+        menuBarIcon = UserDefaults.standard.object(forKey: "menuBarIcon") as? String ?? "list.clipboard.fill"
+        autoExpireHours = UserDefaults.standard.object(forKey: "autoExpireHours") as? Int ?? 0
+        encryptHistory = UserDefaults.standard.object(forKey: "encryptHistory") as? Bool ?? true
+        pasteStackReversed = UserDefaults.standard.object(forKey: "pasteStackReversed") as? Bool ?? false
         applyDockVisibility()
     }
 
@@ -107,9 +115,9 @@ class SettingsModel {
 
         var errorDescription: String? {
             switch self {
-            case .encodingFailed: return "Could not encode settings"
-            case .decodingFailed: return "Could not decode settings"
-            case .invalidFormat: return "Invalid settings file format"
+            case .encodingFailed: "Could not encode settings"
+            case .decodingFailed: "Could not decode settings"
+            case .invalidFormat: "Invalid settings file format"
             }
         }
     }
@@ -117,7 +125,7 @@ class SettingsModel {
     /// Export all settings to JSON data
     func exportSettings() throws -> Data {
         let settings: [String: Any] = [
-            "version": 1,  // For future format versioning
+            "version": 1, // For future format versioning
             "maxHistorySize": maxHistorySize,
             "showInDock": showInDock,
             "protectPasswords": protectPasswords,
@@ -127,6 +135,7 @@ class SettingsModel {
             "menuBarIcon": menuBarIcon,
             "autoExpireHours": autoExpireHours,
             "encryptHistory": encryptHistory,
+            "pasteStackReversed": pasteStackReversed,
             // Include clipboard rules
             "rules": [
                 "stripTrackingParams": ClipboardRulesManager.shared.stripTrackingParams,
@@ -176,6 +185,9 @@ class SettingsModel {
         }
         if let value = settings["encryptHistory"] as? Bool {
             encryptHistory = value
+        }
+        if let value = settings["pasteStackReversed"] as? Bool {
+            pasteStackReversed = value
         }
 
         // Apply clipboard rules if present

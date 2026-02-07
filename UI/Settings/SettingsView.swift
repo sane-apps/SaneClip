@@ -1,7 +1,7 @@
-import SwiftUI
 import KeyboardShortcuts
-import ServiceManagement
 import LocalAuthentication
+import ServiceManagement
+import SwiftUI
 
 // MARK: - Notifications
 
@@ -69,21 +69,21 @@ struct SettingsView: View {
 
     private func icon(for tab: SettingsTab) -> String {
         switch tab {
-        case .general: return "gear"
-        case .shortcuts: return "keyboard"
-        case .snippets: return "text.quote"
-        case .storage: return "chart.pie"
-        case .about: return "info.circle"
+        case .general: "gear"
+        case .shortcuts: "keyboard"
+        case .snippets: "text.quote"
+        case .storage: "chart.pie"
+        case .about: "info.circle"
         }
     }
 
     private func iconColor(for tab: SettingsTab) -> Color {
         switch tab {
-        case .general: return .textStone
-        case .shortcuts: return .clipBlue
-        case .snippets: return .green
-        case .storage: return .pinnedOrange
-        case .about: return .brandSilver
+        case .general: .textStone
+        case .shortcuts: .clipBlue
+        case .snippets: .green
+        case .storage: .pinnedOrange
+        case .about: .brandSilver
         }
     }
 }
@@ -94,9 +94,9 @@ struct GeneralSettingsView: View {
     @State private var settings = SettingsModel.shared
     @State private var launchAtLogin = false
     #if !APP_STORE
-    @State private var autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
+        @State private var autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
     #else
-    @State private var autoCheckUpdates = false
+        @State private var autoCheckUpdates = false
     #endif
     @State private var isAuthenticating = false
 
@@ -134,6 +134,11 @@ struct GeneralSettingsView: View {
                     CompactToggle(label: "Play sound when copying", isOn: Binding(
                         get: { settings.playSounds },
                         set: { settings.playSounds = $0 }
+                    ))
+                    CompactDivider()
+                    CompactToggle(label: "Paste stack: newest first", isOn: Binding(
+                        get: { settings.pasteStackReversed },
+                        set: { settings.pasteStackReversed = $0 }
                     ))
                 }
 
@@ -211,23 +216,23 @@ struct GeneralSettingsView: View {
                 }
 
                 #if !APP_STORE
-                CompactSection("Software Updates") {
-                    CompactToggle(label: "Check for updates automatically", isOn: Binding(
-                        get: { autoCheckUpdates },
-                        set: { newValue in
-                            autoCheckUpdates = newValue
-                            UpdateService.shared.automaticallyChecksForUpdates = newValue
+                    CompactSection("Software Updates") {
+                        CompactToggle(label: "Check for updates automatically", isOn: Binding(
+                            get: { autoCheckUpdates },
+                            set: { newValue in
+                                autoCheckUpdates = newValue
+                                UpdateService.shared.automaticallyChecksForUpdates = newValue
+                            }
+                        ))
+                        CompactDivider()
+                        CompactRow("Actions") {
+                            Button("Check Now") {
+                                UpdateService.shared.checkForUpdates()
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
                         }
-                    ))
-                    CompactDivider()
-                    CompactRow("Actions") {
-                        Button("Check Now") {
-                            UpdateService.shared.checkForUpdates()
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
                     }
-                }
                 #endif
 
                 CompactSection("History") {
@@ -309,7 +314,7 @@ struct GeneralSettingsView: View {
         .onAppear {
             checkLaunchAtLogin()
             #if !APP_STORE
-            autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
+                autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
             #endif
         }
     }
@@ -395,9 +400,9 @@ struct GeneralSettingsView: View {
 
         let response = alert.runModal()
         switch response {
-        case .alertFirstButtonReturn:  // Merge
+        case .alertFirstButtonReturn: // Merge
             performImport(from: url, merge: true)
-        case .alertSecondButtonReturn:  // Replace
+        case .alertSecondButtonReturn: // Replace
             performImport(from: url, merge: false)
         default:
             break
@@ -532,7 +537,7 @@ struct ExcludedAppsInline: View {
     }
 
     private func removeApp(_ bundleID: String) {
-        if requireAuthForRemoval, let authenticate = authenticate {
+        if requireAuthForRemoval, let authenticate {
             authenticate("Authenticate to remove app from exclusion list") {
                 withAnimation(.easeInOut(duration: 0.2)) {
                     excludedApps.removeAll { $0 == bundleID }
@@ -752,14 +757,14 @@ struct AboutSettingsView: View {
             .padding(.top, 12)
 
             #if !APP_STORE
-            // Check for Updates
-            Button {
-                checkForUpdates()
-            } label: {
-                Label("Check for Updates", systemImage: "arrow.triangle.2.circlepath")
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.regular)
+                // Check for Updates
+                Button {
+                    checkForUpdates()
+                } label: {
+                    Label("Check for Updates", systemImage: "arrow.triangle.2.circlepath")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.regular)
             #endif
 
             Spacer()
@@ -775,9 +780,9 @@ struct AboutSettingsView: View {
     }
 
     #if !APP_STORE
-    private func checkForUpdates() {
-        UpdateService.shared.checkForUpdates()
-    }
+        private func checkForUpdates() {
+            UpdateService.shared.checkForUpdates()
+        }
     #endif
 
     // MARK: - Licenses Sheet
@@ -912,12 +917,12 @@ struct AboutSettingsView: View {
 
                     // Personal message
                     Text("""
-                        I need your help to keep SaneClip alive. \
-                        Your support — whether one-time or monthly — makes this possible. Thank you.
-                        """)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
+                    I need your help to keep SaneClip alive. \
+                    Your support — whether one-time or monthly — makes this possible. Thank you.
+                    """)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
 
                     Text("— Mr. Sane")
                         .font(.system(size: 13, weight: .medium))
@@ -1044,7 +1049,7 @@ struct VisualEffectBlur: NSViewRepresentable {
     let material: NSVisualEffectView.Material
     let blendingMode: NSVisualEffectView.BlendingMode
 
-    func makeNSView(context: Context) -> NSVisualEffectView {
+    func makeNSView(context _: Context) -> NSVisualEffectView {
         let view = NSVisualEffectView()
         view.material = material
         view.blendingMode = blendingMode
@@ -1052,7 +1057,7 @@ struct VisualEffectBlur: NSViewRepresentable {
         return view
     }
 
-    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
+    func updateNSView(_ nsView: NSVisualEffectView, context _: Context) {
         nsView.material = material
         nsView.blendingMode = blendingMode
     }

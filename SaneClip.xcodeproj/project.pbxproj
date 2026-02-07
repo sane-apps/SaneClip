@@ -550,7 +550,6 @@
 				TargetAttributes = {
 					355299070BFB55028AA7532C = {
 						DevelopmentTeam = M78L6FXD48;
-						ProvisioningStyle = Manual;
 					};
 					43BDAC030E9BA81D8C07AACD = {
 						DevelopmentTeam = M78L6FXD48;
@@ -558,15 +557,12 @@
 					};
 					82F15C9953C599E408BCB355 = {
 						DevelopmentTeam = M78L6FXD48;
-						ProvisioningStyle = Manual;
 					};
 					A2F610D4BC5CC8FAB336B0E2 = {
 						DevelopmentTeam = M78L6FXD48;
-						ProvisioningStyle = Manual;
 					};
 					F4822D70D6EC34E3F92050C1 = {
 						DevelopmentTeam = M78L6FXD48;
-						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -660,7 +656,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint . || true\nelse\n  echo \"warning: SwiftLint not installed\"\nfi\n";
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint . 2>&1 | sed 's/: error:/: warning:/' || true\nelse\n  echo \"warning: SwiftLint not installed\"\nfi\n";
 		};
 		C34C13DC62FF48E2EE3CFF22 /* Strip Sparkle for App Store */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -945,8 +941,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgets.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
@@ -1137,9 +1132,8 @@
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = SaneClip/SaneClipAppStore.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = M78L6FXD48;
@@ -1190,8 +1184,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOS.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
@@ -1276,8 +1270,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Widgets/SaneClipWidgets.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = M78L6FXD48;

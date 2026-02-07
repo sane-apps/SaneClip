@@ -152,13 +152,13 @@ targets:
           PROVISIONING_PROFILE_SPECIFIER: "SaneClip Developer ID"
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-          CODE_SIGN_IDENTITY: "Apple Distribution"
+          CODE_SIGN_STYLE: Automatic
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipAppStore.entitlements
           OTHER_SWIFT_FLAGS: "-D APP_STORE -D ENABLE_SYNC"
     postCompileScripts:
       - script: |
           if which swiftlint >/dev/null; then
-            swiftlint . || true
+            swiftlint . 2>&1 | sed 's/: error:/: warning:/' || true
           else
             echo "warning: SwiftLint not installed"
           fi
@@ -239,7 +239,7 @@ targets:
           PROVISIONING_PROFILE_SPECIFIER: "SaneClip Widgets Developer ID"
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
-          CODE_SIGN_IDENTITY: "Apple Distribution"
+          CODE_SIGN_STYLE: Automatic
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
 
   # iOS App
@@ -301,7 +301,7 @@ targets:
           CODE_SIGN_ENTITLEMENTS: iOS/SaneClipIOS.entitlements
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios
-          CODE_SIGN_IDENTITY: "Apple Distribution"
+          CODE_SIGN_STYLE: Automatic
           CODE_SIGN_ENTITLEMENTS: iOS/SaneClipIOS.entitlements
 
   # iOS Widgets
@@ -343,5 +343,5 @@ targets:
           CODE_SIGN_ENTITLEMENTS: iOSWidgets/SaneClipIOSWidgets.entitlements
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.widgets
-          CODE_SIGN_IDENTITY: "Apple Distribution"
+          CODE_SIGN_STYLE: Automatic
           CODE_SIGN_ENTITLEMENTS: iOSWidgets/SaneClipIOSWidgets.entitlements

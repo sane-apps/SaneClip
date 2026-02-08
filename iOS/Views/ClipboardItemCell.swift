@@ -7,10 +7,50 @@ struct ClipboardItemCell: View {
     var isCopied: Bool = false
     @Environment(\.colorScheme) private var colorScheme
 
-    // MARK: - Brand Colors
+    // MARK: - Source-Aware Colors
 
+    /// Harmonious muted palette — each hue family is distinct, no two colors clash.
+    /// Dark mode: bright/saturated for readability on dark backgrounds.
+    /// Light mode: darkened variants for WCAG AA (4.5:1) on light backgrounds.
+    private var sourceColor: Color {
+        guard let source = item.sourceAppName?.lowercased() else { return Color.clipBlue }
+        if colorScheme == .dark {
+            switch source {
+            case "messages": return Color(hex: 0x5EC2A0) // Sage green
+            case "mail": return Color(hex: 0xE8807C) // Soft coral
+            case "safari": return Color(hex: 0x6BADE4) // Sky blue
+            case "notes": return Color(hex: 0xE4C05C) // Warm gold
+            case "maps": return Color(hex: 0x4DBAD4) // Cyan teal
+            case "contacts": return Color(hex: 0xC8ACE4) // Soft lavender (boosted)
+            case "calendar": return Color(hex: 0xD4849A) // Dusty rose
+            case "photos": return Color(hex: 0xE89A3C) // Warm amber (distinct from gold)
+            case "reminders": return Color(hex: 0x8A9FE4) // Periwinkle (boosted)
+            default: return Color.clipBlue
+            }
+        } else {
+            switch source {
+            case "messages": return Color(hex: 0x2E8B6A) // Deep sage
+            case "mail": return Color(hex: 0xC4524E) // Deep coral
+            case "safari": return Color(hex: 0x3A7DB8) // Deep sky
+            case "notes": return Color(hex: 0x9E8528) // Deep gold
+            case "maps": return Color(hex: 0x2A8FA8) // Deep teal
+            case "contacts": return Color(hex: 0x7A5FA8) // Deep lavender
+            case "calendar": return Color(hex: 0xA8566E) // Deep rose
+            case "photos": return Color(hex: 0xB87A22) // Deep amber
+            case "reminders": return Color(hex: 0x4E62A8) // Deep periwinkle
+            default: return Color.clipBlue
+            }
+        }
+    }
+
+    /// Bar color: orange for pinned, source color otherwise
+    private var barColor: Color {
+        isPinned ? Color.pinnedOrange : sourceColor
+    }
+
+    /// Accent for icons and source labels: always source-aware, even on pinned items
     private var accentColor: Color {
-        isPinned ? Color.pinnedOrange : Color.clipBlue
+        sourceColor
     }
 
     private var cardBackground: Color {
@@ -38,17 +78,27 @@ struct ClipboardItemCell: View {
 
     private var itemFont: Font {
         item.isCode
-            ? .system(.callout, design: .monospaced)
-            : .system(.callout, weight: .medium)
+            ? .system(.subheadline, design: .monospaced, weight: .semibold)
+            : .system(.subheadline, weight: .semibold)
+    }
+
+    /// Preview text: bright white in dark, near-black in light
+    private var previewColor: Color {
+        colorScheme == .dark ? Color.textCloud : Color(hex: 0x1A1A1A)
+    }
+
+    /// Metadata: readable gray, not washed out
+    private var metadataColor: Color {
+        colorScheme == .dark ? Color.textStone : Color(hex: 0x555555)
     }
 
     // MARK: - Body
 
     var body: some View {
         HStack(spacing: 0) {
-            // Accent bar on left (matches macOS)
+            // Accent bar on left — orange for pinned, source color otherwise
             RoundedRectangle(cornerRadius: 2)
-                .fill(accentColor.opacity(isCopied ? 1.0 : 0.65))
+                .fill(barColor)
                 .frame(width: 3)
 
             HStack(alignment: .top, spacing: 10) {
@@ -57,15 +107,15 @@ struct ClipboardItemCell: View {
                     Image(systemName: "pin.fill")
                         .font(.caption2)
                         .foregroundStyle(Color.pinnedOrange)
-                        .padding(.top, 3)
+                        .padding(.top, 2)
                 }
 
                 // Content type icon
                 Image(systemName: iconName)
-                    .font(.caption)
-                    .foregroundStyle(isCopied ? .green : accentColor.opacity(0.8))
-                    .frame(width: 16)
-                    .padding(.top, 3)
+                    .font(.callout)
+                    .foregroundStyle(isCopied ? Color.semanticSuccess : accentColor)
+                    .frame(width: 18)
+                    .padding(.top, 2)
 
                 VStack(alignment: .leading, spacing: 4) {
                     // Preview text or image thumbnail
@@ -74,7 +124,7 @@ struct ClipboardItemCell: View {
                         Text(item.preview)
                             .font(itemFont)
                             .lineLimit(2)
-                            .foregroundStyle(.primary)
+                            .foregroundColor(previewColor)
                     case let .imageData(data, _, _):
                         if let uiImage = UIImage(data: data) {
                             Image(uiImage: uiImage)
@@ -92,36 +142,36 @@ struct ClipboardItemCell: View {
                     // Metadata row
                     HStack(spacing: 6) {
                         Text(item.relativeTime)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .font(.caption)
+                            .foregroundStyle(metadataColor)
 
                         if let source = item.sourceAppName {
                             Text("·")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                                .foregroundStyle(metadataColor)
                             Text(source)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                                .foregroundColor(accentColor)
                         }
 
                         if !item.deviceName.isEmpty {
                             Text("·")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                                .foregroundStyle(metadataColor)
                             Text(item.deviceName)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                                .foregroundStyle(metadataColor)
                         }
                     }
                 }
 
                 Spacer(minLength: 0)
 
-                // Chevron hint for long-press detail
+                // Chevron hint for detail view
                 Image(systemName: "chevron.right")
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
-                    .padding(.top, 3)
+                    .font(.caption)
+                    .foregroundStyle(metadataColor)
+                    .padding(.top, 2)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 10)

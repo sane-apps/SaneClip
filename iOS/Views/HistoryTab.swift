@@ -115,7 +115,7 @@ struct CopiedToast: View {
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(.green)
+                .foregroundStyle(Color.semanticSuccess)
             Text("Copied")
                 .font(.subheadline.weight(.medium))
         }

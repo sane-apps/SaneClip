@@ -13,7 +13,8 @@ struct PinnedTab: View {
                     EmptyStateView(
                         icon: "pin.slash",
                         title: "No Pinned Clips",
-                        message: "Pin items on your Mac to access them quickly here."
+                        message: "Pin items on your Mac to access them quickly here.",
+                        accentColor: .pinnedOrange
                     )
                 } else {
                     pinnedList
@@ -83,7 +84,7 @@ struct PinnedTab: View {
             } label: {
                 Label("Copy", systemImage: "doc.on.doc")
             }
-            .tint(Color.clipBlue)
+            .tint(Color.pinnedOrange)
         }
         .accessibilityLabel(item.accessibilityDescription)
         .accessibilityHint("Tap to copy, long press for options")

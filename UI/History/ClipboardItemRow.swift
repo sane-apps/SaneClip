@@ -45,10 +45,49 @@ struct ClipboardItemRow: View {
         return parts.joined(separator: ", ")
     }
 
+    // MARK: - Source-Aware Colors (matches iOS ClipboardItemCell palette)
+
+    /// Harmonious muted palette — each hue family is distinct, no two colors clash.
+    /// Dark mode: bright/saturated. Light mode: darkened for WCAG AA on light backgrounds.
+    private var sourceColor: Color {
+        guard let source = item.sourceAppName?.lowercased() else { return Color.clipBlue }
+        if colorScheme == .dark {
+            switch source {
+            case "messages": return Color(hex: 0x5EC2A0)
+            case "mail": return Color(hex: 0xE8807C)
+            case "safari": return Color(hex: 0x6BADE4)
+            case "notes": return Color(hex: 0xE4C05C)
+            case "maps": return Color(hex: 0x4DBAD4)
+            case "contacts": return Color(hex: 0xC8ACE4)
+            case "calendar": return Color(hex: 0xD4849A)
+            case "photos": return Color(hex: 0xE89A3C)
+            case "reminders": return Color(hex: 0x8A9FE4)
+            default: return Color.clipBlue
+            }
+        } else {
+            switch source {
+            case "messages": return Color(hex: 0x2E8B6A)
+            case "mail": return Color(hex: 0xC4524E)
+            case "safari": return Color(hex: 0x3A7DB8)
+            case "notes": return Color(hex: 0x9E8528)
+            case "maps": return Color(hex: 0x2A8FA8)
+            case "contacts": return Color(hex: 0x7A5FA8)
+            case "calendar": return Color(hex: 0xA8566E)
+            case "photos": return Color(hex: 0xB87A22)
+            case "reminders": return Color(hex: 0x4E62A8)
+            default: return Color.clipBlue
+            }
+        }
+    }
+
+    /// Bar color: orange for pinned, source color otherwise
+    private var barColor: Color {
+        isPinned ? .pinnedOrange : sourceColor
+    }
+
+    /// Accent for icons and source labels: always source-aware, even on pinned items
     private var accentColor: Color {
-        isPinned
-            ? .pinnedOrange
-            : .clipBlue
+        sourceColor
     }
 
     private var cardBackground: Color {
@@ -85,9 +124,9 @@ struct ClipboardItemRow: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            // Accent bar on left (subtle, 65% opacity)
+            // Accent bar on left — orange for pinned, source color otherwise
             RoundedRectangle(cornerRadius: 2)
-                .fill(accentColor.opacity(0.65))
+                .fill(barColor)
                 .frame(width: 3)
 
             HStack(alignment: .top, spacing: 8) {
@@ -105,7 +144,7 @@ struct ClipboardItemRow: View {
                         // Content-type icon for faster scanning
                         contentTypeIcon
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(accentColor)
                             .frame(width: 14)
 
                         Text(item.preview)
@@ -167,7 +206,6 @@ struct ClipboardItemRow: View {
                 }
 
                 Spacer(minLength: 4)
-
             }
             .padding(.vertical, 12)
             .padding(.leading, 10)
@@ -224,7 +262,7 @@ struct ClipboardItemRow: View {
             }
 
             // Open Link (for URLs only)
-            if item.isURL, case .text(let urlString) = item.content,
+            if item.isURL, case let .text(urlString) = item.content,
                let url = URL(string: urlString.trimmingCharacters(in: .whitespacesAndNewlines)) {
                 Button("Open Link") {
                     NSWorkspace.shared.open(url)
@@ -232,7 +270,7 @@ struct ClipboardItemRow: View {
             }
 
             // Edit (text only)
-            if case .text(let text) = item.content {
+            if case let .text(text) = item.content {
                 Button("Edit...") {
                     editText = text
                     showEditSheet = true
@@ -271,13 +309,11 @@ struct ClipboardItemRow: View {
     // MARK: - Share Helper
 
     private func shareItem() {
-        var shareContent: Any?
-
-        switch item.content {
-        case .text(let string):
-            shareContent = string
-        case .image(let image):
-            shareContent = image
+        var shareContent: Any? = switch item.content {
+        case let .text(string):
+            string
+        case let .image(image):
+            image
         }
 
         guard let content = shareContent else { return }

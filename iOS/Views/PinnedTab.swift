@@ -4,57 +4,108 @@ import SwiftUI
 struct PinnedTab: View {
     @EnvironmentObject var viewModel: ClipboardHistoryViewModel
     @State private var searchText = ""
+    @State private var selectedItem: SharedClipboardItem?
 
     var body: some View {
         NavigationStack {
             Group {
-                if viewModel.pinnedItems.isEmpty && !viewModel.isLoading {
+                if viewModel.pinnedItems.isEmpty, !viewModel.isLoading {
                     EmptyStateView(
                         icon: "pin.slash",
                         title: "No Pinned Clips",
                         message: "Pin items on your Mac to access them quickly here."
                     )
                 } else {
-                    List {
-                        ForEach(viewModel.filteredPinned(searchText)) { item in
-                            ClipboardItemCell(item: item, isPinned: true)
-                                .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
-                                .listRowSeparator(.hidden)
-                                .listRowBackground(Color.clear)
-                                .swipeActions(edge: .trailing) {
-                                    Button {
-                                        viewModel.copyToClipboard(item)
-                                    } label: {
-                                        Label("Copy", systemImage: "doc.on.doc")
-                                    }
-                                    .tint(Color.clipBlue)
-                                }
-                        }
-                    }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
-                    .searchable(text: $searchText, prompt: "Search pinned")
+                    pinnedList
                 }
             }
             .navigationTitle("Pinned")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        Task {
-                            await viewModel.refresh()
-                        }
-                    } label: {
-                        Image(systemName: "arrow.clockwise")
-                            .foregroundStyle(Color.pinnedOrange)
-                    }
-                    .disabled(viewModel.isLoading)
+                    refreshButton
                 }
             }
             .refreshable {
                 await viewModel.refresh()
             }
+            .sheet(item: $selectedItem) { item in
+                ClipboardDetailView(item: item, viewModel: viewModel)
+            }
+            .overlay(alignment: .bottom) {
+                copiedToastOverlay
+            }
+            .animation(.easeInOut(duration: 0.2), value: viewModel.copiedItemID)
         }
         .tint(Color.pinnedOrange)
+    }
+
+    // MARK: - Subviews
+
+    private var pinnedList: some View {
+        List {
+            ForEach(viewModel.filteredPinned(searchText)) { item in
+                pinnedRow(item)
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .searchable(text: $searchText, prompt: "Search pinned")
+    }
+
+    private func pinnedRow(_ item: SharedClipboardItem) -> some View {
+        ClipboardItemCell(
+            item: item,
+            isPinned: true,
+            isCopied: viewModel.copiedItemID == item.id
+        )
+        .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            viewModel.copyToClipboard(item)
+        }
+        .contextMenu {
+            Button {
+                viewModel.copyToClipboard(item)
+            } label: {
+                Label("Copy", systemImage: "doc.on.doc")
+            }
+            Button {
+                selectedItem = item
+            } label: {
+                Label("Details", systemImage: "info.circle")
+            }
+        }
+        .swipeActions(edge: .trailing) {
+            Button {
+                viewModel.copyToClipboard(item)
+            } label: {
+                Label("Copy", systemImage: "doc.on.doc")
+            }
+            .tint(Color.clipBlue)
+        }
+        .accessibilityLabel(item.accessibilityDescription)
+        .accessibilityHint("Tap to copy, long press for options")
+    }
+
+    private var refreshButton: some View {
+        Button {
+            Task { await viewModel.refresh() }
+        } label: {
+            Image(systemName: "arrow.clockwise")
+                .foregroundStyle(Color.pinnedOrange)
+        }
+        .disabled(viewModel.isLoading)
+    }
+
+    @ViewBuilder
+    private var copiedToastOverlay: some View {
+        if viewModel.copiedItemID != nil {
+            CopiedToast()
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .padding(.bottom, 16)
+        }
     }
 }
 

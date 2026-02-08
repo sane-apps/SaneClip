@@ -143,4 +143,27 @@ struct SharedClipboardItem: Identifiable, Codable, Sendable {
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: timestamp, relativeTo: Date())
     }
+
+    /// Full text content (untruncated) for detail views
+    var fullText: String? {
+        if case let .text(string) = content { return string }
+        return nil
+    }
+
+    /// Accessibility description
+    var accessibilityDescription: String {
+        var parts: [String] = []
+        switch content {
+        case let .text(string):
+            if isURL { parts.append("Link") } else if isCode { parts.append("Code snippet") } else { parts.append("Text") }
+            parts.append(String(string.prefix(80)))
+        case .imageData:
+            parts.append("Image")
+        }
+        if let source = sourceAppName {
+            parts.append("from \(source)")
+        }
+        parts.append(relativeTime)
+        return parts.joined(separator: ", ")
+    }
 }

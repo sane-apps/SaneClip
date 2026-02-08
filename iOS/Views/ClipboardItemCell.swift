@@ -4,6 +4,7 @@ import SwiftUI
 struct ClipboardItemCell: View {
     let item: SharedClipboardItem
     var isPinned: Bool = false
+    var isCopied: Bool = false
     @Environment(\.colorScheme) private var colorScheme
 
     // MARK: - Brand Colors
@@ -13,7 +14,10 @@ struct ClipboardItemCell: View {
     }
 
     private var cardBackground: Color {
-        colorScheme == .dark
+        if isCopied {
+            return accentColor.opacity(0.12)
+        }
+        return colorScheme == .dark
             ? Color.white.opacity(0.06)
             : Color.black.opacity(0.03)
     }
@@ -21,6 +25,7 @@ struct ClipboardItemCell: View {
     // MARK: - Content Detection
 
     private var iconName: String {
+        if isCopied { return "checkmark.circle.fill" }
         switch item.content {
         case .text:
             if item.isURL { return "link" }
@@ -43,7 +48,7 @@ struct ClipboardItemCell: View {
         HStack(spacing: 0) {
             // Accent bar on left (matches macOS)
             RoundedRectangle(cornerRadius: 2)
-                .fill(accentColor.opacity(0.65))
+                .fill(accentColor.opacity(isCopied ? 1.0 : 0.65))
                 .frame(width: 3)
 
             HStack(alignment: .top, spacing: 10) {
@@ -58,37 +63,65 @@ struct ClipboardItemCell: View {
                 // Content type icon
                 Image(systemName: iconName)
                     .font(.caption)
-                    .foregroundStyle(accentColor.opacity(0.8))
+                    .foregroundStyle(isCopied ? .green : accentColor.opacity(0.8))
                     .frame(width: 16)
                     .padding(.top, 3)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    // Preview text
-                    Text(item.preview)
-                        .font(itemFont)
-                        .lineLimit(2)
-                        .foregroundStyle(.primary)
+                    // Preview text or image thumbnail
+                    switch item.content {
+                    case .text:
+                        Text(item.preview)
+                            .font(itemFont)
+                            .lineLimit(2)
+                            .foregroundStyle(.primary)
+                    case let .imageData(data, _, _):
+                        if let uiImage = UIImage(data: data) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(maxHeight: 60)
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                        } else {
+                            Text("[Image]")
+                                .font(itemFont)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
 
                     // Metadata row
                     HStack(spacing: 6) {
-                        // Timestamp
                         Text(item.relativeTime)
                             .font(.caption2)
-                            .foregroundStyle(Color.textStone)
+                            .foregroundStyle(.secondary)
 
-                        // Source app
                         if let source = item.sourceAppName {
-                            Text("•")
+                            Text("·")
                                 .font(.caption2)
-                                .foregroundStyle(Color.textStone)
+                                .foregroundStyle(.secondary)
                             Text(source)
                                 .font(.caption2)
-                                .foregroundStyle(Color.textStone)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        if !item.deviceName.isEmpty {
+                            Text("·")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                            Text(item.deviceName)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
 
                 Spacer(minLength: 0)
+
+                // Chevron hint for long-press detail
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .padding(.top, 3)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 10)
@@ -98,13 +131,16 @@ struct ClipboardItemCell: View {
         .overlay(
             RoundedRectangle(cornerRadius: 8)
                 .strokeBorder(
-                    colorScheme == .dark
-                        ? Color.white.opacity(0.08)
-                        : Color.black.opacity(0.06),
-                    lineWidth: 0.5
+                    isCopied
+                        ? accentColor.opacity(0.3)
+                        : (colorScheme == .dark
+                            ? Color.white.opacity(0.08)
+                            : Color.black.opacity(0.06)),
+                    lineWidth: isCopied ? 1 : 0.5
                 )
         )
         .contentShape(Rectangle())
+        .animation(.easeInOut(duration: 0.15), value: isCopied)
     }
 }
 
@@ -123,7 +159,8 @@ struct ClipboardItemCell: View {
             item: SharedClipboardItem(
                 content: .text("https://example.com/page?utm_source=test"),
                 sourceAppName: "Chrome"
-            )
+            ),
+            isCopied: true
         )
         .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
         .listRowSeparator(.hidden)

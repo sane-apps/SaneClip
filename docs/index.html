@@ -46,16 +46,11 @@
         "name": "SaneClip",
         "description": "A beautiful, secure clipboard manager for macOS with Touch ID protection. Access your clipboard history instantly with keyboard shortcuts.",
         "applicationCategory": "UtilitiesApplication",
-        "operatingSystem": "macOS 14 Sonoma or later",
+        "operatingSystem": "macOS 15 Sequoia or later",
         "offers": {
             "@type": "Offer",
             "price": "5",
             "priceCurrency": "USD"
-        },
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "5",
-            "ratingCount": "1"
         },
         "author": {
             "@type": "Person",
@@ -63,16 +58,24 @@
             "url": "https://github.com/sane-apps"
         },
         "downloadUrl": "https://go.saneapps.com/buy/saneclip?ref=website",
-        "softwareVersion": "1.2",
-        "releaseNotes": "v1.2: Simplified to 100% local-only storage. Removed iCloud sync pending provisioning resolution. Full-featured clipboard manager with Touch ID, snippets, and transforms.",
+        "softwareVersion": "1.4",
+        "releaseNotes": "v1.4: AES-256-GCM encryption at rest, Keychain integration, HTTPS webhook enforcement, URL scheme confirmation dialogs, seamless plaintext migration.",
         "screenshot": "https://saneclip.com/images/screenshot-popover.png",
         "featureList": [
             "Touch ID Protection",
-            "Clipboard History",
+            "AES-256-GCM Encryption at Rest",
+            "Sensitive Data Detection (credit cards, SSNs, API keys)",
+            "Smart Snippets with Dynamic Placeholders",
+            "Text Transforms (UPPERCASE, Title Case, JSON Pretty Print)",
+            "Paste Stack (FIFO/LIFO)",
+            "Clipboard Rules (strip tracking params, auto-trim)",
             "Keyboard Shortcuts (Cmd+Shift+V, Cmd+1-9)",
+            "Siri Shortcuts Integration",
+            "macOS Widgets",
             "Pin Important Items",
+            "iOS Companion App with Siri Shortcuts",
             "100% On-Device Privacy",
-            "Native macOS Design"
+            "Open Source (GPL v3)"
         ]
     }
     </script>
@@ -1250,7 +1253,7 @@
                     Download — $5
                 </a>
             </div>
-            <p class="system-requirements animate-in delay-4" style="color: var(--text-secondary); font-size: 0.875rem; margin-top: -28px; margin-bottom: 40px;">Requires macOS 14.0 (Sonoma) or later</p>
+            <p class="system-requirements animate-in delay-4" style="color: var(--text-secondary); font-size: 0.875rem; margin-top: -28px; margin-bottom: 40px;">Requires macOS 15.0 (Sequoia) or later &middot; Also on the <a href="https://apps.apple.com/app/saneclip/id6758898132" style="color: var(--accent);">Mac App Store</a></p>
 
             <!-- Demo Preview - Actual Screenshot -->
             <div class="hero-screenshot animate-in delay-5">
@@ -1374,6 +1377,18 @@
                     </div>
                     <h3>Auto-Expire</h3>
                     <p>Automatically clean old items after 1 hour, 24 hours, or 7 days. <strong>Pinned items never expire.</strong></p>
+                </div>
+
+                <!-- iOS Companion App -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                        </svg>
+                    </div>
+                    <h3>iOS Companion App</h3>
+                    <p>Browse your clipboard on iPhone with <strong>Siri Shortcuts</strong>, Share Extension, widgets, and tap-to-copy. Coming soon to the App Store.</p>
                 </div>
 
                 <!-- Export History -->

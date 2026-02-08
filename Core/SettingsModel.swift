@@ -112,7 +112,7 @@ class SettingsModel {
 
     init() {
         maxHistorySize = UserDefaults.standard.object(forKey: "maxHistorySize") as? Int ?? 50
-        showInDock = UserDefaults.standard.object(forKey: "showInDock") as? Bool ?? true
+        showInDock = UserDefaults.standard.object(forKey: "showInDock") as? Bool ?? false
         protectPasswords = UserDefaults.standard.object(forKey: "protectPasswords") as? Bool ?? true
         requireTouchID = UserDefaults.standard.object(forKey: "requireTouchID") as? Bool ?? false
         excludedApps = UserDefaults.standard.object(forKey: "excludedApps") as? [String] ?? []

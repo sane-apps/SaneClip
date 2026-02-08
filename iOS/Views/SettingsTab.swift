@@ -4,23 +4,65 @@ import SwiftUI
 struct SettingsTab: View {
     @EnvironmentObject var viewModel: ClipboardHistoryViewModel
 
+    #if ENABLE_SYNC
+        @State private var coordinator = SyncCoordinator.shared
+    #endif
+
     var body: some View {
         NavigationStack {
             List {
-                // Sync Status Section
+                // Sync Section
                 Section {
-                    HStack {
-                        Label("Last Synced", systemImage: "arrow.triangle.2.circlepath")
-                            .foregroundStyle(Color.clipBlue)
-                        Spacer()
-                        if let lastSync = viewModel.lastSyncTime {
-                            Text(lastSync, style: .relative)
-                                .foregroundStyle(Color.textStone)
-                        } else {
-                            Text("Never")
-                                .foregroundStyle(Color.textStone)
+                    #if ENABLE_SYNC
+                        Toggle(isOn: $coordinator.isSyncEnabled) {
+                            Label("iCloud Sync", systemImage: "icloud")
+                                .foregroundStyle(Color.clipBlue)
                         }
-                    }
+                        .toggleStyle(.switch)
+
+                        if coordinator.isSyncEnabled {
+                            HStack {
+                                Label("Status", systemImage: "circle.fill")
+                                    .foregroundStyle(syncStatusColor)
+                                Spacer()
+                                Text(coordinator.syncStatus.rawValue)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            HStack {
+                                Label("Last Synced", systemImage: "arrow.triangle.2.circlepath")
+                                    .foregroundStyle(Color.clipBlue)
+                                Spacer()
+                                if let lastSync = coordinator.lastSyncDate {
+                                    Text(lastSync, style: .relative)
+                                        .foregroundStyle(.secondary)
+                                } else {
+                                    Text("Never")
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+
+                            if !coordinator.connectedDevices.isEmpty {
+                                ForEach(coordinator.connectedDevices, id: \.self) { device in
+                                    Label(device, systemImage: "desktopcomputer")
+                                        .foregroundStyle(Color.clipBlue)
+                                }
+                            }
+                        }
+                    #else
+                        HStack {
+                            Label("Last Synced", systemImage: "arrow.triangle.2.circlepath")
+                                .foregroundStyle(Color.clipBlue)
+                            Spacer()
+                            if let lastSync = viewModel.lastSyncTime {
+                                Text(lastSync, style: .relative)
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text("Never")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    #endif
 
                     Button {
                         Task {
@@ -48,7 +90,7 @@ struct SettingsTab: View {
                             .foregroundStyle(Color.clipBlue)
                         Spacer()
                         Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
-                            .foregroundStyle(Color.textStone)
+                            .foregroundStyle(.secondary)
                     }
 
                     Link(destination: URL(string: "https://saneclip.com")!) {
@@ -67,9 +109,9 @@ struct SettingsTab: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("SaneClip iOS")
                             .font(.headline)
-                        Text("View and copy your clipboard history synced from your Mac. Items copied here are added to your Mac's clipboard history.")
+                        Text("View and copy your clipboard history synced from your Mac. Enable iCloud Sync to keep your clipboard in sync across all your devices.")
                             .font(.caption)
-                            .foregroundStyle(Color.textStone)
+                            .foregroundStyle(.secondary)
                     }
                     .padding(.vertical, 4)
                 } header: {
@@ -80,6 +122,18 @@ struct SettingsTab: View {
         }
         .tint(Color.clipBlue)
     }
+
+    #if ENABLE_SYNC
+        private var syncStatusColor: Color {
+            switch coordinator.syncStatus {
+            case .idle: .green
+            case .syncing: .blue
+            case .error: .red
+            case .disabled: .gray
+            case .noAccount: .orange
+            }
+        }
+    #endif
 }
 
 #Preview {

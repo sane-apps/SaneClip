@@ -4,6 +4,10 @@
     import Foundation
     import os.log
 
+    #if os(iOS)
+        import UIKit
+    #endif
+
     /// Main sync orchestrator. Implements CKSyncEngineDelegate to handle
     /// bidirectional sync between local clipboard history and iCloud.
     ///
@@ -30,6 +34,12 @@
         var syncStatus: SyncStatus = .idle
         var lastSyncDate: Date?
         var connectedDevices: [String] = []
+
+        #if os(iOS)
+            /// On iOS, synced items received from other devices are stored here.
+            /// The ClipboardHistoryViewModel observes this array.
+            var syncedItems: [SharedClipboardItem] = []
+        #endif
 
         enum SyncStatus: String {
             case idle = "Idle"
@@ -293,25 +303,30 @@
         }
 
         private func buildRecordForID(_ recordID: CKRecord.ID) throws -> CKRecord? {
-            guard let manager = ClipboardManager.shared,
-                  let itemID = UUID(uuidString: recordID.recordName),
-                  let item = manager.history.first(where: { $0.id == itemID })
-            else {
+            #if os(macOS)
+                guard let manager = ClipboardManager.shared,
+                      let itemID = UUID(uuidString: recordID.recordName),
+                      let item = manager.history.first(where: { $0.id == itemID })
+                else {
+                    return nil
+                }
+
+                let shared = SharedClipboardItem(
+                    id: item.id,
+                    content: item.sharedContent,
+                    timestamp: item.timestamp,
+                    sourceAppBundleID: item.sourceAppBundleID,
+                    sourceAppName: item.sourceAppName,
+                    pasteCount: item.pasteCount,
+                    deviceId: deviceId,
+                    deviceName: deviceName
+                )
+
+                return try SyncDataModel.encode(shared, encrypt: SettingsModel.shared.encryptHistory)
+            #else
+                // iOS is receive-only for now — no local clipboard items to upload
                 return nil
-            }
-
-            let shared = SharedClipboardItem(
-                id: item.id,
-                content: item.sharedContent,
-                timestamp: item.timestamp,
-                sourceAppBundleID: item.sourceAppBundleID,
-                sourceAppName: item.sourceAppName,
-                pasteCount: item.pasteCount,
-                deviceId: deviceId,
-                deviceName: deviceName
-            )
-
-            return try SyncDataModel.encode(shared, encrypt: SettingsModel.shared.encryptHistory)
+            #endif
         }
 
         // MARK: - Handle Database Changes
@@ -354,13 +369,12 @@
             }
         }
 
-        // MARK: - Notifications to ClipboardManager
+        // MARK: - Notifications to Local Data Layer
 
         private func notifyNewSyncedItem(_ item: SharedClipboardItem) {
-            guard let manager = ClipboardManager.shared else { return }
-            // Add synced item to local history if not already present
-            if !manager.history.contains(where: { $0.id == item.id }) {
-                #if os(macOS)
+            #if os(macOS)
+                guard let manager = ClipboardManager.shared else { return }
+                if !manager.history.contains(where: { $0.id == item.id }) {
                     let clipItem = ClipboardItem(
                         id: item.id,
                         content: item.macOSContent,
@@ -370,15 +384,23 @@
                         pasteCount: item.pasteCount
                     )
                     manager.insertSyncedItem(clipItem)
-                #endif
-            }
+                }
+            #else
+                if !syncedItems.contains(where: { $0.id == item.id }) {
+                    syncedItems.insert(item, at: 0)
+                }
+            #endif
         }
 
         private func notifyDeletedSyncedItem(_ itemID: UUID) {
-            guard let manager = ClipboardManager.shared else { return }
-            if manager.history.contains(where: { $0.id == itemID }) {
-                manager.deleteSyncedItem(itemID)
-            }
+            #if os(macOS)
+                guard let manager = ClipboardManager.shared else { return }
+                if manager.history.contains(where: { $0.id == itemID }) {
+                    manager.deleteSyncedItem(itemID)
+                }
+            #else
+                syncedItems.removeAll { $0.id == itemID }
+            #endif
         }
     }
 

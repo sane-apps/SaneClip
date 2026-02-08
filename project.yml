@@ -76,6 +76,7 @@ schemes:
       targets:
         SaneClipIOS: all
         SaneClipIOSWidgets: all
+        SaneClipIOSShare: all
     profile:
       config: Release
     run:
@@ -258,8 +259,16 @@ targets:
           - "**/CLAUDE.md"
       - path: Core/Models/WidgetClipboardItem.swift
       - path: Core/BrandColors.swift
+      - path: Core/Sync
+        excludes:
+          - "**/CLAUDE.md"
+      - path: Core/Security/KeychainHelper.swift
+      - path: Core/Security/HistoryEncryption.swift
     dependencies:
       - target: SaneClipIOSWidgets
+        embed: true
+        codeSign: true
+      - target: SaneClipIOSShare
         embed: true
         codeSign: true
     info:
@@ -303,6 +312,7 @@ targets:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios
           CODE_SIGN_STYLE: Automatic
           CODE_SIGN_ENTITLEMENTS: iOS/SaneClipIOS.entitlements
+          OTHER_SWIFT_FLAGS: "-D APP_STORE -D ENABLE_SYNC"
 
   # iOS Widgets
   SaneClipIOSWidgets:
@@ -345,3 +355,52 @@ targets:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.widgets
           CODE_SIGN_STYLE: Automatic
           CODE_SIGN_ENTITLEMENTS: iOSWidgets/SaneClipIOSWidgets.entitlements
+
+  # iOS Share Extension
+  SaneClipIOSShare:
+    type: app-extension
+    platform: iOS
+    bundleId: com.saneclip.app.ios.share
+    deploymentTarget:
+      iOS: 18.0
+    sources:
+      - iOSShareExtension
+      - path: Core/Models/WidgetClipboardItem.swift
+    info:
+      path: iOSShareExtension/Info.plist
+      properties:
+        CFBundleDisplayName: Save to SaneClip
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).ShareViewController"
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsText: true
+              NSExtensionActivationSupportsWebURLWithMaxCount: 1
+              NSExtensionActivationSupportsWebPageWithMaxCount: 1
+    settings:
+      base:
+        PRODUCT_NAME: SaneClipIOSShare
+        PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.share
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: 6.0
+        IPHONEOS_DEPLOYMENT_TARGET: 18.0
+        TARGETED_DEVICE_FAMILY: "1,2"
+        DEVELOPMENT_TEAM: M78L6FXD48
+        CODE_SIGN_STYLE: Manual
+        SKIP_INSTALL: YES
+        LD_RUNPATH_SEARCH_PATHS: "@executable_path/../Frameworks @executable_path/../../../../Frameworks"
+      configs:
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.ios.share
+          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_ENTITLEMENTS: iOSShareExtension/SaneClipShareDebug.entitlements
+        Release:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.share
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          CODE_SIGN_ENTITLEMENTS: iOSShareExtension/SaneClipShare.entitlements
+        Release-AppStore:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.share
+          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_ENTITLEMENTS: iOSShareExtension/SaneClipShare.entitlements

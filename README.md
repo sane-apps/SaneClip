@@ -72,6 +72,8 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 - ✅ **URL Scheme Confirmation** — Destructive commands require user approval
 - ✅ **HTTPS Enforcement** — Webhooks must use HTTPS
 - ✅ **Seamless Migration** — Existing plaintext data auto-migrates to encrypted format
+- ✅ **Paste Stack Order** — FIFO/LIFO modes for paste stack
+- 🏪 **Now on the Mac App Store** — [Get SaneClip on the App Store](https://apps.apple.com/app/saneclip/id6758898132)
 
 [Full Changelog](CHANGELOG.md)
 
@@ -324,11 +326,15 @@ Before opening a PR:
 
 ## 📱 iOS Companion App
 
-View your clipboard history on iPhone and iPad:
+View and manage your clipboard history on iPhone and iPad:
 
-- **History Tab** — Browse recent clips shared via App Groups
+- **History Tab** — Browse recent clips with tap-to-copy and haptic feedback
 - **Pinned Tab** — Quick access to your favorites
+- **Detail View** — Full content preview with selectable text, tappable URLs, and image rendering
+- **Siri Shortcuts** — "Get recent clips", "Search clips", "Copy last clip" via Shortcuts app
+- **Share Extension** — Save text and URLs to SaneClip from any app's share sheet
 - **iOS Widgets** — Recent and Pinned clips for Home Screen and Lock Screen
+- **iCloud Sync** — Keep your clipboard in sync across all your devices (optional)
 
 ---
 

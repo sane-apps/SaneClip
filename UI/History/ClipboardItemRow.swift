@@ -57,11 +57,15 @@ struct ClipboardItemRow: View {
             case "mail": return Color(hex: 0xE8807C)
             case "safari": return Color(hex: 0x6BADE4)
             case "notes": return Color(hex: 0xE4C05C)
-            case "maps": return Color(hex: 0x4DBAD4)
+            case "maps": return Color(hex: 0x4B9FE8)
             case "contacts": return Color(hex: 0xC8ACE4)
             case "calendar": return Color(hex: 0xD4849A)
             case "photos": return Color(hex: 0xE89A3C)
             case "reminders": return Color(hex: 0x8A9FE4)
+            case "terminal": return Color(hex: 0x66E08E) // Lime green
+            case "xcode": return Color(hex: 0x6B7FE8) // Indigo
+            case "finder": return Color(hex: 0x4DD4D4) // Cyan
+            case "slack": return Color(hex: 0xD464CC) // Fuchsia
             default: return Color.clipBlue
             }
         } else {
@@ -70,11 +74,15 @@ struct ClipboardItemRow: View {
             case "mail": return Color(hex: 0xC4524E)
             case "safari": return Color(hex: 0x3A7DB8)
             case "notes": return Color(hex: 0x9E8528)
-            case "maps": return Color(hex: 0x2A8FA8)
+            case "maps": return Color(hex: 0x2D7AC2)
             case "contacts": return Color(hex: 0x7A5FA8)
             case "calendar": return Color(hex: 0xA8566E)
             case "photos": return Color(hex: 0xB87A22)
             case "reminders": return Color(hex: 0x4E62A8)
+            case "terminal": return Color(hex: 0x2D8A4E) // Deep lime
+            case "xcode": return Color(hex: 0x4450A8) // Deep indigo
+            case "finder": return Color(hex: 0x2A8FA8) // Deep cyan
+            case "slack": return Color(hex: 0xA03898) // Deep fuchsia
             default: return Color.clipBlue
             }
         }

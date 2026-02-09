@@ -81,6 +81,7 @@
 		E536D1C7BAF4008597CEBB54 /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 3F1B86A6C77CFF7FA0AAD10A /* CLAUDE.md */; };
 		F5163A69E164634BA8652A30 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6785DC91231845BA4B10499F /* PrivacyInfo.xcprivacy */; };
 		F65E7C1FC3DA96F5B644D77A /* SearchClipsIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44529FCAA8809428979A60BC /* SearchClipsIntent.swift */; };
+		F903EA3E74F83ADB70AC45F1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF3C7603DE7E07A2AC7D3C74 /* Assets.xcassets */; };
 		FB023FB9283A573C5E3BD4CB /* ClipboardItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352F7E56F26119F6981AEFB2 /* ClipboardItemRow.swift */; };
 		FDD144B1AFB419C804989B70 /* SyncSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08983A3D7903ACF79993349 /* SyncSettingsView.swift */; };
 /* End PBXBuildFile section */
@@ -220,6 +221,7 @@
 		E255CCFA37A4633D75D64EF2 /* ClipboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardItem.swift; sourceTree = "<group>"; };
 		F7120D46FF8B86B71EAB5508 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		FEB6B85899467ECE68DDCE6E /* SharedClipboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedClipboardItem.swift; sourceTree = "<group>"; };
+		FF3C7603DE7E07A2AC7D3C74 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -461,6 +463,7 @@
 		E2FA8B6080FA528017F8B223 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				FF3C7603DE7E07A2AC7D3C74 /* Assets.xcassets */,
 				61392CF56C24077C8FD681EE /* Info.plist */,
 				197F40B4EAA11C09CD1A5801 /* PrivacyInfo.xcprivacy */,
 				2FA17931D596332935591539 /* SaneClipIOS.entitlements */,
@@ -712,6 +715,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F903EA3E74F83ADB70AC45F1 /* Assets.xcassets in Resources */,
 				802474EB5319EC0BE29B5D80 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

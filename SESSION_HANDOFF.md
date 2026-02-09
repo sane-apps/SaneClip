@@ -1,92 +1,106 @@
-# Session Handoff - 2026-02-07 (5:45 PM)
+# Session Handoff - 2026-02-07 (10:10 PM)
 
-## Current State: v2.0 TestFlight Upload Complete
+## Current State: iOS Visual Polish — Source-Aware Colors
 
 ### What Was Done This Session
 
-1. **CKSyncEngine v2.0 sync** — Already committed from prior session
-2. **iCloud capability** — Configured in Xcode with container `iCloud.com.saneclip.app`
-3. **Signing config fixed** — All Release-AppStore configs switched to `CODE_SIGN_STYLE: Automatic` (was Manual with explicit identity that caused conflicts)
-4. **SwiftLint archive fix** — SwiftLint "error:" output was causing `xcodebuild archive` to fail. Added `sed 's/: error:/: warning:/'` pipe in project.yml
-5. **Widget sandbox entitlement** — Added `com.apple.security.app-sandbox` to `Widgets/SaneClipWidgets.entitlements` (App Store validation requirement)
-6. **App Store Connect** — SaneClip app created (ID: `6758898132`, Bundle: `com.saneclip.app`)
-7. **TestFlight upload** — Build archived and exported successfully, uploaded to App Store Connect
-8. **New API key** — Created "SaneApps" key (`S34998ZCRT`) with Admin access, `.p8` saved to `~/.private_keys/AuthKey_S34998ZCRT.p8`
-9. **notarytool updated** — Keychain profile `"notarytool"` now uses key `S34998ZCRT` (was `7LMFF3A258`)
-10. **Global CLAUDE.md updated** — Apple Developer Credentials section rewritten with both keys, full command reference
+1. **README + website updated** — Added iOS Companion App section to README.md, feature card to docs/index.html, committed as `254c4d3`
+2. **Simulator seeded with realistic data** — Everyday content (messages, recipes, tracking numbers, flight confirmations) replacing technical examples. Marketing peppered in (saneapps.com URL, "Just tried SaneClip..." testimonial)
+3. **iOS ClipboardItemCell visual overhaul** — Multiple rounds of user-driven fixes:
+   - Fixed gray-on-gray text: explicit `previewColor` (textCloud #e5e5e5 dark, #1A1A1A light) and `metadataColor` (textStone #888888 dark, #555555 light)
+   - Font bumped to `.subheadline` weight `.semibold`, metadata to `.caption`
+   - Removed all opacity dimming on accent colors
+4. **Source-aware color palette** — 9 app-specific colors (Messages=sage, Mail=coral, Safari=sky, Notes=gold, Maps=cyan, Contacts=lavender, Calendar=rose, Photos=amber, Reminders=periwinkle)
+   - Split `barColor` (orange for pinned, source for regular) from `accentColor` (always source-aware)
+   - Dark mode AND light mode variants (darkened for WCAG AA 4.5:1 on light backgrounds)
+5. **Ported to macOS** — `ClipboardItemRow.swift` now has identical source color palette, bar/accent split, colored content type icons
+6. **Consistency fixes** — Toast uses `semanticSuccess`, PinnedTab empty state uses `pinnedOrange`, swipe action matches tab tint
+7. **3 parallel critic agents** ran: UI/UX critic, color harmony critic, macOS parity explorer
 
-### Commit: `7820c13` (pushed to main)
+### Commits This Session
 
-Changes in this commit:
-- project.yml: Automatic signing for Release-AppStore, SwiftLint fix
-- Widgets/SaneClipWidgets.entitlements: Added app-sandbox
-- SaneClipAppStore.entitlements: Key reordering by Xcode (no functional change)
-- All CKSyncEngine sync code (from prior sessions)
+| Hash | Description |
+|------|-------------|
+| `254c4d3` | feat: iOS app overhaul — detail view, Siri Shortcuts, Share Extension |
+| `1af0fc1` | feat: source-aware colors for clipboard items on iOS and macOS |
 
 ---
 
-## App Store Connect Status
+## CRITICAL: Outstanding Issue — Maps vs Messages Colors
+
+**User says Maps (#4DBAD4 cyan teal) and Messages (#5EC2A0 sage green) are STILL too similar.** This must be fixed first thing next session. Both are in the green-cyan family.
+
+**Fix approach:** Move Maps to a completely different hue family — try blue (#4B9FE8) or a warmer teal-blue (#3498DB) to create clear visual separation from the green Messages color. The dark AND light variants both need updating.
+
+**Files to edit:**
+- `iOS/Views/ClipboardItemCell.swift` — lines ~19-20 (dark) and ~33-34 (light) for maps
+- `UI/History/ClipboardItemRow.swift` — matching dark/light maps entries
+
+---
+
+## Color Critic Findings (Not Yet Applied)
+
+From the color harmony critic (partially applied, some remain):
+- Pinned orange (#f59e0b) clashes with Notes/Photos warm tones — critic recommends → #d97706
+- All source colors should be tested against actual card backgrounds, not just white
+- Consider adding a subtle colored background tint to cards from source apps
+
+From the UI/UX critic:
+- Settings tab monochrome feels dated compared to colorful History/Pinned tabs
+- User already took 3 dark mode screenshots (History, Pinned, Settings) — need 3 light mode + retake dark after color fixes
+
+---
+
+## Simulator Test Data
+
+App Group container with seeded data:
+- Path: `/Users/sj/Library/Developer/CoreSimulator/Devices/71BCCECA-4123-48BB-988E-775A2B101515/data/Containers/Shared/AppGroup/C98BAA81-66C4-4872-B8F7-8882BA932E08/widget-data.json`
+- Bundle ID (debug): `com.saneclip.dev.ios`
+- Simulator: iPhone 17 Pro (`71BCCECA-4123-48BB-988E-775A2B101515`)
+- Timestamp format: Apple reference date (Double, seconds since 2001-01-01)
+
+---
+
+## Key Architecture: Source Color System
+
+```
+sourceColor (computed per item.sourceAppName)
+  ├── colorScheme == .dark → bright/saturated hex
+  └── colorScheme == .light → darkened hex (WCAG AA)
+
+barColor = isPinned ? .pinnedOrange : sourceColor
+accentColor = sourceColor (always, even on pinned items)
+```
+
+Both iOS (`ClipboardItemCell`) and macOS (`ClipboardItemRow`) share identical palettes.
+
+---
+
+## App Store Submission Status
 
 | Field | Value |
 |-------|-------|
-| App Name | SaneClip |
 | App ID | `6758898132` |
 | Bundle ID | `com.saneclip.app` |
-| SKU | `saneclip` |
-| Version | 1.0 |
-| State | **PREPARE_FOR_SUBMISSION** |
-| Platform | macOS |
-| Build | Uploaded (processing) |
+| State | PREPARE_FOR_SUBMISSION |
+| iOS Pricing | Free (companion to $6.99 macOS app) |
+| Cross-sell | Aggressive — saneapps.com links in test data |
 
-### Still Needed for App Store Submission
+### Still Needed
+- [ ] **Fix Maps/Messages color similarity** (user blocker)
+- [ ] Retake all 6 screenshots (3 dark, 3 light) after color fix
 - [ ] App Store metadata (description, keywords, category)
-- [ ] Screenshots (at least 1 required for macOS)
 - [ ] Privacy policy URL
-- [ ] App icon (1024x1024 for App Store)
-- [ ] Privacy manifest (`PrivacyInfo.xcprivacy`) — not yet created
-- [ ] Review build processing status in App Store Connect
-- [ ] TestFlight testing of sync features
+- [ ] PrivacyInfo.xcprivacy
+- [ ] Final TestFlight testing
 
 ---
 
-## Apple Developer API Keys
+## Build Status
 
-| Name | Key ID | Access | Status |
-|------|--------|--------|--------|
-| SaneBar Notarization | `7LMFF3A258` | Developer | Legacy — no .p8 on disk |
-| **SaneApps** | **`S34998ZCRT`** | Admin | **Active — .p8 at `~/.private_keys/`** |
-
-- **Issuer ID**: `c98b1e0a-8d10-4fce-a417-536b31c09bfb`
-- **Team ID**: `M78L6FXD48`
-- **Keychain profile `notarytool`** now uses `S34998ZCRT`
-
-```bash
-# TestFlight upload
-xcrun altool --upload-app -f /path/to/export.pkg --apiKey S34998ZCRT --apiIssuer c98b1e0a-8d10-4fce-a417-536b31c09bfb
-
-# Notarization
-xcrun notarytool submit /path/to/app.dmg --keychain-profile "notarytool" --wait
-```
-
----
-
-## Key Architecture Decisions
-
-### Signing Strategy
-- **Release-AppStore**: `CODE_SIGN_STYLE: Automatic` (Xcode picks cert), no explicit `CODE_SIGN_IDENTITY`
-- **Release (Developer ID)**: Manual signing with `Developer ID Application` cert
-- **Debug**: Automatic with dev cert
-
-### CKSyncEngine (v2.0)
-- Conditional compilation: `#if ENABLE_SYNC` (only in Release-AppStore builds)
-- `OTHER_SWIFT_FLAGS: "-D APP_STORE -D ENABLE_SYNC"` in project.yml
-- iCloud container: `iCloud.com.saneclip.app`
-- Developer ID builds have NO sync (no CloudKit provisioning for direct distribution)
-
-### SwiftLint + Archive
-- SwiftLint errors cause archive failure even with exit code 0
-- Fix: pipe through `sed 's/: error:/: warning:/'`
-- Root cause: SettingsView.swift is 1318 lines (over 1000 line limit)
+- macOS: BUILD SUCCEEDED, 55 tests pass (6 suites)
+- iOS: BUILD SUCCEEDED (SaneClipIOS scheme, iPhone 17 Pro simulator)
+- Scheme names: `SaneClip` (macOS), `SaneClipIOS` (iOS)
 
 ---
 
@@ -94,37 +108,16 @@ xcrun notarytool submit /path/to/app.dmg --keychain-profile "notarytool" --wait
 
 | Issue | Detail |
 |-------|--------|
-| R2 bucket | `sanebar-downloads` (shared), use `--remote` flag |
+| Simulator names changed | iPhone 16 Pro → iPhone 17 Pro (OS update) |
+| iOS bundle ID (debug) | `com.saneclip.dev.ios` (NOT `com.saneclip.app`) |
+| Timestamp encoding | `JSONDecoder()` default = `deferredToDate` = Double, NOT ISO 8601 |
 | Sparkle key | ONE key for ALL SaneApps. Public: `7Pl/8cwfb2vm4Dm65AByslkMCScLJ9tbGlwGGx81qYU=` |
-| API key .p8 | Apple only lets you download ONCE. Saved at `~/.private_keys/AuthKey_S34998ZCRT.p8` |
-| notarytool profile | Now `S34998ZCRT` (was `7LMFF3A258`). Verified working. |
-| Mac mini | Can build Release-AppStore but has NO signing certs. Use `CODE_SIGN_IDENTITY="-"` for compile-only verification |
-| Widget sandbox | ALL executables need `com.apple.security.app-sandbox` for App Store |
-| ExportOptions.plist | At `/tmp/ExportOptions.plist` — method: app-store-connect, signingStyle: automatic, destination: upload |
-
----
-
-## What's Next
-
-### Immediate
-1. Check TestFlight build processing status
-2. Fill App Store metadata (description, screenshots, privacy policy)
-3. Create `PrivacyInfo.xcprivacy`
-4. TestFlight test sync features between Mac and iOS
-
-### v1.5 (iOS)
-- Fix iOS deployment target (`26.0` → `18.0` in project.yml)
-- Remove stale CloudKit entitlement from iOS target
-- iOS onboarding with SanePromise
-- iOS App Store submission
-
-### Automation
-- Automated archive + TestFlight upload script (API key ready)
-- Mac mini CI integration
+| R2 uploads | ALWAYS use `--remote` flag |
 
 ---
 
 ## Previous Sessions (Archived)
+- Feb 7 (earlier): iOS app overhaul — detail view, Siri Shortcuts, Share Extension, App Intents
 - Feb 3: SaneClip 1.4 DMG release, Product Hunt launch prep
 - Jan 27: Security hardening (7/10 → 9/10), Sparkle conditional compilation
 - Jan 26: DMG release readiness, icon fixes

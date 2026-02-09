@@ -9,14 +9,14 @@
 [![GitHub stars](https://img.shields.io/github/stars/sane-apps/SaneClip?style=flat-square)](https://github.com/sane-apps/SaneClip/stargazers)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
 [![macOS](https://img.shields.io/badge/macOS-15.0+-blue?style=flat-square)](https://www.apple.com/macos/)
-[![Price](https://img.shields.io/badge/Price-$5_one--time-green?style=flat-square)](https://saneclip.com)
+[![Price](https://img.shields.io/badge/Price-$6.99_one--time-green?style=flat-square)](https://saneclip.com)
 
-> **⭐ Star this repo if you find it useful!** · **[💰 Buy the DMG for $5](https://saneclip.com)** · Takes 30 seconds, keeps development alive
+> **⭐ Star this repo if you find it useful!** · **[💰 Buy the DMG for $6.99](https://saneclip.com)** · Takes 30 seconds, keeps development alive
 
 <img src="docs/images/screenshot-popover.png" alt="SaneClip Screenshot" width="600">
 
 <h3>
-  <a href="https://saneclip.com">🚀 Get SaneClip — $5 One-Time Purchase</a>
+  <a href="https://saneclip.com">🚀 Get SaneClip — $6.99 One-Time Purchase</a>
 </h3>
 
 <p>
@@ -59,7 +59,7 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 **100% local. Zero cloud. Zero analytics. Zero telemetry.**
 
-[**→ Download SaneClip ($5 one-time, free updates for life)**](https://saneclip.com)
+[**→ Download SaneClip ($6.99 one-time, free updates for life)**](https://saneclip.com)
 
 ---
 
@@ -137,11 +137,13 @@ Automatic processing applied to every copy:
 ### Organization
 
 - **📌 Pin Favorites** — Keep frequently-used text always accessible
-- **🔍 Instant Search** — Filter by date, type, or source app
+- **🔍 Instant Search** — Filter by content, source app, or date
+- **🎨 Source-Aware Colors** — Every clip is color-coded by source app (Messages green, Safari blue, Mail red, and more)
 - **📱 App Source Attribution** — See which app each clip came from
 - **🔄 Duplicate Detection** — Identical clips automatically consolidate
 - **📊 Paste Count Badges** — Track how many times you've used each item
 - **⏱️ Auto-Expire** — Delete old items after 1h, 24h, 7d, or 30d
+- **🖼️ Image Capture** — Copies images too, not just text
 
 ### macOS Widgets
 
@@ -198,8 +200,8 @@ Send HTTP notifications when clipboard events occur with HMAC-SHA256 signatures 
 
 SaneClip is **privacy-first**:
 
-- ✅ **100% Local** — All data stays on your Mac
-- ✅ **Zero Cloud Sync** — No servers, no accounts, no sync
+- ✅ **100% On-Device** — All processing stays on your Mac
+- ✅ **iCloud Sync Only** — Syncs between your devices via iCloud, no third-party servers
 - ✅ **Zero Analytics** — No tracking, no telemetry, no data collection
 - ✅ **Open Source** — Verify yourself at [github.com/sane-apps/SaneClip](https://github.com/sane-apps/SaneClip)
 - ✅ **GPL v3 License** — Community-auditable, copyleft protection
@@ -219,7 +221,9 @@ See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) for full details.
 
 ## 📦 Installation
 
-**Download the latest DMG from [saneclip.com](https://saneclip.com) — $5 one-time purchase, free updates for life.**
+**Download the latest DMG from [saneclip.com](https://saneclip.com) — $6.99 one-time purchase, free updates for life.**
+
+> *I wanted to make it $5, but processing fees and taxes were... insane. — Mr. Sane*
 
 DMGs are hosted on Cloudflare (not attached to GitHub releases). **Sparkle auto-updates** keep you current — once installed, updates are delivered automatically.
 
@@ -237,9 +241,7 @@ DMGs are hosted on Cloudflare (not attached to GitHub releases). **Sparkle auto-
 
 ## 🛠️ Development
 
-> **📢 752 developers have cloned this repo. Only 7 starred it.**
->
-> If you're about to clone, **[⭐ star it first](https://github.com/sane-apps/SaneClip)**. Help others discover quality open source.
+> **Cloning without starring?** For real? **[⭐ Star it first](https://github.com/sane-apps/SaneClip)**. Help others discover quality open source.
 
 ```bash
 # Clone the repo
@@ -264,7 +266,7 @@ Before opening a PR:
 2. Read [CONTRIBUTING.md](CONTRIBUTING.md)
 3. Open an issue first to discuss major changes
 
-**Building from source?** Consider [buying the DMG for $5](https://saneclip.com) to support continued development. Open source doesn't mean free labor.
+**Building from source?** Consider [buying the DMG for $6.99](https://saneclip.com) to support continued development. Open source doesn't mean free labor.
 
 ---
 
@@ -305,11 +307,11 @@ Before opening a PR:
 | ❌ Cloud sync (data exposure risk) | ✅ 100% local, zero servers |
 | ❌ Analytics and telemetry | ✅ Zero tracking, zero telemetry |
 | ❌ Closed source | ✅ Open source (GPL v3) |
-| ❌ Subscription pricing | ✅ $5 one-time, free updates |
+| ❌ Subscription pricing | ✅ $6.99 one-time, free updates |
 | ❌ No Touch ID protection | ✅ Biometric locks with grace period |
 | ❌ No sensitive data detection | ✅ Auto-flags credit cards, API keys, SSNs |
 
-**[→ Get SaneClip for $5](https://saneclip.com)** — One-time purchase. Free updates for life. 100% secure.
+**[→ Get SaneClip for $6.99](https://saneclip.com)** — One-time purchase. Free updates for life. 100% secure.
 
 ---
 
@@ -324,17 +326,17 @@ Before opening a PR:
 
 ---
 
-## 📱 iOS Companion App
+## 📱 iOS Companion App (Free)
 
-View and manage your clipboard history on iPhone and iPad:
+Your clipboard history, on your iPhone and iPad. Free with SaneClip for Mac.
 
-- **History Tab** — Browse recent clips with tap-to-copy and haptic feedback
+- **History Tab** — Browse recent clips with source-aware colors, tap-to-copy, and haptic feedback
 - **Pinned Tab** — Quick access to your favorites
 - **Detail View** — Full content preview with selectable text, tappable URLs, and image rendering
 - **Siri Shortcuts** — "Get recent clips", "Search clips", "Copy last clip" via Shortcuts app
 - **Share Extension** — Save text and URLs to SaneClip from any app's share sheet
 - **iOS Widgets** — Recent and Pinned clips for Home Screen and Lock Screen
-- **iCloud Sync** — Keep your clipboard in sync across all your devices (optional)
+- **iCloud Sync** — Keep your clipboard in sync across all your devices via CKSyncEngine
 
 ---
 
@@ -342,7 +344,7 @@ View and manage your clipboard history on iPhone and iPad:
 
 Looking at alternatives? Here's how SaneClip stacks up:
 
-- **vs. Paste** — Paste costs $30/year subscription. SaneClip is $5 one-time. Paste syncs to cloud (privacy risk). SaneClip is 100% local.
+- **vs. Paste** — Paste costs $30/year subscription. SaneClip is $6.99 one-time. Paste syncs to cloud (privacy risk). SaneClip is 100% local.
 - **vs. CopyClip** — CopyClip is free but stores data in plaintext. SaneClip encrypts everything with AES-256-GCM.
 - **vs. Maccy** — Maccy is open source but lacks Touch ID, encryption, and sensitive data detection. SaneClip has all three.
 
@@ -362,6 +364,6 @@ GPL v3 — see [LICENSE](LICENSE) for details.
 
 **Not fear, but power, love, sound mind** — 2 Timothy 1:7
 
-[**→ Get SaneClip for $5**](https://saneclip.com)
+[**→ Get SaneClip for $6.99**](https://saneclip.com)
 
 </div>

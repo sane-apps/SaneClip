@@ -49,7 +49,7 @@
         "operatingSystem": "macOS 15 Sequoia or later",
         "offers": {
             "@type": "Offer",
-            "price": "5",
+            "price": "6.99",
             "priceCurrency": "USD"
         },
         "author": {
@@ -106,7 +106,8 @@
             --bg-secondary: #12121a;
             --bg-card: #1a1a24;
             --text-primary: #f5f5f7;
-            --text-secondary: #c0c0d0;
+            --text-secondary: #e8e8f0;
+            --text-muted: #d0d0e0;
             --accent: #0099ff;
             --accent-soft: #0077cc;
             --accent-subtle: rgba(0, 153, 255, 0.15);
@@ -186,22 +187,10 @@
             height: 32px;
             border-radius: 8px;
         }
-
-        .logo-family {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 400;
-            margin-left: 12px;
-            margin-right: auto;
-            padding-left: 12px;
-            border-left: 1px solid var(--border);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .logo-family:hover {
-            color: var(--accent);
-        }
+        .logo-group { display: flex; flex-direction: column; }
+        .logo-family { font-size: 0.7rem; color: var(--text-secondary); text-decoration: none; margin-left: 44px; margin-top: -2px; opacity: 0.8; transition: color 0.2s; }
+        .logo-family:hover { color: var(--text-primary); }
+        @media (max-width: 768px) { .logo-family { display: none; } }
 
         .nav-links {
             display: flex;
@@ -947,6 +936,68 @@
             font-size: 1.1rem;
         }
 
+        /* iOS Companion Section */
+        .ios-companion {
+            padding: 80px 0;
+            text-align: center;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ios-features {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 24px 0 40px;
+        }
+
+        .ios-features span {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .ios-screenshots {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .ios-screenshot-item {
+            flex: 0 1 200px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .ios-screenshot-item:hover {
+            transform: translateY(-4px);
+        }
+
+        .ios-screenshot-item img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--border-subtle);
+        }
+
+        .ios-screenshot-item p {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .ios-note {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 8px;
+        }
+
         /* Support Section */
         .support {
             padding: 80px 0;
@@ -1182,6 +1233,10 @@
         .sustainability-option h4 { font-size: 1rem; margin-bottom: 8px; color: var(--text-primary); }
         .sustainability-option p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
         @media (max-width: 768px) { .sustainability-options { grid-template-columns: 1fr; } }
+        .price-note { position: relative; display: inline; color: var(--text-primary); font-size: 0.75rem; vertical-align: super; margin-left: 3px; cursor: default; }
+        .price-note::after { content: "I wanted to make it $5, but processing fees and taxes were… insane. — Mr. Sane"; position: absolute; left: calc(100% + 6px); top: 50%; transform: translateY(-50%); background: var(--bg-card); color: var(--text-primary); padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-style: italic; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.1s; z-index: 999; border: 1px solid var(--border); }
+        .price-note:hover::after { opacity: 1; }
+        @media (max-width: 768px) { .price-note { display: none; } }
     </style>
 </head>
 <body>
@@ -1196,13 +1251,16 @@
 
     <nav>
         <div class="container">
-            <a href="#" class="logo">
-                <img src="images/icon.png" alt="SaneClip">
-                SaneClip
-            </a>
-            <a href="https://saneapps.com" class="logo-family">Part of the SaneApps family</a>
+            <div class="logo-group">
+                <a href="#" class="logo">
+                    <img src="images/icon.png" alt="SaneClip">
+                    SaneClip
+                </a>
+                <a href="https://saneapps.com" class="logo-family">Part of the SaneApps family</a>
+            </div>
             <div class="nav-links">
                 <a href="#features">Features</a>
+                <a href="#ios">iOS App</a>
                 <a href="#compare">Compare</a>
                 <a href="/guides.html">Guides</a>
                 <a href="https://github.com/sane-apps/SaneClip">GitHub</a>
@@ -1223,6 +1281,7 @@
         <button class="mobile-nav-close" onclick="toggleMobileNav()" aria-label="Close menu">&times;</button>
         <p class="mobile-nav-section">Navigation</p>
         <a href="#features" onclick="toggleMobileNav()">Features</a>
+        <a href="#ios" onclick="toggleMobileNav()">iOS App</a>
         <a href="#compare" onclick="toggleMobileNav()">Compare</a>
         <a href="/guides.html" onclick="toggleMobileNav()">Guides</a>
         <a href="https://github.com/sane-apps/SaneClip">GitHub</a>
@@ -1231,34 +1290,64 @@
         <a href="https://sanebar.com">SaneBar &mdash; Menu Bar Manager</a>
         <a href="https://sanehosts.com">SaneHosts &mdash; System-Level Ad Blocker</a>
         <a href="https://saneapps.com">See all SaneApps &rarr;</a>
-        <a href="https://go.saneapps.com/buy/saneclip?ref=website" class="mobile-nav-cta">Download SaneClip &mdash; $5</a>
+        <a href="https://go.saneapps.com/buy/saneclip?ref=website" class="mobile-nav-cta">Download SaneClip &mdash; $6.99</a>
     </div>
 
     <section class="hero">
         <div class="container">
             <h1 class="animate-in delay-1">Bring <em>Sanity</em> to your Clipboard</h1>
-            <p class="subtitle animate-in delay-2">The <em>only</em> clipboard manager with Touch ID protection. Your copy history never leaves your Mac.</p>
-            <div class="trust-badges animate-in delay-3">
-                <a href="https://forums.basehub.com/sane-apps/SaneClip/3" target="_blank" rel="noopener" style="color: inherit; text-decoration: none;">🛡️ Provably private (Audit)</a>
+            <p class="subtitle animate-in delay-2">The <em>only</em> clipboard manager with Touch ID protection.</p>
+            <p class="subtitle animate-in delay-3" style="margin-top: -8px;">Includes Mac and iOS apps.</p>
+            <div class="trust-badges animate-in delay-4">
+                <a href="https://forums.basehub.com/sane-apps/SaneClip/3" target="_blank" rel="noopener" style="color: inherit; text-decoration: none;">🛡️ Provably private (Review)</a>
                 <span>&#x1F4B5; No subscription</span>
                 <span>&#x1F6E0;&#xFE0F; Actively maintained</span>
             </div>
-            <div class="cta-buttons animate-in delay-3">
+            <div class="cta-buttons animate-in delay-5">
                 <a href="https://go.saneapps.com/buy/saneclip?ref=website" class="btn btn-primary">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                         <polyline points="7 10 12 15 17 10"/>
                         <line x1="12" y1="15" x2="12" y2="3"/>
                     </svg>
-                    Download — $5
-                </a>
+                    Download — $6.99
+                </a><span class="price-note">*</span>
             </div>
-            <p class="system-requirements animate-in delay-4" style="color: var(--text-secondary); font-size: 0.875rem; margin-top: -28px; margin-bottom: 40px;">Requires macOS 15.0 (Sequoia) or later &middot; Also on the <a href="https://apps.apple.com/app/saneclip/id6758898132" style="color: var(--accent);">Mac App Store</a></p>
+            <p class="system-requirements animate-in delay-4" style="color: var(--text-secondary); font-size: 0.875rem; margin-top: -28px; margin-bottom: 40px;">Requires macOS 15.0 (Sequoia) or later</p>
 
             <!-- Demo Preview - Actual Screenshot -->
             <div class="hero-screenshot animate-in delay-5">
                 <img src="images/screenshot-popover.png" alt="SaneClip clipboard history">
             </div>
+        </div>
+    </section>
+
+    <section class="ios-companion" id="ios">
+        <div class="container">
+            <h2 class="section-title">Your Clipboard, on iPhone</h2>
+            <p class="section-subtitle">SaneClip syncs across all your devices via iCloud. Browse, search, and paste your clipboard history right from your pocket.</p>
+            <div class="ios-features">
+                <span>Siri Shortcuts</span>
+                <span>Share Extension</span>
+                <span>Widgets</span>
+                <span>Tap to Copy</span>
+                <span>Source-Aware Colors</span>
+            </div>
+            <div class="ios-screenshots">
+                <div class="ios-screenshot-item" onclick="openLightbox('images/screenshot-ios-history-dark.png', 'Clipboard History on iPhone — Source-aware colors and full sync')">
+                    <img src="images/screenshot-ios-history-dark.png" alt="SaneClip iOS - Clipboard History" loading="lazy">
+                    <p>History</p>
+                </div>
+                <div class="ios-screenshot-item" onclick="openLightbox('images/screenshot-ios-pinned-dark.png', 'Pinned Items on iPhone — Keep important clips always accessible')">
+                    <img src="images/screenshot-ios-pinned-dark.png" alt="SaneClip iOS - Pinned Items" loading="lazy">
+                    <p>Pinned</p>
+                </div>
+                <div class="ios-screenshot-item" onclick="openLightbox('images/screenshot-ios-settings-dark.png', 'Settings on iPhone — iCloud sync, about, and more')">
+                    <img src="images/screenshot-ios-settings-dark.png" alt="SaneClip iOS - Settings" loading="lazy">
+                    <p>Settings</p>
+                </div>
+            </div>
+            <p class="ios-note">Free with SaneClip for Mac.</p>
         </div>
     </section>
 
@@ -1276,7 +1365,42 @@
                         </svg>
                     </div>
                     <h3>Touch ID Protection</h3>
-                    <p>Lock your clipboard history with <strong>biometric authentication</strong>. Keep sensitive data like passwords and keys protected.</p>
+                    <p>Lock your clipboard history with <strong>biometric authentication</strong>. The only clipboard manager that does this.</p>
+                </a>
+
+                <!-- AES-256 Encryption -->
+                <div class="feature-card featured">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <h3>AES-256-GCM Encryption</h3>
+                    <p>Your clipboard history is <strong>encrypted at rest</strong>. Keys stored in macOS Keychain. Even if someone copies your files, they can't read your data.</p>
+                </div>
+
+                <!-- Sensitive Data Detection -->
+                <div class="feature-card featured">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </div>
+                    <h3>Sensitive Data Detection</h3>
+                    <p>Automatically detects <strong>credit cards, SSNs, API keys, passwords, and private keys</strong>. Auto-purges them on a schedule you control.</p>
+                </div>
+
+                <!-- Search & Unlimited History -->
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-popover.png', 'Search &amp; History — Find anything you ever copied')" class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+                    <h3>Search &amp; Unlimited History</h3>
+                    <p>Stores everything you copy — text and images. <strong>Search instantly</strong> by content, edit items, and see word counts and source apps at a glance.</p>
                 </a>
 
                 <!-- Keyboard Shortcuts -->
@@ -1288,59 +1412,32 @@
                         </svg>
                     </div>
                     <h3>Lightning Shortcuts</h3>
-                    <p><strong>&#8984;Shift+V</strong> opens history. <strong>&#8984;1-9</strong> pastes instantly. No mouse needed—your hands stay on the keyboard.</p>
+                    <p><strong>&#8984;Shift+V</strong> opens history. <strong>&#8984;1-9</strong> pastes instantly. Vim-style navigation. No mouse needed.</p>
                 </a>
 
                 <!-- Pin Items -->
-                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-snippets.png', 'Pin Important Items — Keep frequently-used text always accessible')" class="feature-card">
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-snippets.png', 'Pin &amp; Snippets — Keep important text always accessible')" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="17" x2="12" y2="22"></line>
                             <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>
                         </svg>
                     </div>
-                    <h3>Pin Important Items</h3>
-                    <p>Keep SSH keys, code snippets, and frequently-used text always accessible. Pinned items never expire.</p>
+                    <h3>Pins &amp; Snippets</h3>
+                    <p>Pin frequently-used text. Create <strong>reusable snippets</strong> with placeholders like <code>{{date}}</code> and <code>{{time}}</code> that auto-expand.</p>
                 </a>
 
-                <!-- Unlimited History -->
-                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-popover.png', 'Unlimited History — Everything you copy, organized and searchable')" class="feature-card">
+                <!-- Paste Stack -->
+                <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
+                            <rect x="4" y="4" width="16" height="6" rx="1"></rect>
+                            <rect x="4" y="14" width="16" height="6" rx="1"></rect>
                         </svg>
                     </div>
-                    <h3>Unlimited History</h3>
-                    <p>Stores everything you copy, with smart word and character counts. Find that code snippet from last week instantly.</p>
-                </a>
-
-                <!-- Beautiful UI -->
-                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-settings.png', 'Native macOS Design — Glass effects and dark mode support')" class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="13.5" cy="6.5" r="0.5"></circle>
-                            <circle cx="17.5" cy="10.5" r="0.5"></circle>
-                            <circle cx="8.5" cy="7.5" r="0.5"></circle>
-                            <circle cx="6.5" cy="12.5" r="0.5"></circle>
-                            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"></path>
-                        </svg>
-                    </div>
-                    <h3>Native macOS Design</h3>
-                    <p>Glass effects, smooth animations, and dark mode support. Looks like it belongs on your Mac because it does.</p>
-                </a>
-
-                <!-- Privacy -->
-                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-settings.png', 'Private by Design — 100% on-device, zero network calls')" class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                            <path d="M9 12l2 2 4-4"/>
-                        </svg>
-                    </div>
-                    <h3>Private by Design</h3>
-                    <p><strong>100% on-device.</strong> No cloud sync. No analytics. No network calls. Your clipboard stays on your Mac.</p>
-                </a>
+                    <h3>Paste Stack</h3>
+                    <p>Queue multiple items, paste in order with <strong>&#8984;&#8963;V</strong>. FIFO or LIFO. Perfect for filling forms or batch operations.</p>
+                </div>
 
                 <!-- Text Transforms -->
                 <div class="feature-card">
@@ -1352,19 +1449,69 @@
                         </svg>
                     </div>
                     <h3>Text Transforms</h3>
-                    <p>Right-click to paste as <strong>UPPERCASE</strong>, lowercase, Title Case, or trimmed. Transform text on the fly.</p>
+                    <p>Paste as <strong>UPPERCASE</strong>, lowercase, Title Case, trimmed, reversed, or <strong>format JSON</strong>. Strip HTML or Markdown. Smart paste auto-detects content type.</p>
                 </div>
 
-                <!-- Paste Stack -->
+                <!-- Clipboard Rules -->
                 <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="4" y="4" width="16" height="6" rx="1"></rect>
-                            <rect x="4" y="14" width="16" height="6" rx="1"></rect>
+                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
                         </svg>
                     </div>
-                    <h3>Paste Stack</h3>
-                    <p>Queue multiple items, then paste them in order with <strong>⌘⌃V</strong>. Choose oldest-first or newest-first. Perfect for filling forms or batch operations.</p>
+                    <h3>Clipboard Rules</h3>
+                    <p><strong>Auto-strip tracking params</strong> from URLs (utm_*, fbclid). Auto-trim whitespace, normalize line endings, clean duplicate spaces. Copies arrive clean.</p>
+                </div>
+
+                <!-- Source-Aware Colors -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="13.5" cy="6.5" r="0.5"></circle>
+                            <circle cx="17.5" cy="10.5" r="0.5"></circle>
+                            <circle cx="8.5" cy="7.5" r="0.5"></circle>
+                            <circle cx="6.5" cy="12.5" r="0.5"></circle>
+                            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"></path>
+                        </svg>
+                    </div>
+                    <h3>Source-Aware Colors</h3>
+                    <p>Every clip is color-coded by source app. <strong>Messages green, Safari blue, Mail red</strong> — instantly see where each item came from.</p>
+                </div>
+
+                <!-- Automation -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="16 18 22 12 16 6"></polyline>
+                            <polyline points="8 6 2 12 8 18"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Automation</h3>
+                    <p><strong>URL schemes</strong> for Shortcuts integration. <strong>Webhooks</strong> with HMAC-SHA256 signatures fire on copy, paste, or delete events.</p>
+                </div>
+
+                <!-- Private by Design -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 12l2 2 4-4"/>
+                            <circle cx="12" cy="12" r="10"></circle>
+                        </svg>
+                    </div>
+                    <h3>Private by Design</h3>
+                    <p><strong>100% on-device.</strong> iCloud sync between your devices only. No third-party servers. No analytics. No tracking. Open source.</p>
+                </div>
+
+                <!-- Password Manager Safe -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M9 12l2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <h3>Password Manager Safe</h3>
+                    <p>Automatically ignores copies from <strong>1Password, LastPass, Dashlane, Bitwarden</strong>, and other password managers. Your secrets never enter the history.</p>
                 </div>
 
                 <!-- Auto-Expire -->
@@ -1376,22 +1523,10 @@
                         </svg>
                     </div>
                     <h3>Auto-Expire</h3>
-                    <p>Automatically clean old items after 1 hour, 24 hours, or 7 days. <strong>Pinned items never expire.</strong></p>
+                    <p>Automatically clean old items after 1 hour, 24 hours, or 7 days. <strong>Pinned items never expire.</strong> Exclude specific apps entirely.</p>
                 </div>
 
-                <!-- iOS Companion App -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                            <line x1="12" y1="18" x2="12.01" y2="18"></line>
-                        </svg>
-                    </div>
-                    <h3>iOS Companion App</h3>
-                    <p>Browse your clipboard on iPhone with <strong>Siri Shortcuts</strong>, Share Extension, widgets, and tap-to-copy. Coming soon to the App Store.</p>
-                </div>
-
-                <!-- Export History -->
+                <!-- Export & Import -->
                 <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1400,8 +1535,8 @@
                             <line x1="12" y1="3" x2="12" y2="15"></line>
                         </svg>
                     </div>
-                    <h3>Export History</h3>
-                    <p>Export your clipboard history to JSON with timestamps, paste counts, and source apps. <strong>Your data, your way.</strong></p>
+                    <h3>Export &amp; Import</h3>
+                    <p>Export your clipboard history to JSON. Import from backups with merge or replace. <strong>Your data, portable and yours.</strong></p>
                 </div>
             </div>
         </div>
@@ -1520,7 +1655,7 @@
                                 <span class="feature-label">Price</span>
                                 <span class="feature-desc">One-time purchase</span>
                             </td>
-                            <td class="highlight-col"><strong>$5</strong></td>
+                            <td class="highlight-col"><strong>$6.99</strong></td>
                             <td>$30/yr</td>
                             <td>Free</td>
                             <td>$13</td>
@@ -1611,14 +1746,14 @@
             <div class="sustainability-card">
                 <h2 style="font-family: 'Playfair Display', serif; font-size: 2.25rem; margin-bottom: 20px;">Open Source ≠ Free</h2>
                 <div class="sustainability-body">
-                    <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 30px;">Great open-source tools die when developers can't sustain them. $5 keeps SaneClip alive and actively maintained.</p>
+                    <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 30px;">Great open-source tools die when developers can't sustain them. $6.99 keeps SaneClip alive and actively maintained.</p>
                     <div class="sustainability-options">
                         <a href="https://github.com/sane-apps/SaneClip" class="sustainability-option">
                             <h4>Build It Yourself</h4>
                             <p>Clone the repo. GPL v3 Licensed. Build from source for free.</p>
                         </a>
                         <a href="https://go.saneapps.com/buy/saneclip?ref=website" class="sustainability-option featured">
-                            <h4>Buy the DMG — $5</h4>
+                            <h4>Buy the DMG — $6.99</h4>
                             <p>Get a signed, notarized, ready-to-use DMG and support development.</p>
                         </a>
                     </div>
@@ -1629,7 +1764,7 @@
     <footer>
         <div class="container">
             <p class="footer-quote">"For God has not given us a spirit of fear, but of power, love, and a sound mind." — 2 Timothy 1:7</p>
-            <p class="footer-privacy"><strong>0% Telemetry</strong>. <strong>0% Cloud</strong>. <strong>100% On-Device</strong>.</p>
+            <p class="footer-privacy"><strong>0% Telemetry</strong>. <strong>0% Third-Party Cloud</strong>. <strong>100% On-Device</strong>.</p>
             <div class="footer-links">
                 <a href="/guides.html">Guides</a>
                 <a href="https://github.com/sane-apps/SaneClip">GitHub</a>
@@ -1640,6 +1775,7 @@
                 <a href="https://github.com/sponsors/MrSaneApps"><svg height="12" viewBox="0 0 16 16" width="12" fill="#ea4aaa" style="vertical-align: -1px; margin-right: 3px;"><path d="M4.25 2.5c-1.336 0-2.75 1.164-2.75 3 0 2.15 1.58 4.144 3.365 5.682A20.565 20.565 0 008 13.393a20.561 20.561 0 003.135-2.211C12.92 9.644 14.5 7.65 14.5 5.5c0-1.836-1.414-3-2.75-3-1.373 0-2.609.986-3.029 2.456a.75.75 0 01-1.442 0C6.859 3.486 5.623 2.5 4.25 2.5zM8 14.25l-.345.666-.002-.001-.006-.003-.018-.01a7.643 7.643 0 01-.31-.17 22.075 22.075 0 01-3.434-2.414C2.045 10.731 0 8.35 0 5.5 0 2.836 2.086 1 4.25 1 5.797 1 7.153 1.802 8 3.02 8.847 1.802 10.203 1 11.75 1 13.914 1 16 2.836 16 5.5c0 2.85-2.045 5.231-3.885 6.818a22.08 22.08 0 01-3.744 2.584l-.018.01-.006.003h-.002L8 14.25z"/></svg>Sponsor</a>
                 <a href="https://saneapps.com">SaneApps</a>
             </div>
+            <p id="pricing-note" style="color: var(--text-secondary); font-size: 0.8rem; font-style: italic; opacity: 0.7; margin-bottom: 12px;">*I wanted to make it $5, but processing fees and taxes were... insane. — Mr. Sane</p>
             <p class="footer-copy">Made with care by Mr. Sane · &copy; 2026 SaneClip</p>
             <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 12px;">"Built for a Sound Mind" · <a href="https://saneapps.com" style="color: var(--text-secondary);">saneapps.com</a></p>
         </div>

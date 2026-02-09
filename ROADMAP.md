@@ -111,7 +111,7 @@
 ## Distribution
 
 - **Website**: [saneclip.com](https://saneclip.com)
-- **Purchase**: $5 via Lemon Squeezy
+- **Purchase**: $6.99 via Lemon Squeezy
 - **Source**: [GitHub](https://github.com/sane-apps/SaneClip) (open source)
 - **Updates**: Sparkle (automatic)
 

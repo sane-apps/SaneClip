@@ -336,11 +336,27 @@ Your clipboard history, on your iPhone and iPad. Free with SaneClip for Mac.
 
 Looking at alternatives? Here's how SaneClip stacks up:
 
-- **vs. Paste** — Paste costs $30/year subscription. SaneClip is $6.99 one-time. Paste syncs to cloud (privacy risk). SaneClip is 100% local.
-- **vs. CopyClip** — CopyClip is free but stores data in plaintext. SaneClip encrypts everything with AES-256-GCM.
-- **vs. Maccy** — Maccy is open source but lacks Touch ID, encryption, and sensitive data detection. SaneClip has all three.
+| Feature | SaneClip | Paste | Maccy | Pastebot | CopyClip |
+|---------|:--------:|:-----:|:-----:|:--------:|:--------:|
+| **AES-256 Encryption** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Touch ID Protection** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Sensitive Data Detection** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Password Manager Safety** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Clipboard Rules** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Webhooks & URL Schemes** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Siri Shortcuts & Widgets** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| App Exclusions | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Source App Colors | ✅ | ✅ | ❌ | ✅ | ❌ |
+| Text Transforms | ✅ | ❌ | ❌ | ✅ | ❌ |
+| Paste Stack | ✅ | ❌ | ❌ | ✅ | ❌ |
+| Snippets & Placeholders | ✅ | ✅ | ❌ | ✅ | ❌ |
+| iOS Companion App | ✅ Free | ✅ Paid | ❌ | ❌ | ❌ |
+| iCloud Sync | ✅ | ✅ | ❌ | ✅ | ❌ |
+| Open Source | ✅ | ❌ | ✅ | ❌ | ❌ |
+| 100% Private | ✅ | ❌ | ✅ | ✅ | ✅ |
+| **Price** | **$6.99** | $30/yr | Free | $13 | Free |
 
-**Bottom line:** If privacy and security matter to you, SaneClip is the only choice.
+**Bottom line:** The first 7 rows are SaneClip-only features. No other clipboard manager offers encryption, Touch ID, sensitive data detection, or webhook automation. If privacy and security matter to you, SaneClip is the only choice.
 
 ---
 

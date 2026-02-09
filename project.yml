@@ -138,16 +138,16 @@ targets:
         MACOSX_DEPLOYMENT_TARGET: 15.0
         ARCHS: arm64
         VALID_ARCHS: arm64
-        DEVELOPMENT_TEAM: M78L6FXD48
         CODE_SIGN_STYLE: Manual
         CODE_SIGN_INJECT_BASE_ENTITLEMENTS: YES
       configs:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev
-          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_IDENTITY: "-"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipDebug.entitlements
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
+          DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Developer ID Application"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClip.entitlements
           PROVISIONING_PROFILE_SPECIFIER: "SaneClip Developer ID"
@@ -194,12 +194,12 @@ targets:
       - target: SaneClip
     settings:
       base:
-        DEVELOPMENT_TEAM: M78L6FXD48
         CODE_SIGN_STYLE: Manual
       configs:
         Debug:
-          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_IDENTITY: "-"
         Release:
+          DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Development"
 
   SaneClipWidgets:
@@ -224,17 +224,17 @@ targets:
         MARKETING_VERSION: "1.4"
         CURRENT_PROJECT_VERSION: "6"
         SWIFT_VERSION: 6.0
-        DEVELOPMENT_TEAM: M78L6FXD48
         CODE_SIGN_STYLE: Manual
         SKIP_INSTALL: YES
         LD_RUNPATH_SEARCH_PATHS: "@executable_path/../Frameworks @executable_path/../../../../Frameworks"
       configs:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.widgets
-          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_IDENTITY: "-"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgetsDebug.entitlements
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
+          DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Developer ID Application"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
           PROVISIONING_PROFILE_SPECIFIER: "SaneClip Widgets Developer ID"
@@ -297,15 +297,15 @@ targets:
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"
-        DEVELOPMENT_TEAM: M78L6FXD48
         CODE_SIGN_STYLE: Manual
       configs:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.ios
-          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_IDENTITY: "-"
           CODE_SIGN_ENTITLEMENTS: iOS/SaneClipIOSDebug.entitlements
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios
+          DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Distribution"
           CODE_SIGN_ENTITLEMENTS: iOS/SaneClipIOS.entitlements
         Release-AppStore:
@@ -339,16 +339,16 @@ targets:
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"
-        DEVELOPMENT_TEAM: M78L6FXD48
         CODE_SIGN_STYLE: Manual
         SKIP_INSTALL: YES
       configs:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.ios.widgets
-          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_IDENTITY: "-"
           CODE_SIGN_ENTITLEMENTS: iOSWidgets/SaneClipIOSWidgetsDebug.entitlements
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.widgets
+          DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Distribution"
           CODE_SIGN_ENTITLEMENTS: iOSWidgets/SaneClipIOSWidgets.entitlements
         Release-AppStore:
@@ -387,17 +387,17 @@ targets:
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"
-        DEVELOPMENT_TEAM: M78L6FXD48
         CODE_SIGN_STYLE: Manual
         SKIP_INSTALL: YES
         LD_RUNPATH_SEARCH_PATHS: "@executable_path/../Frameworks @executable_path/../../../../Frameworks"
       configs:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.ios.share
-          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_IDENTITY: "-"
           CODE_SIGN_ENTITLEMENTS: iOSShareExtension/SaneClipShareDebug.entitlements
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.share
+          DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Distribution"
           CODE_SIGN_ENTITLEMENTS: iOSShareExtension/SaneClipShare.entitlements
         Release-AppStore:

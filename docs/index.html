@@ -1356,7 +1356,9 @@
             <h2 class="section-title">Everything you need. Nothing you don't.</h2>
             <p class="section-subtitle">A clipboard manager that respects your privacy and stays out of your way.</p>
             <div class="feature-grid">
-                <!-- Touch ID Lock - THE unique feature -->
+                <!-- === ROW 1: UNIQUE TO SANECLIP (featured glow) === -->
+
+                <!-- Touch ID Lock -->
                 <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-popover.png', 'Touch ID Protection — Biometric security for your clipboard history')" class="feature-card featured">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1391,6 +1393,86 @@
                     <p>Automatically detects <strong>credit cards, SSNs, API keys, passwords, and private keys</strong>. Auto-purges them on a schedule you control.</p>
                 </div>
 
+                <!-- === ROW 2: UNIQUE TO SANECLIP (featured glow) === -->
+
+                <!-- Password Manager Safe -->
+                <div class="feature-card featured">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M9 12l2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <h3>Password Manager Safe</h3>
+                    <p>Automatically ignores copies from <strong>1Password, LastPass, Dashlane, Bitwarden</strong>, and other password managers. Your secrets never enter the history.</p>
+                </div>
+
+                <!-- Source-Aware Colors -->
+                <div class="feature-card featured">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="13.5" cy="6.5" r="0.5"></circle>
+                            <circle cx="17.5" cy="10.5" r="0.5"></circle>
+                            <circle cx="8.5" cy="7.5" r="0.5"></circle>
+                            <circle cx="6.5" cy="12.5" r="0.5"></circle>
+                            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"></path>
+                        </svg>
+                    </div>
+                    <h3>Source App Tracking</h3>
+                    <p>Every clip shows <strong>which app it came from</strong> with unique color coding. Scan your history visually — no reading required.</p>
+                </div>
+
+                <!-- Clipboard Rules -->
+                <div class="feature-card featured">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                        </svg>
+                    </div>
+                    <h3>Clipboard Rules</h3>
+                    <p><strong>Auto-strip tracking params</strong> from URLs (utm_*, fbclid). Auto-trim whitespace, normalize line endings, clean duplicate spaces. Copies arrive clean.</p>
+                </div>
+
+                <!-- === ROW 3: UNIQUE TO SANECLIP === -->
+
+                <!-- Automation -->
+                <div class="feature-card featured">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="16 18 22 12 16 6"></polyline>
+                            <polyline points="8 6 2 12 8 18"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Webhooks &amp; Automation</h3>
+                    <p><strong>URL schemes</strong> for Shortcuts. <strong>Webhooks</strong> with HMAC-SHA256 signatures fire on copy, paste, or delete. Build workflows around your clipboard.</p>
+                </div>
+
+                <!-- Private by Design -->
+                <div class="feature-card featured">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 12l2 2 4-4"/>
+                            <circle cx="12" cy="12" r="10"></circle>
+                        </svg>
+                    </div>
+                    <h3>Private by Design</h3>
+                    <p><strong>100% on-device.</strong> iCloud sync between your devices only. No third-party servers. No analytics. No tracking. Open source.</p>
+                </div>
+
+                <!-- Auto-Expire -->
+                <div class="feature-card featured">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Auto-Expire &amp; Auto-Purge</h3>
+                    <p>Old items auto-delete after 1h, 24h, or 7d. Sensitive data purges faster. <strong>Pinned items never expire.</strong> Exclude apps entirely.</p>
+                </div>
+
+                <!-- === ROW 4+: SOLID FEATURES === -->
+
                 <!-- Search & Unlimited History -->
                 <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-popover.png', 'Search &amp; History — Find anything you ever copied')" class="feature-card">
                     <div class="feature-icon">
@@ -1400,7 +1482,7 @@
                         </svg>
                     </div>
                     <h3>Search &amp; Unlimited History</h3>
-                    <p>Stores everything you copy — text and images. <strong>Search instantly</strong> by content, edit items, and see word counts and source apps at a glance.</p>
+                    <p>Stores everything you copy — text and images. <strong>Search instantly</strong> by content, edit items, and see word counts at a glance.</p>
                 </a>
 
                 <!-- Keyboard Shortcuts -->
@@ -1415,7 +1497,7 @@
                     <p><strong>&#8984;Shift+V</strong> opens history. <strong>&#8984;1-9</strong> pastes instantly. Vim-style navigation. No mouse needed.</p>
                 </a>
 
-                <!-- Pin Items -->
+                <!-- Pin Items & Snippets -->
                 <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-snippets.png', 'Pin &amp; Snippets — Keep important text always accessible')" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1450,80 +1532,6 @@
                     </div>
                     <h3>Text Transforms</h3>
                     <p>Paste as <strong>UPPERCASE</strong>, lowercase, Title Case, trimmed, reversed, or <strong>format JSON</strong>. Strip HTML or Markdown. Smart paste auto-detects content type.</p>
-                </div>
-
-                <!-- Clipboard Rules -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-                        </svg>
-                    </div>
-                    <h3>Clipboard Rules</h3>
-                    <p><strong>Auto-strip tracking params</strong> from URLs (utm_*, fbclid). Auto-trim whitespace, normalize line endings, clean duplicate spaces. Copies arrive clean.</p>
-                </div>
-
-                <!-- Source-Aware Colors -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="13.5" cy="6.5" r="0.5"></circle>
-                            <circle cx="17.5" cy="10.5" r="0.5"></circle>
-                            <circle cx="8.5" cy="7.5" r="0.5"></circle>
-                            <circle cx="6.5" cy="12.5" r="0.5"></circle>
-                            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"></path>
-                        </svg>
-                    </div>
-                    <h3>Source-Aware Colors</h3>
-                    <p>Every clip is color-coded by source app. <strong>Messages green, Safari blue, Mail red</strong> — instantly see where each item came from.</p>
-                </div>
-
-                <!-- Automation -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="16 18 22 12 16 6"></polyline>
-                            <polyline points="8 6 2 12 8 18"></polyline>
-                        </svg>
-                    </div>
-                    <h3>Automation</h3>
-                    <p><strong>URL schemes</strong> for Shortcuts integration. <strong>Webhooks</strong> with HMAC-SHA256 signatures fire on copy, paste, or delete events.</p>
-                </div>
-
-                <!-- Private by Design -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M9 12l2 2 4-4"/>
-                            <circle cx="12" cy="12" r="10"></circle>
-                        </svg>
-                    </div>
-                    <h3>Private by Design</h3>
-                    <p><strong>100% on-device.</strong> iCloud sync between your devices only. No third-party servers. No analytics. No tracking. Open source.</p>
-                </div>
-
-                <!-- Password Manager Safe -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                            <path d="M9 12l2 2 4-4"/>
-                        </svg>
-                    </div>
-                    <h3>Password Manager Safe</h3>
-                    <p>Automatically ignores copies from <strong>1Password, LastPass, Dashlane, Bitwarden</strong>, and other password managers. Your secrets never enter the history.</p>
-                </div>
-
-                <!-- Auto-Expire -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                    </div>
-                    <h3>Auto-Expire</h3>
-                    <p>Automatically clean old items after 1 hour, 24 hours, or 7 days. <strong>Pinned items never expire.</strong> Exclude specific apps entirely.</p>
                 </div>
 
                 <!-- Export & Import -->

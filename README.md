@@ -15,10 +15,6 @@
 
 <img src="docs/images/screenshot-popover.png" alt="SaneClip Screenshot" width="600">
 
-<h3>
-  <a href="https://saneclip.com">🚀 Get SaneClip — $6.99 One-Time Purchase</a>
-</h3>
-
 <p>
   <a href="#whats-new">What's New</a> •
   <a href="#features">Features</a> •
@@ -58,8 +54,6 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 | **🕵️ Sensitive Data Detection** | Automatically flags credit cards, SSNs, API keys, passwords, private keys. |
 
 **100% local. Zero cloud. Zero analytics. Zero telemetry.**
-
-[**→ Download SaneClip ($6.99 one-time, free updates for life)**](https://saneclip.com)
 
 ---
 
@@ -225,7 +219,7 @@ See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) for full details.
 
 > *I wanted to make it $5, but processing fees and taxes were... insane. — Mr. Sane*
 
-DMGs are hosted on Cloudflare (not attached to GitHub releases). **Sparkle auto-updates** keep you current — once installed, updates are delivered automatically.
+**Sparkle auto-updates** keep you current — once installed, updates are delivered automatically.
 
 ### Requirements
 
@@ -266,7 +260,7 @@ Before opening a PR:
 2. Read [CONTRIBUTING.md](CONTRIBUTING.md)
 3. Open an issue first to discuss major changes
 
-**Building from source?** Consider [buying the DMG for $6.99](https://saneclip.com) to support continued development. Open source doesn't mean free labor.
+**Building from source?** Consider [buying the DMG](https://saneclip.com) to support continued development.
 
 ---
 
@@ -310,8 +304,6 @@ Before opening a PR:
 | ❌ Subscription pricing | ✅ $6.99 one-time, free updates |
 | ❌ No Touch ID protection | ✅ Biometric locks with grace period |
 | ❌ No sensitive data detection | ✅ Auto-flags credit cards, API keys, SSNs |
-
-**[→ Get SaneClip for $6.99](https://saneclip.com)** — One-time purchase. Free updates for life. 100% secure.
 
 ---
 
@@ -363,7 +355,5 @@ GPL v3 — see [LICENSE](LICENSE) for details.
 **Made with ❤️ in 🇺🇸 by [Mr. Sane](https://github.com/MrSaneApps)**
 
 **Not fear, but power, love, sound mind** — 2 Timothy 1:7
-
-[**→ Get SaneClip for $6.99**](https://saneclip.com)
 
 </div>

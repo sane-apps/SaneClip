@@ -3,8 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaneClip — Clipboard Manager for macOS with Touch ID</title>
-    <meta name="description" content="A beautiful, secure clipboard manager for macOS with Touch ID protection. Access your full clipboard history instantly with keyboard shortcuts and paste stacks.">
+    <title>SaneClip — Clipboard Manager for Mac with Touch ID &amp; Encryption</title>
+    <meta name="description" content="Clipboard manager for Mac with AES-256 encryption, Touch ID lock, and sensitive data detection. 100% local, open source. $6.99 one-time.">
+    <link rel="canonical" href="https://saneclip.com">
+    <meta property="og:title" content="SaneClip — Clipboard Manager for Mac with Touch ID & Encryption">
+    <meta property="og:description" content="Clipboard manager for Mac with AES-256 encryption, Touch ID lock, and sensitive data detection. 100% local, open source. $6.99 one-time.">
+    <meta property="og:url" content="https://saneclip.com">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SaneClip">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SaneClip — Clipboard Manager for Mac with Touch ID & Encryption">
+    <meta name="twitter:description" content="Clipboard manager for Mac with AES-256 encryption, Touch ID lock, and sensitive data detection. 100% local, open source. $6.99 one-time.">
     <meta name="keywords" content="clipboard manager, macos, clipboard history, touch id, paste, copy, mac clipboard, clipboard app, pasteboard, copy paste manager, macos sequoia, best clipboard manager">
     <meta name="author" content="Mr. Sane">
     <meta name="robots" content="index, follow">
@@ -12,31 +21,9 @@
     <meta name="apple-mobile-web-app-title" content="SaneClip">
     <meta name="application-name" content="SaneClip">
 
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://saneclip.com/">
-
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="256x256" href="images/icon.png">
     <link rel="apple-touch-icon" href="images/icon.png">
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://saneclip.com/">
-    <meta property="og:title" content="SaneClip — Clipboard Manager for macOS with Touch ID">
-    <meta property="og:description" content="Beautiful clipboard history with Touch ID protection. Access everything you've copied with lightning-fast keyboard shortcuts.">
-    <meta property="og:image" content="https://saneclip.com/images/og-image.png?v=1.4">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="SaneClip">
-    <meta property="og:locale" content="en_US">
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://saneclip.com/">
-    <meta name="twitter:title" content="SaneClip — Clipboard Manager for macOS with Touch ID">
-    <meta name="twitter:description" content="Beautiful clipboard history with Touch ID protection. Access everything you've copied with lightning-fast keyboard shortcuts.">
-    <meta name="twitter:image" content="https://saneclip.com/images/og-image.png?v=1.4">
-    <meta name="twitter:site" content="@saneapps">
 
     <!-- Structured Data - Software Application -->
     <script type="application/ld+json">
@@ -1567,11 +1554,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- UNIQUE TO SANECLIP -->
+                        <!-- === SECURITY & PRIVACY — SANECLIP DOMINATES === -->
                         <tr>
                             <td class="feature-name">
-                                <span class="feature-label">Touch ID Lock</span>
-                                <span class="feature-desc">Biometric protection for history</span>
+                                <span class="feature-label">AES-256 Encryption</span>
+                                <span class="feature-desc">History encrypted at rest on disk</span>
                             </td>
                             <td class="highlight-col"><span class="check">&#10003;</span></td>
                             <td><span class="cross">&#10007;</span></td>
@@ -1581,8 +1568,64 @@
                         </tr>
                         <tr>
                             <td class="feature-name">
-                                <span class="feature-label">App Source Icons</span>
-                                <span class="feature-desc">See which app each clip came from</span>
+                                <span class="feature-label">Touch ID Protection</span>
+                                <span class="feature-desc">Biometric lock on clipboard history</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">Sensitive Data Detection</span>
+                                <span class="feature-desc">Flags credit cards, SSNs, API keys</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">Password Manager Safety</span>
+                                <span class="feature-desc">Auto-skips 1Password, Bitwarden, etc.</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">App Exclusions</span>
+                                <span class="feature-desc">Block any app from clipboard capture</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                        </tr>
+                        <!-- === POWER FEATURES === -->
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">Clipboard Rules</span>
+                                <span class="feature-desc">Auto-strip tracking params, trim, clean</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">Source App Colors</span>
+                                <span class="feature-desc">Color-coded clips by source app</span>
                             </td>
                             <td class="highlight-col"><span class="check">&#10003;</span></td>
                             <td><span class="check">&#10003;</span></td>
@@ -1592,53 +1635,30 @@
                         </tr>
                         <tr>
                             <td class="feature-name">
-                                <span class="feature-label">Excluded Apps</span>
-                                <span class="feature-desc">Block sensitive apps from capture</span>
-                            </td>
-                            <td class="highlight-col"><span class="check">&#10003;</span></td>
-                            <td><span class="check">&#10003;</span></td>
-                            <td><span class="check">&#10003;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                        </tr>
-                        <tr>
-                            <td class="feature-name">
-                                <span class="feature-label">Password Detection</span>
-                                <span class="feature-desc">Auto-skip password manager clips</span>
+                                <span class="feature-label">Text Transforms</span>
+                                <span class="feature-desc">UPPER, lower, Title, JSON, strip HTML</span>
                             </td>
                             <td class="highlight-col"><span class="check">&#10003;</span></td>
                             <td><span class="cross">&#10007;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                        </tr>
-                        <!-- COMMON FEATURES -->
-                        <tr>
-                            <td class="feature-name">
-                                <span class="feature-label">Pin Items</span>
-                                <span class="feature-desc">Keep favorites always accessible</span>
-                            </td>
-                            <td class="highlight-col"><span class="check">&#10003;</span></td>
-                            <td><span class="check">&#10003;</span></td>
                             <td><span class="cross">&#10007;</span></td>
                             <td><span class="check">&#10003;</span></td>
                             <td><span class="cross">&#10007;</span></td>
                         </tr>
                         <tr>
                             <td class="feature-name">
-                                <span class="feature-label">Keyboard Shortcuts</span>
-                                <span class="feature-desc">Global hotkeys for access</span>
+                                <span class="feature-label">Paste Stack</span>
+                                <span class="feature-desc">Queue items, paste in FIFO/LIFO order</span>
                             </td>
                             <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
                             <td><span class="check">&#10003;</span></td>
-                            <td><span class="check">&#10003;</span></td>
-                            <td><span class="check">&#10003;</span></td>
-                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
                         </tr>
                         <tr>
                             <td class="feature-name">
-                                <span class="feature-label">Quick Paste (⌘1-9)</span>
-                                <span class="feature-desc">Instant paste by number</span>
+                                <span class="feature-label">Snippets &amp; Placeholders</span>
+                                <span class="feature-desc">Templates with {{date}}, {{name}}, etc.</span>
                             </td>
                             <td class="highlight-col"><span class="check">&#10003;</span></td>
                             <td><span class="check">&#10003;</span></td>
@@ -1646,11 +1666,67 @@
                             <td><span class="check">&#10003;</span></td>
                             <td><span class="cross">&#10007;</span></td>
                         </tr>
-                        <!-- TRUST & VALUE -->
+                        <!-- === ECOSYSTEM === -->
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">Webhooks &amp; URL Schemes</span>
+                                <span class="feature-desc">HMAC-signed hooks, Shortcuts integration</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">Siri Shortcuts &amp; Widgets</span>
+                                <span class="feature-desc">App Intents + desktop/lock screen widgets</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">iOS Companion App</span>
+                                <span class="feature-desc">Free iPhone/iPad app with iCloud sync</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span> Free</td>
+                            <td><span class="check">&#10003;</span> Paid</td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">iCloud Sync</span>
+                                <span class="feature-desc">Sync between your own devices</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                        </tr>
+                        <!-- === TRUST & VALUE === -->
+                        <tr>
+                            <td class="feature-name">
+                                <span class="feature-label">Open Source</span>
+                                <span class="feature-desc">Full source code on GitHub</span>
+                            </td>
+                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="check">&#10003;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="cross">&#10007;</span></td>
+                        </tr>
                         <tr>
                             <td class="feature-name">
                                 <span class="feature-label">100% Private</span>
-                                <span class="feature-desc">No network calls, no analytics</span>
+                                <span class="feature-desc">No third-party servers, no analytics</span>
                             </td>
                             <td class="highlight-col"><span class="check">&#10003;</span></td>
                             <td><span class="cross">&#10007;</span></td>
@@ -1661,7 +1737,7 @@
                         <tr>
                             <td class="feature-name">
                                 <span class="feature-label">Price</span>
-                                <span class="feature-desc">One-time purchase</span>
+                                <span class="feature-desc">One-time vs subscription</span>
                             </td>
                             <td class="highlight-col"><strong>$6.99</strong></td>
                             <td>$30/yr</td>

@@ -7,6 +7,37 @@
     <language>en</language>
 
     <item>
+      <title>Version 2.0</title>
+      <link>https://saneclip.com</link>
+      <sparkle:version>7</sparkle:version>
+      <sparkle:shortVersionString>2.0</sparkle:shortVersionString>
+      <description><![CDATA[
+        <h2>SaneClip 2.0 - Cross-Device Sync & Smart Paste</h2>
+        <h3>New Features</h3>
+        <ul>
+          <li><strong>Cross-Device Sync</strong> - iCloud sync via CKSyncEngine keeps clipboard history in sync across your Mac and iPhone</li>
+          <li><strong>Smart Paste Modes</strong> - Auto-detects code (pastes plain), URLs (strips tracking params), or standard text</li>
+          <li><strong>Paste Stack</strong> - Queue multiple items and paste them in FIFO or LIFO order</li>
+          <li><strong>Source-Aware Colors</strong> - Color-coded bars show which app each clip came from (12 app colors)</li>
+          <li><strong>iOS Companion App</strong> - View, search, and manage clipboard history from your iPhone with Siri Shortcuts and widgets</li>
+        </ul>
+        <h3>Improvements</h3>
+        <ul>
+          <li>Default paste mode setting (Standard, Plain Text, or Smart)</li>
+          <li>URL tracking parameter stripping (utm_*, fbclid, gclid, and more)</li>
+          <li>App Store availability as Universal Purchase (one purchase for Mac + iPhone)</li>
+        </ul>
+      ]]></description>
+      <pubDate>Mon, 09 Feb 2026 22:38:06 -0500</pubDate>
+      <enclosure
+        url="https://dist.saneclip.com/updates/SaneClip-2.0.dmg"
+        sparkle:edSignature="hfb2sW7oiBMrPuzczd4cbAkSRQ6z4xZCCtWWu+3PK4U/sVA1oHbAHpqhw5B6U7QAMQchFOUaFmGwoqSlEOFvDQ=="
+        length="3005400"
+        type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+    </item>
+
+    <item>
       <title>Version 1.4</title>
       <link>https://saneclip.com</link>
       <sparkle:version>6</sparkle:version>

@@ -247,7 +247,7 @@ targets:
   SaneClipIOS:
     type: application
     platform: iOS
-    bundleId: com.saneclip.app.ios
+    bundleId: com.saneclip.app
     deploymentTarget:
       iOS: 18.0
     sources:
@@ -289,7 +289,7 @@ targets:
     settings:
       base:
         PRODUCT_NAME: SaneClip
-        PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios
+        PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -300,16 +300,17 @@ targets:
         CODE_SIGN_STYLE: Manual
       configs:
         Debug:
-          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.ios
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev
           CODE_SIGN_IDENTITY: "-"
           CODE_SIGN_ENTITLEMENTS: iOS/SaneClipIOSDebug.entitlements
         Release:
-          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Distribution"
           CODE_SIGN_ENTITLEMENTS: iOS/SaneClipIOS.entitlements
         Release-AppStore:
-          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
+          DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_STYLE: Automatic
           CODE_SIGN_ENTITLEMENTS: iOS/SaneClipIOS.entitlements
           OTHER_SWIFT_FLAGS: "-D APP_STORE -D ENABLE_SYNC"
@@ -318,7 +319,7 @@ targets:
   SaneClipIOSWidgets:
     type: app-extension
     platform: iOS
-    bundleId: com.saneclip.app.ios.widgets
+    bundleId: com.saneclip.app.ioswidgets
     deploymentTarget:
       iOS: 18.0
     sources:
@@ -333,7 +334,7 @@ targets:
     settings:
       base:
         PRODUCT_NAME: SaneClipIOSWidgets
-        PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.widgets
+        PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ioswidgets
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: 6.0
@@ -343,16 +344,17 @@ targets:
         SKIP_INSTALL: YES
       configs:
         Debug:
-          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.ios.widgets
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.ioswidgets
           CODE_SIGN_IDENTITY: "-"
           CODE_SIGN_ENTITLEMENTS: iOSWidgets/SaneClipIOSWidgetsDebug.entitlements
         Release:
-          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.widgets
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ioswidgets
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Distribution"
           CODE_SIGN_ENTITLEMENTS: iOSWidgets/SaneClipIOSWidgets.entitlements
         Release-AppStore:
-          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.widgets
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ioswidgets
+          DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_STYLE: Automatic
           CODE_SIGN_ENTITLEMENTS: iOSWidgets/SaneClipIOSWidgets.entitlements
 
@@ -360,7 +362,7 @@ targets:
   SaneClipIOSShare:
     type: app-extension
     platform: iOS
-    bundleId: com.saneclip.app.ios.share
+    bundleId: com.saneclip.app.share
     deploymentTarget:
       iOS: 18.0
     sources:
@@ -381,7 +383,7 @@ targets:
     settings:
       base:
         PRODUCT_NAME: SaneClipIOSShare
-        PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.share
+        PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.share
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: 6.0
@@ -392,15 +394,16 @@ targets:
         LD_RUNPATH_SEARCH_PATHS: "@executable_path/../Frameworks @executable_path/../../../../Frameworks"
       configs:
         Debug:
-          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.ios.share
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.share
           CODE_SIGN_IDENTITY: "-"
           CODE_SIGN_ENTITLEMENTS: iOSShareExtension/SaneClipShareDebug.entitlements
         Release:
-          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.share
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.share
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Distribution"
           CODE_SIGN_ENTITLEMENTS: iOSShareExtension/SaneClipShare.entitlements
         Release-AppStore:
-          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ios.share
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.share
+          DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_STYLE: Automatic
           CODE_SIGN_ENTITLEMENTS: iOSShareExtension/SaneClipShare.entitlements

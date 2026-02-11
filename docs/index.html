@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SaneClip — Clipboard Manager for Mac with Touch ID &amp; Encryption</title>
-    <meta name="description" content="Clipboard manager for Mac with AES-256 encryption, Touch ID lock, and sensitive data detection. 100% local, open source. $6.99 one-time.">
+    <meta name="description" content="Clipboard manager for Mac with strong encryption, Touch ID lock, and sensitive data detection. 100% local, open source. $6.99 one-time.">
     <link rel="canonical" href="https://saneclip.com">
     <meta property="og:title" content="SaneClip — Clipboard Manager for Mac with Touch ID & Encryption">
-    <meta property="og:description" content="Clipboard manager for Mac with AES-256 encryption, Touch ID lock, and sensitive data detection. 100% local, open source. $6.99 one-time.">
+    <meta property="og:description" content="Clipboard manager for Mac with strong encryption, Touch ID lock, and sensitive data detection. 100% local, open source. $6.99 one-time.">
     <meta property="og:url" content="https://saneclip.com">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="SaneClip">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="SaneClip — Clipboard Manager for Mac with Touch ID & Encryption">
-    <meta name="twitter:description" content="Clipboard manager for Mac with AES-256 encryption, Touch ID lock, and sensitive data detection. 100% local, open source. $6.99 one-time.">
+    <meta name="twitter:description" content="Clipboard manager for Mac with strong encryption, Touch ID lock, and sensitive data detection. 100% local, open source. $6.99 one-time.">
     <meta name="keywords" content="clipboard manager, macos, clipboard history, touch id, paste, copy, mac clipboard, clipboard app, pasteboard, copy paste manager, macos sequoia, best clipboard manager">
     <meta name="author" content="Mr. Sane">
     <meta name="robots" content="index, follow">
@@ -46,21 +46,21 @@
         },
         "downloadUrl": "https://go.saneapps.com/buy/saneclip?ref=website",
         "softwareVersion": "1.4",
-        "releaseNotes": "v1.4: AES-256-GCM encryption at rest, Keychain integration, HTTPS webhook enforcement, URL scheme confirmation dialogs, seamless plaintext migration.",
+        "releaseNotes": "v1.4: Strong encryption at rest, secure storage integration, HTTPS webhook enforcement, quick action confirmation dialogs, seamless plaintext migration.",
         "screenshot": "https://saneclip.com/images/screenshot-popover.png",
         "featureList": [
             "Touch ID Protection",
-            "AES-256-GCM Encryption at Rest",
-            "Sensitive Data Detection (credit cards, SSNs, API keys)",
+            "Strong Encryption at Rest",
+            "Sensitive Data Detection (credit cards, SSNs, security tokens)",
             "Smart Snippets with Dynamic Placeholders",
-            "Text Transforms (UPPERCASE, Title Case, JSON Pretty Print)",
+            "Text Transforms (UPPERCASE, Title Case, Format Text)",
             "Paste Stack (FIFO/LIFO)",
             "Clipboard Rules (strip tracking params, auto-trim)",
             "Keyboard Shortcuts (Cmd+Shift+V, Cmd+1-9)",
-            "Siri Shortcuts Integration",
+            "Integrations",
             "macOS Widgets",
             "Pin Important Items",
-            "iOS Companion App with Siri Shortcuts",
+            "iOS Companion App with Integrations",
             "100% On-Device Privacy",
             "Open Source (GPL v3)"
         ]
@@ -450,13 +450,19 @@
         }
 
         .feature-card {
-            background: linear-gradient(145deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
-            border: 1px solid var(--border-subtle);
+            background:
+                radial-gradient(ellipse at 90% 50%, rgba(0, 153, 255, 0.18) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 30%, rgba(0, 153, 255, 0.1) 0%, transparent 40%),
+                linear-gradient(135deg, #0a1628 0%, #0d1f3c 50%, #081020 100%);
+            border: 1px solid rgba(0, 153, 255, 0.25);
             border-radius: 20px;
             padding: 36px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            box-shadow:
+                0 0 30px rgba(0, 153, 255, 0.08),
+                0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .feature-card::before {
@@ -472,37 +478,17 @@
         }
 
         .feature-card:hover {
-            border-color: var(--accent);
+            border-color: rgba(0, 153, 255, 0.45);
             transform: translateY(-6px);
             box-shadow:
-                0 20px 40px rgba(0, 0, 0, 0.3),
-                0 0 0 1px var(--accent-subtle);
+                0 0 50px rgba(0, 153, 255, 0.12),
+                0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
         .feature-card:hover::before {
             opacity: 1;
         }
 
-        /* Featured card - Touch ID */
-        .feature-card.featured {
-            background:
-                radial-gradient(ellipse at 90% 50%, rgba(0, 153, 255, 0.25) 0%, transparent 50%),
-                radial-gradient(ellipse at 85% 30%, rgba(0, 153, 255, 0.15) 0%, transparent 40%),
-                linear-gradient(135deg, #0a1628 0%, #0d1f3c 50%, #081020 100%);
-            border-color: rgba(0, 153, 255, 0.3);
-            box-shadow:
-                0 0 40px rgba(0, 153, 255, 0.15),
-                0 8px 32px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        }
-
-        .feature-card.featured:hover {
-            border-color: rgba(0, 153, 255, 0.5);
-            box-shadow:
-                0 0 60px rgba(0, 153, 255, 0.25),
-                0 20px 40px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.08);
-        }
 
         .feature-icon {
             margin-bottom: 20px;
@@ -656,9 +642,9 @@
 
         .more-apps-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 24px;
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -1276,6 +1262,7 @@
         <p class="mobile-nav-section">More SaneApps</p>
         <a href="https://sanebar.com">SaneBar &mdash; Menu Bar Manager</a>
         <a href="https://sanehosts.com">SaneHosts &mdash; System-Level Ad Blocker</a>
+        <a href="https://sanesales.com">SaneSales &mdash; Sales Tracker</a>
         <a href="https://saneapps.com">See all SaneApps &rarr;</a>
         <a href="https://go.saneapps.com/buy/saneclip?ref=website" class="mobile-nav-cta">Download SaneClip &mdash; $6.99</a>
     </div>
@@ -1346,7 +1333,7 @@
                 <!-- === ROW 1: UNIQUE TO SANECLIP (featured glow) === -->
 
                 <!-- Touch ID Lock -->
-                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-popover.png', 'Touch ID Protection — Biometric security for your clipboard history')" class="feature-card featured">
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-popover.png', 'Touch ID Protection — Biometric security for your clipboard history')" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -1357,19 +1344,19 @@
                     <p>Lock your clipboard history with <strong>biometric authentication</strong>. The only clipboard manager that does this.</p>
                 </a>
 
-                <!-- AES-256 Encryption -->
-                <div class="feature-card featured">
+                <!-- Strong Encryption -->
+                <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                         </svg>
                     </div>
-                    <h3>AES-256-GCM Encryption</h3>
-                    <p>Your clipboard history is <strong>encrypted at rest</strong>. Keys stored in macOS Keychain. Even if someone copies your files, they can't read your data.</p>
+                    <h3>Strong Encryption</h3>
+                    <p>Your clipboard history is <strong>encrypted at rest</strong>. Keys stored in your Mac's secure storage. Even if someone copies your files, they can't read your data.</p>
                 </div>
 
                 <!-- Sensitive Data Detection -->
-                <div class="feature-card featured">
+                <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -1377,13 +1364,13 @@
                         </svg>
                     </div>
                     <h3>Sensitive Data Detection</h3>
-                    <p>Automatically detects <strong>credit cards, SSNs, API keys, passwords, and private keys</strong>. Auto-purges them on a schedule you control.</p>
+                    <p>Automatically detects <strong>credit cards, SSNs, security tokens, passwords, and private keys</strong>. Auto-purges them on a schedule you control.</p>
                 </div>
 
                 <!-- === ROW 2: UNIQUE TO SANECLIP (featured glow) === -->
 
                 <!-- Password Manager Safe -->
-                <div class="feature-card featured">
+                <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -1395,7 +1382,7 @@
                 </div>
 
                 <!-- Source-Aware Colors -->
-                <div class="feature-card featured">
+                <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="13.5" cy="6.5" r="0.5"></circle>
@@ -1410,7 +1397,7 @@
                 </div>
 
                 <!-- Clipboard Rules -->
-                <div class="feature-card featured">
+                <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
@@ -1423,19 +1410,19 @@
                 <!-- === ROW 3: UNIQUE TO SANECLIP === -->
 
                 <!-- Automation -->
-                <div class="feature-card featured">
+                <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="16 18 22 12 16 6"></polyline>
                             <polyline points="8 6 2 12 8 18"></polyline>
                         </svg>
                     </div>
-                    <h3>Webhooks &amp; Automation</h3>
-                    <p><strong>URL schemes</strong> for Shortcuts. <strong>Webhooks</strong> with HMAC-SHA256 signatures fire on copy, paste, or delete. Build workflows around your clipboard.</p>
+                    <h3>Integrations</h3>
+                    <p><strong>Quick Actions</strong> for Shortcuts. <strong>Web integrations</strong> with secure signatures fire on copy, paste, or delete. Build workflows around your clipboard.</p>
                 </div>
 
                 <!-- Private by Design -->
-                <div class="feature-card featured">
+                <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M9 12l2 2 4-4"/>
@@ -1447,7 +1434,7 @@
                 </div>
 
                 <!-- Auto-Expire -->
-                <div class="feature-card featured">
+                <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -1459,7 +1446,7 @@
                 </div>
 
                 <!-- Search & Unlimited History -->
-                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-popover.png', 'Search &amp; History — Find anything you ever copied')" class="feature-card featured">
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-popover.png', 'Search &amp; History — Find anything you ever copied')" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="11" cy="11" r="8"></circle>
@@ -1471,7 +1458,7 @@
                 </a>
 
                 <!-- Keyboard Shortcuts -->
-                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-shortcuts.png', 'Lightning Shortcuts — Global hotkeys for instant access')" class="feature-card featured">
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-shortcuts.png', 'Lightning Shortcuts — Global hotkeys for instant access')" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
@@ -1483,7 +1470,7 @@
                 </a>
 
                 <!-- Pin Items & Snippets -->
-                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-snippets.png', 'Pin &amp; Snippets — Keep important text always accessible')" class="feature-card featured">
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-snippets.png', 'Pin &amp; Snippets — Keep important text always accessible')" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="17" x2="12" y2="22"></line>
@@ -1495,7 +1482,7 @@
                 </a>
 
                 <!-- Paste Stack -->
-                <div class="feature-card featured">
+                <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="4" y="4" width="16" height="6" rx="1"></rect>
@@ -1507,7 +1494,7 @@
                 </div>
 
                 <!-- Text Transforms -->
-                <div class="feature-card featured">
+                <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="4 7 4 4 20 4 20 7"></polyline>
@@ -1516,11 +1503,11 @@
                         </svg>
                     </div>
                     <h3>Text Transforms</h3>
-                    <p>Paste as <strong>UPPERCASE</strong>, lowercase, Title Case, trimmed, reversed, or <strong>format JSON</strong>. Strip HTML or Markdown. Smart paste auto-detects content type.</p>
+                    <p>Paste as <strong>UPPERCASE</strong>, lowercase, Title Case, trimmed, reversed, or <strong>formatted text</strong>. Strip HTML or Markdown. Smart paste auto-detects content type.</p>
                 </div>
 
                 <!-- Export & Import -->
-                <div class="feature-card featured">
+                <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -1667,8 +1654,8 @@
                         <!-- === ECOSYSTEM === -->
                         <tr>
                             <td class="feature-name">
-                                <span class="feature-label">Webhooks &amp; URL Schemes</span>
-                                <span class="feature-desc">HMAC-signed hooks, Shortcuts integration</span>
+                                <span class="feature-label">Integrations</span>
+                                <span class="feature-desc">Secure web integrations, Shortcuts support</span>
                             </td>
                             <td class="highlight-col"><span class="check">&#10003;</span></td>
                             <td><span class="cross">&#10007;</span></td>
@@ -1816,6 +1803,14 @@
                     <p class="app-card-tagline">Run scripts, convert files, and automate your Mac directly from the right-click menu. 50+ actions, 100% private.</p>
                     <span class="app-card-cta">Learn more →</span>
                 </a>
+                <a href="https://sanesales.com" class="app-card">
+                    <div class="app-card-header">
+                        <img src="images/sanesales-icon.png" alt="SaneSales" class="app-card-icon">
+                        <div class="app-card-name">SaneSales</div>
+                    </div>
+                    <p class="app-card-tagline">Track your indie sales from LemonSqueezy, Gumroad, and Stripe in one beautiful, native app. Revenue charts, CSV export, 100% on-device.</p>
+                    <span class="app-card-cta">Learn more →</span>
+                </a>
             </div>
             <div class="more-apps-hub">
                 <a href="https://saneapps.com">See all apps at saneapps.com →</a>
@@ -1846,7 +1841,7 @@
     <footer>
         <div class="container">
             <p class="footer-quote">"For God has not given us a spirit of fear, but of power, love, and a sound mind." — 2 Timothy 1:7</p>
-            <p class="footer-privacy"><strong>0% Telemetry</strong>. <strong>0% Third-Party Cloud</strong>. <strong>100% On-Device</strong>.</p>
+            <p class="footer-privacy"><strong>0% Tracking</strong>. <strong>0% Third-Party Cloud</strong>. <strong>100% On-Device</strong>.</p>
             <div class="footer-links">
                 <a href="/guides.html">Guides</a>
                 <a href="https://github.com/sane-apps/SaneClip">GitHub</a>

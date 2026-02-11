@@ -82,6 +82,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_: Notification) {
         appLogger.info("SaneClip starting...")
 
+        #if !DEBUG
+            SaneAppMover.moveToApplicationsFolderIfNeeded()
+        #endif
+
         #if !APP_STORE
             // Initialize update service (Sparkle)
             updateService = UpdateService.shared
@@ -472,4 +476,42 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             URLSchemeHandler.shared.handle(url)
         }
     }
+
+    // MARK: - Dock Menu
+
+    func applicationDockMenu(_: NSApplication) -> NSMenu? {
+        let menu = NSMenu()
+
+        // Show History
+        let showHistoryItem = NSMenuItem(title: "Show History", action: #selector(togglePopover), keyEquivalent: "")
+        showHistoryItem.target = self
+        menu.addItem(showHistoryItem)
+
+        // Clear History
+        let clearHistoryItem = NSMenuItem(title: "Clear History", action: #selector(clearHistoryFromMenu), keyEquivalent: "")
+        clearHistoryItem.target = self
+        menu.addItem(clearHistoryItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        #if !APP_STORE
+            // Check for Updates
+            let updatesItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
+            updatesItem.target = self
+            menu.addItem(updatesItem)
+        #endif
+
+        // Settings
+        let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: "")
+        settingsItem.target = self
+        menu.addItem(settingsItem)
+
+        return menu
+    }
+
+    #if !APP_STORE
+        @objc private func checkForUpdates() {
+            updateService.checkForUpdates()
+        }
+    #endif
 }

@@ -53,6 +53,7 @@
 		959A8C26A75136D338B643F4 /* PinnedClipsIOSWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CAE73B92B88E86164C13BE4 /* PinnedClipsIOSWidget.swift */; };
 		97C7F0E599822C25790FE644 /* SyncConflictResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098AA40BC8DC5C2501EECC1C /* SyncConflictResolver.swift */; };
 		9ABA34BEB2F16A4A3646750C /* StorageStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE7465DE4D6ABC7FA43FECC8 /* StorageStatsView.swift */; };
+		9AE9193A4B91AF9225D37A06 /* MoveToApplications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A33BA21C41E9F3415FFB0D /* MoveToApplications.swift */; };
 		A1E34C40B6B4693E554DB614 /* SharedClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB6B85899467ECE68DDCE6E /* SharedClipboardItem.swift */; };
 		A2DA6F029DD4A6EEEA2396AF /* RecentClipsIOSWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19827830127FF21617618069 /* RecentClipsIOSWidget.swift */; };
 		A7C25C4197EB4F9E316E7BE7 /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
@@ -188,6 +189,7 @@
 		7D5C28D690980C222E8B0E03 /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		817694FD0F55D259B3F10FDA /* SaneClipWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipWidgets.swift; sourceTree = "<group>"; };
 		82FA89438430FB80B145A7C5 /* HistoryEncryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEncryption.swift; sourceTree = "<group>"; };
+		84A33BA21C41E9F3415FFB0D /* MoveToApplications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveToApplications.swift; sourceTree = "<group>"; };
 		8D2D1E638F1E9A0D4C8C9E45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8FCC4B9D9BD539DC99A6AD4D /* CopyClipIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyClipIntent.swift; sourceTree = "<group>"; };
 		8FFF4DCFB95C5B26D00A640F /* SaneClipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipApp.swift; sourceTree = "<group>"; };
@@ -300,6 +302,15 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		3DA3DCD92F8A3621E23C93AE /* shared */ = {
+			isa = PBXGroup;
+			children = (
+				84A33BA21C41E9F3415FFB0D /* MoveToApplications.swift */,
+			);
+			name = shared;
+			path = ../../infra/SaneProcess/shared;
+			sourceTree = "<group>";
+		};
 		421E2940F20104B95C6C67C8 = {
 			isa = PBXGroup;
 			children = (
@@ -311,6 +322,7 @@
 				AC18BD20DF756C306CF4FC65 /* iOSWidgets */,
 				317C3B96EA035EB98F83B6DF /* Resources */,
 				1B130F3074655C63B056F11C /* Shared */,
+				3DA3DCD92F8A3621E23C93AE /* shared */,
 				A1F5CB5A388610A825BF634E /* Tests */,
 				D9D0EFB2C3ADEBAA6D5BF62C /* UI */,
 				F661AFAC01CB909BE6438415 /* Widgets */,
@@ -819,6 +831,7 @@
 				D9E962C435414799E3C255BD /* ClipboardRulesManager.swift in Sources */,
 				DFC8A7437D713D82B5224D1E /* HistoryEncryption.swift in Sources */,
 				281630B49BCFA5B27C0C93B4 /* KeychainHelper.swift in Sources */,
+				9AE9193A4B91AF9225D37A06 /* MoveToApplications.swift in Sources */,
 				77B7D62B808F69AD4A23279A /* OnboardingView.swift in Sources */,
 				B3761DF4123417A5EA8C0DF3 /* SaneClipApp.swift in Sources */,
 				95711D419E5C0F66ED022198 /* SaneClipIntents.swift in Sources */,

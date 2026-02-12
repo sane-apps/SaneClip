@@ -9,6 +9,8 @@ build:
   xcodegen: true
 
 release:
+  team_id: M78L6FXD48
+  signing_identity: "Developer ID Application"
   dist_host: dist.saneclip.com
   site_host: saneclip.com
   r2_bucket: sanebar-downloads
@@ -46,6 +48,20 @@ mcps:
   - context7
   - github
   - xcode
+
+appstore:
+  enabled: true
+  app_id: "6758898132"
+  configuration: Release-AppStore
+  platforms: [macos, ios]
+  ios_scheme: SaneClipIOS
+  screenshots:
+    macos: Screenshots/*-mac.png
+    ios: Screenshots/*-6.7.png
+  contact:
+    name: "Stephan Joseph"
+    phone: "+17277589785"
+    email: "hi@saneapps.com"
 
 website: true
 website_domain: saneclip.com

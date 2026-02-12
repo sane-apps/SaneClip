@@ -115,6 +115,7 @@ targets:
       path: SaneClip/Info.plist
       properties:
         LSUIElement: true
+        ITSAppUsesNonExemptEncryption: false
         LSApplicationCategoryType: "public.app-category.productivity"
         NSAppleEventsUsageDescription: "SaneClip needs to paste clipboard content to other applications."
         # URL Scheme (Phase 3)

@@ -155,6 +155,7 @@ targets:
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
           CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipAppStore.entitlements
           OTHER_SWIFT_FLAGS: "-D APP_STORE -D ENABLE_SYNC"
     postCompileScripts:
@@ -242,6 +243,7 @@ targets:
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
           CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
 
   # iOS App

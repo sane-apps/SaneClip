@@ -154,6 +154,7 @@ targets:
           PROVISIONING_PROFILE_SPECIFIER: "SaneClip Developer ID"
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
+          DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_STYLE: Automatic
           CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipAppStore.entitlements
@@ -242,6 +243,7 @@ targets:
           PROVISIONING_PROFILE_SPECIFIER: "SaneClip Widgets Developer ID"
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
+          DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_STYLE: Automatic
           CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements

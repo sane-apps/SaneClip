@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		07EBD6613F07245138A3332A /* TextTransformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEA795AFED8797FFAE0DD3E /* TextTransformService.swift */; };
-		08715A357C7F5B1C693B5C47 /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = DE1B3E95AFE08432850B538B /* CLAUDE.md */; };
 		113E5DCC28CDB39825FDF84D /* PinnedClipsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A06A5E6F4A48C14D539ABD91 /* PinnedClipsWidget.swift */; };
 		14416464FDEC646CB5F437DB /* SharedClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB6B85899467ECE68DDCE6E /* SharedClipboardItem.swift */; };
 		1504813C73E5700C5BB876DE /* SettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = A942FCE8A60E673C341FFB02 /* SettingsTab.swift */; };
@@ -25,7 +24,6 @@
 		33E5382D17E0E77A658BF322 /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D5C28D690980C222E8B0E03 /* SettingsModel.swift */; };
 		355AB4192CCD090052C307E1 /* RecentClipsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA1B6A946118EB9C90AB95F /* RecentClipsWidget.swift */; };
 		37F29CD598C72F5AC2A699BD /* SaneClipWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 09C2D5E2943BC51ED6D88512 /* SaneClipWidgets.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		3817DA763CFB9E32801AE3F2 /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = DFBEB7C75B37BEE4A35646CE /* CLAUDE.md */; };
 		3E30328E30A861550080AE6D /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7120D46FF8B86B71EAB5508 /* ShareViewController.swift */; };
 		414A920720EECE33D2310A7C /* DMGIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = AD5C75ADF36A7D05AEEFAE0C /* DMGIcon.icns */; };
 		4B2B8214AB250D15350054F9 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592FBED989BC40A70F0B5060 /* KeychainHelper.swift */; };
@@ -79,7 +77,6 @@
 		DFC8A7437D713D82B5224D1E /* HistoryEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82FA89438430FB80B145A7C5 /* HistoryEncryption.swift */; };
 		E1F118A7B4867A2E6F26A819 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1808F717600EB63D59B347DB /* SyncCoordinator.swift */; };
 		E4BBDD04577B7398507E9597 /* ClipboardItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35354A7D3201B61455110B3F /* ClipboardItemCell.swift */; };
-		E536D1C7BAF4008597CEBB54 /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 3F1B86A6C77CFF7FA0AAD10A /* CLAUDE.md */; };
 		F5163A69E164634BA8652A30 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6785DC91231845BA4B10499F /* PrivacyInfo.xcprivacy */; };
 		F65E7C1FC3DA96F5B644D77A /* SearchClipsIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44529FCAA8809428979A60BC /* SearchClipsIntent.swift */; };
 		F903EA3E74F83ADB70AC45F1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF3C7603DE7E07A2AC7D3C74 /* Assets.xcassets */; };
@@ -164,7 +161,6 @@
 		352F7E56F26119F6981AEFB2 /* ClipboardItemRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardItemRow.swift; sourceTree = "<group>"; };
 		35354A7D3201B61455110B3F /* ClipboardItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardItemCell.swift; sourceTree = "<group>"; };
 		3AA1B6A946118EB9C90AB95F /* RecentClipsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentClipsWidget.swift; sourceTree = "<group>"; };
-		3F1B86A6C77CFF7FA0AAD10A /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
 		44529FCAA8809428979A60BC /* SearchClipsIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchClipsIntent.swift; sourceTree = "<group>"; };
 		4BCD829890D1F0F66702EC52 /* SaneClipIOSWidgetsDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipIOSWidgetsDebug.entitlements; sourceTree = "<group>"; };
 		4D77AB048F107D7E2F8AB415 /* SaneClipShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipShortcuts.swift; sourceTree = "<group>"; };
@@ -217,8 +213,6 @@
 		D3D786C9674AE3DE8113632A /* SyncDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncDataModel.swift; sourceTree = "<group>"; };
 		D73D02F6E4DBB9312E67A0AD /* ClipboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardManager.swift; sourceTree = "<group>"; };
 		DD2BF58DEC0153C26EA351A8 /* SaneClipIOSWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipIOSWidgets.swift; sourceTree = "<group>"; };
-		DE1B3E95AFE08432850B538B /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
-		DFBEB7C75B37BEE4A35646CE /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
 		DFBF87F7472E2026DE0E0EF6 /* SaneClipWidgetsDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipWidgetsDebug.entitlements; sourceTree = "<group>"; };
 		E255CCFA37A4633D75D64EF2 /* ClipboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardItem.swift; sourceTree = "<group>"; };
 		F7120D46FF8B86B71EAB5508 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
@@ -390,7 +384,6 @@
 		A1F5CB5A388610A825BF634E /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				DE1B3E95AFE08432850B538B /* CLAUDE.md */,
 				71B639CB4375AE4479924B74 /* SaneClipTests.swift */,
 				1775AC6444F4E26AD66FA435 /* SecurityTests.swift */,
 			);
@@ -418,7 +411,6 @@
 		AC18BD20DF756C306CF4FC65 /* iOSWidgets */ = {
 			isa = PBXGroup;
 			children = (
-				3F1B86A6C77CFF7FA0AAD10A /* CLAUDE.md */,
 				17C9815342518E615ADBC5A4 /* Info.plist */,
 				6CAE73B92B88E86164C13BE4 /* PinnedClipsIOSWidget.swift */,
 				19827830127FF21617618069 /* RecentClipsIOSWidget.swift */,
@@ -498,7 +490,6 @@
 		F661AFAC01CB909BE6438415 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
-				DFBEB7C75B37BEE4A35646CE /* CLAUDE.md */,
 				A0EAEDB65797C08836E1259B /* Info.plist */,
 				A06A5E6F4A48C14D539ABD91 /* PinnedClipsWidget.swift */,
 				3AA1B6A946118EB9C90AB95F /* RecentClipsWidget.swift */,
@@ -517,7 +508,6 @@
 			buildConfigurationList = F3BA67FE9A31414CAEB5E596 /* Build configuration list for PBXNativeTarget "SaneClipWidgets" */;
 			buildPhases = (
 				0A7B199E994D09871D0F8430 /* Sources */,
-				B5455DD5CEDB78A330F0D3F8 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -535,7 +525,6 @@
 			buildConfigurationList = FA412243DF99EC2331D50153 /* Build configuration list for PBXNativeTarget "SaneClipTests" */;
 			buildPhases = (
 				092E1DF1915B592662C0FFA3 /* Sources */,
-				B458BD3748AE93BB363D1A1E /* Resources */,
 			);
 			buildRules = (
 			);
@@ -617,7 +606,6 @@
 			buildConfigurationList = 74A58F02C6CC48CFEDADAFE0 /* Build configuration list for PBXNativeTarget "SaneClipIOSWidgets" */;
 			buildPhases = (
 				BCA3AD84F45555D8D58FCD7B /* Sources */,
-				3AD85C1D5DE9BA2C8A28BC6E /* Resources */,
 			);
 			buildRules = (
 			);
@@ -673,14 +661,6 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		3AD85C1D5DE9BA2C8A28BC6E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E536D1C7BAF4008597CEBB54 /* CLAUDE.md in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		97F5EB016F6D04FE0FB39199 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -688,22 +668,6 @@
 				31AE3F98F164FB0ECD0829BD /* Assets.xcassets in Resources */,
 				414A920720EECE33D2310A7C /* DMGIcon.icns in Resources */,
 				F5163A69E164634BA8652A30 /* PrivacyInfo.xcprivacy in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B458BD3748AE93BB363D1A1E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				08715A357C7F5B1C693B5C47 /* CLAUDE.md in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B5455DD5CEDB78A330F0D3F8 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3817DA763CFB9E32801AE3F2 /* CLAUDE.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -59,14 +59,15 @@ mcp__xcode__RenderPreview    # SwiftUI previews
 | Data models | `Core/Models/` |
 | UI components | `UI/` directory |
 | Project config | `project.yml` (XcodeGen) |
-| Past learnings | `mcp__plugin_claude-mem_mcp-search__search` |
+| Past learnings | Serena memories (`read_memory`) or official Memory MCP |
 
 ---
 
-## Memory MCP
+## Serena Memories
 
 ```
-mcp__plugin_claude-mem_mcp-search__search query: "topic" project: "SaneClip"
+read_memory  # Check past learnings
+write_memory # Save important findings
 ```
 
 ---

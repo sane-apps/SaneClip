@@ -199,8 +199,8 @@ This is the standard protocol for investigating problems. Used by Rule #3, Circu
 ### Memory MCP Usage
 
 ```
-# Project-scoped searches
-mcp__plugin_claude-mem_mcp-search__search query: "clipboard" project: "SaneClip"
+# Project-scoped searches (Official Memory MCP)
+mcp__memory__search_nodes query: "clipboard"
 ```
 
 ### Research Output -> Plan
@@ -391,7 +391,7 @@ Use SaneMaster for macOS builds/tests. Xcode Tools MCP handles build/test/previe
 |------|-------|
 | Build/test commands | `./scripts/SaneMaster.rb verify` |
 | Project structure | `project.yml` (XcodeGen config) |
-| Past bugs/learnings | Sane-Mem MCP: `mcp__plugin_claude-mem_mcp-search__search` |
+| Past bugs/learnings | Official Memory MCP: `mcp__memory__search_nodes` |
 | Touch ID/security | `Core/ClipboardManager.swift` (authentication logic) |
 | Clipboard logic | `Core/ClipboardManager.swift` |
 | UI components | `UI/` directory |

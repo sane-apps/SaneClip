@@ -118,4 +118,4 @@ iCloud sync may return in a future version once provisioning issues are resolved
 - Multiple paste modes (plain text, UPPERCASE, lowercase, Title Case)
 - Smart snippets with placeholders
 - Rich search filters
-- See [ROADMAP.md](ROADMAP.md) for full plans
+- See [GitHub Issues](https://github.com/sane-apps/SaneClip/issues) for full plans

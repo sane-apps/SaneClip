@@ -80,7 +80,7 @@ struct ClipboardItemRow: View {
 
 1. Check [GitHub Issues](https://github.com/sane-apps/SaneClip/issues) for existing discussions
 2. For significant changes, open an issue first to discuss the approach
-3. Check the [ROADMAP.md](ROADMAP.md) for planned features
+3. Check [GitHub Issues](https://github.com/sane-apps/SaneClip/issues) for planned features
 
 ### Pull Request Process
 
@@ -149,7 +149,6 @@ Before submitting a PR, verify:
 | Document | Purpose |
 |----------|---------|
 | [README.md](README.md) | User-facing overview |
-| [ROADMAP.md](ROADMAP.md) | Feature plans |
 | [SECURITY.md](SECURITY.md) | Security policy |
 | [PRIVACY.md](PRIVACY.md) | Privacy practices |
 
@@ -164,6 +163,6 @@ This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). Please be r
 ## Questions?
 
 - Open a [GitHub Issue](https://github.com/sane-apps/SaneClip/issues)
-- Check the [Roadmap](ROADMAP.md) for feature status
+- Check [GitHub Issues](https://github.com/sane-apps/SaneClip/issues) for feature status
 
 Thank you for contributing!

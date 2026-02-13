@@ -20,7 +20,6 @@
   <a href="#features">Features</a> •
   <a href="#security">Security</a> •
   <a href="#automation">Automation</a> •
-  <a href="ROADMAP.md">Roadmap</a>
 </p>
 
 </div>
@@ -268,7 +267,6 @@ Before opening a PR:
 
 | Document | Purpose |
 |----------|---------|
-| [ROADMAP.md](ROADMAP.md) | Feature plans and timeline |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
 | [DEVELOPMENT.md](DEVELOPMENT.md) | Development setup and guidelines |
 | [CHANGELOG.md](CHANGELOG.md) | Version history |

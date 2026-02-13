@@ -57,9 +57,9 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ---
 
-## 🆕 What's New in v1.4
+## 🆕 What's New in v2.0
 
-**Security Hardening Release (Feb 3, 2026)**
+**Security Hardening + App Store Release (Feb 2026)**
 
 - ✅ **History Encryption-at-Rest** — AES-256-GCM encryption enabled by default
 - ✅ **Keychain Integration** — All secrets stored securely in macOS Keychain

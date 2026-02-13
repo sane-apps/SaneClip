@@ -2,6 +2,7 @@ import AppKit
 import Combine
 import os.log
 import SwiftUI
+import UniformTypeIdentifiers
 import WidgetKit
 
 @MainActor
@@ -770,5 +771,77 @@ class ClipboardManager {
             logger.info("Replaced history with \(importedItems.count) imported items")
             return importedItems.count
         }
+    }
+
+    // MARK: - Services Support
+
+    /// Add an item from macOS Services (public wrapper for private addItem)
+    func addItemFromService(_ item: ClipboardItem) {
+        addItem(item)
+    }
+
+    // MARK: - PDF Export
+
+    func exportItemAsPDF(item: ClipboardItem) {
+        guard case let .text(text) = item.content else { return }
+
+        let savePanel = NSSavePanel()
+        savePanel.allowedContentTypes = [.pdf]
+        let firstLine = text.components(separatedBy: .newlines).first ?? "clipboard"
+        let cleanName = String(
+            firstLine.prefix(50)
+                .replacingOccurrences(of: "[^a-zA-Z0-9 _\\-]", with: "", options: .regularExpression)
+                .trimmingCharacters(in: .whitespaces)
+        )
+        savePanel.nameFieldStringValue = (cleanName.isEmpty ? "clipboard" : cleanName) + ".pdf"
+
+        guard savePanel.runModal() == .OK, let url = savePanel.url else { return }
+
+        // PDF dimensions: US Letter
+        let pageWidth: CGFloat = 612
+        let pageHeight: CGFloat = 792
+        let margin: CGFloat = 72
+        let textRect = CGRect(x: margin, y: margin, width: pageWidth - 2 * margin, height: pageHeight - 2 * margin)
+
+        let font = CTFontCreateWithName("Menlo" as CFString, 11, nil)
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 4
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: NSColor.black,
+            .paragraphStyle: paragraphStyle
+        ]
+        let attributedString = NSAttributedString(string: text, attributes: attributes)
+        let framesetter = CTFramesetterCreateWithAttributedString(attributedString)
+
+        var mediaBox = CGRect(x: 0, y: 0, width: pageWidth, height: pageHeight)
+        guard let dataConsumer = CGDataConsumer(url: url as CFURL),
+              let pdfContext = CGContext(consumer: dataConsumer, mediaBox: &mediaBox, nil)
+        else {
+            logger.error("Failed to create PDF context")
+            return
+        }
+
+        var currentIndex = 0
+        while currentIndex < attributedString.length {
+            pdfContext.beginPDFPage(nil)
+
+            let path = CGPath(rect: textRect, transform: nil)
+            let frameRange = CFRange(location: currentIndex, length: 0)
+            let frame = CTFramesetterCreateFrame(framesetter, frameRange, path, nil)
+
+            CTFrameDraw(frame, pdfContext)
+
+            let visibleRange = CTFrameGetVisibleStringRange(frame)
+            currentIndex += visibleRange.length
+
+            pdfContext.endPDFPage()
+
+            // Safety: break if no progress
+            if visibleRange.length == 0 { break }
+        }
+
+        pdfContext.closePDF()
+        logger.info("Exported clipboard item as PDF to \(url.path)")
     }
 }

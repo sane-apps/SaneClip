@@ -269,6 +269,13 @@ struct ClipboardItemRow: View {
                 shareItem()
             }
 
+            // Save as PDF (text only)
+            if case .text = item.content {
+                Button("Save as PDF...") {
+                    clipboardManager.exportItemAsPDF(item: item)
+                }
+            }
+
             // Open Link (for URLs only)
             if item.isURL, case let .text(urlString) = item.content,
                let url = URL(string: urlString.trimmingCharacters(in: .whitespacesAndNewlines)) {

@@ -128,6 +128,13 @@ targets:
         SUPublicEDKey: "7Pl/8cwfb2vm4Dm65AByslkMCScLJ9tbGlwGGx81qYU="
         SUEnableAutomaticChecks: true
         SUEnableSystemProfiling: false
+        NSServices:
+          - NSMessage: "saveToSaneClip"
+            NSPortName: "SaneClip"
+            NSSendTypes:
+              - "public.plain-text"
+            NSMenuItem:
+              default: "Save to SaneClip"
     settings:
       base:
         PRODUCT_NAME: SaneClip

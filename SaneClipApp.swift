@@ -119,32 +119,9 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             object: nil
         )
 
-        // Create right-click context menu
-        let menu = NSMenu()
-
-        let showHistoryItem = NSMenuItem(title: "Show History", action: #selector(togglePopover), keyEquivalent: "")
-        showHistoryItem.target = self
-        menu.addItem(showHistoryItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        let clearHistoryItem = NSMenuItem(title: "Clear History", action: #selector(clearHistoryFromMenu), keyEquivalent: "")
-        clearHistoryItem.target = self
-        menu.addItem(clearHistoryItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ",")
-        settingsItem.target = self
-        menu.addItem(settingsItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        let quitItem = NSMenuItem(
-            title: "Quit SaneClip", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"
-        )
-        menu.addItem(quitItem)
-        statusItem.menu = nil // We'll show it manually on right-click
+        // Register as macOS Services provider (right-click → Services → "Save to SaneClip")
+        NSApp.servicesProvider = self
+        NSApp.registerServicesMenuSendTypes([.string], returnTypes: [])
 
         // Create popover
         popover = NSPopover()
@@ -354,26 +331,55 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         guard let button = statusItem.button else { return }
 
         let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "Show History", action: #selector(showPopover), keyEquivalent: ""))
+
+        let showItem = NSMenuItem(title: "Show History", action: #selector(showPopover), keyEquivalent: "")
+        showItem.target = self
+        menu.addItem(showItem)
         menu.addItem(NSMenuItem.separator())
 
-        // Add recent items
-        let recentItems = Array(clipboardManager.history.prefix(5))
-        if !recentItems.isEmpty {
-            for (index, item) in recentItems.enumerated() {
-                let menuItem = NSMenuItem(
-                    title: String(item.preview.prefix(40)) + (item.preview.count > 40 ? "..." : ""),
-                    action: #selector(pasteFromMenu(_:)),
-                    keyEquivalent: ""
-                )
-                menuItem.tag = index
-                menuItem.target = self
-                menu.addItem(menuItem)
-            }
-            menu.addItem(NSMenuItem.separator())
-        }
+        addRecentItemsToMenu(menu)
+        menu.addItem(buildSnippetsSubmenu())
+        menu.addItem(NSMenuItem.separator())
 
-        // Snippets submenu
+        let clearItem = NSMenuItem(title: "Clear History", action: #selector(clearHistoryFromMenu), keyEquivalent: "")
+        clearItem.target = self
+        menu.addItem(clearItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ",")
+        settingsItem.target = self
+        menu.addItem(settingsItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        let quit = NSMenuItem(
+            title: "Quit SaneClip", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"
+        )
+        menu.addItem(quit)
+
+        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.bounds.minY), in: button)
+    }
+
+    // MARK: - Shared Menu Helpers
+
+    private func addRecentItemsToMenu(_ menu: NSMenu) {
+        let recentItems = Array(clipboardManager.history.prefix(5))
+        guard !recentItems.isEmpty else { return }
+        for (index, item) in recentItems.enumerated() {
+            let menuItem = NSMenuItem(
+                title: String(item.preview.prefix(40)) + (item.preview.count > 40 ? "..." : ""),
+                action: #selector(pasteFromMenu(_:)),
+                keyEquivalent: ""
+            )
+            menuItem.tag = index
+            menuItem.target = self
+            menu.addItem(menuItem)
+        }
+        menu.addItem(NSMenuItem.separator())
+    }
+
+    private func buildSnippetsSubmenu() -> NSMenuItem {
         let snippetsMenu = NSMenu()
         let snippetsItem = NSMenuItem(title: "Snippets", action: nil, keyEquivalent: "")
         let recentSnippets = Array(SnippetManager.shared.snippets.prefix(10))
@@ -394,29 +400,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             snippetsMenu.addItem(emptyItem)
         }
         snippetsItem.submenu = snippetsMenu
-        menu.addItem(snippetsItem)
-        menu.addItem(NSMenuItem.separator())
-
-        let clearItem = NSMenuItem(title: "Clear History", action: #selector(clearHistoryFromMenu), keyEquivalent: "")
-        clearItem.target = self
-        menu.addItem(clearItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ",")
-        settingsItem.target = self
-        menu.addItem(settingsItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        let quit = NSMenuItem(
-            title: "Quit SaneClip", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"
-        )
-        menu.addItem(quit)
-
-        statusItem.menu = menu
-        button.performClick(nil)
-        statusItem.menu = nil
+        return snippetsItem
     }
 
     @objc private func showPopover() {
@@ -483,9 +467,17 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         let menu = NSMenu()
 
         // Show History
-        let showHistoryItem = NSMenuItem(title: "Show History", action: #selector(togglePopover), keyEquivalent: "")
+        let showHistoryItem = NSMenuItem(title: "Show History", action: #selector(showPopover), keyEquivalent: "")
         showHistoryItem.target = self
         menu.addItem(showHistoryItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        // Recent items & snippets
+        addRecentItemsToMenu(menu)
+        menu.addItem(buildSnippetsSubmenu())
+
+        menu.addItem(NSMenuItem.separator())
 
         // Clear History
         let clearHistoryItem = NSMenuItem(title: "Clear History", action: #selector(clearHistoryFromMenu), keyEquivalent: "")
@@ -514,4 +506,37 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             updateService.checkForUpdates()
         }
     #endif
+
+    // MARK: - macOS Services
+
+    @objc func saveToSaneClip(
+        _ pboard: NSPasteboard,
+        userData _: String?,
+        error errorPointer: AutoreleasingUnsafeMutablePointer<NSString?>
+    ) {
+        guard let text = pboard.string(forType: .string), !text.isEmpty else {
+            errorPointer.pointee = "No text found on pasteboard" as NSString
+            return
+        }
+
+        let frontmostApp = NSWorkspace.shared.frontmostApplication
+        let bundleID = frontmostApp?.bundleIdentifier
+        let appName = frontmostApp?.localizedName
+
+        // Respect excluded apps
+        if let bundleID, SettingsModel.shared.isAppExcluded(bundleID) {
+            return
+        }
+
+        let item = ClipboardItem(
+            content: .text(text),
+            sourceAppBundleID: bundleID,
+            sourceAppName: appName
+        )
+        clipboardManager.addItemFromService(item)
+
+        if SettingsModel.shared.playSounds {
+            NSSound(named: .init("Pop"))?.play()
+        }
+    }
 }

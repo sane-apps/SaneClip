@@ -3,8 +3,7 @@ import Security
 
 /// Thread-safe Keychain wrapper for storing secrets (webhook credentials, encryption keys)
 struct KeychainHelper: Sendable {
-
-    static let service = "com.saneclip.app"
+    static let service = Bundle.main.bundleIdentifier ?? "com.saneclip.app"
 
     // MARK: - Account Constants
 

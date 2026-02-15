@@ -31,7 +31,7 @@ enum ContentTypeFilter: String, CaseIterable {
 // MARK: - Clipboard History View
 
 struct ClipboardHistoryView: View {
-    let clipboardManager: ClipboardManager
+    var clipboardManager: ClipboardManager
     @State private var searchText = ""
     @State private var selectedIndex: Int = 0
     @FocusState private var isListFocused: Bool
@@ -57,7 +57,7 @@ struct ClipboardHistoryView: View {
         // Apply text search
         if !searchText.isEmpty {
             items = items.filter { item in
-                if case .text(let string) = item.content {
+                if case let .text(string) = item.content {
                     return string.localizedCaseInsensitiveContains(searchText)
                 }
                 return false
@@ -82,7 +82,7 @@ struct ClipboardHistoryView: View {
         // Apply text search
         if !searchText.isEmpty {
             items = items.filter { item in
-                if case .text(let string) = item.content {
+                if case let .text(string) = item.content {
                     return string.localizedCaseInsensitiveContains(searchText)
                 }
                 return false
@@ -103,20 +103,20 @@ struct ClipboardHistoryView: View {
     private func applyContentTypeFilter(to items: [ClipboardItem]) -> [ClipboardItem] {
         switch contentTypeFilter {
         case .all:
-            return items
+            items
         case .text:
-            return items.filter { item in
+            items.filter { item in
                 if case .text = item.content {
                     return !item.isURL && !item.isCode
                 }
                 return false
             }
         case .url:
-            return items.filter { $0.isURL }
+            items.filter(\.isURL)
         case .code:
-            return items.filter { $0.isCode }
+            items.filter(\.isCode)
         case .image:
-            return items.filter { item in
+            items.filter { item in
                 if case .image = item.content { return true }
                 return false
             }
@@ -216,7 +216,7 @@ struct ClipboardHistoryView: View {
             Divider()
 
             // History list
-            if filteredHistory.isEmpty && filteredPinned.isEmpty {
+            if filteredHistory.isEmpty, filteredPinned.isEmpty {
                 let title = hasActiveFilters
                     ? "No Matches"
                     : (searchText.isEmpty ? "No Clipboard History" : "No Results")
@@ -352,7 +352,7 @@ struct ClipboardHistoryView: View {
     }
 
     private func pasteSelectedItem() {
-        guard selectedIndex >= 0 && selectedIndex < allItems.count else { return }
+        guard selectedIndex >= 0, selectedIndex < allItems.count else { return }
         let item = allItems[selectedIndex]
         clipboardManager.paste(item: item)
     }

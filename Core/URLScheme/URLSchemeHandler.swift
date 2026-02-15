@@ -1,5 +1,5 @@
-import Foundation
 import AppKit
+import Foundation
 
 /// Notification names for URL scheme actions
 extension Notification.Name {
@@ -23,9 +23,9 @@ enum URLSchemeCommand: Equatable {
     var requiresConfirmation: Bool {
         switch self {
         case .copy, .paste, .snippet, .clear:
-            return true
+            true
         case .search, .export, .history:
-            return false
+            false
         }
     }
 }
@@ -42,7 +42,6 @@ enum URLSchemeCommand: Equatable {
 /// - saneclip://copy?text=TEXT - Copy text to clipboard
 @MainActor
 final class URLSchemeHandler {
-
     /// Shared singleton instance
     static let shared = URLSchemeHandler()
 
@@ -124,9 +123,9 @@ final class URLSchemeHandler {
         }
 
         switch command {
-        case .paste(let index):
+        case let .paste(index):
             return handlePaste(index: index)
-        case .search(let query):
+        case let .search(query):
             return handleSearch(query: query)
         case .export:
             return handleExport()
@@ -134,9 +133,9 @@ final class URLSchemeHandler {
             return handleShowHistory()
         case .clear:
             return handleClear()
-        case .snippet(let name, let values):
+        case let .snippet(name, values):
             return handleSnippet(name: name, values: values)
-        case .copy(let text):
+        case let .copy(text):
             return handleCopy(text: text)
         }
     }
@@ -221,6 +220,23 @@ final class URLSchemeHandler {
             message: "An external source wants to paste snippet \"\(name)\":\n\n\"\(preview)\""
         ) else { return false }
 
+        // Check accessibility before attempting paste
+        guard AXIsProcessTrusted() else {
+            // Show permission alert — same as ClipboardManager.simulatePaste()
+            let alert = NSAlert()
+            alert.messageText = "Accessibility Permission Required"
+            alert.informativeText = "SaneClip needs Accessibility permission to paste into other apps.\n\nGo to System Settings > Privacy & Security > Accessibility and enable SaneClip."
+            alert.addButton(withTitle: "Open System Settings")
+            alert.addButton(withTitle: "Cancel")
+            alert.alertStyle = .warning
+            if alert.runModal() == .alertFirstButtonReturn {
+                if let settingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                    NSWorkspace.shared.open(settingsURL)
+                }
+            }
+            return false
+        }
+
         // Set to clipboard and paste
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
@@ -267,7 +283,8 @@ extension URL {
     /// Gets a query parameter value by key
     func queryValue(for key: String) -> String? {
         guard let components = URLComponents(url: self, resolvingAgainstBaseURL: false),
-              let queryItems = components.queryItems else {
+              let queryItems = components.queryItems
+        else {
             return nil
         }
         return queryItems.first { $0.name == key }?.value

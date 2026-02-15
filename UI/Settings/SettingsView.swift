@@ -720,6 +720,8 @@ struct ShortcutsSettingsView: View {
 struct AboutSettingsView: View {
     @State private var showLicenses = false
     @State private var showSupport = false
+    @State private var showFeedback = false
+    @State private var didCopyDiagnostics = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -786,13 +788,34 @@ struct AboutSettingsView: View {
                 .buttonStyle(.bordered)
                 .controlSize(.large)
 
-                Link(destination: URL(string: "https://github.com/sane-apps/SaneClip/issues")!) {
+                Button {
+                    showFeedback = true
+                } label: {
                     Label("Report Issue", systemImage: "ladybug")
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)
             }
             .padding(.top, 12)
+
+            // Diagnostics + Email row
+            HStack(spacing: 16) {
+                Button {
+                    copyDiagnostics()
+                } label: {
+                    Label(
+                        didCopyDiagnostics ? "Copied!" : "Copy Diagnostics",
+                        systemImage: didCopyDiagnostics ? "checkmark" : "doc.on.doc"
+                    )
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.regular)
+
+                Link("Email Us", destination: URL(string: "mailto:hi@saneapps.com")!)
+                    .buttonStyle(.bordered)
+                    .controlSize(.regular)
+            }
+            .padding(.top, 4)
 
             #if !APP_STORE
                 // Check for Updates
@@ -814,6 +837,25 @@ struct AboutSettingsView: View {
         }
         .sheet(isPresented: $showSupport) {
             supportSheet
+        }
+        .sheet(isPresented: $showFeedback) {
+            FeedbackView()
+        }
+    }
+
+    private func copyDiagnostics() {
+        Task {
+            let report = await DiagnosticsService.shared.collectDiagnostics()
+            let markdown = report.toMarkdown(userDescription: "<describe what happened here>")
+            await MainActor.run {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(markdown, forType: .string)
+                didCopyDiagnostics = true
+            }
+            try? await Task.sleep(for: .seconds(2))
+            await MainActor.run {
+                didCopyDiagnostics = false
+            }
         }
     }
 

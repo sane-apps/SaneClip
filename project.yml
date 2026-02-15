@@ -152,7 +152,8 @@ targets:
       configs:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev
-          CODE_SIGN_IDENTITY: "-"
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipDebug.entitlements
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
@@ -208,7 +209,8 @@ targets:
         CODE_SIGN_STYLE: Manual
       configs:
         Debug:
-          CODE_SIGN_IDENTITY: "-"
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Apple Development"
         Release:
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Development"
@@ -241,7 +243,8 @@ targets:
       configs:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.widgets
-          CODE_SIGN_IDENTITY: "-"
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgetsDebug.entitlements
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
@@ -315,7 +318,8 @@ targets:
       configs:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev
-          CODE_SIGN_IDENTITY: "-"
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: iOS/SaneClipIOSDebug.entitlements
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
@@ -359,7 +363,8 @@ targets:
       configs:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.ioswidgets
-          CODE_SIGN_IDENTITY: "-"
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: iOSWidgets/SaneClipIOSWidgetsDebug.entitlements
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ioswidgets
@@ -409,7 +414,8 @@ targets:
       configs:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.share
-          CODE_SIGN_IDENTITY: "-"
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: iOSShareExtension/SaneClipShareDebug.entitlements
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.share

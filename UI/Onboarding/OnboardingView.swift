@@ -3,6 +3,8 @@ import SwiftUI
 
 struct OnboardingView: View {
     @State private var currentPage = 0
+    @State private var showPermissionWarning = false
+    private let totalPages = 4
 
     var body: some View {
         VStack(spacing: 0) {
@@ -12,9 +14,9 @@ struct OnboardingView: View {
                 case 0:
                     WelcomePage()
                 case 1:
-                    PermissionsPage()
+                    HowItWorksPage()
                 case 2:
-                    ShortcutsPage()
+                    PermissionsPage()
                 case 3:
                     SanePromisePage()
                 default:
@@ -25,43 +27,48 @@ struct OnboardingView: View {
 
             // Page indicators
             HStack(spacing: 8) {
-                ForEach(0 ..< 4) { index in
+                ForEach(0 ..< totalPages, id: \.self) { index in
                     Circle()
-                        .fill(currentPage == index ? Color.accentColor : Color.secondary.opacity(0.3))
+                        .fill(currentPage == index ? Color.accentColor : Color.white.opacity(0.3))
                         .frame(width: 8, height: 8)
                 }
             }
             .padding(.bottom, 20)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Page \(currentPage + 1) of 4")
+            .accessibilityLabel("Page \(currentPage + 1) of \(totalPages)")
 
             // Bottom Controls
             HStack {
-                if currentPage < 3 {
-                    Button("Skip") {
-                        completeOnboarding()
+                if currentPage > 0 {
+                    Button("Back") {
+                        withAnimation {
+                            currentPage -= 1
+                        }
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(.secondary)
-                    .accessibilityHint("Skip setup and start using SaneClip immediately")
+                    .foregroundStyle(.white.opacity(0.7))
+                    .font(.system(size: 14))
+                }
 
-                    Spacer()
+                Spacer()
 
+                if currentPage < totalPages - 1 {
                     Button("Next") {
-                        withAnimation {
-                            currentPage += 1
+                        if currentPage == 2, !AXIsProcessTrusted() {
+                            showPermissionWarning = true
+                        } else {
+                            withAnimation {
+                                currentPage += 1
+                            }
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    .accessibilityHint("Continue to next setup step")
                 } else {
-                    Spacer()
                     Button("Start Using SaneClip") {
                         completeOnboarding()
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
-                    .accessibilityHint("Complete setup and open SaneClip")
                 }
             }
             .padding(.horizontal, 40)
@@ -69,6 +76,20 @@ struct OnboardingView: View {
         }
         .frame(width: 700, height: 520)
         .background(OnboardingBackground())
+        .alert(
+            "Paste Won't Work Without Permission",
+            isPresented: $showPermissionWarning
+        ) {
+            Button("Grant Permission") {
+                requestAccessibilityPermission()
+            }
+            .keyboardShortcut(.defaultAction)
+            Button("Continue Anyway", role: .destructive) {
+                withAnimation { currentPage += 1 }
+            }
+        } message: {
+            Text("SaneClip needs Accessibility permission to paste into apps. Without it, you can browse and copy your clipboard history, but paste won't work.")
+        }
     }
 
     private func completeOnboarding() {
@@ -115,28 +136,144 @@ struct VisualEffectBackground: NSViewRepresentable {
     }
 }
 
-// MARK: - Pages
+// MARK: - Page 0: Welcome
 
 struct WelcomePage: View {
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 24) {
             Image(nsImage: NSApp.applicationIconImage)
                 .resizable()
-                .frame(width: 128, height: 128)
+                .frame(width: 100, height: 100)
                 .shadow(color: .black.opacity(0.15), radius: 10, x: 0, y: 5)
 
             Text("Welcome to SaneClip")
                 .font(.system(size: 32, weight: .bold))
+                .foregroundStyle(.white)
 
-            Text("The clipboard manager that stays out of your way.\nFast, private, and keyboard-centric.")
+            Text("Everything you copy is automatically saved.")
+                .font(.system(size: 18))
+                .foregroundStyle(.white.opacity(0.9))
+
+            // Visual: copy flow
+            HStack(spacing: 16) {
+                CopyFlowStep(icon: "doc.on.clipboard", label: "Copy anything")
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 20))
+                    .foregroundStyle(.white.opacity(0.4))
+                CopyFlowStep(icon: "clock.arrow.circlepath", label: "Saved to history")
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 20))
+                    .foregroundStyle(.white.opacity(0.4))
+                CopyFlowStep(icon: "text.cursor", label: "Paste anywhere")
+            }
+            .padding(.top, 8)
+
+            Text("Text, images, files — SaneClip remembers it all.\nPrivate and local. Nothing leaves your Mac.")
                 .multilineTextAlignment(.center)
-                .font(.title3)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal)
+                .font(.system(size: 14))
+                .foregroundStyle(.white.opacity(0.7))
+                .padding(.top, 4)
         }
         .padding()
     }
 }
+
+private struct CopyFlowStep: View {
+    let icon: String
+    let label: String
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 28))
+                .foregroundStyle(.white)
+                .frame(width: 56, height: 56)
+                .background(Color.white.opacity(0.1))
+                .cornerRadius(12)
+            Text(label)
+                .font(.system(size: 13))
+                .foregroundStyle(.white.opacity(0.8))
+        }
+    }
+}
+
+// MARK: - Page 1: How It Works
+
+struct HowItWorksPage: View {
+    var body: some View {
+        VStack(spacing: 24) {
+            Text("How to Use SaneClip")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(.white)
+
+            // Access methods
+            VStack(spacing: 16) {
+                FeatureRow(
+                    icon: "menubar.arrow.up.rectangle",
+                    title: "Click the menu bar icon",
+                    description: "Your full clipboard history in a popover"
+                )
+
+                FeatureRow(
+                    icon: "command",
+                    title: "Press  \u{2318}\u{21E7}V",
+                    description: "Open history from anywhere with one shortcut"
+                )
+
+                FeatureRow(
+                    icon: "pin.fill",
+                    title: "Pin important items",
+                    description: "Right-click any item to pin it — stays at the top forever"
+                )
+
+                FeatureRow(
+                    icon: "magnifyingglass",
+                    title: "Search your history",
+                    description: "Type to instantly filter — find anything you've copied"
+                )
+
+                FeatureRow(
+                    icon: "text.quote",
+                    title: "Snippets",
+                    description: "Save templates with placeholders for repeated text"
+                )
+            }
+            .padding(.horizontal, 40)
+        }
+        .padding(.vertical, 16)
+    }
+}
+
+private struct FeatureRow: View {
+    let icon: String
+    let title: String
+    let description: String
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundStyle(Color.accentColor)
+                .frame(width: 36, height: 36)
+                .background(Color.blue.opacity(0.15))
+                .cornerRadius(8)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white)
+                Text(description)
+                    .font(.system(size: 13))
+                    .foregroundStyle(.white.opacity(0.7))
+            }
+
+            Spacer()
+        }
+        .frame(maxWidth: 460)
+    }
+}
+
+// MARK: - Page 2: Permissions
 
 struct PermissionsPage: View {
     @State private var isTrusted: Bool = AXIsProcessTrusted()
@@ -150,32 +287,34 @@ struct PermissionsPage: View {
 
             Text("Permissions")
                 .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(.white)
 
             VStack(spacing: 12) {
-                Text("SaneClip needs Accessibility permissions to paste directly into other apps.")
+                Text("SaneClip needs Accessibility permission to paste directly into other apps.")
                     .multilineTextAlignment(.center)
-                    .font(.body)
+                    .font(.system(size: 15))
+                    .foregroundStyle(.white.opacity(0.85))
 
                 if isTrusted {
                     HStack {
                         Image(systemName: "checkmark.circle.fill")
                         Text("Permissions granted!")
                     }
-                    .font(.headline)
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.green)
                     .padding()
-                    .background(Color.green.opacity(0.1))
+                    .background(Color.green.opacity(0.15))
                     .cornerRadius(8)
                 } else {
                     Button("Grant Permissions") {
-                        promptForPermissions()
+                        requestAccessibilityPermission()
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
 
-                    Text("System Settings > Privacy & Security > Accessibility")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    Text("Opens System Settings > Accessibility")
+                        .font(.system(size: 13))
+                        .foregroundStyle(.white.opacity(0.6))
                 }
             }
             .padding(.horizontal, 40)
@@ -191,109 +330,36 @@ struct PermissionsPage: View {
             timer?.invalidate()
         }
     }
-
-    @MainActor
-    private func promptForPermissions() {
-        // Prompt for accessibility permissions
-        // Use nonisolated helper to avoid concurrency warnings
-        requestAccessibilityPermission()
-    }
 }
 
-// Helper function outside the view to avoid concurrency issues
+// Open System Settings > Accessibility directly (same as SaneBar)
 private nonisolated func requestAccessibilityPermission() {
-    let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
-    let options = [key: true] as CFDictionary
-    AXIsProcessTrustedWithOptions(options)
-}
-
-struct ShortcutsPage: View {
-    var body: some View {
-        VStack(spacing: 30) {
-            Text("Master the Keyboard")
-                .font(.system(size: 28, weight: .bold))
-
-            VStack(spacing: 20) {
-                ShortcutRow(
-                    title: "Show History",
-                    keys: ["⌘", "⇧", "V"],
-                    description: "Opens the clipboard history at your cursor"
-                )
-
-                ShortcutRow(
-                    title: "Paste Plain Text",
-                    keys: ["⌘", "⇧", "⌥", "V"],
-                    description: "Pastes the current item without formatting"
-                )
-
-                ShortcutRow(
-                    title: "Quick Paste",
-                    keys: ["⌘", "⌃", "1-9"],
-                    description: "Instantly paste recent items"
-                )
-            }
-            .padding(.horizontal)
-        }
+    if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+        NSWorkspace.shared.open(url)
     }
 }
 
-struct ShortcutRow: View {
-    let title: String
-    let keys: [String]
-    let description: String
-
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(title)
-                    .font(.headline)
-                Text(description)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Spacer()
-
-            HStack(spacing: 4) {
-                ForEach(keys, id: \.self) { key in
-                    Text(key)
-                        .font(.system(.body, design: .monospaced))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.secondary.opacity(0.1))
-                        .cornerRadius(6)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                        )
-                }
-            }
-        }
-        .padding()
-        .background(Color.primary.opacity(0.04))
-        .cornerRadius(10)
-        .frame(maxWidth: 500)
-    }
-}
-
-// MARK: - Sane Promise (Brand Philosophy)
+// MARK: - Page 3: Sane Promise (Brand Philosophy)
 
 struct SanePromisePage: View {
     var body: some View {
         VStack(spacing: 24) {
             Text("Our Sane Philosophy")
                 .font(.system(size: 32, weight: .bold))
+                .foregroundStyle(.white)
 
             VStack(spacing: 8) {
                 Text("\"For God has not given us a spirit of fear,")
                     .font(.system(size: 17))
                     .italic()
+                    .foregroundStyle(.white.opacity(0.9))
                 Text("but of power and of love and of a sound mind.\"")
                     .font(.system(size: 17))
                     .italic()
+                    .foregroundStyle(.white.opacity(0.9))
                 Text("— 2 Timothy 1:7")
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.white.opacity(0.7))
                     .padding(.top, 4)
             }
 
@@ -340,10 +406,11 @@ private struct SanePillarCard: View {
 
             Text(title)
                 .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(.white)
 
             Text(description)
                 .font(.system(size: 14))
-                .foregroundStyle(.primary)
+                .foregroundStyle(.white.opacity(0.8))
                 .multilineTextAlignment(.center)
                 .lineLimit(3)
                 .fixedSize(horizontal: false, vertical: true)
@@ -351,7 +418,7 @@ private struct SanePillarCard: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 18)
         .padding(.horizontal, 14)
-        .background(Color.primary.opacity(0.08))
+        .background(Color.white.opacity(0.08))
         .cornerRadius(12)
     }
 }

@@ -36,6 +36,7 @@
 		60E0917C7EE6C533E0E339D6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E0713E5848E1A9394B7528D /* SettingsView.swift */; };
 		688027DE4259A7F8C38DA1C4 /* CopyClipIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FCC4B9D9BD539DC99A6AD4D /* CopyClipIntent.swift */; };
 		6B47CA6E1CF35E4F6F645980 /* SecurityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1775AC6444F4E26AD66FA435 /* SecurityTests.swift */; };
+		72BA7458DAD9665A1C2D2D88 /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD97F0C64EB8A27CB792DD37 /* FeedbackView.swift */; };
 		74554CCC6E39DFED46437C7C /* BrandColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5449565520B6E5CF68C78D6B /* BrandColors.swift */; };
 		77B7D62B808F69AD4A23279A /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2926A000DAF31581D97F6ACF /* OnboardingView.swift */; };
 		7A565742375608A744388912 /* SaneClipIOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ECEE64E98BCC2FC7D58874A /* SaneClipIOSApp.swift */; };
@@ -79,6 +80,7 @@
 		E4BBDD04577B7398507E9597 /* ClipboardItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35354A7D3201B61455110B3F /* ClipboardItemCell.swift */; };
 		F5163A69E164634BA8652A30 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6785DC91231845BA4B10499F /* PrivacyInfo.xcprivacy */; };
 		F65E7C1FC3DA96F5B644D77A /* SearchClipsIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44529FCAA8809428979A60BC /* SearchClipsIntent.swift */; };
+		F6C0F161CBEAFA2C67714A57 /* DiagnosticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29612677A8240D0E5F68DAAF /* DiagnosticsService.swift */; };
 		F903EA3E74F83ADB70AC45F1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF3C7603DE7E07A2AC7D3C74 /* Assets.xcassets */; };
 		FB023FB9283A573C5E3BD4CB /* ClipboardItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352F7E56F26119F6981AEFB2 /* ClipboardItemRow.swift */; };
 		FDD144B1AFB419C804989B70 /* SyncSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08983A3D7903ACF79993349 /* SyncSettingsView.swift */; };
@@ -156,6 +158,7 @@
 		2330CDCBAA8760CAF780861E /* SaneClipShareDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipShareDebug.entitlements; sourceTree = "<group>"; };
 		25007B56789ED465BA3544BA /* Snippet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snippet.swift; sourceTree = "<group>"; };
 		2926A000DAF31581D97F6ACF /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		29612677A8240D0E5F68DAAF /* DiagnosticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsService.swift; sourceTree = "<group>"; };
 		2FA17931D596332935591539 /* SaneClipIOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipIOS.entitlements; sourceTree = "<group>"; };
 		305BB1EB756CA0FC1DAAFFAD /* SaneClipIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipIntents.swift; sourceTree = "<group>"; };
 		352F7E56F26119F6981AEFB2 /* ClipboardItemRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardItemRow.swift; sourceTree = "<group>"; };
@@ -206,6 +209,7 @@
 		B94CC9C6F7E02316FEE7E6C4 /* ClipboardRulesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardRulesManager.swift; sourceTree = "<group>"; };
 		BE7465DE4D6ABC7FA43FECC8 /* StorageStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageStatsView.swift; sourceTree = "<group>"; };
 		C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetClipboardItem.swift; sourceTree = "<group>"; };
+		CD97F0C64EB8A27CB792DD37 /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackView.swift; sourceTree = "<group>"; };
 		CE95B8CE57324347C7B10C45 /* HistoryTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTab.swift; sourceTree = "<group>"; };
 		CF6FECCD60F5BFD8E7FD9484 /* GetRecentClipsIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetRecentClipsIntent.swift; sourceTree = "<group>"; };
 		D10F261894209685FFC6BF8E /* ClipboardHistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryViewModel.swift; sourceTree = "<group>"; };
@@ -244,6 +248,14 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		04B08B70036DEC73874DD6E5 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				29612677A8240D0E5F68DAAF /* DiagnosticsService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		1B130F3074655C63B056F11C /* Shared */ = {
 			isa = PBXGroup;
 			children = (
@@ -279,6 +291,7 @@
 				8963796CABEF00573B399B2C /* Intents */,
 				01121E53FCA5AD4EBABF86B1 /* Models */,
 				903C3BC12BB2E45AD8A34011 /* Security */,
+				04B08B70036DEC73874DD6E5 /* Services */,
 				C0DBDA2E36872AC2C4583362 /* Sync */,
 				A34F8DDA889A2E5A4E7DF589 /* URLScheme */,
 				771DF3F953E6CCFB00E1CBD5 /* Webhooks */,
@@ -401,6 +414,7 @@
 		A8D8AAF79390D8CCEB64615E /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				CD97F0C64EB8A27CB792DD37 /* FeedbackView.swift */,
 				6E0713E5848E1A9394B7528D /* SettingsView.swift */,
 				9371FC1CADBC7CB49A105A80 /* SnippetsSettingsView.swift */,
 				BE7465DE4D6ABC7FA43FECC8 /* StorageStatsView.swift */,
@@ -627,8 +641,23 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					355299070BFB55028AA7532C = {
+						DevelopmentTeam = M78L6FXD48;
+					};
 					43BDAC030E9BA81D8C07AACD = {
 						ProvisioningStyle = Manual;
+					};
+					76789C3628330078706BF5B1 = {
+						DevelopmentTeam = M78L6FXD48;
+					};
+					82F15C9953C599E408BCB355 = {
+						DevelopmentTeam = M78L6FXD48;
+					};
+					A2F610D4BC5CC8FAB336B0E2 = {
+						DevelopmentTeam = M78L6FXD48;
+					};
+					F4822D70D6EC34E3F92050C1 = {
+						DevelopmentTeam = M78L6FXD48;
 					};
 				};
 			};
@@ -793,6 +822,8 @@
 				FB023FB9283A573C5E3BD4CB /* ClipboardItemRow.swift in Sources */,
 				7E6E29E295A478AD08C4DB0E /* ClipboardManager.swift in Sources */,
 				D9E962C435414799E3C255BD /* ClipboardRulesManager.swift in Sources */,
+				F6C0F161CBEAFA2C67714A57 /* DiagnosticsService.swift in Sources */,
+				72BA7458DAD9665A1C2D2D88 /* FeedbackView.swift in Sources */,
 				DFC8A7437D713D82B5224D1E /* HistoryEncryption.swift in Sources */,
 				281630B49BCFA5B27C0C93B4 /* KeychainHelper.swift in Sources */,
 				9AE9193A4B91AF9225D37A06 /* MoveToApplications.swift in Sources */,
@@ -861,9 +892,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShareDebug.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
@@ -963,9 +995,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = M78L6FXD48;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1179,9 +1212,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOSDebug.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1233,11 +1267,12 @@
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = SaneClip/SaneClipDebug.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 7;
+				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SaneClip/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1419,9 +1454,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgetsDebug.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1443,10 +1479,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Widgets/SaneClipWidgetsDebug.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 7;
+				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
 				MARKETING_VERSION = 2.0;

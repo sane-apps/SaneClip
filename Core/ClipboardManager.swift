@@ -1,4 +1,5 @@
 import AppKit
+@preconcurrency import ApplicationServices
 import Combine
 import os.log
 import SwiftUI
@@ -369,17 +370,56 @@ class ClipboardManager {
         pasteStack.removeAll()
     }
 
+    /// Whether accessibility permission alert is currently showing (prevents duplicates)
+    private var isShowingPermissionAlert = false
+
     private func simulatePaste() {
-        let source = CGEventSource(stateID: .hidSystemState)
+        guard AXIsProcessTrusted() else {
+            logger.error("Accessibility permission not granted — paste blocked")
+            guard !isShowingPermissionAlert else { return }
+            isShowingPermissionAlert = true
+            // Dispatch to escape the async Task context — runModal() needs its own run loop
+            DispatchQueue.main.async { [weak self] in
+                self?.showAccessibilityAlert()
+                self?.isShowingPermissionAlert = false
+            }
+            return
+        }
 
-        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true) // V key
-        keyDown?.flags = .maskCommand
+        guard let source = CGEventSource(stateID: .hidSystemState) else {
+            logger.error("Failed to create CGEventSource for paste simulation")
+            return
+        }
 
-        let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false)
-        keyUp?.flags = .maskCommand
+        guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
+              let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false)
+        else {
+            logger.error("Failed to create CGEvent for paste simulation")
+            return
+        }
 
-        keyDown?.post(tap: .cghidEventTap)
-        keyUp?.post(tap: .cghidEventTap)
+        keyDown.flags = .maskCommand
+        keyUp.flags = .maskCommand
+
+        keyDown.post(tap: .cghidEventTap)
+        keyUp.post(tap: .cghidEventTap)
+    }
+
+    /// Show a standalone NSAlert for accessibility permission — works even when the panel isn't visible
+    /// (e.g., paste-as-plain-text, paste-from-stack, quick-paste hotkeys)
+    private func showAccessibilityAlert() {
+        let alert = NSAlert()
+        alert.messageText = "Accessibility Permission Required"
+        alert.informativeText = "SaneClip needs Accessibility permission to paste into other apps.\n\nGo to System Settings > Privacy & Security > Accessibility and enable SaneClip."
+        alert.addButton(withTitle: "Open System Settings")
+        alert.addButton(withTitle: "Cancel")
+        alert.alertStyle = .warning
+
+        if alert.runModal() == .alertFirstButtonReturn {
+            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                NSWorkspace.shared.open(url)
+            }
+        }
     }
 
     func delete(item: ClipboardItem) {

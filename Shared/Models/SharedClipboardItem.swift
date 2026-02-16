@@ -59,6 +59,7 @@ struct SharedClipboardItem: Identifiable, Codable, Sendable {
     let sourceAppBundleID: String?
     let sourceAppName: String?
     var pasteCount: Int
+    var note: String?
     let deviceId: String
     let deviceName: String
 
@@ -69,6 +70,7 @@ struct SharedClipboardItem: Identifiable, Codable, Sendable {
         sourceAppBundleID: String? = nil,
         sourceAppName: String? = nil,
         pasteCount: Int = 0,
+        note: String? = nil,
         deviceId: String = "",
         deviceName: String = ""
     ) {
@@ -78,6 +80,7 @@ struct SharedClipboardItem: Identifiable, Codable, Sendable {
         self.sourceAppBundleID = sourceAppBundleID
         self.sourceAppName = sourceAppName
         self.pasteCount = pasteCount
+        self.note = note
         self.deviceId = deviceId
         self.deviceName = deviceName
     }

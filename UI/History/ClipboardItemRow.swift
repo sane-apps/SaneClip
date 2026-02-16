@@ -10,6 +10,12 @@ struct ClipboardItemRow: View {
     @State private var isHovering = false
     @State private var showEditSheet = false
     @State private var editText = ""
+    @State private var editNote = ""
+
+    private var isImageItem: Bool {
+        if case .image = item.content { return true }
+        return false
+    }
 
     // MARK: - Accessibility
 
@@ -166,9 +172,31 @@ struct ClipboardItemRow: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(maxHeight: 80)
+                                .background(
+                                    // Checkerboard so white/transparent images are visible
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .fill(Color.primary.opacity(0.08))
+                                )
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
+                                )
                                 .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
                         }
+                    }
+
+                    // Note indicator
+                    if let note = item.note, !note.isEmpty {
+                        HStack(spacing: 4) {
+                            Image(systemName: "note.text")
+                                .font(.caption2)
+                            Text(note)
+                                .font(.caption)
+                                .lineLimit(1)
+                        }
+                        .foregroundStyle(.secondary)
+                        .padding(.leading, 20) // Align with content (past the icon)
                     }
 
                     // Metadata line - fixed columns for alignment
@@ -291,7 +319,34 @@ struct ClipboardItemRow: View {
             if case let .text(text) = item.content {
                 Button("Edit...") {
                     editText = text
+                    editNote = item.note ?? ""
                     showEditSheet = true
+                }
+            }
+
+            // Notes
+            if item.note == nil || item.note?.isEmpty == true {
+                Button("Add Note...") {
+                    if case let .text(text) = item.content {
+                        editText = text
+                    } else {
+                        editText = ""
+                    }
+                    editNote = ""
+                    showEditSheet = true
+                }
+            } else {
+                Button("Edit Note...") {
+                    if case let .text(text) = item.content {
+                        editText = text
+                    } else {
+                        editText = ""
+                    }
+                    editNote = item.note ?? ""
+                    showEditSheet = true
+                }
+                Button("Remove Note") {
+                    clipboardManager.updateItemNote(id: item.id, note: nil)
                 }
             }
 
@@ -313,8 +368,13 @@ struct ClipboardItemRow: View {
         .sheet(isPresented: $showEditSheet) {
             EditClipboardItemSheet(
                 text: $editText,
+                note: $editNote,
+                isImageItem: isImageItem,
                 onSave: {
-                    clipboardManager.updateItemContent(id: item.id, newContent: editText)
+                    if !isImageItem {
+                        clipboardManager.updateItemContent(id: item.id, newContent: editText)
+                    }
+                    clipboardManager.updateItemNote(id: item.id, note: editNote)
                     showEditSheet = false
                 },
                 onCancel: {
@@ -351,18 +411,33 @@ struct ClipboardItemRow: View {
 
 struct EditClipboardItemSheet: View {
     @Binding var text: String
+    @Binding var note: String
+    var isImageItem: Bool = false
     let onSave: () -> Void
     let onCancel: () -> Void
 
     var body: some View {
         VStack(spacing: 16) {
-            Text("Edit Clipboard Item")
+            Text(isImageItem ? "Edit Note" : "Edit Clipboard Item")
                 .font(.headline)
 
-            TextEditor(text: $text)
-                .font(.system(.body, design: .monospaced))
-                .frame(minWidth: 400, minHeight: 200)
-                .border(Color.secondary.opacity(0.3), width: 1)
+            if !isImageItem {
+                TextEditor(text: $text)
+                    .font(.system(.body, design: .monospaced))
+                    .frame(minWidth: 400, minHeight: 200)
+                    .border(Color.secondary.opacity(0.3), width: 1)
+            }
+
+            // Note section
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Note (optional)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                TextEditor(text: $note)
+                    .font(.system(.body))
+                    .frame(minHeight: 60, maxHeight: 80)
+                    .border(Color.secondary.opacity(0.3), width: 1)
+            }
 
             HStack {
                 Button("Cancel") {
@@ -376,11 +451,11 @@ struct EditClipboardItemSheet: View {
                     onSave()
                 }
                 .keyboardShortcut(.defaultAction)
-                .disabled(text.isEmpty)
+                .disabled(!isImageItem && text.isEmpty)
             }
         }
         .padding()
-        .frame(minWidth: 450, minHeight: 300)
+        .frame(minWidth: 450, minHeight: isImageItem ? 200 : 350)
     }
 }
 

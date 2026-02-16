@@ -13,6 +13,7 @@ struct ClipboardItem: Identifiable {
     let sourceAppBundleID: String?
     let sourceAppName: String?
     var pasteCount: Int
+    var note: String?
 
     init(
         id: UUID = UUID(),
@@ -20,7 +21,8 @@ struct ClipboardItem: Identifiable {
         timestamp: Date = Date(),
         sourceAppBundleID: String? = nil,
         sourceAppName: String? = nil,
-        pasteCount: Int = 0
+        pasteCount: Int = 0,
+        note: String? = nil
     ) {
         self.id = id
         self.content = content
@@ -28,6 +30,7 @@ struct ClipboardItem: Identifiable {
         self.sourceAppBundleID = sourceAppBundleID
         self.sourceAppName = sourceAppName
         self.pasteCount = pasteCount
+        self.note = note
     }
 
     /// Get the app icon for the source app

@@ -54,11 +54,15 @@ struct ClipboardHistoryView: View {
     var filteredHistory: [ClipboardItem] {
         var items = clipboardManager.history
 
-        // Apply text search
+        // Apply text search (matches content and notes)
         if !searchText.isEmpty {
             items = items.filter { item in
-                if case let .text(string) = item.content {
-                    return string.localizedCaseInsensitiveContains(searchText)
+                if case let .text(string) = item.content,
+                   string.localizedCaseInsensitiveContains(searchText) {
+                    return true
+                }
+                if let note = item.note, note.localizedCaseInsensitiveContains(searchText) {
+                    return true
                 }
                 return false
             }
@@ -79,11 +83,15 @@ struct ClipboardHistoryView: View {
     var filteredPinned: [ClipboardItem] {
         var items = clipboardManager.pinnedItems
 
-        // Apply text search
+        // Apply text search (matches content and notes)
         if !searchText.isEmpty {
             items = items.filter { item in
-                if case let .text(string) = item.content {
-                    return string.localizedCaseInsensitiveContains(searchText)
+                if case let .text(string) = item.content,
+                   string.localizedCaseInsensitiveContains(searchText) {
+                    return true
+                }
+                if let note = item.note, note.localizedCaseInsensitiveContains(searchText) {
+                    return true
                 }
                 return false
             }

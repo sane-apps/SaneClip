@@ -140,7 +140,7 @@ targets:
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
         MARKETING_VERSION: "2.1"
-        CURRENT_PROJECT_VERSION: "8"
+        CURRENT_PROJECT_VERSION: "21"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -239,7 +239,7 @@ targets:
         PRODUCT_NAME: SaneClipWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
         MARKETING_VERSION: "2.1"
-        CURRENT_PROJECT_VERSION: "8"
+        CURRENT_PROJECT_VERSION: "21"
         SWIFT_VERSION: 6.0
         CODE_SIGN_STYLE: Manual
         SKIP_INSTALL: YES
@@ -311,8 +311,8 @@ targets:
       base:
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "3"
+        MARKETING_VERSION: "2.1"
+        CURRENT_PROJECT_VERSION: "21"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -357,8 +357,8 @@ targets:
       base:
         PRODUCT_NAME: SaneClipIOSWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ioswidgets
-        MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "3"
+        MARKETING_VERSION: "2.1"
+        CURRENT_PROJECT_VERSION: "21"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"
@@ -407,8 +407,8 @@ targets:
       base:
         PRODUCT_NAME: SaneClipIOSShare
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.share
-        MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "3"
+        MARKETING_VERSION: "2.1"
+        CURRENT_PROJECT_VERSION: "21"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"

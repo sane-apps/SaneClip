@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy — SaneClip</title>
-    <meta name="description" content="SaneClip privacy policy: 100% on-device storage, AES-256-GCM encryption, Touch ID protection. No analytics, no telemetry, no tracking.">
+    <meta name="description" content="SaneClip privacy policy: 100% on-device storage, AES-256-GCM encryption, Touch ID protection. Zero app analytics or telemetry. Website uses privacy-focused Cloudflare Web Analytics (no cookies, no personal data).">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://saneclip.com/privacy.html">
     <link rel="icon" type="image/png" sizes="256x256" href="images/icon.png">
@@ -230,21 +230,21 @@
     <section class="content">
         <div class="container">
             <h1>Privacy Policy</h1>
-            <p class="updated"><strong>Effective Date:</strong> February 7, 2026<br><strong>Developer:</strong> Mr. Sane / SaneApps</p>
+            <p class="updated"><strong>Effective Date:</strong> February 16, 2026<br><strong>Developer:</strong> Mr. Sane / SaneApps</p>
 
             <p class="intro">
-                SaneClip is built on a simple principle: <strong>your clipboard data belongs to you, and only you.</strong> This policy explains exactly what data SaneClip collects (spoiler: none), how it's stored (locally, encrypted), and what we do with it (nothing — it never leaves your Mac).
+                SaneClip is built on a simple principle: <strong>your clipboard data belongs to you, and only you.</strong> This policy explains exactly what data SaneClip collects (spoiler: none), how it's stored (locally, encrypted), and what happens with it (nothing — it never leaves your Mac).
             </p>
 
-            <h2>1. What We Collect</h2>
+            <h2>1. What SaneClip Collects</h2>
             <p><strong>Short answer: Nothing.</strong></p>
             <p>SaneClip does not collect, transmit, or store any personal information on external servers. There are no analytics, no telemetry, no tracking pixels, and no network requests. SaneClip operates entirely offline.</p>
 
             <h2>2. How Data Is Stored</h2>
-            <p>All clipboard history is stored <strong>locally on your device</strong> in a SQLite database managed by Apple's SwiftData framework. Your data never touches a server, cloud service, or third party.</p>
+            <p>All clipboard history is stored <strong>locally on your device</strong> as encrypted JSON files in your Application Support directory. Your data never touches a server, cloud service, or third party.</p>
 
             <ul>
-                <li><strong>Location:</strong> Your clipboard history is stored in <code>~/Library/Containers/com.saneclip.app/Data/</code> (or the <code>.dev</code> equivalent for debug builds).</li>
+                <li><strong>Location:</strong> Your clipboard history is stored in <code>~/Library/Application Support/SaneClip/</code> (direct download) or <code>~/Library/Containers/com.saneclip.app/Data/</code> (Mac App Store version, sandboxed).</li>
                 <li><strong>Encryption:</strong> SaneClip uses <strong>AES-256-GCM encryption at rest</strong> (enabled by default). Your clipboard data is encrypted on disk and only decrypted when you access it.</li>
                 <li><strong>Touch ID / Password Protection:</strong> When enabled, your clipboard history is locked behind biometric or password authentication. Even if someone gains physical access to your Mac, they cannot access your clipboard without authentication.</li>
                 <li><strong>Sensitive Data Auto-Detection:</strong> SaneClip automatically detects and purges passwords, credit card numbers, and other sensitive data using heuristics. Items flagged as sensitive are not saved to history.</li>
@@ -269,7 +269,7 @@
             <ul>
                 <li>Webhooks are <strong>disabled by default</strong>. You must explicitly configure a webhook URL in settings.</li>
                 <li><strong>You control what data is sent and where it goes.</strong> SaneClip only sends data to the URL you specify.</li>
-                <li>We recommend using HTTPS endpoints and reviewing the privacy policy of any third-party service you integrate with.</li>
+                <li>I recommend using HTTPS endpoints and reviewing the privacy policy of any third-party service you integrate with.</li>
             </ul>
 
             <div class="highlight">
@@ -283,19 +283,20 @@
             <ul>
                 <li><strong>Apple iCloud (if you enable sync)</strong> — governed by Apple's privacy policy.</li>
                 <li><strong>User-configured webhooks (if you enable them)</strong> — governed by the privacy policy of the endpoint you choose.</li>
+                <li><strong>Cloudflare Web Analytics (website only)</strong> — The saneclip.com website uses <a href="https://www.cloudflare.com/web-analytics/" target="_blank">Cloudflare Web Analytics</a>, a privacy-focused analytics service that collects no personal data, uses no cookies, and does not track individual users. This applies only to the website, not the app itself. The SaneClip app contains zero analytics.</li>
             </ul>
 
             <h2>6. Open Source Transparency</h2>
             <p>SaneClip is <strong>open source</strong> under the GPL v3 license. You can audit the code yourself on GitHub:</p>
             <p><a href="https://github.com/sane-apps/SaneClip" target="_blank">github.com/sane-apps/SaneClip</a></p>
 
-            <p>If you find a privacy concern, please open an issue or contact us at <a href="mailto:hi@saneapps.com">hi@saneapps.com</a>.</p>
+            <p>If you find a privacy concern, please open an issue or contact me at <a href="mailto:hi@saneapps.com">hi@saneapps.com</a>.</p>
 
             <h2>7. Children's Privacy</h2>
             <p>SaneClip does not collect any personal information from anyone, including children under the age of 13. The app operates entirely offline and does not require an account or registration.</p>
 
             <h2>8. Changes to This Policy</h2>
-            <p>We may update this privacy policy from time to time. When we do, we will update the "Effective Date" at the top of this page and notify users via the app's release notes.</p>
+            <p>This privacy policy may be updated from time to time. When it changes, the "Effective Date" at the top of this page will be updated and users will be notified via the app's release notes.</p>
 
             <p>Continued use of SaneClip after changes to this policy constitutes acceptance of the updated terms.</p>
 
@@ -309,7 +310,7 @@
             </p>
 
             <div class="highlight" style="margin-top: 48px;">
-                <p><strong>TL;DR:</strong> SaneClip stores everything locally, encrypts it, and never phones home. No analytics, no telemetry, no tracking. Your clipboard is yours.</p>
+                <p><strong>TL;DR:</strong> SaneClip stores everything locally, encrypts it, and never phones home. The app has zero analytics, zero telemetry, zero tracking. The saneclip.com website uses privacy-focused Cloudflare Web Analytics (no cookies, no personal data). Your clipboard is yours.</p>
             </div>
         </div>
     </section>

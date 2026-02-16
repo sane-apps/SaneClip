@@ -220,38 +220,45 @@ final class URLSchemeHandler {
             message: "An external source wants to paste snippet \"\(name)\":\n\n\"\(preview)\""
         ) else { return false }
 
-        // Check accessibility before attempting paste
-        guard AXIsProcessTrusted() else {
-            // Show permission alert — same as ClipboardManager.simulatePaste()
-            let alert = NSAlert()
-            alert.messageText = "Accessibility Permission Required"
-            alert.informativeText = "SaneClip needs Accessibility permission to paste into other apps.\n\nGo to System Settings > Privacy & Security > Accessibility and enable SaneClip."
-            alert.addButton(withTitle: "Open System Settings")
-            alert.addButton(withTitle: "Cancel")
-            alert.alertStyle = .warning
-            if alert.runModal() == .alertFirstButtonReturn {
-                if let settingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-                    NSWorkspace.shared.open(settingsURL)
-                }
-            }
-            return false
-        }
-
-        // Set to clipboard and paste
+        // Set to clipboard
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(expanded, forType: .string)
 
-        // Trigger paste
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let source = CGEventSource(stateID: .hidSystemState)
-            let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 9, keyDown: true)
-            let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 9, keyDown: false)
-            keyDown?.flags = .maskCommand
-            keyUp?.flags = .maskCommand
-            keyDown?.post(tap: .cghidEventTap)
-            keyUp?.post(tap: .cghidEventTap)
-        }
+        #if APP_STORE
+            // App Store: just copy to clipboard, user pastes manually
+            if SettingsModel.shared.playSounds {
+                NSSound(named: .init("Pop"))?.play()
+            }
+        #else
+            // Check accessibility before attempting paste
+            guard AXIsProcessTrusted() else {
+                // Show permission alert — same as ClipboardManager.simulatePaste()
+                let alert = NSAlert()
+                alert.messageText = "Accessibility Permission Required"
+                alert.informativeText = "SaneClip needs Accessibility permission to paste into other apps.\n\nGo to System Settings > Privacy & Security > Accessibility and enable SaneClip."
+                alert.addButton(withTitle: "Open System Settings")
+                alert.addButton(withTitle: "Cancel")
+                alert.alertStyle = .warning
+                if alert.runModal() == .alertFirstButtonReturn {
+                    if let settingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                        NSWorkspace.shared.open(settingsURL)
+                    }
+                }
+                return false
+            }
+
+            // Trigger paste
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                let source = CGEventSource(stateID: .hidSystemState)
+                let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 9, keyDown: true)
+                let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 9, keyDown: false)
+                keyDown?.flags = .maskCommand
+                keyUp?.flags = .maskCommand
+                keyDown?.post(tap: .cghidEventTap)
+                keyUp?.post(tap: .cghidEventTap)
+            }
+        #endif
 
         return true
     }

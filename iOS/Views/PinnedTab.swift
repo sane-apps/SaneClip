@@ -21,6 +21,7 @@ struct PinnedTab: View {
                 }
             }
             .navigationTitle("Pinned")
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     refreshButton
@@ -49,7 +50,6 @@ struct PinnedTab: View {
             }
         }
         .listStyle(.plain)
-        .scrollContentBackground(.hidden)
         .searchable(text: $searchText, prompt: "Search pinned")
     }
 
@@ -61,7 +61,6 @@ struct PinnedTab: View {
         )
         .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
         .listRowSeparator(.hidden)
-        .listRowBackground(Color.clear)
         .contentShape(Rectangle())
         .onTapGesture {
             viewModel.copyToClipboard(item)
@@ -95,7 +94,6 @@ struct PinnedTab: View {
             Task { await viewModel.refresh() }
         } label: {
             Image(systemName: "arrow.clockwise")
-                .foregroundStyle(Color.pinnedOrange)
         }
         .disabled(viewModel.isLoading)
     }
@@ -103,7 +101,7 @@ struct PinnedTab: View {
     @ViewBuilder
     private var copiedToastOverlay: some View {
         if viewModel.copiedItemID != nil {
-            CopiedToast()
+            ToastView(icon: "checkmark.circle.fill", text: "Copied", color: Color.teal)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .padding(.bottom, 16)
         }

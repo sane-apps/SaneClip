@@ -9,9 +9,9 @@ struct OnboardingView: View {
             // Background gradient matching brand
             LinearGradient(
                 colors: [
-                    Color.clipBlue.opacity(0.08),
+                    Color.teal.opacity(0.08),
                     Color.purple.opacity(0.05),
-                    Color.clipBlue.opacity(0.03)
+                    Color.teal.opacity(0.03)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -43,8 +43,8 @@ private struct WelcomePageIOS: View {
 
             Image(systemName: "doc.on.clipboard.fill")
                 .font(.system(size: 80))
-                .foregroundStyle(Color.clipBlue)
-                .shadow(color: Color.clipBlue.opacity(0.3), radius: 10, x: 0, y: 5)
+                .foregroundStyle(Color.teal)
+                .shadow(color: Color.teal.opacity(0.3), radius: 10, x: 0, y: 5)
 
             Text("Welcome to SaneClip")
                 .font(.system(size: 32, weight: .bold))
@@ -52,7 +52,7 @@ private struct WelcomePageIOS: View {
             Text("Your clipboard history, always accessible.\nFast, private, and secure.")
                 .multilineTextAlignment(.center)
                 .font(.title3)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.white.opacity(0.9))
                 .padding(.horizontal, 32)
 
             Spacer()
@@ -75,7 +75,7 @@ private struct FeaturesPageIOS: View {
             VStack(spacing: 20) {
                 FeatureRow(
                     icon: "doc.on.clipboard",
-                    color: .clipBlue,
+                    color: .teal,
                     title: "Clipboard History",
                     description: "Access your recent copies from any app"
                 )
@@ -130,7 +130,7 @@ private struct FeatureRow: View {
                     .font(.headline)
                 Text(description)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.9))
             }
 
             Spacer()
@@ -197,7 +197,7 @@ private struct SanePromisePageIOS: View {
                     .padding(.vertical, 14)
             }
             .buttonStyle(.borderedProminent)
-            .tint(Color.clipBlue)
+            .tint(Color.teal)
             .padding(.horizontal, 40)
             .padding(.bottom, 60)
         }

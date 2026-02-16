@@ -57,7 +57,7 @@ struct ClipboardDetailView: View {
                 Link(destination: url) {
                     Text(string)
                         .font(.body)
-                        .foregroundStyle(Color.clipBlue)
+                        .foregroundStyle(.teal)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             } else {
@@ -121,7 +121,7 @@ struct ClipboardDetailView: View {
         HStack {
             Label(label, systemImage: icon)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.white.opacity(0.9))
                 .frame(width: 120, alignment: .leading)
             Text(value)
                 .font(.subheadline)

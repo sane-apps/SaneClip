@@ -65,7 +65,11 @@ struct OnboardingView: View {
                     .buttonStyle(.borderedProminent)
                 } else {
                     Button("Start Using SaneClip") {
-                        completeOnboarding()
+                        if !AXIsProcessTrusted() {
+                            showPermissionWarning = true
+                        } else {
+                            completeOnboarding()
+                        }
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
@@ -85,7 +89,11 @@ struct OnboardingView: View {
             }
             .keyboardShortcut(.defaultAction)
             Button("Continue Anyway", role: .destructive) {
-                withAnimation { currentPage += 1 }
+                if currentPage >= totalPages - 1 {
+                    completeOnboarding()
+                } else {
+                    withAnimation { currentPage += 1 }
+                }
             }
         } message: {
             Text("SaneClip needs Accessibility permission to paste into apps. Without it, you can browse and copy your clipboard history, but paste won't work.")

@@ -16,7 +16,7 @@ struct SettingsTab: View {
                     #if ENABLE_SYNC
                         Toggle(isOn: $coordinator.isSyncEnabled) {
                             Label("iCloud Sync", systemImage: "icloud")
-                                .foregroundStyle(Color.clipBlue)
+                                .foregroundStyle(.teal)
                         }
                         .toggleStyle(.switch)
 
@@ -26,40 +26,40 @@ struct SettingsTab: View {
                                     .foregroundStyle(syncStatusColor)
                                 Spacer()
                                 Text(coordinator.syncStatus.rawValue)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.white.opacity(0.9))
                             }
 
                             HStack {
                                 Label("Last Synced", systemImage: "arrow.triangle.2.circlepath")
-                                    .foregroundStyle(Color.clipBlue)
+                                    .foregroundStyle(.teal)
                                 Spacer()
                                 if let lastSync = coordinator.lastSyncDate {
                                     Text(lastSync, style: .relative)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(.white.opacity(0.9))
                                 } else {
                                     Text("Never")
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(.white.opacity(0.9))
                                 }
                             }
 
                             if !coordinator.connectedDevices.isEmpty {
                                 ForEach(coordinator.connectedDevices, id: \.self) { device in
                                     Label(device, systemImage: "desktopcomputer")
-                                        .foregroundStyle(Color.clipBlue)
+                                        .foregroundStyle(.teal)
                                 }
                             }
                         }
                     #else
                         HStack {
                             Label("Last Synced", systemImage: "arrow.triangle.2.circlepath")
-                                .foregroundStyle(Color.clipBlue)
+                                .foregroundStyle(.teal)
                             Spacer()
                             if let lastSync = viewModel.lastSyncTime {
                                 Text(lastSync, style: .relative)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.white.opacity(0.9))
                             } else {
                                 Text("Never")
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.white.opacity(0.9))
                             }
                         }
                     #endif
@@ -74,27 +74,28 @@ struct SettingsTab: View {
                             Spacer()
                             if viewModel.isLoading {
                                 ProgressView()
-                                    .tint(Color.clipBlue)
+                                    .tint(.teal)
                             }
                         }
                     }
                     .disabled(viewModel.isLoading)
                 } header: {
                     Text("Sync")
+                        .foregroundStyle(.white)
                 }
 
                 // About Section
                 Section {
                     HStack {
                         Label("Version", systemImage: "info.circle")
-                            .foregroundStyle(Color.clipBlue)
+                            .foregroundStyle(.teal)
                         Spacer()
                         Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.white.opacity(0.9))
                     }
 
-                    Link(destination: URL(string: "https://saneclip.com")!) {
-                        Label("Website", systemImage: "globe")
+                    Link(destination: URL(string: "mailto:hi@saneapps.com")!) {
+                        Label("Contact Support", systemImage: "envelope")
                     }
 
                     Link(destination: URL(string: "https://saneclip.com/privacy")!) {
@@ -102,6 +103,7 @@ struct SettingsTab: View {
                     }
                 } header: {
                     Text("About")
+                        .foregroundStyle(.white)
                 }
 
                 // Info Section
@@ -109,18 +111,19 @@ struct SettingsTab: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("SaneClip iOS")
                             .font(.headline)
-                        Text("View and copy your clipboard history synced from your Mac. Enable iCloud Sync to keep your clipboard in sync across all your devices.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        Text("Save clipboard items with the + button or Share menu. Tap any item to copy it back. Enable iCloud Sync to share your clipboard between your Mac and iOS devices.")
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.9))
                     }
                     .padding(.vertical, 4)
                 } header: {
                     Text("How It Works")
+                        .foregroundStyle(.white)
                 }
             }
             .navigationTitle("Settings")
+            .toolbarBackground(.visible, for: .navigationBar)
         }
-        .tint(Color.clipBlue)
     }
 
     #if ENABLE_SYNC

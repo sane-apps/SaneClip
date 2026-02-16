@@ -4,6 +4,9 @@ import Combine
 import os.log
 import SwiftUI
 import UniformTypeIdentifiers
+#if APP_STORE
+    import UserNotifications
+#endif
 import WidgetKit
 
 @MainActor
@@ -120,20 +123,27 @@ class ClipboardManager {
     private func processClipboardContent(
         _ pasteboard: NSPasteboard, sourceAppBundleID: String?, sourceAppName: String?
     ) {
-        if let string = pasteboard.string(forType: .string), !string.isEmpty {
+        // Check for image FIRST — when copying images (e.g. desktop wallpaper),
+        // macOS puts both a file path string AND image data on the pasteboard.
+        // Prefer the image so we get a visual thumbnail instead of a file path.
+        let hasImageType = pasteboard.types?.contains(where: {
+            [.tiff, .png].contains($0)
+        }) ?? false
+
+        if hasImageType, let image = NSImage(pasteboard: pasteboard) {
+            lastClipboardContent = nil
+            lastCopyTime = nil
+            addItem(ClipboardItem(
+                content: .image(image),
+                sourceAppBundleID: sourceAppBundleID,
+                sourceAppName: sourceAppName
+            ))
+        } else if let string = pasteboard.string(forType: .string), !string.isEmpty {
             let processedString = processString(string)
             lastClipboardContent = processedString
             lastCopyTime = Date()
             addItem(ClipboardItem(
                 content: .text(processedString),
-                sourceAppBundleID: sourceAppBundleID,
-                sourceAppName: sourceAppName
-            ))
-        } else if let image = NSImage(pasteboard: pasteboard) {
-            lastClipboardContent = nil
-            lastCopyTime = nil
-            addItem(ClipboardItem(
-                content: .image(image),
                 sourceAppBundleID: sourceAppBundleID,
                 sourceAppName: sourceAppName
             ))
@@ -213,11 +223,17 @@ class ClipboardManager {
             NSSound(named: .init("Pop"))?.play()
         }
 
-        // Simulate Cmd+V with longer delay to let popover close
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(200))
-            self.simulatePaste()
-        }
+        // Paste or copy-only depending on build
+        #if APP_STORE
+            // App Store: just copy to clipboard, user pastes manually
+            showCopiedNotification()
+        #else
+            // Direct distribution: simulate Cmd+V
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(200))
+                self.simulatePaste()
+            }
+        #endif
     }
 
     /// Paste most recent item as plain text (for global shortcut)
@@ -246,10 +262,14 @@ class ClipboardManager {
             NSSound(named: .init("Pop"))?.play()
         }
 
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(200))
-            self.simulatePaste()
-        }
+        #if APP_STORE
+            showCopiedNotification()
+        #else
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(200))
+                self.simulatePaste()
+            }
+        #endif
     }
 
     /// Smart paste: auto-selects paste behavior based on content type
@@ -276,10 +296,14 @@ class ClipboardManager {
                 NSSound(named: .init("Pop"))?.play()
             }
 
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(200))
-                self.simulatePaste()
-            }
+            #if APP_STORE
+                showCopiedNotification()
+            #else
+                Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(200))
+                    self.simulatePaste()
+                }
+            #endif
         } else {
             paste(item: item)
         }
@@ -318,10 +342,14 @@ class ClipboardManager {
             NSSound(named: .init("Pop"))?.play()
         }
 
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(200))
-            self.simulatePaste()
-        }
+        #if APP_STORE
+            showCopiedNotification()
+        #else
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(200))
+                self.simulatePaste()
+            }
+        #endif
     }
 
     /// Paste an expanded snippet to the active application
@@ -338,10 +366,14 @@ class ClipboardManager {
             NSSound(named: .init("Pop"))?.play()
         }
 
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(200))
-            self.simulatePaste()
-        }
+        #if APP_STORE
+            showCopiedNotification()
+        #else
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(200))
+                self.simulatePaste()
+            }
+        #endif
     }
 
     // MARK: - Paste Stack
@@ -370,57 +402,79 @@ class ClipboardManager {
         pasteStack.removeAll()
     }
 
-    /// Whether accessibility permission alert is currently showing (prevents duplicates)
-    private var isShowingPermissionAlert = false
-
-    private func simulatePaste() {
-        guard AXIsProcessTrusted() else {
-            logger.error("Accessibility permission not granted — paste blocked")
-            guard !isShowingPermissionAlert else { return }
-            isShowingPermissionAlert = true
-            // Dispatch to escape the async Task context — runModal() needs its own run loop
-            DispatchQueue.main.async { [weak self] in
-                self?.showAccessibilityAlert()
-                self?.isShowingPermissionAlert = false
-            }
-            return
-        }
-
-        guard let source = CGEventSource(stateID: .hidSystemState) else {
-            logger.error("Failed to create CGEventSource for paste simulation")
-            return
-        }
-
-        guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
-              let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false)
-        else {
-            logger.error("Failed to create CGEvent for paste simulation")
-            return
-        }
-
-        keyDown.flags = .maskCommand
-        keyUp.flags = .maskCommand
-
-        keyDown.post(tap: .cghidEventTap)
-        keyUp.post(tap: .cghidEventTap)
-    }
-
-    /// Show a standalone NSAlert for accessibility permission — works even when the panel isn't visible
-    /// (e.g., paste-as-plain-text, paste-from-stack, quick-paste hotkeys)
-    private func showAccessibilityAlert() {
-        let alert = NSAlert()
-        alert.messageText = "Accessibility Permission Required"
-        alert.informativeText = "SaneClip needs Accessibility permission to paste into other apps.\n\nGo to System Settings > Privacy & Security > Accessibility and enable SaneClip."
-        alert.addButton(withTitle: "Open System Settings")
-        alert.addButton(withTitle: "Cancel")
-        alert.alertStyle = .warning
-
-        if alert.runModal() == .alertFirstButtonReturn {
-            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-                NSWorkspace.shared.open(url)
+    #if APP_STORE
+        /// Show a brief "Copied to clipboard" notification for App Store builds
+        /// where paste simulation (CGEvent) is not available in the sandbox.
+        private func showCopiedNotification() {
+            logger.debug("App Store mode: copied to clipboard, user must paste manually")
+            // Request notification permission on first use, then deliver
+            let center = UNUserNotificationCenter.current()
+            center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
+                guard granted else { return }
+                let content = UNMutableNotificationContent()
+                content.title = "Copied to Clipboard"
+                content.body = "Press \u{2318}V to paste"
+                let request = UNNotificationRequest(
+                    identifier: "com.saneclip.copied.\(UUID().uuidString)",
+                    content: content,
+                    trigger: nil
+                )
+                center.add(request)
             }
         }
-    }
+    #else
+        /// Whether accessibility permission alert is currently showing (prevents duplicates)
+        private var isShowingPermissionAlert = false
+
+        private func simulatePaste() {
+            guard AXIsProcessTrusted() else {
+                logger.error("Accessibility permission not granted — paste blocked")
+                guard !isShowingPermissionAlert else { return }
+                isShowingPermissionAlert = true
+                // Dispatch to escape the async Task context — runModal() needs its own run loop
+                DispatchQueue.main.async { [weak self] in
+                    self?.showAccessibilityAlert()
+                    self?.isShowingPermissionAlert = false
+                }
+                return
+            }
+
+            guard let source = CGEventSource(stateID: .hidSystemState) else {
+                logger.error("Failed to create CGEventSource for paste simulation")
+                return
+            }
+
+            guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
+                  let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false)
+            else {
+                logger.error("Failed to create CGEvent for paste simulation")
+                return
+            }
+
+            keyDown.flags = .maskCommand
+            keyUp.flags = .maskCommand
+
+            keyDown.post(tap: .cghidEventTap)
+            keyUp.post(tap: .cghidEventTap)
+        }
+
+        /// Show a standalone NSAlert for accessibility permission — works even when the panel isn't visible
+        /// (e.g., paste-as-plain-text, paste-from-stack, quick-paste hotkeys)
+        private func showAccessibilityAlert() {
+            let alert = NSAlert()
+            alert.messageText = "Accessibility Permission Required"
+            alert.informativeText = "SaneClip needs Accessibility permission to paste into other apps.\n\nGo to System Settings > Privacy & Security > Accessibility and enable SaneClip."
+            alert.addButton(withTitle: "Open System Settings")
+            alert.addButton(withTitle: "Cancel")
+            alert.alertStyle = .warning
+
+            if alert.runModal() == .alertFirstButtonReturn {
+                if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+        }
+    #endif
 
     func delete(item: ClipboardItem) {
         history.removeAll { $0.id == item.id }

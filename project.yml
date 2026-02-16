@@ -139,8 +139,8 @@ targets:
       base:
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.0"
-        CURRENT_PROJECT_VERSION: "7"
+        MARKETING_VERSION: "2.1"
+        CURRENT_PROJECT_VERSION: "8"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -188,7 +188,11 @@ targets:
             /usr/libexec/PlistBuddy -c "Delete :SUPublicEDKey" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             /usr/libexec/PlistBuddy -c "Delete :SUEnableAutomaticChecks" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             /usr/libexec/PlistBuddy -c "Delete :SUEnableSystemProfiling" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
-            echo "App Store build: Sparkle fully removed"
+            # Strip NSServices (not applicable in sandbox)
+            /usr/libexec/PlistBuddy -c "Delete :NSServices" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+            # Strip Apple Events usage description (no longer needed without paste simulation)
+            /usr/libexec/PlistBuddy -c "Delete :NSAppleEventsUsageDescription" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+            echo "App Store build: Sparkle, NSServices, and Apple Events keys removed"
           fi
         name: Strip Sparkle for App Store
         basedOnDependencyAnalysis: false
@@ -234,8 +238,8 @@ targets:
       base:
         PRODUCT_NAME: SaneClipWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
-        MARKETING_VERSION: "2.0"
-        CURRENT_PROJECT_VERSION: "7"
+        MARKETING_VERSION: "2.1"
+        CURRENT_PROJECT_VERSION: "8"
         SWIFT_VERSION: 6.0
         CODE_SIGN_STYLE: Manual
         SKIP_INSTALL: YES
@@ -308,7 +312,7 @@ targets:
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
         MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "2"
+        CURRENT_PROJECT_VERSION: "3"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -354,7 +358,7 @@ targets:
         PRODUCT_NAME: SaneClipIOSWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ioswidgets
         MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "1"
+        CURRENT_PROJECT_VERSION: "3"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"
@@ -404,7 +408,7 @@ targets:
         PRODUCT_NAME: SaneClipIOSShare
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.share
         MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "1"
+        CURRENT_PROJECT_VERSION: "3"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"

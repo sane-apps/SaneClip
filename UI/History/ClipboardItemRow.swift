@@ -155,10 +155,20 @@ struct ClipboardItemRow: View {
                             .foregroundStyle(accentColor)
                             .frame(width: 14)
 
-                        Text(item.preview)
-                            .lineLimit(3)
-                            .font(itemFont)
-                            .foregroundStyle(.primary)
+                        switch item.content {
+                        case .text:
+                            Text(item.preview)
+                                .lineLimit(3)
+                                .font(itemFont)
+                                .foregroundStyle(.primary)
+                        case let .image(nsImage):
+                            Image(nsImage: nsImage)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(maxHeight: 80)
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
+                        }
                     }
 
                     // Metadata line - fixed columns for alignment
@@ -243,8 +253,10 @@ struct ClipboardItemRow: View {
         .scaleEffect(isHovering ? 1.01 : 1.0)
         .animation(.easeOut(duration: 0.15), value: isHovering)
         .contextMenu {
+            // Primary actions
             Button("Paste") { clipboardManager.paste(item: item) }
             Button("Paste as Plain Text") { clipboardManager.pasteAsPlainText(item: item) }
+            Button("Copy") { clipboardManager.copyWithoutPaste(item: item) }
 
             // Text transform options (only for text content)
             if case .text = item.content {
@@ -259,21 +271,12 @@ struct ClipboardItemRow: View {
 
             Divider()
 
-            // Copy without paste
-            Button("Copy") {
-                clipboardManager.copyWithoutPaste(item: item)
+            // Organize
+            Button(isPinned ? "Unpin" : "Pin") {
+                clipboardManager.togglePin(item: item)
             }
-
-            // Share menu
-            Button("Share...") {
-                shareItem()
-            }
-
-            // Save as PDF (text only)
-            if case .text = item.content {
-                Button("Save as PDF...") {
-                    clipboardManager.exportItemAsPDF(item: item)
-                }
+            Button("Add to Paste Stack") {
+                clipboardManager.addToPasteStack(item)
             }
 
             // Open Link (for URLs only)
@@ -293,14 +296,18 @@ struct ClipboardItemRow: View {
             }
 
             Divider()
-            Button("Add to Paste Stack") {
-                clipboardManager.addToPasteStack(item)
+
+            // Export & share
+            Button("Share...") { shareItem() }
+            if case .text = item.content {
+                Button("Save as PDF...") {
+                    clipboardManager.exportItemAsPDF(item: item)
+                }
             }
+
             Divider()
-            Button(isPinned ? "Unpin" : "Pin") {
-                clipboardManager.togglePin(item: item)
-            }
-            Divider()
+
+            // Destructive
             Button("Delete", role: .destructive) { clipboardManager.delete(item: item) }
         }
         .sheet(isPresented: $showEditSheet) {

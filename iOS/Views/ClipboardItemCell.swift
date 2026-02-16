@@ -13,7 +13,7 @@ struct ClipboardItemCell: View {
     /// Dark mode: bright/saturated for readability on dark backgrounds.
     /// Light mode: darkened variants for WCAG AA (4.5:1) on light backgrounds.
     private var sourceColor: Color {
-        guard let source = item.sourceAppName?.lowercased() else { return Color.clipBlue }
+        guard let source = item.sourceAppName?.lowercased() else { return Color.teal }
         if colorScheme == .dark {
             switch source {
             case "messages": return Color(hex: 0x5EC2A0) // Sage green
@@ -29,7 +29,7 @@ struct ClipboardItemCell: View {
             case "xcode": return Color(hex: 0x6B7FE8) // Indigo
             case "finder": return Color(hex: 0x4DD4D4) // Cyan
             case "slack": return Color(hex: 0xD464CC) // Fuchsia
-            default: return Color.clipBlue
+            default: return Color.teal
             }
         } else {
             switch source {
@@ -46,7 +46,7 @@ struct ClipboardItemCell: View {
             case "xcode": return Color(hex: 0x4450A8) // Deep indigo
             case "finder": return Color(hex: 0x2A8FA8) // Deep cyan
             case "slack": return Color(hex: 0xA03898) // Deep fuchsia
-            default: return Color.clipBlue
+            default: return Color.teal
             }
         }
     }
@@ -121,7 +121,7 @@ struct ClipboardItemCell: View {
                 // Content type icon
                 Image(systemName: iconName)
                     .font(.callout)
-                    .foregroundStyle(isCopied ? Color.semanticSuccess : accentColor)
+                    .foregroundStyle(accentColor)
                     .frame(width: 18)
                     .padding(.top, 2)
 
@@ -143,7 +143,7 @@ struct ClipboardItemCell: View {
                         } else {
                             Text("[Image]")
                                 .font(itemFont)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.white.opacity(0.9))
                         }
                     }
 

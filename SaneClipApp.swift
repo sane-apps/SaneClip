@@ -82,7 +82,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_: Notification) {
         appLogger.info("SaneClip starting...")
 
-        #if !DEBUG
+        #if !DEBUG && !APP_STORE
             SaneAppMover.moveToApplicationsFolderIfNeeded()
         #endif
 
@@ -120,8 +120,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         )
 
         // Register as macOS Services provider (right-click → Services → "Save to SaneClip")
-        NSApp.servicesProvider = self
-        NSApp.registerServicesMenuSendTypes([.string], returnTypes: [])
+        #if !APP_STORE
+            NSApp.servicesProvider = self
+            NSApp.registerServicesMenuSendTypes([.string], returnTypes: [])
+        #endif
 
         // Create popover
         popover = NSPopover()

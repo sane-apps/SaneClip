@@ -9,7 +9,8 @@ struct SaneClipIOSApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(viewModel)
-                .tint(Color.clipBlue)
+                .tint(.teal)
+                .preferredColorScheme(.dark)
                 .fullScreenCover(isPresented: Binding(
                     get: { !hasCompletedOnboarding },
                     set: { if $0 { hasCompletedOnboarding = false } }

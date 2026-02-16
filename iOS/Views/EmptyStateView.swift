@@ -5,7 +5,7 @@ struct EmptyStateView: View {
     let icon: String
     let title: String
     let message: String
-    var accentColor: Color = .clipBlue
+    var accentColor: Color = .teal
 
     var body: some View {
         VStack(spacing: 16) {
@@ -19,7 +19,7 @@ struct EmptyStateView: View {
 
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.white.opacity(0.9))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
         }

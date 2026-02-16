@@ -35,6 +35,8 @@
 	<string>public.app-category.productivity</string>
 	<key>LSUIElement</key>
 	<true/>
+	<key>NSAccessibilityUsageDescription</key>
+	<string>SaneClip uses Accessibility to paste clipboard items directly into applications.</string>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>SaneClip needs to paste clipboard content to other applications.</string>
 	<key>NSServices</key>

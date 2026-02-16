@@ -20,6 +20,10 @@ class ClipboardManager {
     var pasteStack: [ClipboardItem] = []
     var isPasteStackMode: Bool { !pasteStack.isEmpty }
     private var lastChangeCount: Int = 0
+    /// Suppresses clipboard monitoring after we write to the pasteboard ourselves
+    /// (e.g. paste-as-uppercase, smart paste, snippets) to prevent feedback loops
+    /// where our own write gets captured as a new history entry.
+    private var isSelfWrite = false
     private var lastClipboardContent: String?
     private var lastCopyTime: Date?
     private var timer: Timer?
@@ -62,6 +66,12 @@ class ClipboardManager {
         let pasteboard = NSPasteboard.general
         guard pasteboard.changeCount != lastChangeCount else { return }
         lastChangeCount = pasteboard.changeCount
+
+        // Skip if we just wrote to the pasteboard ourselves (paste-as-transform, snippets, etc.)
+        if isSelfWrite {
+            isSelfWrite = false
+            return
+        }
 
         // Security checks
         guard !containsTransientTypes(pasteboard) else { return }
@@ -198,6 +208,7 @@ class ClipboardManager {
     }
 
     func paste(item: ClipboardItem) {
+        isSelfWrite = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
 
@@ -232,6 +243,7 @@ class ClipboardManager {
     func pasteAsPlainText(item: ClipboardItem) {
         guard case let .text(string) = item.content else { return }
 
+        isSelfWrite = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(string, forType: .string)
@@ -257,6 +269,7 @@ class ClipboardManager {
             pasteAsPlainText(item: item)
         } else if item.isURL, case let .text(urlString) = item.content {
             let cleaned = ClipboardItem.stripTrackingParams(from: urlString)
+            isSelfWrite = true
             let pasteboard = NSPasteboard.general
             pasteboard.clearContents()
             pasteboard.setString(cleaned, forType: .string)
@@ -292,6 +305,7 @@ class ClipboardManager {
         guard case let .text(string) = item.content else { return }
 
         let transformed = transform.apply(to: string)
+        isSelfWrite = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(transformed, forType: .string)
@@ -312,6 +326,7 @@ class ClipboardManager {
     func pasteSnippet(_ snippet: Snippet, values: [String: String] = [:]) {
         let expanded = SnippetManager.shared.expand(snippet: snippet, values: values)
 
+        isSelfWrite = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(expanded, forType: .string)
@@ -491,6 +506,7 @@ class ClipboardManager {
 
     /// Copy item to clipboard without triggering paste (Cmd+V)
     func copyWithoutPaste(item: ClipboardItem) {
+        isSelfWrite = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
 

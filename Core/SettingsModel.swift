@@ -1,6 +1,24 @@
 import Combine
 import SwiftUI
 
+/// Sound to play when pasting from clipboard history
+enum PasteSound: String, CaseIterable {
+    case off = "Off"
+    case tink = "Tink"
+    case pop = "Pop"
+    case glass = "Glass"
+
+    /// Play the configured sound (no-op for .off)
+    func play() {
+        switch self {
+        case .off: break
+        case .tink: NSSound(named: .init("Tink"))?.play()
+        case .pop: NSSound(named: .init("Pop"))?.play()
+        case .glass: NSSound(named: .init("Glass"))?.play()
+        }
+    }
+}
+
 /// Default paste mode when pasting from history
 enum PasteMode: String, CaseIterable {
     case standard = "Standard"
@@ -52,11 +70,14 @@ class SettingsModel {
         }
     }
 
-    var playSounds: Bool {
+    var pasteSound: PasteSound {
         didSet {
-            UserDefaults.standard.set(playSounds, forKey: "playSounds")
+            UserDefaults.standard.set(pasteSound.rawValue, forKey: "pasteSound")
         }
     }
+
+    /// Backward-compatible computed property
+    var playSounds: Bool { pasteSound != .off }
 
     /// Paste stack order: false = FIFO (oldest first), true = LIFO (newest first)
     var pasteStackReversed: Bool {
@@ -116,7 +137,15 @@ class SettingsModel {
         protectPasswords = UserDefaults.standard.object(forKey: "protectPasswords") as? Bool ?? true
         requireTouchID = UserDefaults.standard.object(forKey: "requireTouchID") as? Bool ?? false
         excludedApps = UserDefaults.standard.object(forKey: "excludedApps") as? [String] ?? []
-        playSounds = UserDefaults.standard.object(forKey: "playSounds") as? Bool ?? false
+        // Migrate from old playSounds bool → new pasteSound enum
+        if let raw = UserDefaults.standard.string(forKey: "pasteSound"),
+           let sound = PasteSound(rawValue: raw) {
+            pasteSound = sound
+        } else if let oldBool = UserDefaults.standard.object(forKey: "playSounds") as? Bool {
+            pasteSound = oldBool ? .pop : .off
+        } else {
+            pasteSound = .off
+        }
         menuBarIcon = UserDefaults.standard.object(forKey: "menuBarIcon") as? String ?? "list.clipboard.fill"
         autoExpireHours = UserDefaults.standard.object(forKey: "autoExpireHours") as? Int ?? 0
         encryptHistory = UserDefaults.standard.object(forKey: "encryptHistory") as? Bool ?? true
@@ -154,7 +183,7 @@ class SettingsModel {
             "protectPasswords": protectPasswords,
             "requireTouchID": requireTouchID,
             "excludedApps": excludedApps,
-            "playSounds": playSounds,
+            "pasteSound": pasteSound.rawValue,
             "menuBarIcon": menuBarIcon,
             "autoExpireHours": autoExpireHours,
             "encryptHistory": encryptHistory,
@@ -198,8 +227,11 @@ class SettingsModel {
         if let value = settings["excludedApps"] as? [String] {
             excludedApps = value
         }
-        if let value = settings["playSounds"] as? Bool {
-            playSounds = value
+        if let value = settings["pasteSound"] as? String,
+           let sound = PasteSound(rawValue: value) {
+            pasteSound = sound
+        } else if let value = settings["playSounds"] as? Bool {
+            pasteSound = value ? .pop : .off
         }
         if let value = settings["menuBarIcon"] as? String {
             menuBarIcon = value

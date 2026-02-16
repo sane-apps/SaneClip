@@ -1,6 +1,6 @@
 # Session Handoff - 2026-02-14
 
-## Current State: v2.0 Released (DMG) — CX Fixes Ready (commit pending user approval)
+## Current State: v2.1 (code) — v2.0 Released (DMG) — App Store REJECTED — Docs Fixed (Feb 16)
 
 ### What Was Done This Session (Feb 14)
 
@@ -48,9 +48,17 @@
 2. **Shared SaneUI infrastructure** — Create SaneDiagnosticsCollector protocol, SaneFeedbackView, SanePermissionRow in SaneUI package
 3. **Roll out to all apps** — SaneClick, SaneHosts, SaneSync, SaneVideo, SaneSales all need: DiagnosticsService, FeedbackView, runtime permission detection, onboarding enforcement
 
-### App Store Rejections (Lower Priority)
+### App Store Status: REJECTED — Resubmission Required
 
-Check App Store Connect status for both macOS and iOS submissions. Fix rejection issues and resubmit.
+Both macOS and iOS submissions were rejected. Specific rejection reason not documented in App Store Connect notes (check ASC directly). Likely causes identified by docs audit:
+1. **Guideline 2.1 — App Completeness**: Paste silently fails in sandbox without feedback
+2. **Guideline 2.3 — Accurate Metadata**: Feature claims that don't work in sandboxed build
+3. **Guideline 5.1.1 — Data Collection**: Privacy policy inconsistencies
+4. **Guideline 4.0 — Design**: Silent failure without user feedback
+
+**Code fixes verified (Feb 16):** `#if APP_STORE` guards with `showCopiedNotification()`, `AXIsProcessTrusted()` guard in `simulatePaste()`, onboarding permission enforcement, FeedbackView wired to Settings. All code-level CX fixes are in place.
+
+**Documentation fixes applied (Feb 16):** Privacy policy corrected (JSON not SQLite, Cloudflare analytics disclosed, storage paths documented for both sandboxed/unsandboxed), website version updated to v2.1, support page macOS requirement corrected to 15.0, README false App Store claim removed, DMG vs App Store feature comparison added, encryption exemption documented.
 
 ### Commits This Session
 
@@ -76,8 +84,8 @@ Check App Store Connect status for both macOS and iOS submissions. Fix rejection
 
 | Platform | Version | Build | State | Release |
 |----------|---------|-------|-------|---------|
-| **macOS** | 1.0 | 6 | WAITING_FOR_REVIEW | AFTER_APPROVAL |
-| **iOS** | 1.0 | 2 | WAITING_FOR_REVIEW | MANUAL |
+| **macOS** | 1.0 | 6 | **REJECTED** | AFTER_APPROVAL |
+| **iOS** | 1.0 | 2 | **REJECTED** | MANUAL |
 
 - **App ID**: `6758898132`
 - **Bundle ID**: `com.saneclip.app` (Universal Purchase)
@@ -99,7 +107,7 @@ Check App Store Connect status for both macOS and iOS submissions. Fix rejection
 | Smart paste code | ✅ Compiled | PasteMode enum, settings, logic all present |
 | Paste stack code | ✅ Compiled | pasteStackReversed setting implemented |
 | CKSyncEngine | ⚠️ Untestable | App Store build only (`-D ENABLE_SYNC`) |
-| iOS app | ⚠️ In review | Submitted, awaiting Apple review |
+| iOS app | ❌ Rejected | Needs resubmission after doc/code fixes |
 
 ---
 
@@ -135,8 +143,8 @@ Check App Store Connect status for both macOS and iOS submissions. Fix rejection
 
 | Target | Marketing | Build | Notes |
 |--------|-----------|-------|-------|
-| SaneClip (macOS) | 2.0 | 7 | DMG released, App Store 1.0/6 in review |
-| SaneClipWidgets (macOS) | 2.0 | 7 | Matches macOS app |
+| SaneClip (macOS) | 2.1 | 21 | DMG v2.0 released, v2.1 pending release. App Store 1.0/6 REJECTED |
+| SaneClipWidgets (macOS) | 2.1 | 21 | Matches macOS app |
 | SaneClipIOS | 1.0 | 2 | In App Store review |
 | SaneClipIOSWidgets | 1.0 | 1 | Matches iOS app |
 | SaneClipIOSShare | 1.0 | 1 | Matches iOS app |

@@ -48,7 +48,7 @@ class ClipboardManager {
     }
 
     private func startMonitoring() {
-        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 self?.checkClipboard()
             }
@@ -218,22 +218,8 @@ class ClipboardManager {
             saveHistory()
         }
 
-        // Play a subtle sound (if enabled)
-        if SettingsModel.shared.playSounds {
-            NSSound(named: .init("Pop"))?.play()
-        }
-
-        // Paste or copy-only depending on build
-        #if APP_STORE
-            // App Store: just copy to clipboard, user pastes manually
-            showCopiedNotification()
-        #else
-            // Direct distribution: simulate Cmd+V
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(200))
-                self.simulatePaste()
-            }
-        #endif
+        SettingsModel.shared.pasteSound.play()
+        dismissAndPaste()
     }
 
     /// Paste most recent item as plain text (for global shortcut)
@@ -258,18 +244,8 @@ class ClipboardManager {
             saveHistory()
         }
 
-        if SettingsModel.shared.playSounds {
-            NSSound(named: .init("Pop"))?.play()
-        }
-
-        #if APP_STORE
-            showCopiedNotification()
-        #else
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(200))
-                self.simulatePaste()
-            }
-        #endif
+        SettingsModel.shared.pasteSound.play()
+        dismissAndPaste()
     }
 
     /// Smart paste: auto-selects paste behavior based on content type
@@ -292,18 +268,8 @@ class ClipboardManager {
                 saveHistory()
             }
 
-            if SettingsModel.shared.playSounds {
-                NSSound(named: .init("Pop"))?.play()
-            }
-
-            #if APP_STORE
-                showCopiedNotification()
-            #else
-                Task { @MainActor in
-                    try? await Task.sleep(for: .milliseconds(200))
-                    self.simulatePaste()
-                }
-            #endif
+            SettingsModel.shared.pasteSound.play()
+            dismissAndPaste()
         } else {
             paste(item: item)
         }
@@ -338,18 +304,8 @@ class ClipboardManager {
             saveHistory()
         }
 
-        if SettingsModel.shared.playSounds {
-            NSSound(named: .init("Pop"))?.play()
-        }
-
-        #if APP_STORE
-            showCopiedNotification()
-        #else
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(200))
-                self.simulatePaste()
-            }
-        #endif
+        SettingsModel.shared.pasteSound.play()
+        dismissAndPaste()
     }
 
     /// Paste an expanded snippet to the active application
@@ -362,18 +318,8 @@ class ClipboardManager {
 
         SnippetManager.shared.incrementUseCount(for: snippet)
 
-        if SettingsModel.shared.playSounds {
-            NSSound(named: .init("Pop"))?.play()
-        }
-
-        #if APP_STORE
-            showCopiedNotification()
-        #else
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(200))
-                self.simulatePaste()
-            }
-        #endif
+        SettingsModel.shared.pasteSound.play()
+        dismissAndPaste()
     }
 
     // MARK: - Paste Stack
@@ -381,9 +327,7 @@ class ClipboardManager {
     /// Add an item to the paste stack (FIFO queue)
     func addToPasteStack(_ item: ClipboardItem) {
         pasteStack.append(item)
-        if SettingsModel.shared.playSounds {
-            NSSound(named: .init("Pop"))?.play()
-        }
+        SettingsModel.shared.pasteSound.play()
     }
 
     /// Paste the next item from the stack (FIFO or LIFO based on settings)
@@ -400,6 +344,19 @@ class ClipboardManager {
     /// Clear all items from the paste stack
     func clearPasteStack() {
         pasteStack.removeAll()
+    }
+
+    /// Dismiss the popover (so Cmd+V targets the correct app) then simulate paste.
+    private func dismissAndPaste() {
+        NotificationCenter.default.post(name: .dismissForPaste, object: nil)
+        #if APP_STORE
+            showCopiedNotification()
+        #else
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(200))
+                self.simulatePaste()
+            }
+        #endif
     }
 
     #if APP_STORE
@@ -546,9 +503,7 @@ class ClipboardManager {
             }
         }
 
-        if SettingsModel.shared.playSounds {
-            NSSound(named: .init("Pop"))?.play()
-        }
+        SettingsModel.shared.pasteSound.play()
 
         logger.debug("Copied item to clipboard (no paste)")
     }

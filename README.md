@@ -56,9 +56,9 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ---
 
-## 🆕 What's New in v2.0
+## 🆕 What's New in v2.1
 
-**Security Hardening + App Store Release (Feb 2026)**
+**Security Hardening + iOS Companion App (Feb 2026)**
 
 - ✅ **History Encryption-at-Rest** — AES-256-GCM encryption enabled by default
 - ✅ **Keychain Integration** — All secrets stored securely in macOS Keychain
@@ -66,9 +66,8 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 - ✅ **HTTPS Enforcement** — Webhooks must use HTTPS
 - ✅ **Seamless Migration** — Existing plaintext data auto-migrates to encrypted format
 - ✅ **Paste Stack Order** — FIFO/LIFO modes for paste stack
-- 🏪 **Now on the Mac App Store** — [Get SaneClip on the App Store](https://apps.apple.com/app/saneclip/id6758898132)
-
-[Full Changelog](CHANGELOG.md)
+- ✅ **iOS Companion App** — Free iPhone/iPad app with iCloud sync (coming to the App Store)
+- ✅ **macOS & iOS Widgets** — Recent and Pinned clips on your desktop and Home Screen
 
 ---
 
@@ -269,7 +268,6 @@ Before opening a PR:
 |----------|---------|
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
 | [DEVELOPMENT.md](DEVELOPMENT.md) | Development setup and guidelines |
-| [CHANGELOG.md](CHANGELOG.md) | Version history |
 | [SECURITY.md](SECURITY.md) | Security policy |
 | [PRIVACY.md](PRIVACY.md) | Privacy practices |
 
@@ -313,6 +311,29 @@ Before opening a PR:
 - 💡 [Request a Feature](https://github.com/sane-apps/SaneClip/issues/new?template=feature_request.md)
 
 **Cloning without starring?** For real bro? Gimme that star!
+
+---
+
+## 📦 Distribution Versions
+
+SaneClip is available in two versions with different capabilities:
+
+| Feature | DMG (Direct Download) | Mac App Store |
+|---------|:--------------------:|:-------------:|
+| Clipboard History & Search | ✅ | ✅ |
+| AES-256-GCM Encryption | ✅ | ✅ |
+| Touch ID Protection | ✅ | ✅ |
+| Sensitive Data Detection | ✅ | ✅ |
+| Snippets & Text Transforms | ✅ | ✅ |
+| Keyboard Shortcuts | ✅ | ✅ |
+| Siri Shortcuts & Widgets | ✅ | ✅ |
+| **Auto-Paste into apps** | ✅ One-click paste | ❌ Copies to clipboard; press Cmd+V to paste |
+| **Automatic Updates** | ✅ Built-in auto-updater | ✅ Via App Store |
+| **iCloud Sync** | ❌ | ✅ |
+
+> **Why the difference?** The Mac App Store version runs in Apple's sandbox, which blocks simulated keyboard events (used for auto-paste). Instead, the App Store version copies items to your clipboard and shows a notification — just press Cmd+V to paste. All other features work identically.
+
+**DMG:** [$6.99 one-time at saneclip.com](https://saneclip.com) — includes Sparkle auto-updates.
 
 ---
 

@@ -144,10 +144,31 @@ struct GeneralSettingsView: View {
                         .frame(width: 140)
                     }
                     CompactDivider()
-                    CompactToggle(label: "Play sound when copying", isOn: Binding(
-                        get: { settings.playSounds },
-                        set: { settings.playSounds = $0 }
-                    ))
+                    CompactRow("Paste sound") {
+                        HStack(spacing: 8) {
+                            Picker("", selection: Binding(
+                                get: { settings.pasteSound },
+                                set: { settings.pasteSound = $0 }
+                            )) {
+                                ForEach(PasteSound.allCases, id: \.self) { sound in
+                                    Text(sound.rawValue).tag(sound)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .frame(width: 80)
+
+                            Button {
+                                settings.pasteSound.play()
+                            } label: {
+                                Image(systemName: "speaker.wave.2")
+                                    .font(.caption)
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                            .disabled(settings.pasteSound == .off)
+                            .help("Preview sound")
+                        }
+                    }
                     CompactDivider()
                     CompactToggle(label: "Paste stack: newest first", isOn: Binding(
                         get: { settings.pasteStackReversed },

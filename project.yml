@@ -115,9 +115,14 @@ targets:
       path: SaneClip/Info.plist
       properties:
         LSUIElement: true
+        # Encryption exemption: AES-256-GCM is used solely for local data protection
+        # (encrypting clipboard history at rest on the user's device). No encryption is used
+        # for communication or transmission. This qualifies under EAR Category 5 Part 2
+        # exemption (encryption for data-at-rest/local storage only).
         ITSAppUsesNonExemptEncryption: false
         LSApplicationCategoryType: "public.app-category.productivity"
         NSAppleEventsUsageDescription: "SaneClip needs to paste clipboard content to other applications."
+        NSAccessibilityUsageDescription: "SaneClip uses Accessibility to paste clipboard items directly into applications."
         # URL Scheme (Phase 3)
         CFBundleURLTypes:
           - CFBundleURLName: "SaneClip URL Scheme"

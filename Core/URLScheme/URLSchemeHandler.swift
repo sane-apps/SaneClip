@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import LocalAuthentication
 
 /// Notification names for URL scheme actions
 extension Notification.Name {
@@ -7,6 +8,7 @@ extension Notification.Name {
     static let triggerExport = Notification.Name("SaneClipTriggerExport")
     static let showHistory = Notification.Name("SaneClipShowHistory")
     static let pasteAtIndex = Notification.Name("SaneClipPasteAtIndex")
+    static let dismissForPaste = Notification.Name("SaneClipDismissForPaste")
 }
 
 /// Parsed URL scheme command for testability
@@ -122,6 +124,14 @@ final class URLSchemeHandler {
             return false
         }
 
+        // Destructive commands require Touch ID if enabled
+        if command.requiresConfirmation, SettingsModel.shared.requireTouchID {
+            guard authenticateSync() else {
+                print("URLSchemeHandler: Touch ID authentication failed")
+                return false
+            }
+        }
+
         switch command {
         case let .paste(index):
             return handlePaste(index: index)
@@ -138,6 +148,35 @@ final class URLSchemeHandler {
         case let .copy(text):
             return handleCopy(text: text)
         }
+    }
+
+    // MARK: - Biometric Authentication
+
+    /// Synchronous biometric authentication for URL scheme commands.
+    /// Uses a semaphore to block until Touch ID completes since URL scheme
+    /// handlers need a synchronous return value.
+    private func authenticateSync() -> Bool {
+        let context = LAContext()
+        var error: NSError?
+
+        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+            // No biometrics available — allow access (same as popover behavior)
+            return true
+        }
+
+        let semaphore = DispatchSemaphore(value: 0)
+        var success = false
+
+        context.evaluatePolicy(
+            .deviceOwnerAuthenticationWithBiometrics,
+            localizedReason: "Authenticate to allow external clipboard access"
+        ) { result, _ in
+            success = result
+            semaphore.signal()
+        }
+
+        semaphore.wait()
+        return success
     }
 
     // MARK: - Command Handlers
@@ -227,9 +266,7 @@ final class URLSchemeHandler {
 
         #if APP_STORE
             // App Store: just copy to clipboard, user pastes manually
-            if SettingsModel.shared.playSounds {
-                NSSound(named: .init("Pop"))?.play()
-            }
+            SettingsModel.shared.pasteSound.play()
         #else
             // Check accessibility before attempting paste
             guard AXIsProcessTrusted() else {
@@ -276,9 +313,7 @@ final class URLSchemeHandler {
         pasteboard.clearContents()
         pasteboard.setString(text, forType: .string)
 
-        if SettingsModel.shared.playSounds {
-            NSSound(named: .init("Pop"))?.play()
-        }
+        SettingsModel.shared.pasteSound.play()
 
         return true
     }

@@ -203,7 +203,7 @@ final class DiagnosticsService: @unchecked Sendable {
             settings:
               maxHistorySize: \(settings.maxHistorySize)
               defaultPasteMode: \(settings.defaultPasteMode.rawValue)
-              playSounds: \(settings.playSounds)
+              pasteSound: \(settings.pasteSound.rawValue)
               protectPasswords: \(settings.protectPasswords)
               encryptHistory: \(settings.encryptHistory)
               autoExpireHours: \(settings.autoExpireHours)

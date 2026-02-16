@@ -55,9 +55,14 @@ appstore:
   configuration: Release-AppStore
   platforms: [macos, ios]
   ios_scheme: SaneClipIOS
+  category: public.app-category.productivity
+  age_rating: "4+"
+  privacy_policy_url: "https://saneclip.com/privacy"
+  support_url: "https://saneclip.com/support"
+  review_notes: "SaneClip uses Accessibility permission to paste clipboard items directly into the frontmost application. Without this permission, the app still functions as a clipboard viewer/copier but cannot perform paste actions. To test: grant Accessibility in System Settings > Privacy & Security > Accessibility, then use the global hotkey (Cmd+Shift+V) to open history and click any item to paste it."
   screenshots:
-    macos: Screenshots/*-mac.png
-    ios: Screenshots/*-6.7.png
+    macos: docs/images/screenshot-[!i]*.png
+    ios: docs/images/screenshot-ios-*.png
   contact:
     name: "Stephan Joseph"
     phone: "+17277589785"

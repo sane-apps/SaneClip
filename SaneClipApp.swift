@@ -119,6 +119,14 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             object: nil
         )
 
+        // Dismiss popover when paste is about to simulate Cmd+V
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleDismissForPaste),
+            name: .dismissForPaste,
+            object: nil
+        )
+
         // Register as macOS Services provider (right-click → Services → "Save to SaneClip")
         #if !APP_STORE
             NSApp.servicesProvider = self
@@ -431,7 +439,24 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func pasteFromMenu(_ sender: NSMenuItem) {
         let index = sender.tag
-        clipboardManager.pasteItemAt(index: index)
+        guard index < clipboardManager.history.count else { return }
+
+        if SettingsModel.shared.requireTouchID {
+            if let lastAuth = lastAuthenticationTime,
+               Date().timeIntervalSince(lastAuth) < authGracePeriod {
+                clipboardManager.pasteItemAt(index: index)
+            } else {
+                authenticateWithBiometrics { [weak self] success in
+                    guard success else { return }
+                    Task { @MainActor in
+                        self?.lastAuthenticationTime = Date()
+                        self?.clipboardManager.pasteItemAt(index: index)
+                    }
+                }
+            }
+        } else {
+            clipboardManager.pasteItemAt(index: index)
+        }
     }
 
     @objc private func pasteSnippetFromMenu(_ sender: NSMenuItem) {
@@ -440,10 +465,19 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         guard index < snippets.count else { return }
         let snippet = snippets[index]
 
-        // If snippet has user placeholders, just copy the template
-        // (full placeholder UI would require a sheet - keep it simple for context menu)
-        if SnippetManager.shared.hasUserPlaceholders(snippet: snippet) {
-            clipboardManager.pasteSnippet(snippet)
+        if SettingsModel.shared.requireTouchID {
+            if let lastAuth = lastAuthenticationTime,
+               Date().timeIntervalSince(lastAuth) < authGracePeriod {
+                clipboardManager.pasteSnippet(snippet)
+            } else {
+                authenticateWithBiometrics { [weak self] success in
+                    guard success else { return }
+                    Task { @MainActor in
+                        self?.lastAuthenticationTime = Date()
+                        self?.clipboardManager.pasteSnippet(snippet)
+                    }
+                }
+            }
         } else {
             clipboardManager.pasteSnippet(snippet)
         }
@@ -453,6 +487,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         guard let iconName = notification.object as? String,
               let button = statusItem.button else { return }
         button.image = NSImage(systemSymbolName: iconName, accessibilityDescription: "SaneClip")
+    }
+
+    @objc private func handleDismissForPaste() {
+        if popover.isShown {
+            popover.performClose(nil)
+        }
     }
 
     // MARK: - URL Scheme Handling
@@ -537,8 +577,6 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         )
         clipboardManager.addItemFromService(item)
 
-        if SettingsModel.shared.playSounds {
-            NSSound(named: .init("Pop"))?.play()
-        }
+        SettingsModel.shared.pasteSound.play()
     }
 }

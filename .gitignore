@@ -191,3 +191,5 @@ MinimalTest/
 *.bak
 project.yml.bak
 scripts/*.swift
+fastlane/
+training_data/

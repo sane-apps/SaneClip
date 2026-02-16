@@ -7,6 +7,31 @@
     <language>en</language>
 
     <item>
+      <title>Version 2.1</title>
+      <link>https://saneclip.com</link>
+      <sparkle:version>21</sparkle:version>
+      <sparkle:shortVersionString>2.1</sparkle:shortVersionString>
+      <description><![CDATA[
+        <h2>SaneClip 2.1</h2>
+        <h3>Improvements</h3>
+        <ul>
+          <li><strong>Image Thumbnails</strong> - Clipboard history now shows visual previews for copied images</li>
+          <li><strong>Image-First Capture</strong> - Copying wallpapers and images now captures the image data instead of file paths</li>
+          <li><strong>Reorganized Context Menu</strong> - Right-click menu grouped logically: actions, organize, export, delete</li>
+          <li><strong>Onboarding Permission Check</strong> - Accessibility permission verified before completing setup</li>
+          <li><strong>Dark Mode Enforced</strong> - iOS app now always uses dark mode matching the brand</li>
+        </ul>
+      ]]></description>
+      <pubDate>Sat, 15 Feb 2026 19:38:00 -0500</pubDate>
+      <enclosure
+        url="https://dist.saneclip.com/updates/SaneClip-2.1.zip"
+        sparkle:edSignature="j/2WaJXw5/99FV3xW1nUQOHM2eCOsVKO4Iswv10NoZVktSjGbn762qAujNCySHuJFdF5GuXuI1d3kWK+qGHtDw=="
+        length="2610533"
+        type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+    </item>
+
+    <item>
       <title>Version 2.0</title>
       <link>https://saneclip.com</link>
       <sparkle:version>7</sparkle:version>

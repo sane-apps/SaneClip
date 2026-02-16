@@ -23,7 +23,7 @@ class ClipboardManager {
     /// Suppresses clipboard monitoring after we write to the pasteboard ourselves
     /// (e.g. paste-as-uppercase, smart paste, snippets) to prevent feedback loops
     /// where our own write gets captured as a new history entry.
-    private var isSelfWrite = false
+    var isSelfWrite = false
     private var lastClipboardContent: String?
     private var lastCopyTime: Date?
     private var timer: Timer?
@@ -368,7 +368,7 @@ class ClipboardManager {
             showCopiedNotification()
         #else
             Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(200))
+                try? await Task.sleep(for: .milliseconds(300))
                 self.simulatePaste()
             }
         #endif

@@ -1,6 +1,32 @@
-# Session Handoff - 2026-02-14
+# Session Handoff - 2026-02-16
 
 ## Current State: v2.1 (code) — v2.0 Released (DMG) — App Store REJECTED — Docs Fixed (Feb 16)
+
+### What Was Done This Session (Feb 16) — UNCOMMITTED
+
+**Customer bug fixes triggered by Glenn (email #48) and code review:**
+
+1. **Paste-as-transform feedback loop fix** — `isSelfWrite` flag added to `ClipboardManager.swift`. Set `true` before pasteboard write, checked/cleared in `checkClipboard()`. Applied to ALL 5 paste methods: `paste()`, `pasteAsPlainText()`, `pasteSmartMode()`, `pasteWithTransform()`, `pasteSnippet()`. Prevents self-writes from being captured as new history entries. Critic review (21 models) confirmed: `clearContents()` guarantees changeCount increment so flag always self-clears.
+
+2. **Release entitlements — App Group added** — `SaneClip.entitlements` now includes `com.apple.security.application-groups` with `group.com.saneclip.app`. Fixes "Failed to update widget data" error in Release/DMG builds. App Store build already had this.
+
+3. **Debug entitlements — Apple Events added** — `SaneClipDebug.entitlements` now includes `com.apple.security.automation.apple-events`. Required for `simulatePaste()` CGEvent simulation. Note: App Group was NOT added to Debug because it breaks manual code signing provisioning (tried and reverted).
+
+**Build/test status:** Debug build succeeded, 55/55 tests passed on MacBook Air.
+
+**NOT done — changes are local, not committed or released.**
+
+### Glenn's Issues (Email #48) — Status
+
+| Issue | Status | Notes |
+|-------|--------|-------|
+| Paste doesn't work (click sound, no paste) | NOT A CODE BUG | Glenn needs Accessibility permission. CX parity fixes from Feb 14 session should show alert. Verify deployed. |
+| "[Image]" text instead of thumbnail | ALREADY FIXED | Glenn confirmed fixed in v2.1 |
+| Paste as UPPERCASE creates duplicate | FIXED (isSelfWrite) | Uncommitted |
+
+### Glenn's Outstanding Request
+- Glenn asked for "descriptions/notes on clips" feature — told him it's being added
+- Need to follow up once paste-as-transform fix is released
 
 ### What Was Done This Session (Feb 14)
 

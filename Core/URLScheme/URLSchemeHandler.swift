@@ -175,7 +175,12 @@ final class URLSchemeHandler {
             semaphore.signal()
         }
 
-        semaphore.wait()
+        let result = semaphore.wait(timeout: .now() + 10)
+        guard result == .success else {
+            // Timeout — Touch ID prompt didn't complete in 10s, deny access
+            print("URLSchemeHandler: Touch ID authentication timed out")
+            return false
+        }
         return success
     }
 
@@ -259,7 +264,8 @@ final class URLSchemeHandler {
             message: "An external source wants to paste snippet \"\(name)\":\n\n\"\(preview)\""
         ) else { return false }
 
-        // Set to clipboard
+        // Set to clipboard (prevent feedback loop)
+        ClipboardManager.shared?.isSelfWrite = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(expanded, forType: .string)
@@ -309,6 +315,7 @@ final class URLSchemeHandler {
             message: "An external source wants to replace your clipboard with:\n\n\"\(preview)\""
         ) else { return false }
 
+        ClipboardManager.shared?.isSelfWrite = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(text, forType: .string)

@@ -6,19 +6,22 @@ struct ClipboardDetailView: View {
     let item: SharedClipboardItem
     let viewModel: ClipboardHistoryViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var showCopied = false
+
+    private var isIPad: Bool { sizeClass == .regular }
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: isIPad ? 28 : 16) {
                     // Content
                     contentView
 
                     // Metadata
                     metadataSection
                 }
-                .padding()
+                .padding(isIPad ? 40 : 16)
             }
             .navigationTitle(contentTypeLabel)
             .navigationBarTitleDisplayMode(.inline)
@@ -56,32 +59,34 @@ struct ClipboardDetailView: View {
             if item.isURL, let url = URL(string: string.trimmingCharacters(in: .whitespacesAndNewlines)) {
                 Link(destination: url) {
                     Text(string)
-                        .font(.body)
+                        .font(isIPad ? .title2 : .body)
                         .foregroundStyle(.teal)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             } else {
                 Text(string)
-                    .font(item.isCode ? .system(.body, design: .monospaced) : .body)
+                    .font(isIPad
+                        ? (item.isCode ? .system(size: 22, design: .monospaced) : .title2)
+                        : (item.isCode ? .system(.body, design: .monospaced) : .body))
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
+                    .padding(isIPad ? 28 : 16)
                     .background(Color(.secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: isIPad ? 14 : 8))
             }
         case let .imageData(data, width, height):
             if let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: isIPad ? 14 : 8))
                     .overlay(alignment: .bottomTrailing) {
                         Text("\(width)×\(height)")
-                            .font(.caption2)
-                            .padding(4)
+                            .font(isIPad ? .callout : .caption2)
+                            .padding(isIPad ? 8 : 4)
                             .background(.ultraThinMaterial)
                             .clipShape(RoundedRectangle(cornerRadius: 4))
-                            .padding(6)
+                            .padding(isIPad ? 12 : 6)
                     }
             }
         }
@@ -90,7 +95,7 @@ struct ClipboardDetailView: View {
     // MARK: - Metadata
 
     private var metadataSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: isIPad ? 16 : 8) {
             Divider()
 
             if let source = item.sourceAppName {
@@ -118,13 +123,18 @@ struct ClipboardDetailView: View {
     }
 
     private func metadataRow(icon: String, label: String, value: String) -> some View {
-        HStack {
-            Label(label, systemImage: icon)
-                .font(.subheadline)
+        HStack(spacing: isIPad ? 16 : 8) {
+            Image(systemName: icon)
+                .font(.system(size: isIPad ? 18 : 13))
                 .foregroundStyle(.white.opacity(0.9))
-                .frame(width: 120, alignment: .leading)
+                .frame(width: isIPad ? 26 : 18, alignment: .center)
+            Text(label)
+                .font(.system(size: isIPad ? 22 : 15))
+                .foregroundStyle(.white.opacity(0.9))
+                .frame(width: isIPad ? 180 : 100, alignment: .leading)
             Text(value)
-                .font(.subheadline)
+                .font(.system(size: isIPad ? 22 : 15))
+                .foregroundStyle(.white)
             Spacer()
         }
     }

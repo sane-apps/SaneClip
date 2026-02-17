@@ -4,8 +4,11 @@ import SwiftUI
 struct HistoryTab: View {
     @EnvironmentObject var viewModel: ClipboardHistoryViewModel
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var searchText = ""
     @State private var selectedItem: SharedClipboardItem?
+
+    private var isIPad: Bool { sizeClass == .regular }
 
     var body: some View {
         NavigationStack {
@@ -64,20 +67,21 @@ struct HistoryTab: View {
             viewModel.saveCurrentClipboard()
         } label: {
             Image(systemName: "plus.circle.fill")
-                .font(.title3)
+                .font(isIPad ? .title : .title3)
         }
         .accessibilityLabel("Save current clipboard")
     }
 
     private var demoBanner: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: isIPad ? 16 : 8) {
             Image(systemName: "info.circle.fill")
+                .font(isIPad ? .title : .callout)
                 .foregroundStyle(.white)
             Text("Sample data shown. Install SaneClip on your Mac and enable iCloud Sync to see your real clipboard history.")
-                .font(.caption)
+                .font(isIPad ? .title2 : .caption)
                 .foregroundStyle(.white)
         }
-        .padding(12)
+        .padding(isIPad ? 28 : 12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.brandNavy)
     }
@@ -87,17 +91,19 @@ struct HistoryTab: View {
             viewModel.saveCurrentClipboard()
             viewModel.dismissClipboardDetection()
         } label: {
-            HStack(spacing: 8) {
+            HStack(spacing: isIPad ? 16 : 8) {
                 Image(systemName: "doc.on.clipboard.fill")
+                    .font(isIPad ? .title : .callout)
                     .foregroundStyle(.white)
                 Text("New clipboard content — tap to save")
-                    .font(.caption.weight(.medium))
+                    .font(isIPad ? .title2.weight(.medium) : .caption.weight(.medium))
                     .foregroundStyle(.white)
                 Spacer()
                 Image(systemName: "plus.circle.fill")
+                    .font(isIPad ? .title : .callout)
                     .foregroundStyle(.white)
             }
-            .padding(12)
+            .padding(isIPad ? 28 : 12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.brandNavy.opacity(0.9))
         }
@@ -119,7 +125,12 @@ struct HistoryTab: View {
             isPinned: viewModel.isPinned(item),
             isCopied: viewModel.copiedItemID == item.id
         )
-        .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
+        .listRowInsets(EdgeInsets(
+            top: isIPad ? 10 : 4,
+            leading: isIPad ? 64 : 12,
+            bottom: isIPad ? 10 : 4,
+            trailing: isIPad ? 64 : 12
+        ))
         .listRowSeparator(.hidden)
         .contentShape(Rectangle())
         .onTapGesture {
@@ -175,6 +186,7 @@ struct HistoryTab: View {
             Task { await viewModel.refresh() }
         } label: {
             Image(systemName: "arrow.clockwise")
+                .font(isIPad ? .title2 : .body)
         }
         .disabled(viewModel.isLoading)
     }
@@ -199,16 +211,20 @@ struct ToastView: View {
     let icon: String
     let text: String
     let color: Color
+    @Environment(\.horizontalSizeClass) private var sizeClass
+
+    private var isIPad: Bool { sizeClass == .regular }
 
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: isIPad ? 10 : 6) {
             Image(systemName: icon)
+                .font(isIPad ? .title3 : .subheadline)
                 .foregroundStyle(color)
             Text(text)
-                .font(.subheadline.weight(.medium))
+                .font(isIPad ? .title3.weight(.medium) : .subheadline.weight(.medium))
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.horizontal, isIPad ? 24 : 16)
+        .padding(.vertical, isIPad ? 14 : 10)
         .background(.ultraThinMaterial)
         .clipShape(Capsule())
     }

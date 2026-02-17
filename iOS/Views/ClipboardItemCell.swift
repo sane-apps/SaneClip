@@ -6,6 +6,9 @@ struct ClipboardItemCell: View {
     var isPinned: Bool = false
     var isCopied: Bool = false
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.horizontalSizeClass) private var sizeClass
+
+    private var isIPad: Bool { sizeClass == .regular }
 
     // MARK: - Source-Aware Colors
 
@@ -85,7 +88,12 @@ struct ClipboardItemCell: View {
     }
 
     private var itemFont: Font {
-        item.isCode
+        if isIPad {
+            return item.isCode
+                ? .system(size: 24, weight: .semibold, design: .monospaced)
+                : .system(size: 24, weight: .semibold)
+        }
+        return item.isCode
             ? .system(.subheadline, design: .monospaced, weight: .semibold)
             : .system(.subheadline, weight: .semibold)
     }
@@ -95,9 +103,9 @@ struct ClipboardItemCell: View {
         colorScheme == .dark ? Color.textCloud : Color(hex: 0x1A1A1A)
     }
 
-    /// Metadata: readable gray, not washed out
+    /// Metadata: white (never gray — SaneApps rule)
     private var metadataColor: Color {
-        colorScheme == .dark ? Color.textStone : Color(hex: 0x555555)
+        colorScheme == .dark ? Color.white.opacity(0.9) : Color(hex: 0x333333)
     }
 
     // MARK: - Body
@@ -107,39 +115,39 @@ struct ClipboardItemCell: View {
             // Accent bar on left — orange for pinned, source color otherwise
             RoundedRectangle(cornerRadius: 2)
                 .fill(barColor)
-                .frame(width: 3)
+                .frame(width: isIPad ? 6 : 3)
 
-            HStack(alignment: .top, spacing: 10) {
+            HStack(alignment: .top, spacing: isIPad ? 20 : 10) {
                 // Pin indicator
                 if isPinned {
                     Image(systemName: "pin.fill")
-                        .font(.caption2)
+                        .font(isIPad ? .title3 : .caption2)
                         .foregroundStyle(Color.pinnedOrange)
-                        .padding(.top, 2)
+                        .padding(.top, isIPad ? 4 : 2)
                 }
 
                 // Content type icon
                 Image(systemName: iconName)
-                    .font(.callout)
+                    .font(isIPad ? .title : .callout)
                     .foregroundStyle(accentColor)
-                    .frame(width: 18)
-                    .padding(.top, 2)
+                    .frame(width: isIPad ? 32 : 18)
+                    .padding(.top, isIPad ? 4 : 2)
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: isIPad ? 12 : 4) {
                     // Preview text or image thumbnail
                     switch item.content {
                     case .text:
                         Text(item.preview)
                             .font(itemFont)
-                            .lineLimit(2)
+                            .lineLimit(isIPad ? 3 : 2)
                             .foregroundColor(previewColor)
                     case let .imageData(data, _, _):
                         if let uiImage = UIImage(data: data) {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(maxHeight: 60)
-                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .frame(maxHeight: isIPad ? 200 : 60)
+                                .clipShape(RoundedRectangle(cornerRadius: isIPad ? 8 : 4))
                         } else {
                             Text("[Image]")
                                 .font(itemFont)
@@ -148,26 +156,26 @@ struct ClipboardItemCell: View {
                     }
 
                     // Metadata row
-                    HStack(spacing: 6) {
+                    HStack(spacing: isIPad ? 10 : 6) {
                         Text(item.relativeTime)
-                            .font(.caption)
+                            .font(isIPad ? .system(size: 18) : .caption)
                             .foregroundStyle(metadataColor)
 
                         if let source = item.sourceAppName {
                             Text("·")
-                                .font(.caption)
+                                .font(isIPad ? .system(size: 18) : .caption)
                                 .foregroundStyle(metadataColor)
                             Text(source)
-                                .font(.caption)
+                                .font(isIPad ? .system(size: 18) : .caption)
                                 .foregroundColor(accentColor)
                         }
 
                         if !item.deviceName.isEmpty {
                             Text("·")
-                                .font(.caption)
+                                .font(isIPad ? .system(size: 18) : .caption)
                                 .foregroundStyle(metadataColor)
                             Text(item.deviceName)
-                                .font(.caption)
+                                .font(isIPad ? .system(size: 18) : .caption)
                                 .foregroundStyle(metadataColor)
                         }
                     }
@@ -177,17 +185,17 @@ struct ClipboardItemCell: View {
 
                 // Chevron hint for detail view
                 Image(systemName: "chevron.right")
-                    .font(.caption)
+                    .font(isIPad ? .title3 : .caption)
                     .foregroundStyle(metadataColor)
-                    .padding(.top, 2)
+                    .padding(.top, isIPad ? 8 : 2)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 10)
+            .padding(.horizontal, isIPad ? 24 : 10)
+            .padding(.vertical, isIPad ? 24 : 10)
         }
         .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .clipShape(RoundedRectangle(cornerRadius: isIPad ? 16 : 8))
         .overlay(
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: isIPad ? 16 : 8)
                 .strokeBorder(
                     isCopied
                         ? accentColor.opacity(0.3)

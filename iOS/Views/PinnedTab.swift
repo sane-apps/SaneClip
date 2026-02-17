@@ -3,8 +3,11 @@ import SwiftUI
 /// Pinned tab showing pinned clipboard items
 struct PinnedTab: View {
     @EnvironmentObject var viewModel: ClipboardHistoryViewModel
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var searchText = ""
     @State private var selectedItem: SharedClipboardItem?
+
+    private var isIPad: Bool { sizeClass == .regular }
 
     var body: some View {
         NavigationStack {
@@ -59,7 +62,12 @@ struct PinnedTab: View {
             isPinned: true,
             isCopied: viewModel.copiedItemID == item.id
         )
-        .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
+        .listRowInsets(EdgeInsets(
+            top: isIPad ? 10 : 4,
+            leading: isIPad ? 64 : 12,
+            bottom: isIPad ? 10 : 4,
+            trailing: isIPad ? 64 : 12
+        ))
         .listRowSeparator(.hidden)
         .contentShape(Rectangle())
         .onTapGesture {
@@ -94,6 +102,7 @@ struct PinnedTab: View {
             Task { await viewModel.refresh() }
         } label: {
             Image(systemName: "arrow.clockwise")
+                .font(isIPad ? .title2 : .body)
         }
         .disabled(viewModel.isLoading)
     }

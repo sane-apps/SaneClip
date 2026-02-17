@@ -20,10 +20,20 @@ class ClipboardManager {
     var pasteStack: [ClipboardItem] = []
     var isPasteStackMode: Bool { !pasteStack.isEmpty }
     private var lastChangeCount: Int = 0
-    /// Suppresses clipboard monitoring after we write to the pasteboard ourselves
-    /// (e.g. paste-as-uppercase, smart paste, snippets) to prevent feedback loops
-    /// where our own write gets captured as a new history entry.
-    var isSelfWrite = false
+    /// Tracks the pasteboard changeCount at which our last self-write completed.
+    /// checkClipboard() skips processing while changeCount hasn't advanced past this value.
+    /// This is more robust than a simple boolean because it handles the dual changeCount
+    /// increment from clearContents()+setString() and survives timing edge cases.
+    private var selfWriteChangeCount: Int = 0
+    /// Backward-compatible accessor for external callers (e.g. URLSchemeHandler).
+    /// Setting to true snapshots a high changeCount; setting to false clears suppression.
+    var isSelfWrite: Bool {
+        get { selfWriteChangeCount > 0 }
+        set { selfWriteChangeCount = newValue ? Int.max : 0 }
+    }
+
+    /// Whether a paste operation is currently in flight (prevents overlapping Cmd+V simulations)
+    private var isPasting = false
     private var lastClipboardContent: String?
     private var lastCopyTime: Date?
     private var timer: Timer?
@@ -71,9 +81,16 @@ class ClipboardManager {
         lastChangeCount = pasteboard.changeCount
 
         // Skip if we just wrote to the pasteboard ourselves (paste-as-transform, snippets, etc.)
-        if isSelfWrite {
-            isSelfWrite = false
-            return
+        // Uses changeCount tracking: suppresses until pasteboard advances past our write.
+        if selfWriteChangeCount > 0 {
+            let swc = selfWriteChangeCount
+            let cc = pasteboard.changeCount
+            if cc <= swc {
+                logger.info("Self-write suppressed: changeCount \(cc) <= selfWrite \(swc)")
+                return
+            }
+            logger.info("Self-write cleared: changeCount \(cc) > selfWrite \(swc)")
+            selfWriteChangeCount = 0
         }
 
         // Security checks
@@ -84,7 +101,6 @@ class ClipboardManager {
         let sourceAppName = frontmostApp?.localizedName
 
         guard !isExcludedApp(bundleID: sourceAppBundleID, name: sourceAppName) else { return }
-
         // Process content
         processClipboardContent(pasteboard, sourceAppBundleID: sourceAppBundleID, sourceAppName: sourceAppName)
     }
@@ -267,7 +283,6 @@ class ClipboardManager {
     }
 
     func paste(item: ClipboardItem) {
-        isSelfWrite = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
 
@@ -279,6 +294,7 @@ class ClipboardManager {
                 pasteboard.setData(tiffData, forType: .tiff)
             }
         }
+        selfWriteChangeCount = pasteboard.changeCount
 
         // Move to front and increment paste count
         if let index = history.firstIndex(where: { $0.id == item.id }) {
@@ -302,10 +318,10 @@ class ClipboardManager {
     func pasteAsPlainText(item: ClipboardItem) {
         guard case let .text(string) = item.content else { return }
 
-        isSelfWrite = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(string, forType: .string)
+        selfWriteChangeCount = pasteboard.changeCount
 
         // Move to front and increment paste count
         if let index = history.firstIndex(where: { $0.id == item.id }) {
@@ -328,10 +344,10 @@ class ClipboardManager {
             pasteAsPlainText(item: item)
         } else if item.isURL, case let .text(urlString) = item.content {
             let cleaned = ClipboardItem.stripTrackingParams(from: urlString)
-            isSelfWrite = true
             let pasteboard = NSPasteboard.general
             pasteboard.clearContents()
             pasteboard.setString(cleaned, forType: .string)
+            selfWriteChangeCount = pasteboard.changeCount
 
             if let index = history.firstIndex(where: { $0.id == item.id }) {
                 var updatedItem = history.remove(at: index)
@@ -364,10 +380,12 @@ class ClipboardManager {
         guard case let .text(string) = item.content else { return }
 
         let transformed = transform.apply(to: string)
-        isSelfWrite = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(transformed, forType: .string)
+        selfWriteChangeCount = pasteboard.changeCount
+        let swcT = selfWriteChangeCount
+        logger.info("pasteWithTransform: \(transform.rawValue), selfWriteChangeCount=\(swcT)")
 
         // Move to front and increment paste count
         if let index = history.firstIndex(where: { $0.id == item.id }) {
@@ -385,10 +403,10 @@ class ClipboardManager {
     func pasteSnippet(_ snippet: Snippet, values: [String: String] = [:]) {
         let expanded = SnippetManager.shared.expand(snippet: snippet, values: values)
 
-        isSelfWrite = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(expanded, forType: .string)
+        selfWriteChangeCount = pasteboard.changeCount
 
         SnippetManager.shared.incrementUseCount(for: snippet)
 
@@ -422,13 +440,20 @@ class ClipboardManager {
 
     /// Dismiss the popover (so Cmd+V targets the correct app) then simulate paste.
     private func dismissAndPaste() {
+        guard !isPasting else {
+            logger.debug("Paste already in flight — skipping duplicate")
+            return
+        }
+        isPasting = true
         NotificationCenter.default.post(name: .dismissForPaste, object: nil)
         #if APP_STORE
             showCopiedNotification()
+            isPasting = false
         #else
             Task { @MainActor in
                 try? await Task.sleep(for: .milliseconds(300))
                 self.simulatePaste()
+                self.isPasting = false
             }
         #endif
     }
@@ -587,7 +612,6 @@ class ClipboardManager {
 
     /// Copy item to clipboard without triggering paste (Cmd+V)
     func copyWithoutPaste(item: ClipboardItem) {
-        isSelfWrite = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
 
@@ -599,6 +623,7 @@ class ClipboardManager {
                 pasteboard.setData(tiffData, forType: .tiff)
             }
         }
+        selfWriteChangeCount = pasteboard.changeCount
 
         SettingsModel.shared.pasteSound.play()
 

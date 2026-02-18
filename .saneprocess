@@ -63,6 +63,7 @@ appstore:
   screenshots:
     macos: docs/images/screenshot-[!i]*.png
     ios: docs/images/screenshot-ios-*.png
+    ipad: docs/images/screenshot-ipad-*.png
   contact:
     name: "Stephan Joseph"
     phone: "+17277589785"

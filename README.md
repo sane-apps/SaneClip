@@ -195,7 +195,7 @@ SaneClip is **privacy-first**:
 - ✅ **100% On-Device** — All processing stays on your Mac
 - ✅ **iCloud Sync Only** — Syncs between your devices via iCloud, no third-party servers
 - ✅ **Zero Analytics** — No tracking, no telemetry, no data collection
-- ✅ **Open Source** — Verify yourself at [github.com/sane-apps/SaneClip](https://github.com/sane-apps/SaneClip)
+- ✅ **100% Transparent Code** — Verify yourself at [github.com/sane-apps/SaneClip](https://github.com/sane-apps/SaneClip)
 - ✅ **PolyForm Shield License** — Community-auditable, source-available
 
 **Sensitive Data Detection:**
@@ -233,7 +233,7 @@ See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) for full details.
 
 ## 🛠️ Development
 
-> **Cloning without starring?** For real? **[⭐ Star it first](https://github.com/sane-apps/SaneClip)**. Help others discover quality open source.
+> **Cloning without starring?** For real? **[⭐ Star it first](https://github.com/sane-apps/SaneClip)**. Help others discover quality software.
 
 ```bash
 # Clone the repo
@@ -296,7 +296,7 @@ Before opening a PR:
 | ❌ Plaintext storage | ✅ AES-256-GCM encryption |
 | ❌ Cloud sync (data exposure risk) | ✅ 100% local, zero servers |
 | ❌ Analytics and telemetry | ✅ Zero tracking, zero telemetry |
-| ❌ Closed source | ✅ Open source (PolyForm Shield) |
+| ❌ Closed source | ✅ 100% Transparent Code (PolyForm Shield) |
 | ❌ Subscription pricing | ✅ $6.99 one-time, free updates |
 | ❌ No Touch ID protection | ✅ Biometric locks with grace period |
 | ❌ No sensitive data detection | ✅ Auto-flags credit cards, API keys, SSNs |
@@ -371,7 +371,7 @@ Looking at alternatives? Here's how SaneClip stacks up:
 | Snippets & Placeholders | ✅ | ✅ | ❌ | ✅ | ❌ |
 | iOS Companion App | ✅ Free | ✅ Paid | ❌ | ❌ | ❌ |
 | iCloud Sync | ✅ | ✅ | ❌ | ✅ | ❌ |
-| Open Source | ✅ | ❌ | ✅ | ❌ | ❌ |
+| 100% Transparent Code | ✅ | ❌ | ✅ | ❌ | ❌ |
 | 100% Private | ✅ | ❌ | ✅ | ✅ | ✅ |
 | **Price** | **$6.99** | $30/yr | Free | $13 | Free |
 

@@ -7,7 +7,7 @@
 **AES-256 encryption · Touch ID protection · 100% local · Zero analytics**
 
 [![GitHub stars](https://img.shields.io/github/stars/sane-apps/SaneClip?style=flat-square)](https://github.com/sane-apps/SaneClip/stargazers)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: PolyForm Shield](https://img.shields.io/badge/License-PolyForm%20Shield-blue.svg?style=flat-square)](LICENSE)
 [![macOS](https://img.shields.io/badge/macOS-15.0+-blue?style=flat-square)](https://www.apple.com/macos/)
 [![Price](https://img.shields.io/badge/Price-$6.99_one--time-green?style=flat-square)](https://saneclip.com)
 
@@ -196,7 +196,7 @@ SaneClip is **privacy-first**:
 - ✅ **iCloud Sync Only** — Syncs between your devices via iCloud, no third-party servers
 - ✅ **Zero Analytics** — No tracking, no telemetry, no data collection
 - ✅ **Open Source** — Verify yourself at [github.com/sane-apps/SaneClip](https://github.com/sane-apps/SaneClip)
-- ✅ **GPL v3 License** — Community-auditable, copyleft protection
+- ✅ **PolyForm Shield License** — Community-auditable, source-available
 
 **Sensitive Data Detection:**
 - Credit cards (Luhn algorithm validation)
@@ -296,7 +296,7 @@ Before opening a PR:
 | ❌ Plaintext storage | ✅ AES-256-GCM encryption |
 | ❌ Cloud sync (data exposure risk) | ✅ 100% local, zero servers |
 | ❌ Analytics and telemetry | ✅ Zero tracking, zero telemetry |
-| ❌ Closed source | ✅ Open source (GPL v3) |
+| ❌ Closed source | ✅ Open source (PolyForm Shield) |
 | ❌ Subscription pricing | ✅ $6.99 one-time, free updates |
 | ❌ No Touch ID protection | ✅ Biometric locks with grace period |
 | ❌ No sensitive data detection | ✅ Auto-flags credit cards, API keys, SSNs |
@@ -381,7 +381,7 @@ Looking at alternatives? Here's how SaneClip stacks up:
 
 ## 📝 License
 
-GPL v3 — see [LICENSE](LICENSE) for details.
+[PolyForm Shield 1.0.0](https://polyformproject.org/licenses/shield/1.0.0) — free for any use except building a competing product. See [LICENSE](LICENSE) for details.
 
 ---
 

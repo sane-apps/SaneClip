@@ -10,6 +10,7 @@
 [![License: PolyForm Shield](https://img.shields.io/badge/License-PolyForm%20Shield-blue.svg?style=flat-square)](LICENSE)
 [![macOS](https://img.shields.io/badge/macOS-15.0+-blue?style=flat-square)](https://www.apple.com/macos/)
 [![Price](https://img.shields.io/badge/Price-$6.99_one--time-green?style=flat-square)](https://saneclip.com)
+[![Listed on awesome-macos](https://img.shields.io/badge/Listed%20on-open--source--mac--os--apps%20(40k%E2%98%85)-black?style=flat-square)](https://github.com/serhii-londar/open-source-mac-os-apps)
 
 > **⭐ Star this repo if you find it useful!** · **[💰 Buy for $6.99](https://saneclip.com)** · Takes 30 seconds, keeps development alive
 

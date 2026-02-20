@@ -22,11 +22,11 @@
           <li><strong>Dark Mode Enforced</strong> - iOS app now always uses dark mode matching the brand</li>
         </ul>
       ]]></description>
-      <pubDate>Sat, 15 Feb 2026 19:38:00 -0500</pubDate>
+      <pubDate>Fri, 20 Feb 2026 18:53:54 -0500</pubDate>
       <enclosure
         url="https://dist.saneclip.com/updates/SaneClip-2.1.zip"
-        sparkle:edSignature="j/2WaJXw5/99FV3xW1nUQOHM2eCOsVKO4Iswv10NoZVktSjGbn762qAujNCySHuJFdF5GuXuI1d3kWK+qGHtDw=="
-        length="2610533"
+        sparkle:edSignature="xlBtDwllthlgtaI3UT8GxyltkJ+BSeNy4BwA6qqHZAcFoEjrKdi+sPkwymlgKbKsiJKRZkVbxvz+NBEi7IV4CA=="
+        length="2632363"
         type="application/octet-stream" />
       <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
     </item>

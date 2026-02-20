@@ -77,7 +77,7 @@ private struct WelcomePageIOS: View {
                 HStack(spacing: isIPad ? 24 : 12) {
                     TrustBadgeIOS(icon: "lock.shield.fill", label: "100% Private", isIPad: isIPad)
                     TrustBadgeIOS(icon: "dollarsign.circle.fill", label: "No Subscription", isIPad: isIPad)
-                    TrustBadgeIOS(icon: "chevron.left.forwardslash.chevron.right", label: "Open Source", isIPad: isIPad)
+                    TrustBadgeIOS(icon: "chevron.left.forwardslash.chevron.right", label: "100% Transparent Code", isIPad: isIPad)
                 }
                 .padding(.horizontal, isIPad ? 60 : 20)
                 .padding(.bottom, isIPad ? 60 : 40)
@@ -263,7 +263,7 @@ private struct SanePromisePageIOS: View {
                         title: "Power",
                         lines: [
                             "Your data stays on-device",
-                            "Open source code",
+                            "100% Transparent Code",
                             "Actively maintained"
                         ],
                         isIPad: isIPad

@@ -11,7 +11,7 @@ SaneClip is **privacy-first by design**:
 - ✅ No cloud sync, no network calls
 - ✅ No analytics or telemetry
 - ✅ No account required
-- ✅ Open source — verify yourself
+- ✅ 100% Transparent Code — verify yourself
 
 ---
 
@@ -98,9 +98,9 @@ Questions about privacy?
 
 ---
 
-## Open Source Transparency
+## Code Transparency
 
-SaneClip is open source. You can verify our privacy claims by reviewing the code:
+SaneClip is 100% Transparent Code. You can verify our privacy claims by reviewing the code:
 
 ```bash
 git clone https://github.com/sane-apps/SaneClip.git

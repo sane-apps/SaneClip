@@ -11,7 +11,7 @@
 [![macOS](https://img.shields.io/badge/macOS-15.0+-blue?style=flat-square)](https://www.apple.com/macos/)
 [![Price](https://img.shields.io/badge/Price-$6.99_one--time-green?style=flat-square)](https://saneclip.com)
 
-> **⭐ Star this repo if you find it useful!** · **[💰 Buy the DMG for $6.99](https://saneclip.com)** · Takes 30 seconds, keeps development alive
+> **⭐ Star this repo if you find it useful!** · **[💰 Buy for $6.99](https://saneclip.com)** · Takes 30 seconds, keeps development alive
 
 <img src="docs/images/screenshot-popover.png" alt="SaneClip Screenshot" width="600">
 
@@ -213,7 +213,7 @@ See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) for full details.
 
 ## 📦 Installation
 
-**Download the latest DMG from [saneclip.com](https://saneclip.com) — $6.99 one-time purchase, free updates for life.**
+**Download from [saneclip.com](https://saneclip.com) — $6.99 one-time purchase, free updates for life.**
 
 > *I wanted to make it $5, but processing fees and taxes were... insane. — Mr. Sane*
 
@@ -258,7 +258,7 @@ Before opening a PR:
 2. Read [CONTRIBUTING.md](CONTRIBUTING.md)
 3. Open an issue first to discuss major changes
 
-**Building from source?** Consider [buying the DMG](https://saneclip.com) to support continued development.
+**Building from source?** Consider [buying the app](https://saneclip.com) to support continued development.
 
 ---
 
@@ -318,7 +318,7 @@ Before opening a PR:
 
 SaneClip is available in two versions with different capabilities:
 
-| Feature | DMG (Direct Download) | Mac App Store |
+| Feature | Direct Download | Mac App Store |
 |---------|:--------------------:|:-------------:|
 | Clipboard History & Search | ✅ | ✅ |
 | AES-256-GCM Encryption | ✅ | ✅ |
@@ -333,7 +333,7 @@ SaneClip is available in two versions with different capabilities:
 
 > **Why the difference?** The Mac App Store version runs in Apple's sandbox, which blocks simulated keyboard events (used for auto-paste). Instead, the App Store version copies items to your clipboard and shows a notification — just press Cmd+V to paste. All other features work identically.
 
-**DMG:** [$6.99 one-time at saneclip.com](https://saneclip.com) — includes Sparkle auto-updates.
+**Direct download:** [$6.99 one-time at saneclip.com](https://saneclip.com) — includes Sparkle auto-updates.
 
 ---
 

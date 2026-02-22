@@ -81,6 +81,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_: Notification) {
         appLogger.info("SaneClip starting...")
+        NSApp.appearance = NSAppearance(named: .darkAqua)
 
         #if !DEBUG && !APP_STORE
             SaneAppMover.moveToApplicationsFolderIfNeeded()
@@ -139,6 +140,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(
             rootView: ClipboardHistoryView(clipboardManager: clipboardManager)
+                .preferredColorScheme(.dark)
         )
 
         // Set up keyboard shortcuts
@@ -156,10 +158,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     private func showOnboarding() {
         let onboardingView = OnboardingView()
+            .preferredColorScheme(.dark)
         let hostingController = NSHostingController(rootView: onboardingView)
 
         onboardingWindow = NSWindow(contentViewController: hostingController)
         onboardingWindow?.title = "Welcome to SaneClip"
+        onboardingWindow?.appearance = NSAppearance(named: .darkAqua)
         onboardingWindow?.styleMask = [.titled, .closable]
         onboardingWindow?.setContentSize(NSSize(width: 700, height: 480))
         onboardingWindow?.center()

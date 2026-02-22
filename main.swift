@@ -8,6 +8,7 @@ let app = NSApplication.shared
 
 // Set activation policy to .accessory - this is a menu bar app
 app.setActivationPolicy(.accessory)
+app.appearance = NSAppearance(named: .darkAqua)
 
 let delegate = SaneClipAppDelegate()
 app.delegate = delegate

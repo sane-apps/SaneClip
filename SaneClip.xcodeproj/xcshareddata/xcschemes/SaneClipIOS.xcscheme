@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1430"
-   version = "1.3">
+   version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES">
+      buildImplicitDependencies = "YES"
+      runPostActionsOnFailure = "NO">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -15,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A2F610D4BC5CC8FAB336B0E2"
-               BuildableName = "SaneClip.app"
+               BuildableName = "SaneClipIOS.app"
                BlueprintName = "SaneClipIOS"
                ReferencedContainer = "container:SaneClip.xcodeproj">
             </BuildableReference>
@@ -54,12 +55,13 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      onlyGenerateCoverageForSpecifiedTargets = "NO">
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A2F610D4BC5CC8FAB336B0E2"
-            BuildableName = "SaneClip.app"
+            BuildableName = "SaneClipIOS.app"
             BlueprintName = "SaneClipIOS"
             ReferencedContainer = "container:SaneClip.xcodeproj">
          </BuildableReference>
@@ -82,11 +84,13 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A2F610D4BC5CC8FAB336B0E2"
-            BuildableName = "SaneClip.app"
+            BuildableName = "SaneClipIOS.app"
             BlueprintName = "SaneClipIOS"
             ReferencedContainer = "container:SaneClip.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -99,11 +103,13 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A2F610D4BC5CC8FAB336B0E2"
-            BuildableName = "SaneClip.app"
+            BuildableName = "SaneClipIOS.app"
             BlueprintName = "SaneClipIOS"
             ReferencedContainer = "container:SaneClip.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

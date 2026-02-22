@@ -1299,10 +1299,12 @@ enum SettingsWindowController {
         }
 
         let settingsView = SettingsView()
+            .preferredColorScheme(.dark)
         let hostingController = NSHostingController(rootView: settingsView)
 
         let newWindow = NSWindow(contentViewController: hostingController)
         newWindow.title = "SaneClip Settings"
+        newWindow.appearance = NSAppearance(named: .darkAqua)
         newWindow.styleMask = [.titled, .closable, .resizable]
         newWindow.setContentSize(NSSize(width: 700, height: 450))
         newWindow.center()

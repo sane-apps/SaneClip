@@ -6,6 +6,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.1] - 2026-02-20
+
+### Added
+- **Secure webhook pipeline updates** — Improved validation and safer handling around webhook-triggered actions
+- **Siri Shortcuts and widgets polish** — Better reliability and UX consistency across companion surfaces
+
+### Changed
+- **Update channel alignment** — Sparkle appcast now points to the 2.1 ZIP release artifact
+- **Release metadata refresh** — Versioning and release notes aligned for 2.1 rollout
+
+### Fixed
+- **Stability fixes** — Multiple reliability fixes across clipboard flow and edge-case handling
+
+---
+
+## [2.0] - 2026-02-09
+
+### Added
+- **Cross-device sync** — iCloud-based clipboard sync between macOS and iOS
+- **Smart paste modes** — Context-aware paste behavior for links, code, and standard text
+- **Paste stack** — Queue-based multi-item paste workflow (FIFO/LIFO)
+- **iOS companion app** — Mobile access to clipboard history with shortcuts/widgets
+
+### Changed
+- **Default paste behavior options** — Configurable default mode in settings
+- **URL cleanup improvements** — Expanded tracking-parameter stripping rules
+
+### Fixed
+- **General quality improvements** — Reliability and UX refinements for history/search/paste flows
+
+---
+
 ## [1.4] - 2026-02-03
 
 ### Security Enhancements

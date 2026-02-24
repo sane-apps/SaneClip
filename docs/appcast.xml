@@ -8,7 +8,24 @@
 
     
 
-            <item>
+                    <item>
+            <title>2.1.2</title>
+            <pubDate>Mon, 23 Feb 2026 20:59:27 -0500</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>Changes</h2>
+                <p>Corrective release: align binary metadata with appcast and App Store pipeline.</p>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.1.2.zip"
+                       sparkle:version="2102"
+                       sparkle:shortVersionString="2.1.2"
+                       length="2701729"
+                       type="application/octet-stream"
+                       sparkle:edSignature="UW8E4xV7kNOY2KVZLiRenl1VpL5MBZda7U5Vi3uoeX2nQRY/P7gsVhW12n3PH9pcDj1QZh4spjDQ4sprdHsgBw=="/>
+        </item>
+<item>
             <title>2.1</title>
             <pubDate>Fri, 20 Feb 2026 19:00:53 -0500</pubDate>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>

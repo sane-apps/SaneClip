@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.1.2] - 2026-02-23
+
+Corrective release: align binary metadata with appcast and App Store pipeline.
+
+---
+
 ## [2.1] - 2026-02-20
 
 ### Added

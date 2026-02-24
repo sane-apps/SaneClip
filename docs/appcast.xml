@@ -8,9 +8,10 @@
 
     
 
-                    <item>
+                    
+        <item>
             <title>2.1.2</title>
-            <pubDate>Mon, 23 Feb 2026 20:59:27 -0500</pubDate>
+            <pubDate>Mon, 23 Feb 2026 21:07:14 -0500</pubDate>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
             <description>
                 <![CDATA[
@@ -21,9 +22,9 @@
             <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.1.2.zip"
                        sparkle:version="2102"
                        sparkle:shortVersionString="2.1.2"
-                       length="2701729"
+                       length="2701707"
                        type="application/octet-stream"
-                       sparkle:edSignature="UW8E4xV7kNOY2KVZLiRenl1VpL5MBZda7U5Vi3uoeX2nQRY/P7gsVhW12n3PH9pcDj1QZh4spjDQ4sprdHsgBw=="/>
+                       sparkle:edSignature="IGjv+rFkGLPycEtaeDrPPrgdLLQOr5yPdvttd13NyQlOW6buYYLr6AxeYx/HysnMdIAFXi0g9HpwcKA9U5vnDg=="/>
         </item>
 <item>
             <title>2.1</title>

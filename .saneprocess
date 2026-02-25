@@ -64,6 +64,8 @@ appstore:
     macos: docs/images/screenshot-[!i]*.png
     ios: docs/images/screenshot-ios-*.png
     ipad: docs/images/screenshot-ipad-*.png
+  strip_frameworks:
+    - Sparkle.framework
   contact:
     name: "Stephan Joseph"
     phone: "+17277589785"

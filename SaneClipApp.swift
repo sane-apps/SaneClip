@@ -1,5 +1,6 @@
 import AppKit
 import KeyboardShortcuts
+import SaneUI
 import SwiftUI
 #if !APP_STORE
     import Sparkle
@@ -70,10 +71,18 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     #if !APP_STORE
         private var updateService: UpdateService!
     #endif
-    private var onboardingWindow: NSWindow?
     /// Track when user last authenticated with Touch ID (grace period)
     private var lastAuthenticationTime: Date?
     private let authGracePeriod: TimeInterval = 30.0 // seconds - stays unlocked for 30s
+
+    // MARK: - License
+
+    let licenseService = LicenseService(
+        appName: "SaneClip",
+        checkoutURL: URL(string: "https://go.saneapps.com/buy/saneclip")!
+    )
+
+    @AppStorage("hasSeenWelcome") private var hasSeenWelcome = false
 
     deinit {
         NotificationCenter.default.removeObserver(self, name: .menuBarIconChanged, object: nil)
@@ -92,11 +101,64 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             updateService = UpdateService.shared
         #endif
 
+        // Freemium: always allow app to start — no hard gate
+        licenseService.checkCachedLicense()
+        setupApp()
+
+        // Fire launch event (capture isPro on main actor before detaching)
+        let launchIsPro = licenseService.isPro
+        let isFirstLaunch = !hasSeenWelcome
+        Task.detached {
+            await EventTracker.log(launchIsPro ? "app_launch_pro" : "app_launch_free", app: "saneclip")
+            if isFirstLaunch, !launchIsPro {
+                await EventTracker.log("new_free_user", app: "saneclip")
+            }
+        }
+
+        // Show welcome screen on first install (menu bar apps need standalone window)
+        if !hasSeenWelcome {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
+                self?.showWelcomeWindow()
+            }
+        }
+    }
+
+    private func showWelcomeWindow() {
+        WelcomeWindow.show(
+            appName: "SaneClip",
+            appIcon: "list.clipboard.fill",
+            freeFeatures: [
+                ("clipboard", "Clipboard history — last 25 items"),
+                ("doc.on.doc", "One-tap paste"),
+                ("magnifyingglass", "Search clipboard history")
+            ],
+            proFeatures: [
+                ("infinity", "Unlimited clipboard history"),
+                ("textformat.alt", "Paste as plain text"),
+                ("wand.and.stars", "Smart paste (URL cleaning, code detection)"),
+                ("textformat.abc", "Text transforms (UPPERCASE, lowercase, Title Case...)"),
+                ("square.stack.3d.up", "Paste Stack — queue items for sequential paste"),
+                ("text.quote", "Snippets with placeholders"),
+                ("pin.fill", "Pin items • Item notes • Clipboard rules"),
+                ("lock.shield.fill", "History encryption • Export / Import")
+            ],
+            licenseService: licenseService,
+            onDismiss: { [weak self] in
+                self?.hasSeenWelcome = true
+            }
+        )
+    }
+
+    private func setupApp() {
+        // Make license service available to settings
+        SettingsWindowController.licenseService = licenseService
+
         // Apply dock visibility setting (must happen early)
         _ = SettingsModel.shared
 
-        // Initialize clipboard manager
+        // Initialize clipboard manager and wire license service for Pro gating
         clipboardManager = ClipboardManager()
+        clipboardManager.licenseService = licenseService
         ClipboardManager.shared = clipboardManager
 
         // Create status bar item
@@ -134,12 +196,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             NSApp.registerServicesMenuSendTypes([.string], returnTypes: [])
         #endif
 
-        // Create popover
+        // Create popover — pass licenseService so history view can check Pro status
         popover = NSPopover()
         popover.contentSize = NSSize(width: 320, height: 500)
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(
-            rootView: ClipboardHistoryView(clipboardManager: clipboardManager)
+            rootView: ClipboardHistoryView(clipboardManager: clipboardManager, licenseService: licenseService)
                 .preferredColorScheme(.dark)
         )
 
@@ -147,30 +209,6 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         setupKeyboardShortcuts()
 
         appLogger.info("SaneClip ready")
-
-        // Show onboarding on first launch (delay to ensure app is fully ready)
-        if !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                self?.showOnboarding()
-            }
-        }
-    }
-
-    private func showOnboarding() {
-        let onboardingView = OnboardingView()
-            .preferredColorScheme(.dark)
-        let hostingController = NSHostingController(rootView: onboardingView)
-
-        onboardingWindow = NSWindow(contentViewController: hostingController)
-        onboardingWindow?.title = "Welcome to SaneClip"
-        onboardingWindow?.appearance = NSAppearance(named: .darkAqua)
-        onboardingWindow?.styleMask = [.titled, .closable]
-        onboardingWindow?.setContentSize(NSSize(width: 700, height: 480))
-        onboardingWindow?.center()
-        onboardingWindow?.isReleasedWhenClosed = false
-
-        onboardingWindow?.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
     }
 
     private func setupKeyboardShortcuts() {
@@ -395,7 +433,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     private func buildSnippetsSubmenu() -> NSMenuItem {
         let snippetsMenu = NSMenu()
-        let snippetsItem = NSMenuItem(title: "Snippets", action: nil, keyEquivalent: "")
+        let snippetsTitle = licenseService.isPro ? "Snippets" : "Snippets \u{1F512}"
+        let snippetsItem = NSMenuItem(title: snippetsTitle, action: nil, keyEquivalent: "")
         let recentSnippets = Array(SnippetManager.shared.snippets.prefix(10))
         if !recentSnippets.isEmpty {
             for (index, snippet) in recentSnippets.enumerated() {

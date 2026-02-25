@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		07EBD6613F07245138A3332A /* TextTransformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEA795AFED8797FFAE0DD3E /* TextTransformService.swift */; };
-		08715A357C7F5B1C693B5C47 /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = DE1B3E95AFE08432850B538B /* CLAUDE.md */; };
 		113E5DCC28CDB39825FDF84D /* PinnedClipsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A06A5E6F4A48C14D539ABD91 /* PinnedClipsWidget.swift */; };
 		14416464FDEC646CB5F437DB /* SharedClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB6B85899467ECE68DDCE6E /* SharedClipboardItem.swift */; };
 		1504813C73E5700C5BB876DE /* SettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = A942FCE8A60E673C341FFB02 /* SettingsTab.swift */; };
@@ -26,6 +25,7 @@
 		355AB4192CCD090052C307E1 /* RecentClipsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA1B6A946118EB9C90AB95F /* RecentClipsWidget.swift */; };
 		37F29CD598C72F5AC2A699BD /* SaneClipWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 09C2D5E2943BC51ED6D88512 /* SaneClipWidgets.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3E30328E30A861550080AE6D /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7120D46FF8B86B71EAB5508 /* ShareViewController.swift */; };
+		3EF2F8F390E9B433A6DA76B7 /* ProFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8607149CD7305298C711068F /* ProFeature.swift */; };
 		414A920720EECE33D2310A7C /* DMGIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = AD5C75ADF36A7D05AEEFAE0C /* DMGIcon.icns */; };
 		4B2B8214AB250D15350054F9 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592FBED989BC40A70F0B5060 /* KeychainHelper.swift */; };
 		4BBBBA9D613C81A9CBEF0B0A /* GetRecentClipsIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF6FECCD60F5BFD8E7FD9484 /* GetRecentClipsIntent.swift */; };
@@ -43,6 +43,7 @@
 		7A565742375608A744388912 /* SaneClipIOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ECEE64E98BCC2FC7D58874A /* SaneClipIOSApp.swift */; };
 		7C2DB9FDEE7F3D537CF02CA1 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 0668E59A15F0F31C5BE746B0 /* KeyboardShortcuts */; };
 		7E6E29E295A478AD08C4DB0E /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73D02F6E4DBB9312E67A0AD /* ClipboardManager.swift */; };
+		800E2DBFDB6B69586D884BBF /* SaneUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3C8A1AC0AAF3923420FEA7FF /* SaneUI */; };
 		802474EB5319EC0BE29B5D80 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 197F40B4EAA11C09CD1A5801 /* PrivacyInfo.xcprivacy */; };
 		88429CF77152B054F581B567 /* WebhookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9381D3ACF3CE661318DF305D /* WebhookService.swift */; };
 		8941A3DAF4AF4FC8A5F19C3F /* BrandColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5449565520B6E5CF68C78D6B /* BrandColors.swift */; };
@@ -181,6 +182,7 @@
 		6E5B3959F17D55FF5C7F90E6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7092A10CF0857FEB75EE7222 /* ClipboardDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardDetailView.swift; sourceTree = "<group>"; };
 		71B639CB4375AE4479924B74 /* SaneClipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipTests.swift; sourceTree = "<group>"; };
+		765436A3694232650B05C233 /* SaneUI */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SaneUI; path = ../../infra/SaneUI; sourceTree = SOURCE_ROOT; };
 		7B181DC2ABBFC0F6C29A7CB9 /* AutoPurgeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoPurgeService.swift; sourceTree = "<group>"; };
 		7B6E13A4E249D85E296D3A5C /* SaneClipIOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SaneClipIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BEA795AFED8797FFAE0DD3E /* TextTransformService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTransformService.swift; sourceTree = "<group>"; };
@@ -190,6 +192,7 @@
 		817694FD0F55D259B3F10FDA /* SaneClipWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipWidgets.swift; sourceTree = "<group>"; };
 		82FA89438430FB80B145A7C5 /* HistoryEncryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEncryption.swift; sourceTree = "<group>"; };
 		84A33BA21C41E9F3415FFB0D /* MoveToApplications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveToApplications.swift; sourceTree = "<group>"; };
+		8607149CD7305298C711068F /* ProFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProFeature.swift; sourceTree = "<group>"; };
 		8D2D1E638F1E9A0D4C8C9E45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8FCC4B9D9BD539DC99A6AD4D /* CopyClipIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyClipIntent.swift; sourceTree = "<group>"; };
 		8FFF4DCFB95C5B26D00A640F /* SaneClipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipApp.swift; sourceTree = "<group>"; };
@@ -218,7 +221,6 @@
 		D3D786C9674AE3DE8113632A /* SyncDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncDataModel.swift; sourceTree = "<group>"; };
 		D73D02F6E4DBB9312E67A0AD /* ClipboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardManager.swift; sourceTree = "<group>"; };
 		DD2BF58DEC0153C26EA351A8 /* SaneClipIOSWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipIOSWidgets.swift; sourceTree = "<group>"; };
-		DE1B3E95AFE08432850B538B /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
 		DFBF87F7472E2026DE0E0EF6 /* SaneClipWidgetsDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipWidgetsDebug.entitlements; sourceTree = "<group>"; };
 		E255CCFA37A4633D75D64EF2 /* ClipboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardItem.swift; sourceTree = "<group>"; };
 		F7120D46FF8B86B71EAB5508 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
@@ -233,6 +235,7 @@
 			files = (
 				7C2DB9FDEE7F3D537CF02CA1 /* KeyboardShortcuts in Frameworks */,
 				8B41EC7476C54EDF1695272D /* Sparkle in Frameworks */,
+				800E2DBFDB6B69586D884BBF /* SaneUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -324,11 +327,13 @@
 			isa = PBXGroup;
 			children = (
 				B74750429D17786620EF008E /* main.swift */,
+				8607149CD7305298C711068F /* ProFeature.swift */,
 				8FFF4DCFB95C5B26D00A640F /* SaneClipApp.swift */,
 				2A07E3A1A776FE6A78310D7A /* Core */,
 				E2FA8B6080FA528017F8B223 /* iOS */,
 				D04310DD70513FD880B08F56 /* iOSShareExtension */,
 				AC18BD20DF756C306CF4FC65 /* iOSWidgets */,
+				493F4E3FD878CCDE2141E89E /* Packages */,
 				317C3B96EA035EB98F83B6DF /* Resources */,
 				1B130F3074655C63B056F11C /* Shared */,
 				3DA3DCD92F8A3621E23C93AE /* shared */,
@@ -350,6 +355,14 @@
 				09C2D5E2943BC51ED6D88512 /* SaneClipWidgets.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		493F4E3FD878CCDE2141E89E /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				765436A3694232650B05C233 /* SaneUI */,
+			);
+			name = Packages;
 			sourceTree = "<group>";
 		};
 		69BCB2544EE5E14D64C7050A /* History */ = {
@@ -399,7 +412,6 @@
 		A1F5CB5A388610A825BF634E /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				DE1B3E95AFE08432850B538B /* CLAUDE.md */,
 				71B639CB4375AE4479924B74 /* SaneClipTests.swift */,
 				1775AC6444F4E26AD66FA435 /* SecurityTests.swift */,
 			);
@@ -542,7 +554,6 @@
 			buildConfigurationList = FA412243DF99EC2331D50153 /* Build configuration list for PBXNativeTarget "SaneClipTests" */;
 			buildPhases = (
 				092E1DF1915B592662C0FFA3 /* Sources */,
-				B458BD3748AE93BB363D1A1E /* Resources */,
 			);
 			buildRules = (
 			);
@@ -593,6 +604,7 @@
 			packageProductDependencies = (
 				0668E59A15F0F31C5BE746B0 /* KeyboardShortcuts */,
 				C104FF18269706174A84ADDF /* Sparkle */,
+				3C8A1AC0AAF3923420FEA7FF /* SaneUI */,
 			);
 			productName = SaneClip;
 			productReference = 14D0EBBF195245B8CE7ECF07 /* SaneClip.app */;
@@ -651,16 +663,7 @@
 					43BDAC030E9BA81D8C07AACD = {
 						ProvisioningStyle = Manual;
 					};
-					76789C3628330078706BF5B1 = {
-						DevelopmentTeam = M78L6FXD48;
-					};
 					82F15C9953C599E408BCB355 = {
-						DevelopmentTeam = M78L6FXD48;
-					};
-					A2F610D4BC5CC8FAB336B0E2 = {
-						DevelopmentTeam = M78L6FXD48;
-					};
-					F4822D70D6EC34E3F92050C1 = {
 						DevelopmentTeam = M78L6FXD48;
 					};
 				};
@@ -678,6 +681,7 @@
 			packageReferences = (
 				FF4FB157E962C62A4042BD35 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				9B9B0D09FDAE079B73A7A0CB /* XCRemoteSwiftPackageReference "Sparkle" */,
+				738AFF53E0709A7286E155CD /* XCLocalSwiftPackageReference "../../infra/SaneUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
@@ -701,14 +705,6 @@
 				31AE3F98F164FB0ECD0829BD /* Assets.xcassets in Resources */,
 				414A920720EECE33D2310A7C /* DMGIcon.icns in Resources */,
 				F5163A69E164634BA8652A30 /* PrivacyInfo.xcprivacy in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B458BD3748AE93BB363D1A1E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				08715A357C7F5B1C693B5C47 /* CLAUDE.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -840,6 +836,7 @@
 				281630B49BCFA5B27C0C93B4 /* KeychainHelper.swift in Sources */,
 				9AE9193A4B91AF9225D37A06 /* MoveToApplications.swift in Sources */,
 				77B7D62B808F69AD4A23279A /* OnboardingView.swift in Sources */,
+				3EF2F8F390E9B433A6DA76B7 /* ProFeature.swift in Sources */,
 				B3761DF4123417A5EA8C0DF3 /* SaneClipApp.swift in Sources */,
 				95711D419E5C0F66ED022198 /* SaneClipIntents.swift in Sources */,
 				8B91331218ABFBC1D64F05B7 /* SavedClipboardItem.swift in Sources */,
@@ -906,12 +903,12 @@
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShareDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -926,12 +923,12 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShare.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1002,6 +999,26 @@
 				SWIFT_VERSION = 5.0;
 			};
 			name = "Release-AppStore";
+		};
+		0B7A1241471986E88DDC842C /* ProdDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Widgets/SaneClipWidgetsDebug.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 220;
+				DEVELOPMENT_TEAM = M78L6FXD48;
+				INFOPLIST_FILE = Widgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MARKETING_VERSION = 2.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.widgets;
+				PRODUCT_NAME = SaneClipWidgets;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = ProdDebug;
 		};
 		104EE135498F3FF61433880C /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1091,18 +1108,41 @@
 			};
 			name = Debug;
 		};
+		18DC877C62D218761A1404D1 /* ProdDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 220;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
+				PRODUCT_NAME = SaneClip;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = ProdDebug;
+		};
 		23C1965966ED0B7E8D0AED00 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShare.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1112,12 +1152,31 @@
 			};
 			name = Release;
 		};
+		24210D38A21305A0E1AD6E8F /* ProdDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = M78L6FXD48;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.SaneClipTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SaneClip.app/Contents/MacOS/SaneClip";
+			};
+			name = ProdDebug;
+		};
 		3D602DF12317036A95BE8E2B /* Release-AppStore */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1126,7 +1185,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -1136,6 +1195,93 @@
 			};
 			name = "Release-AppStore";
 		};
+		42A1062E83E80311FC85F8C4 /* ProdDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 220;
+				INFOPLIST_FILE = iOSShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MARKETING_VERSION = 2.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
+				PRODUCT_NAME = SaneClipIOSShare;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = ProdDebug;
+		};
+		42C31971AEA4B908C118298D /* ProdDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 5.0;
+			};
+			name = ProdDebug;
+		};
 		442EBCA238F905A91322AC9C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1143,11 +1289,11 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip Widgets Developer ID";
@@ -1226,7 +1372,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOSDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -1235,7 +1381,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -1254,7 +1400,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SaneClip/Info.plist;
@@ -1263,7 +1409,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip Developer ID";
@@ -1283,7 +1429,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SaneClip/Info.plist;
@@ -1292,7 +1438,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = macosx;
@@ -1311,7 +1457,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SaneClip/Info.plist;
@@ -1320,7 +1466,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				OTHER_SWIFT_FLAGS = "-D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -1336,7 +1482,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1345,7 +1491,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -1355,6 +1501,56 @@
 			};
 			name = Release;
 		};
+		A19EE346BD03DF2744B639B5 /* ProdDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 220;
+				INFOPLIST_FILE = iOSWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
+				PRODUCT_NAME = SaneClipIOSWidgets;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = ProdDebug;
+		};
+		A305F693ABF3AA17F345A81A /* ProdDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SaneClip/SaneClipDebug.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 220;
+				DEVELOPMENT_TEAM = M78L6FXD48;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = SaneClip/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 2.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
+				PRODUCT_NAME = SaneClip;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				VALID_ARCHS = arm64;
+			};
+			name = ProdDebug;
+		};
 		B155B31A55BBFC71CB535545 /* Release-AppStore */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1362,7 +1558,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOS.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -1371,7 +1567,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				OTHER_SWIFT_FLAGS = "-D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -1388,7 +1584,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -1397,7 +1593,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -1449,11 +1645,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;
@@ -1468,7 +1664,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgetsDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1477,7 +1673,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -1494,11 +1690,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2102;
+				CURRENT_PROJECT_VERSION = 220;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.1.2;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;
@@ -1514,6 +1710,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1897803D5ED9870A35226242 /* Debug */,
+				42C31971AEA4B908C118298D /* ProdDebug */,
 				4857A56DA796F207F2BAF17F /* Release */,
 				09ED956E5C9E6C403024AEAD /* Release-AppStore */,
 			);
@@ -1524,6 +1721,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				610D165215A8638A63D449DC /* Debug */,
+				18DC877C62D218761A1404D1 /* ProdDebug */,
 				B973BC3DE9F520F2C1ECBB1A /* Release */,
 				B155B31A55BBFC71CB535545 /* Release-AppStore */,
 			);
@@ -1534,6 +1732,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				081EE4EB28193092E569875A /* Debug */,
+				42A1062E83E80311FC85F8C4 /* ProdDebug */,
 				23C1965966ED0B7E8D0AED00 /* Release */,
 				08C9CEB31BC5576075CEA2D2 /* Release-AppStore */,
 			);
@@ -1544,6 +1743,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F99AF4BA34BC6CBEF9C7DEB7 /* Debug */,
+				A19EE346BD03DF2744B639B5 /* ProdDebug */,
 				9F4600E445B4C83B27734E99 /* Release */,
 				3D602DF12317036A95BE8E2B /* Release-AppStore */,
 			);
@@ -1554,6 +1754,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8BBC3246D221BD28E92945B7 /* Debug */,
+				A305F693ABF3AA17F345A81A /* ProdDebug */,
 				7DB276C762F0B10F39DE682F /* Release */,
 				980353CD513BAEA7BEC43D24 /* Release-AppStore */,
 			);
@@ -1564,6 +1765,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FE742B4FF5DDA825AFC41555 /* Debug */,
+				0B7A1241471986E88DDC842C /* ProdDebug */,
 				442EBCA238F905A91322AC9C /* Release */,
 				E9B63989393D377DBE624400 /* Release-AppStore */,
 			);
@@ -1574,6 +1776,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				104EE135498F3FF61433880C /* Debug */,
+				24210D38A21305A0E1AD6E8F /* ProdDebug */,
 				CA0EBC0F552F4BE83CC9DDD3 /* Release */,
 				BD2901D4BEDF0F5C11AA7631 /* Release-AppStore */,
 			);
@@ -1581,6 +1784,13 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		738AFF53E0709A7286E155CD /* XCLocalSwiftPackageReference "../../infra/SaneUI" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../infra/SaneUI;
+		};
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
 		9B9B0D09FDAE079B73A7A0CB /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -1606,6 +1816,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = FF4FB157E962C62A4042BD35 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
+		};
+		3C8A1AC0AAF3923420FEA7FF /* SaneUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SaneUI;
 		};
 		C104FF18269706174A84ADDF /* Sparkle */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -1,11 +1,15 @@
+import SaneUI
 import SwiftUI
 
 struct SnippetsSettingsView: View {
+    var licenseService: LicenseService?
     @State private var snippetManager = SnippetManager.shared
     @State private var searchText = ""
     @State private var selectedSnippet: Snippet?
     @State private var showAddSheet = false
     @State private var showEditSheet = false
+
+    private var isPro: Bool { licenseService?.isPro == true }
 
     var filteredSnippets: [Snippet] {
         snippetManager.search(searchText)
@@ -13,6 +17,32 @@ struct SnippetsSettingsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            // Pro gate banner for snippets
+            if !isPro {
+                HStack(spacing: 8) {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.teal)
+                    Text("Snippets require SaneClip Pro")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.white)
+                    Spacer()
+                    Button("Upgrade") {
+                        if let ls = licenseService {
+                            ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
+                        }
+                    }
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.teal)
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .background(Color.teal.opacity(0.10))
+
+                Divider()
+            }
+
             // Search bar
             HStack {
                 Image(systemName: "magnifyingglass")
@@ -75,8 +105,14 @@ struct SnippetsSettingsView: View {
 
                 Spacer()
 
-                Button(action: { showAddSheet = true }, label: {
-                    Label("Add Snippet", systemImage: "plus")
+                Button(action: {
+                    if isPro {
+                        showAddSheet = true
+                    } else if let ls = licenseService {
+                        ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
+                    }
+                }, label: {
+                    Label(isPro ? "Add Snippet" : "Add Snippet \u{1F512}", systemImage: "plus")
                 })
                 .buttonStyle(.plain)
             }
@@ -164,8 +200,8 @@ struct SnippetEditorSheet: View {
 
         var title: String {
             switch self {
-            case .add: return "New Snippet"
-            case .edit: return "Edit Snippet"
+            case .add: "New Snippet"
+            case .edit: "Edit Snippet"
             }
         }
     }
@@ -180,7 +216,7 @@ struct SnippetEditorSheet: View {
     @State private var shortcut: String = ""
 
     private var snippet: Snippet? {
-        if case .edit(let existingSnippet) = mode { return existingSnippet }
+        if case let .edit(existingSnippet) = mode { return existingSnippet }
         return nil
     }
 

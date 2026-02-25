@@ -7,10 +7,10 @@
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SaneClip — Clipboard Manager for Mac with Touch ID &amp; Encryption</title>
-    <meta name="description" content="Clipboard manager for Mac with strong encryption, Touch ID lock, and sensitive data detection. 100% local, 100% transparent code. $6.99 one-time.">
+    <meta name="description" content="Free clipboard manager for Mac with Touch ID lock, encryption, and sensitive data detection. 100% local, 100% transparent code. Free forever, Pro at $6.99 one-time.">
     <link rel="canonical" href="https://saneclip.com">
     <meta property="og:title" content="SaneClip — Clipboard Manager for Mac with Touch ID & Encryption">
-    <meta property="og:description" content="Clipboard manager for Mac with strong encryption, Touch ID lock, and sensitive data detection. 100% local, 100% transparent code. $6.99 one-time.">
+    <meta property="og:description" content="Free clipboard manager for Mac with Touch ID lock, encryption, and sensitive data detection. 100% local, 100% transparent code. Free forever, Pro at $6.99 one-time.">
     <meta property="og:url" content="https://saneclip.com">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="SaneClip">
@@ -19,7 +19,7 @@
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="SaneClip — Clipboard Manager for Mac with Touch ID & Encryption">
-    <meta name="twitter:description" content="Clipboard manager for Mac with strong encryption, Touch ID lock, and sensitive data detection. 100% local, 100% transparent code. $6.99 one-time.">
+    <meta name="twitter:description" content="Free clipboard manager for Mac with Touch ID lock, encryption, and sensitive data detection. 100% local, 100% transparent code. Free forever, Pro at $6.99 one-time.">
     <meta name="twitter:image" content="https://saneclip.com/images/og-image.png">
     <meta name="twitter:site" content="@saneapps">
     <meta name="keywords" content="clipboard manager, macos, clipboard history, touch id, paste, copy, mac clipboard, clipboard app, pasteboard, copy paste manager, macos sequoia, best clipboard manager">
@@ -51,7 +51,7 @@
             "url": "https://github.com/sane-apps"
         },
         "downloadUrl": "https://go.saneapps.com/buy/saneclip?ref=website",
-        "softwareVersion": "2.1.2",
+        "softwareVersion": "2.1",
         "releaseNotes": "v2.1: AES-256-GCM encryption at rest, Keychain integration, iOS companion app with iCloud sync, Siri Shortcuts, macOS widgets, URL scheme confirmation, HTTPS webhook enforcement.",
         "screenshot": "https://saneclip.com/images/screenshot-popover.png",
         "featureList": [
@@ -109,6 +109,13 @@
             --border-subtle: rgba(255, 255, 255, 0.04);
             --success: #34d399;
             --success-soft: rgba(52, 211, 153, 0.15);
+            /* Golden ratio spacing */
+            --phi-xs: 8px;
+            --phi-sm: 13px;
+            --phi-md: 21px;
+            --phi-lg: 34px;
+            --phi-xl: 55px;
+            --phi-2xl: 89px;
         }
 
         * {
@@ -1213,6 +1220,151 @@
         .price-note::after { content: "I wanted to make it $5, but processing fees and taxes were… insane. — Mr. Sane"; position: absolute; left: calc(100% + 6px); top: 50%; transform: translateY(-50%); background: var(--bg-card); color: var(--text-primary); padding: 8px 14px; border-radius: 8px; font-size: 0.9375rem; font-style: italic; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.1s; z-index: 999; border: 1px solid var(--border); }
         .price-note:hover::after { opacity: 1; }
         @media (max-width: 768px) { .price-note { display: none; } }
+
+        /* Pricing Grid */
+        .hero-pricing-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--phi-lg);
+            max-width: 700px;
+            margin: 0 auto var(--phi-xxl, 55px);
+            text-align: left;
+            align-items: start;
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: var(--phi-xl) var(--phi-lg);
+            text-align: left;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            border-color: rgba(0, 153, 255, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 13px 34px rgba(0, 0, 0, 0.3);
+        }
+
+        .pricing-card.featured {
+            background:
+                radial-gradient(ellipse at 80% 20%, rgba(0, 153, 255, 0.12) 0%, transparent 50%),
+                linear-gradient(160deg, #0d1830 0%, #0a1225 100%);
+            border-color: rgba(0, 153, 255, 0.35);
+            box-shadow: 0 8px 34px rgba(0, 153, 255, 0.1);
+        }
+
+        .pricing-card.featured:hover {
+            box-shadow: 0 13px 55px rgba(0, 153, 255, 0.15);
+        }
+
+        .pricing-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: var(--phi-sm);
+        }
+
+        .pricing-card.featured .pricing-label {
+            color: var(--accent);
+        }
+
+        .pricing-price {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 2.618rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--phi-xs);
+            line-height: 1.1;
+        }
+
+        .pricing-price-note {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: var(--phi-lg);
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: var(--phi-lg);
+        }
+
+        .pricing-features li {
+            padding: var(--phi-xs) 0;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--phi-xs);
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 3px;
+        }
+
+        .pricing-card.featured .pricing-features li.extra::before {
+            color: var(--accent);
+            content: '★';
+        }
+
+        .pricing-cta {
+            display: block;
+            text-align: center;
+            padding: var(--phi-sm) var(--phi-md);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-cta-free {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .pricing-cta-free:hover {
+            border-color: var(--accent);
+            background: var(--accent-subtle);
+        }
+
+        .pricing-cta-pro {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 21px var(--accent-glow);
+        }
+
+        .pricing-cta-pro:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 34px var(--accent-glow);
+            filter: brightness(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .hero-pricing-grid {
+                grid-template-columns: 1fr;
+                gap: var(--phi-md);
+                max-width: 340px;
+            }
+
+            .pricing-card {
+                padding: var(--phi-lg) var(--phi-md);
+            }
+
+            .pricing-price {
+                font-size: 2rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1240,11 +1392,11 @@
                 <a href="#compare">Compare</a>
                 <a href="/guides.html">Guides</a>
                 <a href="https://github.com/sane-apps/SaneClip">GitHub</a>
-                <a href="#support" class="btn btn-primary btn-donate">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#ef4444" stroke="#ffffff" stroke-width="1.5">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                <a href="https://dist.saneclip.com/updates/SaneClip-2.2.0.dmg" class="btn btn-primary btn-donate">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
                     </svg>
-                    Donate
+                    Download Free
                 </a>
             </div>
             <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
@@ -1267,7 +1419,7 @@
         <a href="https://sanehosts.com">SaneHosts &mdash; System-Level Ad Blocker</a>
         <a href="https://sanesales.com">SaneSales &mdash; Sales Tracker</a>
         <a href="https://saneapps.com">See all SaneApps &rarr;</a>
-        <a href="https://go.saneapps.com/buy/saneclip?ref=website" class="mobile-nav-cta">Buy Now - $6.99</a>
+        <a href="https://dist.saneclip.com/updates/SaneClip-2.2.0.dmg" class="mobile-nav-cta">Download Free</a>
     </div>
 
     <section class="hero">
@@ -1280,15 +1432,46 @@
                 <a href="https://forums.basehub.com/sane-apps/SaneClip/3" target="_blank" rel="noopener" style="color: inherit; text-decoration: none;">&#128737;&#65039; Provably Private (Audit)</a>
                 <span>&#128274; 100% On-Device &middot; 100% Transparent Code</span>
             </div>
-            <div class="cta-buttons animate-in delay-5">
-                <a href="https://go.saneapps.com/buy/saneclip?ref=website" class="btn btn-primary">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    Buy Now - $6.99
-                </a><span class="price-note">*</span>
+            <div class="animate-in delay-5" id="pricing">
+                <div class="hero-pricing-grid">
+                    <div class="pricing-card">
+                        <p class="pricing-label">Basic</p>
+                        <p class="pricing-price">Free</p>
+                        <p class="pricing-price-note">Forever — no catch</p>
+                        <ul class="pricing-features">
+                            <li>Clipboard history (25 items)</li>
+                            <li>Standard paste</li>
+                            <li>Basic search &amp; filtering</li>
+                            <li>iOS companion app (free)</li>
+                            <li>100% on-device privacy</li>
+                        </ul>
+                        <a href="https://dist.saneclip.com/updates/SaneClip-2.2.0.dmg" class="pricing-cta pricing-cta-free">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 6px;">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download Free
+                        </a>
+                    </div>
+                    <div class="pricing-card featured">
+                        <p class="pricing-label">Pro</p>
+                        <p class="pricing-price">$6.99<span class="price-note">*</span></p>
+                        <p class="pricing-price-note">One-time — yours forever</p>
+                        <ul class="pricing-features">
+                            <li>Everything in Basic, plus:</li>
+                            <li class="extra">Unlimited clipboard history</li>
+                            <li class="extra">Paste as plain text</li>
+                            <li class="extra">Smart paste (URL cleaning, code detection)</li>
+                            <li class="extra">Text transforms (UPPER, lower, Title, JSON, strip HTML)</li>
+                            <li class="extra">Paste stack (FIFO/LIFO queue)</li>
+                            <li class="extra">Snippets with placeholders</li>
+                            <li class="extra">Pin &amp; organize items</li>
+                            <li class="extra">Clipboard rules (auto-strip tracking, trim, clean)</li>
+                            <li class="extra">History encryption (AES-256-GCM)</li>
+                            <li class="extra">Export / import history</li>
+                        </ul>
+                        <a href="https://go.saneapps.com/buy/saneclip?ref=website-hero" class="pricing-cta pricing-cta-pro">Buy Pro</a>
+                    </div>
+                </div>
             </div>
             <p class="system-requirements animate-in delay-4" style="color: var(--text-secondary); font-size: 0.9375rem; margin-top: -28px; margin-bottom: 40px;">Requires macOS 15.0 (Sequoia) or later</p>
 
@@ -1826,15 +2009,15 @@
             <div class="sustainability-card">
                 <h2 style="font-family: 'Playfair Display', serif; font-size: 2.25rem; margin-bottom: 20px;">100% Transparent Code ≠ Free</h2>
                 <div class="sustainability-body">
-                    <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 30px;">Great transparent-code tools die when developers can't sustain them. $6.99 keeps SaneClip alive and actively maintained.</p>
+                    <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 30px;">Start free, upgrade when you need more. Pro keeps SaneClip alive and actively maintained.</p>
                     <div class="sustainability-options">
-                        <a href="https://github.com/sane-apps/SaneClip" class="sustainability-option">
-                            <h4>Build It Yourself</h4>
-                            <p>Clone the repo. PolyForm Shield Licensed. Build from source for free.</p>
+                        <a href="https://dist.saneclip.com/updates/SaneClip-2.2.0.dmg" class="sustainability-option">
+                            <h4>Download Free</h4>
+                            <p>25-item clipboard history, standard paste, iOS companion app. No account, no catch.</p>
                         </a>
                         <a href="https://go.saneapps.com/buy/saneclip?ref=website" class="sustainability-option featured">
-                            <h4>Buy Now - $6.99</h4>
-                            <p>Get a signed, notarized, ready-to-use app and support development.</p>
+                            <h4>Upgrade to Pro — $6.99</h4>
+                            <p>Unlimited history, encryption, smart paste, snippets, and more. One-time payment, yours forever.</p>
                         </a>
                     </div>
                 </div>

@@ -1,3 +1,4 @@
+import SaneUI
 import SwiftUI
 
 // MARK: - Filter Enums
@@ -32,6 +33,7 @@ enum ContentTypeFilter: String, CaseIterable {
 
 struct ClipboardHistoryView: View {
     var clipboardManager: ClipboardManager
+    var licenseService: LicenseService?
     @State private var searchText = ""
     @State private var selectedIndex: Int = 0
     @FocusState private var isListFocused: Bool
@@ -40,6 +42,9 @@ struct ClipboardHistoryView: View {
     @State private var dateFilter: DateFilter = .all
     @State private var contentTypeFilter: ContentTypeFilter = .all
     @State private var showFilters = false
+
+    private var isPro: Bool { licenseService?.isPro == true }
+    private var isAtFreeLimit: Bool { !isPro && clipboardManager.history.count >= ClipboardManager.freeHistoryCap }
 
     /// Check if any filters are active
     var hasActiveFilters: Bool {
@@ -245,6 +250,7 @@ struct ClipboardHistoryView: View {
                                     item: item,
                                     isPinned: true,
                                     clipboardManager: clipboardManager,
+                                    licenseService: licenseService,
                                     isSelected: index == selectedIndex
                                 )
                             }
@@ -262,6 +268,7 @@ struct ClipboardHistoryView: View {
                                 item: item,
                                 isPinned: false,
                                 clipboardManager: clipboardManager,
+                                licenseService: licenseService,
                                 shortcutHint: index < 9 ? "⌘⌃\(index + 1)" : nil,
                                 isSelected: globalIndex == selectedIndex
                             )
@@ -279,6 +286,41 @@ struct ClipboardHistoryView: View {
                     moveSelection(by: -1); return .handled
                 }
                 .onKeyPress(.return) { pasteSelectedItem(); return .handled }
+            }
+
+            // Free-tier limit banner — shown when history is at cap
+            if isAtFreeLimit {
+                HStack(spacing: 8) {
+                    Image(systemName: "infinity")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(.teal)
+
+                    Text("25-item limit reached.")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.white)
+
+                    Button {
+                        if let ls = licenseService {
+                            ProUpsellWindow.show(feature: ProFeature.unlimitedHistory, licenseService: ls)
+                        }
+                    } label: {
+                        HStack(spacing: 3) {
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 10))
+                            Text("Upgrade to Pro")
+                                .font(.system(size: 12, weight: .semibold))
+                        }
+                        .foregroundStyle(.teal)
+                    }
+                    .buttonStyle(.plain)
+
+                    Spacer()
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(Color.teal.opacity(0.12))
+                .overlay(Rectangle().frame(height: 1).foregroundStyle(Color.teal.opacity(0.25)), alignment: .top)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
 
             Divider()
@@ -324,6 +366,25 @@ struct ClipboardHistoryView: View {
                     .buttonStyle(.plain)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                } else if !isPro {
+                    // Paste Stack teaser for free users
+                    Divider()
+                        .frame(height: 14)
+                    Button {
+                        if let ls = licenseService {
+                            ProUpsellWindow.show(feature: ProFeature.pasteStack, licenseService: ls)
+                        }
+                    } label: {
+                        HStack(spacing: 3) {
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 9))
+                            Text("Stack")
+                                .font(.system(size: 11))
+                        }
+                        .foregroundStyle(.teal.opacity(0.8))
+                    }
+                    .buttonStyle(.plain)
+                    .help("Unlock Paste Stack with Pro")
                 }
 
                 Spacer()

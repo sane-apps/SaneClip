@@ -1,11 +1,15 @@
+import SaneUI
 import SwiftUI
 
 struct ClipboardItemRow: View {
     let item: ClipboardItem
     let isPinned: Bool
     let clipboardManager: ClipboardManager
+    var licenseService: LicenseService?
     var shortcutHint: String?
     var isSelected: Bool = false
+
+    private var isPro: Bool { licenseService?.isPro == true }
     @Environment(\.colorScheme) private var colorScheme
     @State private var isHovering = false
     @State private var showEditSheet = false
@@ -283,15 +287,28 @@ struct ClipboardItemRow: View {
         .contextMenu {
             // Primary actions
             Button("Paste") { clipboardManager.paste(item: item) }
-            Button("Paste as Plain Text") { clipboardManager.pasteAsPlainText(item: item) }
+
+            // Paste as Plain Text — Pro only
+            Button(isPro ? "Paste as Plain Text" : "Paste as Plain Text \u{1F512}") {
+                clipboardManager.pasteAsPlainText(item: item)
+            }
+
             Button("Copy") { clipboardManager.copyWithoutPaste(item: item) }
 
-            // Text transform options (only for text content)
+            // Text transform options (only for text content) — Pro only
             if case .text = item.content {
-                Menu("Paste As...") {
-                    ForEach(TextTransform.allCases, id: \.self) { transform in
-                        Button(transform.displayName) {
-                            clipboardManager.pasteWithTransform(item: item, transform: transform)
+                Menu(isPro ? "Paste As..." : "Paste As... \u{1F512}") {
+                    if isPro {
+                        ForEach(TextTransform.allCases, id: \.self) { transform in
+                            Button(transform.displayName) {
+                                clipboardManager.pasteWithTransform(item: item, transform: transform)
+                            }
+                        }
+                    } else {
+                        Button("Unlock with Pro") {
+                            if let ls = licenseService {
+                                ProUpsellWindow.show(feature: ProFeature.textTransforms, licenseService: ls)
+                            }
                         }
                     }
                 }
@@ -299,11 +316,15 @@ struct ClipboardItemRow: View {
 
             Divider()
 
-            // Organize
-            Button(isPinned ? "Unpin" : "Pin") {
-                clipboardManager.togglePin(item: item)
+            // Organize — Pin is Pro only, Paste Stack is Pro only
+            Button(isPinned ? "Unpin \u{1F512}" : "Pin \u{1F512}") {
+                if isPro {
+                    clipboardManager.togglePin(item: item)
+                } else if let ls = licenseService {
+                    ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
+                }
             }
-            Button("Add to Paste Stack") {
+            Button(isPro ? "Add to Paste Stack" : "Paste Stack \u{1F512}") {
                 clipboardManager.addToPasteStack(item)
             }
 
@@ -324,26 +345,34 @@ struct ClipboardItemRow: View {
                 }
             }
 
-            // Notes
+            // Notes — Pro only
             if item.note == nil || item.note?.isEmpty == true {
-                Button("Add Note...") {
-                    if case let .text(text) = item.content {
-                        editText = text
-                    } else {
-                        editText = ""
+                Button(isPro ? "Add Note..." : "Add Note... \u{1F512}") {
+                    if isPro {
+                        if case let .text(text) = item.content {
+                            editText = text
+                        } else {
+                            editText = ""
+                        }
+                        editNote = ""
+                        showEditSheet = true
+                    } else if let ls = licenseService {
+                        ProUpsellWindow.show(feature: ProFeature.itemNotes, licenseService: ls)
                     }
-                    editNote = ""
-                    showEditSheet = true
                 }
             } else {
-                Button("Edit Note...") {
-                    if case let .text(text) = item.content {
-                        editText = text
-                    } else {
-                        editText = ""
+                Button(isPro ? "Edit Note..." : "Edit Note... \u{1F512}") {
+                    if isPro {
+                        if case let .text(text) = item.content {
+                            editText = text
+                        } else {
+                            editText = ""
+                        }
+                        editNote = item.note ?? ""
+                        showEditSheet = true
+                    } else if let ls = licenseService {
+                        ProUpsellWindow.show(feature: ProFeature.itemNotes, licenseService: ls)
                     }
-                    editNote = item.note ?? ""
-                    showEditSheet = true
                 }
                 Button("Remove Note") {
                     clipboardManager.updateItemNote(id: item.id, note: nil)

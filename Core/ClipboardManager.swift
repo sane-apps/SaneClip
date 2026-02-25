@@ -2,6 +2,7 @@ import AppKit
 @preconcurrency import ApplicationServices
 import Combine
 import os.log
+import SaneUI
 import SwiftUI
 import UniformTypeIdentifiers
 #if APP_STORE
@@ -15,11 +16,21 @@ import WidgetKit
 class ClipboardManager {
     static var shared: ClipboardManager!
 
+    /// Free tier history cap — Pro users get unlimited.
+    static let freeHistoryCap = 25
+
     var history: [ClipboardItem] = []
     var pinnedItems: [ClipboardItem] = []
     var pasteStack: [ClipboardItem] = []
     var isPasteStackMode: Bool { !pasteStack.isEmpty }
     private var lastChangeCount: Int = 0
+
+    /// License service for Pro feature gating.
+    var licenseService: LicenseService? {
+        didSet {
+            enforceHistoryLimitIfNeeded()
+        }
+    }
     /// Tracks the pasteboard changeCount at which our last self-write completed.
     /// checkClipboard() skips processing while changeCount hasn't advanced past this value.
     /// This is more robust than a simple boolean because it handles the dual changeCount
@@ -73,6 +84,9 @@ class ClipboardManager {
     }
 
     private func checkClipboard() {
+        // Keep history aligned with current tier limits (covers downgrade/migration states).
+        enforceHistoryLimitIfNeeded()
+
         // Cleanup expired items periodically
         cleanupExpiredItems()
 
@@ -251,17 +265,8 @@ class ClipboardManager {
         // Add to front
         history.insert(item, at: 0)
 
-        // Trim to max size, cleaning up thumbnails for removed items
-        if history.count > maxHistorySize {
-            let removed = history.suffix(from: maxHistorySize)
-            for item in removed {
-                if case .image = item.content {
-                    deleteThumbnail(id: item.id)
-                }
-            }
-            history = Array(history.prefix(maxHistorySize))
-        }
-
+        // Trim to current tier limit, cleaning up thumbnails for removed items.
+        enforceHistoryLimitIfNeeded(saveAfterTrim: false)
         saveHistory()
 
         #if ENABLE_SYNC
@@ -314,8 +319,14 @@ class ClipboardManager {
         pasteAsPlainText(item: item)
     }
 
-    /// Paste item as plain text (strips formatting)
+    /// Paste item as plain text (strips formatting) — Pro only
     func pasteAsPlainText(item: ClipboardItem) {
+        guard licenseService?.isPro == true else {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.plainTextPaste, licenseService: ls)
+            }
+            return
+        }
         guard case let .text(string) = item.content else { return }
 
         let pasteboard = NSPasteboard.general
@@ -335,11 +346,17 @@ class ClipboardManager {
         dismissAndPaste()
     }
 
-    /// Smart paste: auto-selects paste behavior based on content type
+    /// Smart paste: auto-selects paste behavior based on content type — Pro only
     /// - Code → plain text (preserves indentation, strips rich formatting)
     /// - URL → cleaned URL with tracking params stripped
     /// - Everything else → standard paste
     func pasteSmartMode(item: ClipboardItem) {
+        guard licenseService?.isPro == true else {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.smartPaste, licenseService: ls)
+            }
+            return
+        }
         if item.isCode {
             pasteAsPlainText(item: item)
         } else if item.isURL, case let .text(urlString) = item.content {
@@ -375,8 +392,14 @@ class ClipboardManager {
         }
     }
 
-    /// Paste item with a text transformation applied
+    /// Paste item with a text transformation applied — Pro only
     func pasteWithTransform(item: ClipboardItem, transform: TextTransform) {
+        guard licenseService?.isPro == true else {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.textTransforms, licenseService: ls)
+            }
+            return
+        }
         guard case let .text(string) = item.content else { return }
 
         let transformed = transform.apply(to: string)
@@ -399,8 +422,14 @@ class ClipboardManager {
         dismissAndPaste()
     }
 
-    /// Paste an expanded snippet to the active application
+    /// Paste an expanded snippet to the active application — Pro only
     func pasteSnippet(_ snippet: Snippet, values: [String: String] = [:]) {
+        guard licenseService?.isPro == true else {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
+            }
+            return
+        }
         let expanded = SnippetManager.shared.expand(snippet: snippet, values: values)
 
         let pasteboard = NSPasteboard.general
@@ -416,14 +445,26 @@ class ClipboardManager {
 
     // MARK: - Paste Stack
 
-    /// Add an item to the paste stack (FIFO queue)
+    /// Add an item to the paste stack (FIFO queue) — Pro only
     func addToPasteStack(_ item: ClipboardItem) {
+        guard licenseService?.isPro == true else {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.pasteStack, licenseService: ls)
+            }
+            return
+        }
         pasteStack.append(item)
         SettingsModel.shared.pasteSound.play()
     }
 
-    /// Paste the next item from the stack (FIFO or LIFO based on settings)
+    /// Paste the next item from the stack (FIFO or LIFO based on settings) — Pro only
     func pasteFromStack() {
+        guard licenseService?.isPro == true else {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.pasteStack, licenseService: ls)
+            }
+            return
+        }
         guard !pasteStack.isEmpty else { return }
         let item: ClipboardItem = if SettingsModel.shared.pasteStackReversed {
             pasteStack.removeLast()
@@ -994,8 +1035,39 @@ class ClipboardManager {
                 let pinnedUUIDs = Set(pinnedIDs.compactMap { UUID(uuidString: $0) })
                 pinnedItems = history.filter { pinnedUUIDs.contains($0.id) }
             }
+
+            // If license service is already available, enforce tier limits immediately.
+            enforceHistoryLimitIfNeeded()
         } catch {
             logger.error("Failed to load history: \(error.localizedDescription)")
+        }
+    }
+
+    private func effectiveHistoryLimit() -> Int? {
+        guard licenseService != nil else { return nil }
+        if licenseService?.isPro == true {
+            return maxHistorySize
+        }
+        return min(maxHistorySize, Self.freeHistoryCap)
+    }
+
+    private func enforceHistoryLimitIfNeeded(saveAfterTrim: Bool = true) {
+        guard let effectiveMax = effectiveHistoryLimit(), history.count > effectiveMax else { return }
+
+        let removed = history.suffix(from: effectiveMax)
+        for item in removed {
+            if case .image = item.content {
+                deleteThumbnail(id: item.id)
+            }
+        }
+
+        history = Array(history.prefix(effectiveMax))
+        pinnedItems = pinnedItems.filter { pinned in
+            history.contains { $0.id == pinned.id }
+        }
+
+        if saveAfterTrim {
+            saveHistory()
         }
     }
 

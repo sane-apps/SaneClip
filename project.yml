@@ -8,6 +8,7 @@ options:
 
 configs:
   Debug: debug
+  ProdDebug: debug
   Release: release
   Release-AppStore: release
 
@@ -18,6 +19,8 @@ packages:
   Sparkle:
     url: https://github.com/sparkle-project/Sparkle
     from: 2.6.0
+  SaneUI:
+    path: ../../infra/SaneUI
 
 settings:
   DEAD_CODE_STRIPPING: YES
@@ -94,6 +97,7 @@ targets:
     sources:
       - main.swift
       - SaneClipApp.swift
+      - ProFeature.swift
       - path: Core
         excludes:
           - "**/CLAUDE.md"
@@ -108,6 +112,7 @@ targets:
     dependencies:
       - package: KeyboardShortcuts
       - package: Sparkle
+      - package: SaneUI
       - target: SaneClipWidgets
         embed: true
         codeSign: true
@@ -144,8 +149,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.1.2"
-        CURRENT_PROJECT_VERSION: "2102"
+        MARKETING_VERSION: "2.2.0"
+        CURRENT_PROJECT_VERSION: "2200"
+        MARKETING_VERSION: "2.2.0"
+        CURRENT_PROJECT_VERSION: "2200"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -156,6 +163,11 @@ targets:
         CODE_SIGN_INJECT_BASE_ENTITLEMENTS: YES
       configs:
         Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipDebug.entitlements
+        ProdDebug:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Development"
@@ -220,6 +232,9 @@ targets:
         Debug:
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Development"
+        ProdDebug:
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Apple Development"
         Release:
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Development"
@@ -243,14 +258,21 @@ targets:
       base:
         PRODUCT_NAME: SaneClipWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
-        MARKETING_VERSION: "2.1.2"
-        CURRENT_PROJECT_VERSION: "2102"
+        MARKETING_VERSION: "2.2.0"
+        CURRENT_PROJECT_VERSION: "2200"
+        MARKETING_VERSION: "2.2.0"
+        CURRENT_PROJECT_VERSION: "2200"
         SWIFT_VERSION: 6.0
         CODE_SIGN_STYLE: Manual
         SKIP_INSTALL: YES
         LD_RUNPATH_SEARCH_PATHS: "@executable_path/../Frameworks @executable_path/../../../../Frameworks"
       configs:
         Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.widgets
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgetsDebug.entitlements
+        ProdDebug:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev.widgets
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Development"
@@ -316,8 +338,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.1.2"
-        CURRENT_PROJECT_VERSION: "2102"
+        MARKETING_VERSION: "2.2.0"
+        CURRENT_PROJECT_VERSION: "2200"
+        MARKETING_VERSION: "2.2.0"
+        CURRENT_PROJECT_VERSION: "2200"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -362,8 +386,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClipIOSWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ioswidgets
-        MARKETING_VERSION: "2.1.2"
-        CURRENT_PROJECT_VERSION: "2102"
+        MARKETING_VERSION: "2.2.0"
+        CURRENT_PROJECT_VERSION: "2200"
+        MARKETING_VERSION: "2.2.0"
+        CURRENT_PROJECT_VERSION: "2200"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"
@@ -412,8 +438,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClipIOSShare
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.share
-        MARKETING_VERSION: "2.1.2"
-        CURRENT_PROJECT_VERSION: "2102"
+        MARKETING_VERSION: "2.2.0"
+        CURRENT_PROJECT_VERSION: "2200"
+        MARKETING_VERSION: "2.2.0"
+        CURRENT_PROJECT_VERSION: "2200"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"

@@ -1,5 +1,6 @@
 import KeyboardShortcuts
 import LocalAuthentication
+import SaneUI
 import ServiceManagement
 import SwiftUI
 
@@ -12,6 +13,7 @@ extension Notification.Name {
 // MARK: - Settings View
 
 struct SettingsView: View {
+    var licenseService: LicenseService?
     @State private var selectedTab: SettingsTab? = .general
 
     enum SettingsTab: String, CaseIterable, Identifiable {
@@ -22,6 +24,7 @@ struct SettingsView: View {
             case sync = "Sync"
         #endif
         case storage = "Storage"
+        case license = "License"
         case about = "About"
 
         var id: String { rawValue }
@@ -50,11 +53,11 @@ struct SettingsView: View {
 
                 switch selectedTab {
                 case .general:
-                    GeneralSettingsView()
+                    GeneralSettingsView(licenseService: licenseService)
                 case .shortcuts:
                     ShortcutsSettingsView()
                 case .snippets:
-                    SnippetsSettingsView()
+                    SnippetsSettingsView(licenseService: licenseService)
                         .padding(20)
                 #if ENABLE_SYNC
                     case .sync:
@@ -63,10 +66,18 @@ struct SettingsView: View {
                 case .storage:
                     StorageStatsView()
                         .padding(20)
+                case .license:
+                    if let licenseService {
+                        Form {
+                            LicenseSettingsView(licenseService: licenseService)
+                        }
+                        .formStyle(.grouped)
+                        .padding(20)
+                    }
                 case .about:
                     AboutSettingsView()
                 case .none:
-                    GeneralSettingsView()
+                    GeneralSettingsView(licenseService: licenseService)
                 }
             }
         }
@@ -83,6 +94,7 @@ struct SettingsView: View {
             case .sync: "arrow.triangle.2.circlepath.icloud"
         #endif
         case .storage: "chart.pie"
+        case .license: "key"
         case .about: "info.circle"
         }
     }
@@ -96,6 +108,7 @@ struct SettingsView: View {
             case .sync: .cyan
         #endif
         case .storage: .pinnedOrange
+        case .license: .teal
         case .about: .brandSilver
         }
     }
@@ -104,6 +117,7 @@ struct SettingsView: View {
 // MARK: - General Settings
 
 struct GeneralSettingsView: View {
+    var licenseService: LicenseService?
     @State private var settings = SettingsModel.shared
     @State private var launchAtLogin = false
     #if !APP_STORE
@@ -112,6 +126,8 @@ struct GeneralSettingsView: View {
         @State private var autoCheckUpdates = false
     #endif
     @State private var isAuthenticating = false
+
+    private var isPro: Bool { licenseService?.isPro == true }
 
     var body: some View {
         ScrollView {
@@ -235,24 +251,29 @@ struct GeneralSettingsView: View {
                     ))
                     .disabled(isAuthenticating)
                     CompactDivider()
-                    CompactToggle(label: "Encrypt history at rest", isOn: Binding(
-                        get: { settings.encryptHistory },
-                        set: { newValue in
-                            if newValue {
-                                // Turning ON encryption - no auth needed
-                                settings.encryptHistory = true
-                            } else {
-                                // Turning OFF encryption - requires auth
-                                Task { @MainActor in
-                                    if await authenticateForSecurityChange(reason: "Authenticate to disable history encryption") {
-                                        settings.encryptHistory = false
+                    if isPro {
+                        CompactToggle(label: "Encrypt history at rest", isOn: Binding(
+                            get: { settings.encryptHistory },
+                            set: { newValue in
+                                if newValue {
+                                    // Turning ON encryption - no auth needed
+                                    settings.encryptHistory = true
+                                } else {
+                                    // Turning OFF encryption - requires auth
+                                    Task { @MainActor in
+                                        if await authenticateForSecurityChange(reason: "Authenticate to disable history encryption") {
+                                            settings.encryptHistory = false
+                                        }
                                     }
                                 }
                             }
-                        }
-                    ))
-                    .disabled(isAuthenticating)
-                    .help("Encrypts clipboard history on disk using AES-256-GCM")
+                        ))
+                        .disabled(isAuthenticating)
+                        .help("Encrypts clipboard history on disk using AES-256-GCM")
+                    } else {
+                        ProLockedRow(label: "Encrypt history at rest", feature: .encryption, licenseService: licenseService)
+                            .help("Encrypts clipboard history on disk using AES-256-GCM — requires Pro")
+                    }
                     CompactDivider()
                     ExcludedAppsInline(
                         excludedApps: Binding(
@@ -328,23 +349,40 @@ struct GeneralSettingsView: View {
                     }
                     CompactDivider()
                     CompactRow("Data") {
-                        HStack(spacing: 8) {
-                            Button("Export...") {
-                                exportHistory()
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
+                        if isPro {
+                            HStack(spacing: 8) {
+                                Button("Export...") {
+                                    exportHistory()
+                                }
+                                .buttonStyle(.bordered)
+                                .controlSize(.small)
 
-                            Button("Import...") {
-                                importHistory()
+                                Button("Import...") {
+                                    importHistory()
+                                }
+                                .buttonStyle(.bordered)
+                                .controlSize(.small)
                             }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
+                        } else {
+                            Button {
+                                if let ls = licenseService {
+                                    ProUpsellWindow.show(feature: ProFeature.exportImport, licenseService: ls)
+                                }
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "lock.fill")
+                                        .font(.system(size: 10))
+                                    Text("Export / Import")
+                                        .font(.system(size: 12, weight: .semibold))
+                                }
+                                .foregroundStyle(.teal)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                 }
 
-                ClipboardRulesSection()
+                ClipboardRulesSection(licenseService: licenseService)
 
                 CompactSection("Backup & Restore") {
                     CompactRow("Settings") {
@@ -1290,6 +1328,7 @@ struct GlassGroupBoxStyle: GroupBoxStyle {
 @MainActor
 enum SettingsWindowController {
     private static var window: NSWindow?
+    static var licenseService: LicenseService?
 
     static func open() {
         if let existingWindow = window, existingWindow.isVisible {
@@ -1298,7 +1337,7 @@ enum SettingsWindowController {
             return
         }
 
-        let settingsView = SettingsView()
+        let settingsView = SettingsView(licenseService: licenseService)
             .preferredColorScheme(.dark)
         let hostingController = NSHostingController(rootView: settingsView)
 
@@ -1322,10 +1361,16 @@ enum SettingsWindowController {
 // MARK: - Clipboard Rules Section
 
 struct ClipboardRulesSection: View {
+    var licenseService: LicenseService?
     @State private var rules = ClipboardRulesManager.shared
+
+    private var isPro: Bool { licenseService?.isPro == true }
 
     var body: some View {
         CompactSection("Clipboard Rules") {
+            if !isPro {
+                ProLockedSectionBanner(feature: .clipboardRules, licenseService: licenseService)
+            }
             CompactToggle(
                 label: "Strip URL tracking parameters",
                 isOn: Binding(
@@ -1333,7 +1378,8 @@ struct ClipboardRulesSection: View {
                     set: { rules.stripTrackingParams = $0 }
                 )
             )
-            .help("Remove utm_*, fbclid, and other tracking params from URLs")
+            .help("Remove utm_*, fbclid, and other tracking params from URLs — requires Pro")
+            .disabled(!isPro)
 
             CompactDivider()
 
@@ -1344,7 +1390,8 @@ struct ClipboardRulesSection: View {
                     set: { rules.autoTrimWhitespace = $0 }
                 )
             )
-            .help("Remove leading/trailing spaces from copied text")
+            .help("Remove leading/trailing spaces from copied text — requires Pro")
+            .disabled(!isPro)
 
             CompactDivider()
 
@@ -1355,7 +1402,8 @@ struct ClipboardRulesSection: View {
                     set: { rules.normalizeLineEndings = $0 }
                 )
             )
-            .help("Convert Windows (CRLF) to Unix (LF) line endings")
+            .help("Convert Windows (CRLF) to Unix (LF) line endings — requires Pro")
+            .disabled(!isPro)
 
             CompactDivider()
 
@@ -1366,7 +1414,8 @@ struct ClipboardRulesSection: View {
                     set: { rules.removeDuplicateSpaces = $0 }
                 )
             )
-            .help("Collapse multiple consecutive spaces into one")
+            .help("Collapse multiple consecutive spaces into one — requires Pro")
+            .disabled(!isPro)
 
             CompactDivider()
 
@@ -1377,7 +1426,72 @@ struct ClipboardRulesSection: View {
                     set: { rules.lowercaseURLs = $0 }
                 )
             )
-            .help("Convert URL hostnames to lowercase")
+            .help("Convert URL hostnames to lowercase — requires Pro")
+            .disabled(!isPro)
         }
+    }
+}
+
+// MARK: - Pro Lock Helpers
+
+/// Inline row showing a lock badge with a "Pro" label — tapping shows the upsell.
+private struct ProLockedRow: View {
+    let label: String
+    let feature: ProFeature
+    var licenseService: LicenseService?
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .foregroundStyle(.white.opacity(0.9))
+            Spacer()
+            Button {
+                if let ls = licenseService {
+                    ProUpsellWindow.show(feature: feature, licenseService: ls)
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 10))
+                    Text("Pro")
+                        .font(.system(size: 11, weight: .semibold))
+                }
+                .foregroundStyle(.teal)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .contentShape(Rectangle())
+    }
+}
+
+/// Banner shown at the top of a Pro-gated section to explain the requirement.
+private struct ProLockedSectionBanner: View {
+    let feature: ProFeature
+    var licenseService: LicenseService?
+
+    var body: some View {
+        Button {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: feature, licenseService: ls)
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.teal)
+                Text("These settings require SaneClip Pro")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.white.opacity(0.92))
+                Spacer()
+                Text("Upgrade")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.teal)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 9)
+        }
+        .buttonStyle(.plain)
     }
 }

@@ -62,8 +62,8 @@ appstore:
   review_notes: "SaneClip uses Accessibility permission to paste clipboard items directly into the frontmost application. Without this permission, the app still functions as a clipboard viewer/copier but cannot perform paste actions. To test: grant Accessibility in System Settings > Privacy & Security > Accessibility, then use the global hotkey (Cmd+Shift+V) to open history and click any item to paste it."
   screenshots:
     macos: docs/images/screenshot-[!i]*.png
-    ios: docs/images/screenshot-ios-*.png
-    ipad: docs/images/screenshot-ipad-*.png
+    ios: docs/images/screenshot-ios-*-dark.png
+    ipad: docs/images/screenshot-ipad-*-dark.png
   strip_frameworks:
     - Sparkle.framework
   contact:

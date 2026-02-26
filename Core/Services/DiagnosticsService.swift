@@ -246,13 +246,45 @@ final class DiagnosticsService: @unchecked Sendable {
 // MARK: - GitHub Issue URL Generation
 
 extension DiagnosticReport {
+    /// Generate a URL that opens a pre-filled GitHub issue.
+    /// Diagnostics are copied to clipboard instead of stuffed into URL params
+    /// (GitHub has URL length limits and the full markdown easily exceeds them).
     func gitHubIssueURL(title: String, userDescription: String) -> URL? {
-        let body = toMarkdown(userDescription: userDescription)
+        let fullBody = toMarkdown(userDescription: userDescription)
+
+        // Copy full diagnostics to clipboard — user pastes into the issue
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(fullBody, forType: .string)
+
+        // URL only carries the title + short user text (hard-clamped).
+        // If users paste full logs in the description field, this prevents
+        // GitHub's "request URL too long" error.
+        let trimmedDescription = userDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+        let baseDescription = trimmedDescription.isEmpty ? "<describe what happened>" : trimmedDescription
+        let maxDescriptionChars = 600
+        let shortDescription: String
+        if baseDescription.count > maxDescriptionChars {
+            shortDescription = String(baseDescription.prefix(maxDescriptionChars)) + "\n\n[Description truncated — full diagnostics copied to clipboard.]"
+        } else {
+            shortDescription = baseDescription
+        }
+
+        // URL only carries title + compact body.
+        let shortBody = """
+        ## Issue Description
+        \(shortDescription)
+
+        ---
+        **Diagnostics have been copied to your clipboard.** Paste them below:
+
+
+        """
 
         var components = URLComponents(string: "https://github.com/sane-apps/SaneClip/issues/new")
         components?.queryItems = [
             URLQueryItem(name: "title", value: title),
-            URLQueryItem(name: "body", value: body)
+            URLQueryItem(name: "body", value: shortBody)
         ]
 
         return components?.url

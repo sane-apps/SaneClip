@@ -236,11 +236,25 @@ See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) for full details.
 
 ## 📦 Installation
 
-**Download from [saneclip.com](https://saneclip.com) — $6.99 one-time purchase, free updates for life.**
+**SaneClip Basic is $0.** Clipboard history, standard paste, search, and iOS companion app are included.
+
+Want more? **[Upgrade to Pro ($6.99 once)](https://go.saneapps.com/buy/saneclip?ref=github-readme)** for unlimited history, Touch ID lock, encryption-at-rest, smart paste, snippets, and advanced rules.
+
+### Install
+
+```bash
+# Homebrew (recommended)
+brew install --cask sane-apps/tap/saneclip
+
+# Already have SaneClip installed? Let Homebrew manage it:
+brew install --cask --adopt sane-apps/tap/saneclip
+```
+
+Or **[download directly](https://saneclip.com)** · or [build from source](#-development)
 
 > *I wanted to make it $5, but processing fees and taxes were... insane. — Mr. Sane*
 
-**Sparkle auto-updates** keep you current — once installed, updates are delivered automatically.
+SaneClip updates itself automatically via Sparkle. `brew upgrade` works too if you prefer.
 
 ### Requirements
 

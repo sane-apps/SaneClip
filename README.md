@@ -45,8 +45,8 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 | Security Feature | What It Does |
 |------------------|--------------|
-| **🔒 AES-256-GCM Encryption** | Your clipboard history is encrypted at rest. Even if malware accesses your disk, it can't read your clips. |
-| **🔐 Touch ID Protection** | Lock your history behind biometrics. 30-second grace period means no repeated prompts. |
+| **🔒 AES-256-GCM Encryption (Pro)** | Encrypts your clipboard history at rest. Even if malware accesses your disk, it can't read your clips. |
+| **🔐 Touch ID History Lock (Pro)** | Locks history behind biometrics. 30-second grace period means no repeated prompts. |
 | **🛡️ Keychain Integration** | All secrets (webhook keys, encryption keys) stored in macOS Keychain — never in JSON files. |
 | **🚫 HTTPS Enforcement** | Webhooks must use HTTPS (localhost exempt for testing). No accidental plaintext transmission. |
 | **⚠️ URL Scheme Confirmation** | Destructive commands (copy, paste, clear) require user approval. No silent data loss. |
@@ -61,7 +61,7 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 **Security Hardening + iOS Companion App (Feb 2026)**
 
-- ✅ **History Encryption-at-Rest** — AES-256-GCM encryption enabled by default
+- ✅ **History Encryption-at-Rest** — AES-256-GCM encryption available in Pro
 - ✅ **Keychain Integration** — All secrets stored securely in macOS Keychain
 - ✅ **URL Scheme Confirmation** — Destructive commands require user approval
 - ✅ **HTTPS Enforcement** — Webhooks must use HTTPS
@@ -69,6 +69,28 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 - ✅ **Paste Stack Order** — FIFO/LIFO modes for paste stack
 - ✅ **iOS Companion App** — Free iPhone/iPad app with iCloud sync (coming to the App Store)
 - ✅ **macOS & iOS Widgets** — Recent and Pinned clips on your desktop and Home Screen
+
+---
+
+## 🧾 Free vs Pro (Current)
+
+### Free includes
+- Clipboard history (last 50 items)
+- Standard paste with original formatting
+- Search and source-aware filtering
+- iPhone companion app with iCloud sync
+- On-device privacy defaults
+
+### Pro adds
+- Unlimited history
+- Touch ID history lock
+- History encryption (AES-256-GCM)
+- Smart paste + plain text paste
+- Text transforms
+- Paste stack (FIFO/LIFO)
+- Snippets with placeholders
+- Pinning, notes, clipboard rules
+- Export and import
 
 ---
 

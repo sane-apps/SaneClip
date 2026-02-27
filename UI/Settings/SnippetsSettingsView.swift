@@ -78,16 +78,24 @@ struct SnippetsSettingsView: View {
                         SnippetRow(snippet: snippet)
                             .tag(snippet)
                             .contextMenu {
-                                Button("Edit") {
-                                    selectedSnippet = snippet
-                                    showEditSheet = true
-                                }
-                                Button("Duplicate") {
-                                    duplicateSnippet(snippet)
-                                }
-                                Divider()
-                                Button("Delete", role: .destructive) {
-                                    snippetManager.delete(id: snippet.id)
+                                if isPro {
+                                    Button("Edit") {
+                                        selectedSnippet = snippet
+                                        showEditSheet = true
+                                    }
+                                    Button("Duplicate") {
+                                        duplicateSnippet(snippet)
+                                    }
+                                    Divider()
+                                    Button("Delete", role: .destructive) {
+                                        snippetManager.delete(id: snippet.id)
+                                    }
+                                } else {
+                                    Button("Unlock Pro") {
+                                        if let ls = licenseService {
+                                            ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
+                                        }
+                                    }
                                 }
                             }
                     }

@@ -19,9 +19,23 @@ struct URLSchemeSecurityTests {
         #expect(command == .paste(index: 3))
     }
 
+    @Test("URL scheme parses paste item alias as 1-based index")
+    func parseCommandPasteItemAlias() {
+        let url = URL(string: "saneclip://paste?item=2")!
+        let command = URLSchemeHandler.parseCommand(url)
+        #expect(command == .paste(index: 1))
+    }
+
     @Test("URL scheme parses search command")
     func parseCommandSearch() {
         let url = URL(string: "saneclip://search?q=hello")!
+        let command = URLSchemeHandler.parseCommand(url)
+        #expect(command == .search(query: "hello"))
+    }
+
+    @Test("URL scheme parses search query alias")
+    func parseCommandSearchAlias() {
+        let url = URL(string: "saneclip://search?query=hello")!
         let command = URLSchemeHandler.parseCommand(url)
         #expect(command == .search(query: "hello"))
     }
@@ -31,6 +45,20 @@ struct URLSchemeSecurityTests {
         let url = URL(string: "saneclip://snippet?name=Email%20Sig")!
         let command = URLSchemeHandler.parseCommand(url)
         #expect(command == .snippet(name: "Email Sig", values: [:]))
+    }
+
+    @Test("URL scheme parses snippet alias")
+    func parseCommandSnippetAlias() {
+        let url = URL(string: "saneclip://snippet?snippet=Daily%20Standup")!
+        let command = URLSchemeHandler.parseCommand(url)
+        #expect(command == .snippet(name: "Daily Standup", values: [:]))
+    }
+
+    @Test("URL scheme parses copy value alias")
+    func parseCommandCopyAlias() {
+        let url = URL(string: "saneclip://copy?value=Hello%20Alias")!
+        let command = URLSchemeHandler.parseCommand(url)
+        #expect(command == .copy(text: "Hello Alias"))
     }
 
     @Test("URL scheme parses clear command")

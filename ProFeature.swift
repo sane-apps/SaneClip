@@ -3,6 +3,7 @@ import SaneUI
 // MARK: - SaneClip Pro Feature Definitions
 
 enum ProFeature: String, ProFeatureDescribing, CaseIterable {
+    case historyLock = "Touch ID History Lock"
     case plainTextPaste = "Paste as Plain Text"
     case smartPaste = "Smart Paste"
     case textTransforms = "Text Transforms"
@@ -20,6 +21,8 @@ enum ProFeature: String, ProFeatureDescribing, CaseIterable {
 
     var featureDescription: String {
         switch self {
+        case .historyLock:
+            "Lock clipboard history behind Touch ID before viewing or pasting sensitive clips."
         case .plainTextPaste:
             "Strip rich formatting and paste pure text — no hidden fonts, colors, or styles carried over."
         case .smartPaste:
@@ -41,12 +44,14 @@ enum ProFeature: String, ProFeatureDescribing, CaseIterable {
         case .exportImport:
             "Back up your clipboard history to JSON and restore it anytime — even on a new Mac."
         case .unlimitedHistory:
-            "Free tier stores your last 25 clips. Pro removes the cap — keep your entire clipboard history."
+            "Free tier stores your last 50 clips. Pro removes the cap — keep your entire clipboard history."
         }
     }
 
     var featureIcon: String {
         switch self {
+        case .historyLock:
+            "touchid"
         case .plainTextPaste:
             "textformat.alt"
         case .smartPaste:

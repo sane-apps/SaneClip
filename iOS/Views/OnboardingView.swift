@@ -12,7 +12,7 @@ struct OnboardingView: View {
             LinearGradient(
                 colors: [
                     Color.teal.opacity(0.12),
-                    Color.purple.opacity(0.08),
+                    Color.teal.opacity(0.08),
                     Color.teal.opacity(0.05)
                 ],
                 startPoint: .topLeading,
@@ -120,7 +120,7 @@ private struct FeaturesPageIOS: View {
         ("icloud", .blue, "iCloud Sync", "Your clips on all your devices"),
         ("exclamationmark.shield.fill", .yellow, "Sensitive Data Detection", "Flags passwords, credit cards, API keys"),
         ("photo", .green, "Images & Text", "Copies images too, not just text"),
-        ("widget.small", .purple, "Home Screen Widgets", "Quick access without opening the app"),
+        ("widget.small", .teal, "Home Screen Widgets", "Quick access without opening the app"),
         ("magnifyingglass", .white, "Instant Search", "Find anything you ever copied")
     ]
 
@@ -283,7 +283,7 @@ private struct SanePromisePageIOS: View {
 
                     SanePillarCardIOS(
                         icon: "brain.head.profile",
-                        color: .purple,
+                        color: .teal,
                         title: "Sound Mind",
                         lines: [
                             "Calm and focused",

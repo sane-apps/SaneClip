@@ -159,7 +159,7 @@ struct ClipItemRow: View {
         case .text: return .primary
         case .url: return .blue
         case .code: return .orange
-        case .image: return .purple
+        case .image: return .teal
         }
     }
 }

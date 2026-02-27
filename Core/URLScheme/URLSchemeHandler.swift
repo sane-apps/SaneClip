@@ -35,13 +35,17 @@ enum URLSchemeCommand: Equatable {
 /// Handles saneclip:// URL scheme commands
 ///
 /// Supported URLs:
-/// - saneclip://paste?index=N - Paste item at index N
+/// - saneclip://paste?index=N - Paste item at index N (0-based)
+/// - saneclip://paste?item=N - Paste item at index N (1-based helper for automation tools)
 /// - saneclip://search?q=QUERY - Open search with query
+/// - saneclip://search?query=QUERY - Alias for search query
 /// - saneclip://export - Trigger history export
 /// - saneclip://history - Show history window
 /// - saneclip://clear - Clear history (with confirmation)
 /// - saneclip://snippet?name=NAME - Paste snippet by name
+/// - saneclip://snippet?snippet=NAME - Alias for snippet name
 /// - saneclip://copy?text=TEXT - Copy text to clipboard
+/// - saneclip://copy?value=TEXT - Alias for copy text
 @MainActor
 final class URLSchemeHandler {
     /// Shared singleton instance
@@ -58,12 +62,19 @@ final class URLSchemeHandler {
 
         switch host.lowercased() {
         case "paste":
-            guard let indexString = url.queryValue(for: "index"),
-                  let index = Int(indexString), index >= 0 else { return nil }
-            return .paste(index: index)
+            if let indexString = url.queryValue(for: "index"),
+               let index = Int(indexString), index >= 0 {
+                return .paste(index: index)
+            }
+            // Convenience alias for tools that provide 1-based list positions.
+            if let itemString = url.queryValue(for: "item"),
+               let item = Int(itemString), item > 0 {
+                return .paste(index: item - 1)
+            }
+            return nil
 
         case "search":
-            guard let query = url.queryValue(for: "q"), !query.isEmpty else { return nil }
+            guard let query = url.firstQueryValue(for: ["q", "query"]), !query.isEmpty else { return nil }
             return .search(query: query)
 
         case "export":
@@ -76,12 +87,12 @@ final class URLSchemeHandler {
             return .clear
 
         case "snippet":
-            guard let name = url.queryValue(for: "name"), !name.isEmpty else { return nil }
+            guard let name = url.firstQueryValue(for: ["name", "snippet"]), !name.isEmpty else { return nil }
             // Collect placeholder values from query params
             var values: [String: String] = [:]
             if let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
                let queryItems = components.queryItems {
-                for item in queryItems where item.name != "name" {
+                for item in queryItems where item.name != "name" && item.name != "snippet" {
                     if let value = item.value {
                         values[item.name] = value
                     }
@@ -90,7 +101,7 @@ final class URLSchemeHandler {
             return .snippet(name: name, values: values)
 
         case "copy":
-            guard let text = url.queryValue(for: "text"), !text.isEmpty else { return nil }
+            guard let text = url.firstQueryValue(for: ["text", "value"]), !text.isEmpty else { return nil }
             return .copy(text: text)
 
         default:
@@ -124,8 +135,10 @@ final class URLSchemeHandler {
             return false
         }
 
-        // Destructive commands require Touch ID if enabled
-        if command.requiresConfirmation, SettingsModel.shared.requireTouchID {
+        // Destructive commands require Touch ID only for Pro users who enabled it.
+        if command.requiresConfirmation,
+           ClipboardManager.shared?.licenseService?.isPro == true,
+           SettingsModel.shared.requireTouchID {
             guard authenticateSync() else {
                 print("URLSchemeHandler: Touch ID authentication failed")
                 return false
@@ -264,46 +277,10 @@ final class URLSchemeHandler {
             message: "An external source wants to paste snippet \"\(name)\":\n\n\"\(preview)\""
         ) else { return false }
 
-        // Set to clipboard (prevent feedback loop)
-        ClipboardManager.shared?.isSelfWrite = true
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-        pasteboard.setString(expanded, forType: .string)
-
-        #if APP_STORE
-            // App Store: just copy to clipboard, user pastes manually
-            SettingsModel.shared.pasteSound.play()
-        #else
-            // Check accessibility before attempting paste
-            guard AXIsProcessTrusted() else {
-                // Show permission alert — same as ClipboardManager.simulatePaste()
-                let alert = NSAlert()
-                alert.messageText = "Accessibility Permission Required"
-                alert.informativeText = "SaneClip needs Accessibility permission to paste into other apps.\n\nGo to System Settings > Privacy & Security > Accessibility and enable SaneClip."
-                alert.addButton(withTitle: "Open System Settings")
-                alert.addButton(withTitle: "Cancel")
-                alert.alertStyle = .warning
-                if alert.runModal() == .alertFirstButtonReturn {
-                    if let settingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-                        NSWorkspace.shared.open(settingsURL)
-                    }
-                }
-                return false
-            }
-
-            // Trigger paste
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                let source = CGEventSource(stateID: .hidSystemState)
-                let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 9, keyDown: true)
-                let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 9, keyDown: false)
-                keyDown?.flags = .maskCommand
-                keyUp?.flags = .maskCommand
-                keyDown?.post(tap: .cghidEventTap)
-                keyUp?.post(tap: .cghidEventTap)
-            }
-        #endif
-
-        return true
+        guard let clipboardManager = ClipboardManager.shared else { return false }
+        let canUseSnippets = clipboardManager.licenseService?.isPro == true
+        clipboardManager.pasteSnippet(snippet, values: mergedValues)
+        return canUseSnippets
     }
 
     /// Copies text directly to clipboard (requires confirmation)
@@ -337,5 +314,15 @@ extension URL {
             return nil
         }
         return queryItems.first { $0.name == key }?.value
+    }
+
+    /// Gets the first non-empty query parameter value for any provided keys.
+    func firstQueryValue(for keys: [String]) -> String? {
+        for key in keys {
+            if let value = queryValue(for: key), !value.isEmpty {
+                return value
+            }
+        }
+        return nil
     }
 }

@@ -8,13 +8,20 @@ struct ClipboardItemRow: View {
     var licenseService: LicenseService?
     var shortcutHint: String?
     var isSelected: Bool = false
+    var isQueuedForMerge: Bool = false
+    var onToggleMergeQueue: (() -> Void)?
 
     private var isPro: Bool { licenseService?.isPro == true }
     @Environment(\.colorScheme) private var colorScheme
     @State private var isHovering = false
     @State private var showEditSheet = false
     @State private var editText = ""
+    @State private var editTitle = ""
+    @State private var editTags = ""
+    @State private var editCollection = "Default"
     @State private var editNote = ""
+    @State private var showCollectionSheet = false
+    @State private var customCollection = ""
 
     private var isImageItem: Bool {
         if case .image = item.content { return true }
@@ -167,10 +174,23 @@ struct ClipboardItemRow: View {
 
                         switch item.content {
                         case .text:
-                            Text(item.preview)
-                                .lineLimit(3)
-                                .font(itemFont)
-                                .foregroundStyle(.primary)
+                            VStack(alignment: .leading, spacing: 2) {
+                                if let title = item.title, !title.isEmpty {
+                                    Text(title)
+                                        .lineLimit(1)
+                                        .font(.system(.subheadline, weight: .semibold))
+                                        .foregroundStyle(.white)
+                                    Text(item.preview)
+                                        .lineLimit(3)
+                                        .font(itemFont)
+                                        .foregroundStyle(.primary.opacity(0.88))
+                                } else {
+                                    Text(item.preview)
+                                        .lineLimit(3)
+                                        .font(itemFont)
+                                        .foregroundStyle(.primary)
+                                }
+                            }
                         case let .image(nsImage):
                             Image(nsImage: nsImage)
                                 .resizable()
@@ -201,6 +221,26 @@ struct ClipboardItemRow: View {
                         }
                         .foregroundStyle(.secondary)
                         .padding(.leading, 20) // Align with content (past the icon)
+                    }
+
+                    if !item.tags.isEmpty {
+                        HStack(spacing: 4) {
+                            ForEach(item.tags.prefix(3), id: \.self) { tag in
+                                Text("#\(tag)")
+                                    .font(.system(size: 10, weight: .medium))
+                                    .foregroundStyle(.white.opacity(0.9))
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.clipBlue.opacity(0.22))
+                                    .clipShape(Capsule())
+                            }
+                            if item.tags.count > 3 {
+                                Text("+\(item.tags.count - 3)")
+                                    .font(.system(size: 10, weight: .medium))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding(.leading, 20)
                     }
 
                     // Metadata line - fixed columns for alignment
@@ -251,6 +291,16 @@ struct ClipboardItemRow: View {
                                 .background(Color.primary.opacity(0.05))
                                 .cornerRadius(4)
                         }
+
+                        if item.collection != "Default" {
+                            Text(item.collection)
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.85))
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 2)
+                                .background(Color.pinnedOrange.opacity(0.2))
+                                .clipShape(Capsule())
+                        }
                     }
                     .lineLimit(1)
                 }
@@ -295,6 +345,10 @@ struct ClipboardItemRow: View {
 
             Button("Copy") { clipboardManager.copyWithoutPaste(item: item) }
 
+            Button(isQueuedForMerge ? "Remove from Merge Queue" : "Add to Merge Queue") {
+                onToggleMergeQueue?()
+            }
+
             // Text transform options (only for text content) — Pro only
             if case .text = item.content {
                 Menu(isPro ? "Paste As..." : "Paste As... \u{1F512}") {
@@ -336,13 +390,51 @@ struct ClipboardItemRow: View {
                 }
             }
 
+            Menu("Move to Collection") {
+                ForEach(clipboardManager.availableCollections(), id: \.self) { collection in
+                    Button(collection) {
+                        clipboardManager.updateItemCollection(id: item.id, collection: collection)
+                    }
+                }
+                Divider()
+                Button("New Collection...") {
+                    customCollection = ""
+                    showCollectionSheet = true
+                }
+            }
+
             // Edit (text only)
             if case let .text(text) = item.content {
                 Button("Edit...") {
                     editText = text
+                    editTitle = item.title ?? ""
+                    editTags = item.tags.joined(separator: ", ")
+                    editCollection = item.collection
                     editNote = item.note ?? ""
                     showEditSheet = true
                 }
+            }
+
+            Button("Rename...") {
+                if case let .text(text) = item.content {
+                    editText = text
+                }
+                editTitle = item.title ?? ""
+                editTags = item.tags.joined(separator: ", ")
+                editCollection = item.collection
+                editNote = item.note ?? ""
+                showEditSheet = true
+            }
+
+            Button("Edit Tags...") {
+                if case let .text(text) = item.content {
+                    editText = text
+                }
+                editTitle = item.title ?? ""
+                editTags = item.tags.joined(separator: ", ")
+                editCollection = item.collection
+                editNote = item.note ?? ""
+                showEditSheet = true
             }
 
             // Notes — Pro only
@@ -354,6 +446,9 @@ struct ClipboardItemRow: View {
                         } else {
                             editText = ""
                         }
+                        editTitle = item.title ?? ""
+                        editTags = item.tags.joined(separator: ", ")
+                        editCollection = item.collection
                         editNote = ""
                         showEditSheet = true
                     } else if let ls = licenseService {
@@ -368,6 +463,9 @@ struct ClipboardItemRow: View {
                         } else {
                             editText = ""
                         }
+                        editTitle = item.title ?? ""
+                        editTags = item.tags.joined(separator: ", ")
+                        editCollection = item.collection
                         editNote = item.note ?? ""
                         showEditSheet = true
                     } else if let ls = licenseService {
@@ -396,13 +494,23 @@ struct ClipboardItemRow: View {
         }
         .sheet(isPresented: $showEditSheet) {
             EditClipboardItemSheet(
+                title: $editTitle,
                 text: $editText,
+                tags: $editTags,
+                collection: $editCollection,
                 note: $editNote,
                 isImageItem: isImageItem,
                 onSave: {
                     if !isImageItem {
                         clipboardManager.updateItemContent(id: item.id, newContent: editText)
                     }
+                    clipboardManager.updateItemTitle(id: item.id, title: editTitle)
+                    let parsedTags = editTags
+                        .split(separator: ",")
+                        .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+                        .filter { !$0.isEmpty }
+                    clipboardManager.updateItemTags(id: item.id, tags: parsedTags)
+                    clipboardManager.updateItemCollection(id: item.id, collection: editCollection)
                     clipboardManager.updateItemNote(id: item.id, note: editNote)
                     showEditSheet = false
                 },
@@ -410,6 +518,28 @@ struct ClipboardItemRow: View {
                     showEditSheet = false
                 }
             )
+        }
+        .sheet(isPresented: $showCollectionSheet) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("New Collection")
+                    .font(.headline)
+                TextField("Collection name", text: $customCollection)
+                    .textFieldStyle(.roundedBorder)
+                HStack {
+                    Spacer()
+                    Button("Cancel") { showCollectionSheet = false }
+                    Button("Save") {
+                        let name = customCollection.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !name.isEmpty {
+                            clipboardManager.updateItemCollection(id: item.id, collection: name)
+                        }
+                        showCollectionSheet = false
+                    }
+                    .keyboardShortcut(.defaultAction)
+                }
+            }
+            .padding(16)
+            .frame(width: 320)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityDescription)
@@ -439,7 +569,10 @@ struct ClipboardItemRow: View {
 // MARK: - Edit Clipboard Item Sheet
 
 struct EditClipboardItemSheet: View {
+    @Binding var title: String
     @Binding var text: String
+    @Binding var tags: String
+    @Binding var collection: String
     @Binding var note: String
     var isImageItem: Bool = false
     let onSave: () -> Void
@@ -450,11 +583,35 @@ struct EditClipboardItemSheet: View {
             Text(isImageItem ? "Edit Note" : "Edit Clipboard Item")
                 .font(.headline)
 
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Title (optional)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                TextField("Display title", text: $title)
+                    .textFieldStyle(.roundedBorder)
+            }
+
             if !isImageItem {
                 TextEditor(text: $text)
                     .font(.system(.body, design: .monospaced))
                     .frame(minWidth: 400, minHeight: 200)
                     .border(Color.secondary.opacity(0.3), width: 1)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Collection")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                TextField("Default", text: $collection)
+                    .textFieldStyle(.roundedBorder)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Tags (comma-separated)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                TextField("work, urgent, client", text: $tags)
+                    .textFieldStyle(.roundedBorder)
             }
 
             // Note section
@@ -484,7 +641,7 @@ struct EditClipboardItemSheet: View {
             }
         }
         .padding()
-        .frame(minWidth: 450, minHeight: isImageItem ? 200 : 350)
+        .frame(minWidth: 450, minHeight: isImageItem ? 300 : 420)
     }
 }
 

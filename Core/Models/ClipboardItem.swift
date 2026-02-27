@@ -13,6 +13,9 @@ struct ClipboardItem: Identifiable {
     let sourceAppBundleID: String?
     let sourceAppName: String?
     var pasteCount: Int
+    var title: String?
+    var tags: [String]
+    var collection: String
     var note: String?
 
     init(
@@ -22,6 +25,9 @@ struct ClipboardItem: Identifiable {
         sourceAppBundleID: String? = nil,
         sourceAppName: String? = nil,
         pasteCount: Int = 0,
+        title: String? = nil,
+        tags: [String] = [],
+        collection: String = "Default",
         note: String? = nil
     ) {
         self.id = id
@@ -30,6 +36,9 @@ struct ClipboardItem: Identifiable {
         self.sourceAppBundleID = sourceAppBundleID
         self.sourceAppName = sourceAppName
         self.pasteCount = pasteCount
+        self.title = title
+        self.tags = tags
+        self.collection = collection
         self.note = note
     }
 
@@ -63,6 +72,13 @@ struct ClipboardItem: Identifiable {
         case .image:
             return "[Image]"
         }
+    }
+
+    var displayTitle: String {
+        if let title, !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return title
+        }
+        return preview
     }
 
     var stats: String {

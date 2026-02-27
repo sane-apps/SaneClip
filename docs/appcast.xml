@@ -13,6 +13,8 @@
             <title>2.1.2</title>
             <pubDate>Mon, 23 Feb 2026 21:07:14 -0500</pubDate>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>2102</sparkle:minimumAutoupdateVersion>
+            <sparkle:criticalUpdate/>
             <description>
                 <![CDATA[
                 <h2>Changes</h2>

@@ -19,6 +19,7 @@ private let appLogger = Logger(subsystem: "com.saneclip.app", category: "App")
         static let shared = UpdateService()
 
         private var updaterController: SPUStandardUpdaterController?
+        private let enforcedUpdateCheckInterval: TimeInterval = 60 * 60 * 6
 
         override init() {
             super.init()
@@ -27,6 +28,8 @@ private let appLogger = Logger(subsystem: "com.saneclip.app", category: "App")
                 updaterDelegate: nil,
                 userDriverDelegate: nil
             )
+            configureUpdatePolicy()
+            updaterController?.updater.checkForUpdatesInBackground()
             appLogger.info("Sparkle updater initialized")
         }
 
@@ -35,9 +38,26 @@ private let appLogger = Logger(subsystem: "com.saneclip.app", category: "App")
             updaterController?.checkForUpdates(nil)
         }
 
+        private func configureUpdatePolicy() {
+            guard let updater = updaterController?.updater else { return }
+            updater.automaticallyChecksForUpdates = true
+            updater.automaticallyDownloadsUpdates = true
+
+            if updater.updateCheckInterval > enforcedUpdateCheckInterval {
+                updater.updateCheckInterval = enforcedUpdateCheckInterval
+            }
+        }
+
         var automaticallyChecksForUpdates: Bool {
-            get { updaterController?.updater.automaticallyChecksForUpdates ?? false }
-            set { updaterController?.updater.automaticallyChecksForUpdates = newValue }
+            get { true }
+            set {
+                if newValue {
+                    updaterController?.updater.automaticallyChecksForUpdates = true
+                } else {
+                    appLogger.info("Ignoring request to disable automatic update checks")
+                    updaterController?.updater.automaticallyChecksForUpdates = true
+                }
+            }
         }
     }
 #endif
@@ -49,6 +69,7 @@ extension KeyboardShortcuts.Name {
     static let pasteAsPlainText = Self("pasteAsPlainText", default: .init(.v, modifiers: [.command, .shift, .option]))
     static let pasteFromStack = Self("pasteFromStack", default: .init(.v, modifiers: [.command, .control]))
     static let pasteSmartMode = Self("pasteSmartMode", default: .init(.v, modifiers: [.command, .shift, .control]))
+    static let ignoreNextCopy = Self("ignoreNextCopy", default: .init(.i, modifiers: [.command, .shift, .control]))
     // Quick paste shortcuts for items 1-9
     static let pasteItem1 = Self("pasteItem1", default: .init(.one, modifiers: [.command, .control]))
     static let pasteItem2 = Self("pasteItem2", default: .init(.two, modifiers: [.command, .control]))
@@ -82,7 +103,14 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         checkoutURL: URL(string: "https://go.saneapps.com/buy/saneclip")!
     )
 
-    @AppStorage("hasSeenWelcome") private var hasSeenWelcome = false
+    private let hasSeenWelcomeKey = "hasSeenWelcome"
+    private var requiresHistoryAuth: Bool {
+        licenseService.isPro && SettingsModel.shared.requireTouchID
+    }
+    private var hasSeenWelcome: Bool {
+        get { UserDefaults.standard.bool(forKey: hasSeenWelcomeKey) }
+        set { UserDefaults.standard.set(newValue, forKey: hasSeenWelcomeKey) }
+    }
 
     deinit {
         NotificationCenter.default.removeObserver(self, name: .menuBarIconChanged, object: nil)
@@ -124,24 +152,21 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showWelcomeWindow() {
+        let onboardingProFeatures: [(icon: String, text: String)] =
+            [("checkmark", "Everything in Basic, plus:")] +
+            ProFeature.allCases.map { ($0.featureIcon, $0.featureName) }
+
         WelcomeWindow.show(
             appName: "SaneClip",
             appIcon: "list.clipboard.fill",
             freeFeatures: [
-                ("clipboard", "Clipboard history — last 25 items"),
-                ("doc.on.doc", "One-tap paste"),
-                ("magnifyingglass", "Search clipboard history")
+                ("clipboard", "Clipboard history — last 50 items"),
+                ("doc.on.doc", "Standard paste with original formatting"),
+                ("magnifyingglass", "Search and source-aware filtering"),
+                ("iphone", "iPhone companion app with iCloud sync"),
+                ("lock.shield", "100% on-device privacy defaults")
             ],
-            proFeatures: [
-                ("infinity", "Unlimited clipboard history"),
-                ("textformat.alt", "Paste as plain text"),
-                ("wand.and.stars", "Smart paste (URL cleaning, code detection)"),
-                ("textformat.abc", "Text transforms (UPPERCASE, lowercase, Title Case...)"),
-                ("square.stack.3d.up", "Paste Stack — queue items for sequential paste"),
-                ("text.quote", "Snippets with placeholders"),
-                ("pin.fill", "Pin items • Item notes • Clipboard rules"),
-                ("lock.shield.fill", "History encryption • Export / Import")
-            ],
+            proFeatures: onboardingProFeatures,
             licenseService: licenseService,
             onDismiss: { [weak self] in
                 self?.hasSeenWelcome = true
@@ -241,6 +266,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
+        KeyboardShortcuts.onKeyUp(for: .ignoreNextCopy) { [weak self] in
+            Task { @MainActor in
+                self?.clipboardManager.ignoreNextCopy()
+            }
+        }
+
         // Quick paste shortcuts 1-9
         let shortcuts: [KeyboardShortcuts.Name] = [
             .pasteItem1, .pasteItem2, .pasteItem3, .pasteItem4, .pasteItem5,
@@ -278,6 +309,11 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         if KeyboardShortcuts.getShortcut(for: .pasteSmartMode) == nil {
             KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .shift, .control]), for: .pasteSmartMode)
             appLogger.info("Set default shortcut: Cmd+Shift+Ctrl+V for smart paste")
+        }
+
+        if KeyboardShortcuts.getShortcut(for: .ignoreNextCopy) == nil {
+            KeyboardShortcuts.setShortcut(.init(.i, modifiers: [.command, .shift, .control]), for: .ignoreNextCopy)
+            appLogger.info("Set default shortcut: Cmd+Shift+Ctrl+I for ignore next copy")
         }
 
         // Quick paste shortcuts: Cmd+Ctrl+1 through 9
@@ -334,7 +370,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             popover.performClose(nil)
         } else {
             // Check if Touch ID is required
-            if SettingsModel.shared.requireTouchID {
+            if requiresHistoryAuth {
                 // Check if within grace period
                 if let lastAuth = lastAuthenticationTime,
                    Date().timeIntervalSince(lastAuth) < authGracePeriod {
@@ -458,7 +494,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func showPopover() {
         // Check if Touch ID is required
-        if SettingsModel.shared.requireTouchID {
+        if requiresHistoryAuth {
             // Check if within grace period
             if let lastAuth = lastAuthenticationTime,
                Date().timeIntervalSince(lastAuth) < authGracePeriod {
@@ -484,7 +520,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         let index = sender.tag
         guard index < clipboardManager.history.count else { return }
 
-        if SettingsModel.shared.requireTouchID {
+        if requiresHistoryAuth {
             if let lastAuth = lastAuthenticationTime,
                Date().timeIntervalSince(lastAuth) < authGracePeriod {
                 clipboardManager.pasteItemAt(index: index)
@@ -508,7 +544,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         guard index < snippets.count else { return }
         let snippet = snippets[index]
 
-        if SettingsModel.shared.requireTouchID {
+        if requiresHistoryAuth {
             if let lastAuth = lastAuthenticationTime,
                Date().timeIntervalSince(lastAuth) < authGracePeriod {
                 clipboardManager.pasteSnippet(snippet)

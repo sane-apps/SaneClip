@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - Filter Enums
 
-enum DateFilter: String, CaseIterable {
+enum DateFilter: String, CaseIterable, Codable {
     case all = "All Time"
     case today = "Today"
     case week = "Last 7 Days"
@@ -21,12 +21,37 @@ enum DateFilter: String, CaseIterable {
     }
 }
 
-enum ContentTypeFilter: String, CaseIterable {
+enum ContentTypeFilter: String, CaseIterable, Codable {
     case all = "All"
     case text = "Text"
     case url = "Links"
     case code = "Code"
     case image = "Images"
+}
+
+struct HistoryFilterPreset: Codable, Identifiable, Hashable {
+    let id: UUID
+    var name: String
+    var dateFilter: DateFilter
+    var contentTypeFilter: ContentTypeFilter
+    var collectionFilter: String
+    var tagFilter: String
+
+    init(
+        id: UUID = UUID(),
+        name: String,
+        dateFilter: DateFilter,
+        contentTypeFilter: ContentTypeFilter,
+        collectionFilter: String,
+        tagFilter: String
+    ) {
+        self.id = id
+        self.name = name
+        self.dateFilter = dateFilter
+        self.contentTypeFilter = contentTypeFilter
+        self.collectionFilter = collectionFilter
+        self.tagFilter = tagFilter
+    }
 }
 
 // MARK: - Clipboard History View
@@ -41,6 +66,12 @@ struct ClipboardHistoryView: View {
     // Filter state
     @State private var dateFilter: DateFilter = .all
     @State private var contentTypeFilter: ContentTypeFilter = .all
+    @State private var selectedCollection: String = "All Collections"
+    @State private var selectedTag: String = "All Tags"
+    @State private var savedPresets: [HistoryFilterPreset] = []
+    @State private var showSavePresetSheet = false
+    @State private var presetName = ""
+    @State private var mergeQueueIDs: Set<UUID> = []
     @State private var showFilters = false
 
     private var isPro: Bool { licenseService?.isPro == true }
@@ -48,7 +79,19 @@ struct ClipboardHistoryView: View {
 
     /// Check if any filters are active
     var hasActiveFilters: Bool {
-        dateFilter != .all || contentTypeFilter != .all
+        dateFilter != .all ||
+            contentTypeFilter != .all ||
+            selectedCollection != "All Collections" ||
+            selectedTag != "All Tags"
+    }
+
+    private var allCollections: [String] {
+        ["All Collections"] + clipboardManager.availableCollections()
+    }
+
+    private var allTags: [String] {
+        let tags = Set((clipboardManager.history + clipboardManager.pinnedItems).flatMap(\.tags))
+        return ["All Tags"] + tags.sorted()
     }
 
     /// All navigable items (pinned + history)
@@ -81,6 +124,14 @@ struct ClipboardHistoryView: View {
         // Apply content type filter
         items = applyContentTypeFilter(to: items)
 
+        if selectedCollection != "All Collections" {
+            items = items.filter { $0.collection == selectedCollection }
+        }
+
+        if selectedTag != "All Tags" {
+            items = items.filter { $0.tags.contains(selectedTag) }
+        }
+
         // Filter out pinned items from main list (they show in pinned section)
         return items.filter { !clipboardManager.isPinned($0) }
     }
@@ -109,6 +160,14 @@ struct ClipboardHistoryView: View {
 
         // Apply content type filter
         items = applyContentTypeFilter(to: items)
+
+        if selectedCollection != "All Collections" {
+            items = items.filter { $0.collection == selectedCollection }
+        }
+
+        if selectedTag != "All Tags" {
+            items = items.filter { $0.tags.contains(selectedTag) }
+        }
 
         return items
     }
@@ -178,6 +237,27 @@ struct ClipboardHistoryView: View {
                 }
                 .buttonStyle(.plain)
                 .help(showFilters ? "Hide filters" : "Show filters")
+
+                Menu {
+                    Button("Pause 5 minutes") { clipboardManager.pauseCapture(minutes: 5) }
+                    Button("Pause 15 minutes") { clipboardManager.pauseCapture(minutes: 15) }
+                    Button("Pause 60 minutes") { clipboardManager.pauseCapture(minutes: 60) }
+                    Divider()
+                    Button("Resume Capture") { clipboardManager.resumeCapture() }
+                    Divider()
+                    Button("Ignore Next Copy") { clipboardManager.ignoreNextCopy() }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: clipboardManager.isCapturePaused ? "pause.circle.fill" : "pause.circle")
+                        if let remaining = clipboardManager.capturePauseRemainingText {
+                            Text(remaining)
+                                .font(.caption2.monospacedDigit())
+                        }
+                    }
+                    .foregroundStyle(clipboardManager.isCapturePaused ? Color.orange : .secondary)
+                }
+                .buttonStyle(.plain)
+                .help(clipboardManager.isCapturePaused ? "Capture paused" : "Pause capture")
             }
             .padding(8)
             .background(.background.secondary)
@@ -205,7 +285,49 @@ struct ClipboardHistoryView: View {
                     .labelsHidden()
                     .frame(width: 80)
 
+                    Picker("Collection", selection: $selectedCollection) {
+                        ForEach(allCollections, id: \.self) { collection in
+                            Text(collection).tag(collection)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                    .frame(width: 130)
+
+                    Picker("Tag", selection: $selectedTag) {
+                        ForEach(allTags, id: \.self) { tag in
+                            Text(tag).tag(tag)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                    .frame(width: 120)
+
+                    if !savedPresets.isEmpty {
+                        Menu("Saved") {
+                            ForEach(savedPresets) { preset in
+                                Button(preset.name) {
+                                    applyPreset(preset)
+                                }
+                            }
+                            Divider()
+                            Button("Clear Saved Presets") {
+                                savedPresets = []
+                                persistSavedPresets()
+                            }
+                        }
+                        .menuStyle(.borderlessButton)
+                    }
+
                     Spacer()
+
+                    Button("Save Current") {
+                        presetName = ""
+                        showSavePresetSheet = true
+                    }
+                    .buttonStyle(.plain)
+                    .font(.caption)
+                    .foregroundStyle(Color.clipBlue)
 
                     // Clear filters button
                     if hasActiveFilters {
@@ -213,6 +335,8 @@ struct ClipboardHistoryView: View {
                             withAnimation {
                                 dateFilter = .all
                                 contentTypeFilter = .all
+                                selectedCollection = "All Collections"
+                                selectedTag = "All Tags"
                             }
                         }
                         .buttonStyle(.plain)
@@ -251,7 +375,9 @@ struct ClipboardHistoryView: View {
                                     isPinned: true,
                                     clipboardManager: clipboardManager,
                                     licenseService: licenseService,
-                                    isSelected: index == selectedIndex
+                                    isSelected: index == selectedIndex,
+                                    isQueuedForMerge: mergeQueueIDs.contains(item.id),
+                                    onToggleMergeQueue: { toggleMergeQueue(id: item.id) }
                                 )
                             }
                             .onMove { source, destination in
@@ -270,7 +396,9 @@ struct ClipboardHistoryView: View {
                                 clipboardManager: clipboardManager,
                                 licenseService: licenseService,
                                 shortcutHint: index < 9 ? "⌘⌃\(index + 1)" : nil,
-                                isSelected: globalIndex == selectedIndex
+                                isSelected: globalIndex == selectedIndex,
+                                isQueuedForMerge: mergeQueueIDs.contains(item.id),
+                                onToggleMergeQueue: { toggleMergeQueue(id: item.id) }
                             )
                         }
                     }
@@ -285,6 +413,17 @@ struct ClipboardHistoryView: View {
                 .onKeyPress(characters: CharacterSet(charactersIn: "kK")) { _ in
                     moveSelection(by: -1); return .handled
                 }
+                .onKeyPress(characters: CharacterSet(charactersIn: "12345")) { keyPress in
+                    switch keyPress.characters {
+                    case "1": contentTypeFilter = .all
+                    case "2": contentTypeFilter = .text
+                    case "3": contentTypeFilter = .url
+                    case "4": contentTypeFilter = .code
+                    case "5": contentTypeFilter = .image
+                    default: break
+                    }
+                    return .handled
+                }
                 .onKeyPress(.return) { pasteSelectedItem(); return .handled }
             }
 
@@ -295,7 +434,7 @@ struct ClipboardHistoryView: View {
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(.teal)
 
-                    Text("25-item limit reached.")
+                    Text("50-item limit reached.")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.white)
 
@@ -337,6 +476,34 @@ struct ClipboardHistoryView: View {
                     Text("(\(allItems.count) shown)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                }
+
+                if !mergeQueueIDs.isEmpty {
+                    Divider()
+                        .frame(height: 14)
+                    HStack(spacing: 4) {
+                        Image(systemName: "link.badge.plus")
+                            .font(.caption)
+                        Text("\(mergeQueueIDs.count)")
+                            .font(.subheadline.monospacedDigit())
+                    }
+                    .foregroundStyle(.teal)
+                    .help("Items queued for merge")
+
+                    Button("Merge") {
+                        mergeQueuedItems()
+                    }
+                    .buttonStyle(.plain)
+                    .font(.subheadline)
+                    .foregroundStyle(.teal)
+                    .disabled(mergeQueueIDs.count < 2)
+
+                    Button("Clear Queue") {
+                        mergeQueueIDs.removeAll()
+                    }
+                    .buttonStyle(.plain)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
                 }
 
                 // Paste stack indicator
@@ -411,6 +578,39 @@ struct ClipboardHistoryView: View {
         .onAppear {
             selectedIndex = 0
             isListFocused = true
+            loadSavedPresets()
+        }
+        .onChange(of: allCollections) { _, newCollections in
+            if !newCollections.contains(selectedCollection) {
+                selectedCollection = "All Collections"
+            }
+        }
+        .onChange(of: allTags) { _, newTags in
+            if !newTags.contains(selectedTag) {
+                selectedTag = "All Tags"
+            }
+        }
+        .sheet(isPresented: $showSavePresetSheet) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Save Filter Preset")
+                    .font(.headline)
+                TextField("Preset name", text: $presetName)
+                    .textFieldStyle(.roundedBorder)
+                HStack {
+                    Spacer()
+                    Button("Cancel") {
+                        showSavePresetSheet = false
+                    }
+                    Button("Save") {
+                        saveCurrentPreset()
+                        showSavePresetSheet = false
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(presetName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+            .padding(16)
+            .frame(width: 320)
         }
     }
 
@@ -424,5 +624,58 @@ struct ClipboardHistoryView: View {
         guard selectedIndex >= 0, selectedIndex < allItems.count else { return }
         let item = allItems[selectedIndex]
         clipboardManager.paste(item: item)
+    }
+
+    private func toggleMergeQueue(id: UUID) {
+        if mergeQueueIDs.contains(id) {
+            mergeQueueIDs.remove(id)
+        } else {
+            mergeQueueIDs.insert(id)
+        }
+    }
+
+    private func mergeQueuedItems() {
+        guard mergeQueueIDs.count >= 2 else { return }
+        let ids = allItems.map(\.id).filter { mergeQueueIDs.contains($0) }
+        _ = clipboardManager.mergeItems(withIDs: ids)
+        mergeQueueIDs.removeAll()
+    }
+
+    private func loadSavedPresets() {
+        guard let data = UserDefaults.standard.data(forKey: "historyFilterPresets"),
+              let decoded = try? JSONDecoder().decode([HistoryFilterPreset].self, from: data)
+        else {
+            savedPresets = []
+            return
+        }
+        savedPresets = decoded
+    }
+
+    private func persistSavedPresets() {
+        guard let data = try? JSONEncoder().encode(savedPresets) else { return }
+        UserDefaults.standard.set(data, forKey: "historyFilterPresets")
+    }
+
+    private func saveCurrentPreset() {
+        let name = presetName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return }
+        let preset = HistoryFilterPreset(
+            name: name,
+            dateFilter: dateFilter,
+            contentTypeFilter: contentTypeFilter,
+            collectionFilter: selectedCollection,
+            tagFilter: selectedTag
+        )
+        savedPresets.removeAll { $0.name.caseInsensitiveCompare(name) == .orderedSame }
+        savedPresets.append(preset)
+        savedPresets.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        persistSavedPresets()
+    }
+
+    private func applyPreset(_ preset: HistoryFilterPreset) {
+        dateFilter = preset.dateFilter
+        contentTypeFilter = preset.contentTypeFilter
+        selectedCollection = allCollections.contains(preset.collectionFilter) ? preset.collectionFilter : "All Collections"
+        selectedTag = allTags.contains(preset.tagFilter) ? preset.tagFilter : "All Tags"
     }
 }

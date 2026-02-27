@@ -54,7 +54,7 @@ struct SettingsView: View {
                 case .general:
                     GeneralSettingsView(licenseService: licenseService)
                 case .shortcuts:
-                    ShortcutsSettingsView()
+                    ShortcutsSettingsView(licenseService: licenseService)
                 case .snippets:
                     SnippetsSettingsView(licenseService: licenseService)
                         .padding(20)
@@ -178,31 +178,37 @@ struct GeneralSettingsView: View {
                         }
                     }
                     CompactDivider()
-                    CompactToggle(label: "Paste stack: newest first", isOn: Binding(
-                        get: { settings.pasteStackReversed },
-                        set: { settings.pasteStackReversed = $0 }
-                    ))
-                    CompactDivider()
-                    CompactRow("Default paste mode") {
-                        Picker("", selection: Binding(
-                            get: { SettingsModel.shared.defaultPasteMode },
-                            set: { SettingsModel.shared.defaultPasteMode = $0 }
-                        )) {
-                            ForEach(PasteMode.allCases, id: \.self) { mode in
-                                Text(mode.rawValue).tag(mode)
+                    if isPro {
+                        CompactToggle(label: "Paste stack: newest first", isOn: Binding(
+                            get: { settings.pasteStackReversed },
+                            set: { settings.pasteStackReversed = $0 }
+                        ))
+                        CompactDivider()
+                        CompactRow("Default paste mode") {
+                            Picker("", selection: Binding(
+                                get: { SettingsModel.shared.defaultPasteMode },
+                                set: { SettingsModel.shared.defaultPasteMode = $0 }
+                            )) {
+                                ForEach(PasteMode.allCases, id: \.self) { mode in
+                                    Text(mode.rawValue).tag(mode)
+                                }
                             }
+                            .pickerStyle(.segmented)
+                            .frame(width: 240)
                         }
-                        .pickerStyle(.segmented)
-                        .frame(width: 240)
+                        HStack {
+                            Spacer()
+                            Text(SettingsModel.shared.defaultPasteMode.description)
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(.white)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.bottom, 8)
+                    } else {
+                        ProLockedRow(label: "Paste stack order (FIFO / LIFO)", feature: .pasteStack, licenseService: licenseService)
+                        CompactDivider()
+                        ProLockedRow(label: "Default paste mode (Plain / Smart)", feature: .smartPaste, licenseService: licenseService)
                     }
-                    HStack {
-                        Spacer()
-                        Text(SettingsModel.shared.defaultPasteMode.description)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.bottom, 8)
                 }
 
                 CompactSection("Security") {
@@ -225,23 +231,27 @@ struct GeneralSettingsView: View {
                     ))
                     .disabled(isAuthenticating)
                     CompactDivider()
-                    CompactToggle(label: "Require Touch ID to view history", isOn: Binding(
-                        get: { settings.requireTouchID },
-                        set: { newValue in
-                            if newValue {
-                                // Turning ON - no auth needed
-                                settings.requireTouchID = true
-                            } else {
-                                // Turning OFF - always requires auth
-                                Task { @MainActor in
-                                    if await authenticateForSecurityChange(reason: "Authenticate to disable Touch ID protection") {
-                                        settings.requireTouchID = false
+                    if isPro {
+                        CompactToggle(label: "Require Touch ID to view history", isOn: Binding(
+                            get: { settings.requireTouchID },
+                            set: { newValue in
+                                if newValue {
+                                    // Turning ON - no auth needed
+                                    settings.requireTouchID = true
+                                } else {
+                                    // Turning OFF - always requires auth
+                                    Task { @MainActor in
+                                        if await authenticateForSecurityChange(reason: "Authenticate to disable Touch ID protection") {
+                                            settings.requireTouchID = false
+                                        }
                                     }
                                 }
                             }
-                        }
-                    ))
-                    .disabled(isAuthenticating)
+                        ))
+                        .disabled(isAuthenticating)
+                    } else {
+                        ProLockedRow(label: "Require Touch ID to view history", feature: .historyLock, licenseService: licenseService)
+                    }
                     CompactDivider()
                     if isPro {
                         CompactToggle(label: "Encrypt history at rest", isOn: Binding(
@@ -300,17 +310,36 @@ struct GeneralSettingsView: View {
 
                 CompactSection("History") {
                     CompactRow("Maximum Items") {
-                        Picker("", selection: Binding(
-                            get: { settings.maxHistorySize },
-                            set: { settings.maxHistorySize = $0 }
-                        )) {
-                            Text("25").tag(25)
-                            Text("50").tag(50)
-                            Text("100").tag(100)
-                            Text("200").tag(200)
+                        if isPro {
+                            Picker("", selection: Binding(
+                                get: { settings.maxHistorySize },
+                                set: { settings.maxHistorySize = $0 }
+                            )) {
+                                Text("50").tag(50)
+                                Text("100").tag(100)
+                                Text("200").tag(200)
+                            }
+                            .pickerStyle(.menu)
+                            .frame(width: 80)
+                        } else {
+                            Button {
+                                if let ls = licenseService {
+                                    ProUpsellWindow.show(feature: ProFeature.unlimitedHistory, licenseService: ls)
+                                }
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Text("50")
+                                        .font(.system(size: 13, weight: .semibold))
+                                    Text("•")
+                                        .foregroundStyle(.white.opacity(0.7))
+                                    Text("100 / 200")
+                                    Image(systemName: "lock.fill")
+                                        .font(.system(size: 10))
+                                }
+                                .foregroundStyle(.teal)
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .pickerStyle(.menu)
-                        .frame(width: 80)
                     }
                     CompactDivider()
                     CompactRow("Auto-delete After") {
@@ -366,6 +395,63 @@ struct GeneralSettingsView: View {
                             }
                             .buttonStyle(.plain)
                         }
+                    }
+                }
+
+                CompactSection("Capture Controls") {
+                    CompactRow("Ignore Next Copy") {
+                        Button("Ignore Once") {
+                            ClipboardManager.shared?.ignoreNextCopy()
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
+                    CompactDivider()
+                    CompactRow("Pause Capture") {
+                        HStack(spacing: 6) {
+                            Button("5m") { ClipboardManager.shared?.pauseCapture(minutes: 5) }
+                                .buttonStyle(.bordered)
+                                .controlSize(.small)
+                            Button("15m") { ClipboardManager.shared?.pauseCapture(minutes: 15) }
+                                .buttonStyle(.bordered)
+                                .controlSize(.small)
+                            Button("60m") { ClipboardManager.shared?.pauseCapture(minutes: 60) }
+                                .buttonStyle(.bordered)
+                                .controlSize(.small)
+                            Button("Resume") { ClipboardManager.shared?.resumeCapture() }
+                                .buttonStyle(.bordered)
+                                .controlSize(.small)
+                        }
+                    }
+                    CompactDivider()
+                    CompactRow("Max Text Size") {
+                        Picker("", selection: Binding(
+                            get: { settings.maxCaptureTextBytes },
+                            set: { settings.maxCaptureTextBytes = $0 }
+                        )) {
+                            Text("64 KB").tag(64 * 1024)
+                            Text("256 KB").tag(256 * 1024)
+                            Text("512 KB").tag(512 * 1024)
+                            Text("1 MB").tag(1024 * 1024)
+                            Text("Unlimited").tag(0)
+                        }
+                        .pickerStyle(.menu)
+                        .frame(width: 110)
+                    }
+                    CompactDivider()
+                    CompactRow("Max Image Size") {
+                        Picker("", selection: Binding(
+                            get: { settings.maxCaptureImageBytes },
+                            set: { settings.maxCaptureImageBytes = $0 }
+                        )) {
+                            Text("2 MB").tag(2 * 1024 * 1024)
+                            Text("5 MB").tag(5 * 1024 * 1024)
+                            Text("10 MB").tag(10 * 1024 * 1024)
+                            Text("25 MB").tag(25 * 1024 * 1024)
+                            Text("Unlimited").tag(0)
+                        }
+                        .pickerStyle(.menu)
+                        .frame(width: 110)
                     }
                 }
 
@@ -566,6 +652,16 @@ struct ExcludedAppsInline: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
 
+            HStack(spacing: 8) {
+                presetButton(label: "Alfred", bundleID: "com.runningwithcrayons.Alfred")
+                presetButton(label: "Raycast", bundleID: "com.raycast.macos")
+                presetButton(label: "1Password", bundleID: "com.1password.1password")
+                presetButton(label: "Bitwarden", bundleID: "com.bitwarden.desktop")
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 8)
+
             // Subtitle
             if excludedApps.isEmpty {
                 HStack {
@@ -595,6 +691,30 @@ struct ExcludedAppsInline: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private func presetButton(label: String, bundleID: String) -> some View {
+        let exists = excludedApps.contains(bundleID)
+        Button {
+            guard !exists else { return }
+            withAnimation(.easeInOut(duration: 0.2)) {
+                excludedApps.append(bundleID)
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: exists ? "checkmark.circle.fill" : "plus.circle")
+                    .font(.system(size: 10))
+                Text(label)
+                    .font(.system(size: 11, weight: .medium))
+            }
+            .foregroundStyle(exists ? .green : .white)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color.white.opacity(0.08))
+            .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
     }
 
     private func removeApp(_ bundleID: String) {
@@ -678,6 +798,9 @@ struct ExcludedAppRow: View {
 // MARK: - Shortcuts Settings
 
 struct ShortcutsSettingsView: View {
+    var licenseService: LicenseService?
+    private var isPro: Bool { licenseService?.isPro == true }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
@@ -686,16 +809,32 @@ struct ShortcutsSettingsView: View {
                         KeyboardShortcuts.Recorder(for: .showClipboardHistory)
                     }
                     CompactDivider()
-                    CompactRow("Paste as Plain Text") {
-                        KeyboardShortcuts.Recorder(for: .pasteAsPlainText)
+                    if isPro {
+                        CompactRow("Paste as Plain Text") {
+                            KeyboardShortcuts.Recorder(for: .pasteAsPlainText)
+                        }
+                    } else {
+                        ProLockedRow(label: "Paste as Plain Text shortcut", feature: .plainTextPaste, licenseService: licenseService)
                     }
                     CompactDivider()
-                    CompactRow("Paste from Stack") {
-                        KeyboardShortcuts.Recorder(for: .pasteFromStack)
+                    if isPro {
+                        CompactRow("Paste from Stack") {
+                            KeyboardShortcuts.Recorder(for: .pasteFromStack)
+                        }
+                    } else {
+                        ProLockedRow(label: "Paste from Stack shortcut", feature: .pasteStack, licenseService: licenseService)
                     }
                     CompactDivider()
-                    CompactRow("Smart Paste") {
-                        KeyboardShortcuts.Recorder(for: .pasteSmartMode)
+                    if isPro {
+                        CompactRow("Smart Paste") {
+                            KeyboardShortcuts.Recorder(for: .pasteSmartMode)
+                        }
+                    } else {
+                        ProLockedRow(label: "Smart Paste shortcut", feature: .smartPaste, licenseService: licenseService)
+                    }
+                    CompactDivider()
+                    CompactRow("Ignore Next Copy") {
+                        KeyboardShortcuts.Recorder(for: .ignoreNextCopy)
                     }
                 }
 
@@ -1123,11 +1262,11 @@ struct SettingsGradientBackground: View {
                 // Dark mode: beautiful glass effect
                 VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow)
 
-                // Subtle blue/purple tint
+                // Subtle navy-teal tint
                 LinearGradient(
                     colors: [
                         Color.clipBlue.opacity(0.08),
-                        Color.purple.opacity(0.05),
+                        Color.teal.opacity(0.05),
                         Color.clipBlue.opacity(0.03)
                     ],
                     startPoint: .topLeading,

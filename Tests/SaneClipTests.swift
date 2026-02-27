@@ -1,3 +1,4 @@
+import AppKit
 import Testing
 @testable import SaneClip
 
@@ -46,6 +47,141 @@ struct SaneClipTests {
 
         #expect(item.sourceAppBundleID == nil)
         #expect(item.sourceAppName == nil)
+    }
+
+    @Test("ClipboardManager joins multi-item plain text for capture")
+    @MainActor
+    func clipboardManagerJoinsMultiItemText() {
+        let first = NSPasteboardItem()
+        first.setString("100", forType: .string)
+        let second = NSPasteboardItem()
+        second.setString("200", forType: .string)
+        let third = NSPasteboardItem()
+        third.setString("300", forType: .string)
+
+        let result = ClipboardManager.preferredTextForCapture(
+            from: [first, second, third],
+            sourceAppBundleID: nil
+        )
+
+        #expect(result == "100\n200\n300")
+    }
+
+    @Test("ClipboardManager prioritizes tabular text payloads")
+    @MainActor
+    func clipboardManagerPrefersTabularText() {
+        let tsv = NSPasteboardItem()
+        tsv.setString(
+            "100\t200\n300\t400",
+            forType: NSPasteboard.PasteboardType("public.tab-separated-values-text")
+        )
+
+        let result = ClipboardManager.preferredTextForCapture(
+            from: [tsv],
+            sourceAppBundleID: nil
+        )
+
+        #expect(result == "100\t200\n300\t400")
+    }
+
+    @Test("ClipboardManager uses plain text for known spreadsheet sources")
+    @MainActor
+    func clipboardManagerPrefersSpreadsheetPlainText() {
+        let item = NSPasteboardItem()
+        item.setString("100\n200\n300", forType: .string)
+
+        let spreadsheetResult = ClipboardManager.preferredTextForCapture(
+            from: [item],
+            sourceAppBundleID: "com.microsoft.Excel"
+        )
+        #expect(spreadsheetResult == "100\n200\n300")
+
+        let singleLine = NSPasteboardItem()
+        singleLine.setString("just one cell", forType: .string)
+        let nonSpreadsheetResult = ClipboardManager.preferredTextForCapture(
+            from: [singleLine],
+            sourceAppBundleID: "com.apple.Safari"
+        )
+        #expect(nonSpreadsheetResult == nil)
+    }
+
+    @Test("ClipboardManager prefers single-item multiline text even outside known spreadsheets")
+    @MainActor
+    func clipboardManagerPrefersSingleItemMultilineText() {
+        let item = NSPasteboardItem()
+        item.setString("100\n200\n300", forType: .string)
+
+        let result = ClipboardManager.preferredTextForCapture(
+            from: [item],
+            sourceAppBundleID: "com.apple.Safari"
+        )
+
+        #expect(result == "100\n200\n300")
+    }
+
+    @Test("ClipboardManager extracts tabular text from HTML table payloads")
+    @MainActor
+    func clipboardManagerPrefersHTMLTableText() {
+        let item = NSPasteboardItem()
+        let html = """
+        <table>
+          <tr><th>Q1</th><th>Q2</th></tr>
+          <tr><td>100</td><td>200</td></tr>
+        </table>
+        """
+        item.setData(Data(html.utf8), forType: .html)
+
+        let result = ClipboardManager.preferredTextForCapture(
+            from: [item],
+            sourceAppBundleID: "com.brave.Browser"
+        )
+
+        #expect(result == "Q1\tQ2\n100\t200")
+    }
+
+    @Test("ClipboardManager ignores non-tabular HTML payloads")
+    @MainActor
+    func clipboardManagerSkipsNonTabularHTML() {
+        let item = NSPasteboardItem()
+        let html = "<p>Hello <strong>world</strong></p>"
+        item.setData(Data(html.utf8), forType: .html)
+
+        let result = ClipboardManager.preferredTextForCapture(
+            from: [item],
+            sourceAppBundleID: "com.brave.Browser"
+        )
+
+        #expect(result == nil)
+    }
+
+    @Test("ClipboardManager accessibility prompt cooldown prevents loops")
+    func clipboardManagerAccessibilityPromptCooldown() {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let future = now.addingTimeInterval(15)
+
+        #expect(ClipboardManager.shouldShowAccessibilityPrompt(now: now, suppressedUntil: nil))
+        #expect(!ClipboardManager.shouldShowAccessibilityPrompt(now: now, suppressedUntil: future))
+        #expect(ClipboardManager.shouldShowAccessibilityPrompt(now: future, suppressedUntil: future))
+    }
+
+    @Test("ClipboardManager accessibility prompt copy is concise")
+    func clipboardManagerAccessibilityPromptCopy() {
+        #expect(ClipboardManager.accessibilityAlertTitle == "Auto-Paste Needs Access")
+        #expect(ClipboardManager.accessibilityAlertMessage.contains("Clip copied."))
+        #expect(!ClipboardManager.accessibilityAlertMessage.contains("Privacy & Security"))
+    }
+
+    @Test("ClipboardManager free tier history limit is capped at 50")
+    func clipboardManagerFreeTierHistoryLimit() {
+        #expect(ClipboardManager.historyLimit(maxHistorySize: 500, isPro: false) == 50)
+        #expect(ClipboardManager.historyLimit(maxHistorySize: 50, isPro: false) == 50)
+        #expect(ClipboardManager.historyLimit(maxHistorySize: 12, isPro: false) == 12)
+    }
+
+    @Test("ClipboardManager pro tier history limit respects configured max")
+    func clipboardManagerProTierHistoryLimit() {
+        #expect(ClipboardManager.historyLimit(maxHistorySize: 500, isPro: true) == 500)
+        #expect(ClipboardManager.historyLimit(maxHistorySize: 50, isPro: true) == 50)
     }
 
     @Test("SettingsModel excludes apps correctly")

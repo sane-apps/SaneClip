@@ -116,6 +116,20 @@ class SettingsModel {
         }
     }
 
+    /// Maximum text size to capture from clipboard (bytes, UTF-8). 0 disables limit.
+    var maxCaptureTextBytes: Int {
+        didSet {
+            UserDefaults.standard.set(maxCaptureTextBytes, forKey: "maxCaptureTextBytes")
+        }
+    }
+
+    /// Maximum image size to capture from clipboard/file (bytes). 0 disables limit.
+    var maxCaptureImageBytes: Int {
+        didSet {
+            UserDefaults.standard.set(maxCaptureImageBytes, forKey: "maxCaptureImageBytes")
+        }
+    }
+
     func isAppExcluded(_ bundleID: String?) -> Bool {
         guard let bundleID else { return false }
         return excludedApps.contains(bundleID)
@@ -151,6 +165,8 @@ class SettingsModel {
         encryptHistory = UserDefaults.standard.object(forKey: "encryptHistory") as? Bool ?? true
         pasteStackReversed = UserDefaults.standard.object(forKey: "pasteStackReversed") as? Bool ?? false
         defaultPasteMode = PasteMode(rawValue: UserDefaults.standard.string(forKey: "defaultPasteMode") ?? "") ?? .standard
+        maxCaptureTextBytes = UserDefaults.standard.object(forKey: "maxCaptureTextBytes") as? Int ?? 262_144
+        maxCaptureImageBytes = UserDefaults.standard.object(forKey: "maxCaptureImageBytes") as? Int ?? 5_000_000
         applyDockVisibility()
     }
 
@@ -189,6 +205,8 @@ class SettingsModel {
             "encryptHistory": encryptHistory,
             "pasteStackReversed": pasteStackReversed,
             "defaultPasteMode": defaultPasteMode.rawValue,
+            "maxCaptureTextBytes": maxCaptureTextBytes,
+            "maxCaptureImageBytes": maxCaptureImageBytes,
             // Include clipboard rules
             "rules": [
                 "stripTrackingParams": ClipboardRulesManager.shared.stripTrackingParams,
@@ -248,6 +266,12 @@ class SettingsModel {
         if let value = settings["defaultPasteMode"] as? String,
            let mode = PasteMode(rawValue: value) {
             defaultPasteMode = mode
+        }
+        if let value = settings["maxCaptureTextBytes"] as? Int {
+            maxCaptureTextBytes = value
+        }
+        if let value = settings["maxCaptureImageBytes"] as? Int {
+            maxCaptureImageBytes = value
         }
 
         // Apply clipboard rules if present

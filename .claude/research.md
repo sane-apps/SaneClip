@@ -118,6 +118,15 @@ Graduate verified findings to ARCHITECTURE.md or DEVELOPMENT.md.
 - Share Extensions add content *into* clipboard history from other apps
 - Useful for "Save to SaneClip" from Safari, Photos, etc.
 - But users can already copy and SaneClip captures it automatically
+
+## Clipboard UX Upgrade Priorities
+**Updated:** 2026-02-27 | **Status:** verified | **TTL:** 30d
+**Source:** local code scan + Apple docs + web + GitHub
+- **Local:** Current SaneClip already has date/content filters, notes, snippets, paste stack, URL schemes, and App Intents; missing items were ignore-next-copy, timed pause, max capture size controls, tags/collections, saved presets, merge workflow, and exclusion presets.
+- **Apple docs:** `NSPasteboard.changeCount` and pasteboard type handling support the current polling model and safe content-type filtering (`NSPasteboard`, `PasteboardType`, `changeCount` docs).
+- **Web:** Alfred clipboard docs emphasize keep/ignore controls and merge/split actions; Raycast clipboard changelog shows saved snippets and quick actions focus; Paste emphasizes labels/pinboards/organization.
+- **GitHub:** Maccy repository/docs confirm practical controls users expect (ignore copied from specific apps, simple menu-driven history workflow).
+- **Resulting priority:** ship easy + medium parity first (capture controls, organization, merge), defer high-effort differentiators (per-app policy engine + secure lane) to next release.
 - Adds convenience but not essential functionality
 - Common in note-taking apps (Bear, Notion) but less common in clipboard managers
 

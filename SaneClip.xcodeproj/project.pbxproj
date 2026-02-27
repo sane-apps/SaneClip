@@ -38,7 +38,6 @@
 		688027DE4259A7F8C38DA1C4 /* CopyClipIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FCC4B9D9BD539DC99A6AD4D /* CopyClipIntent.swift */; };
 		6B47CA6E1CF35E4F6F645980 /* SecurityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1775AC6444F4E26AD66FA435 /* SecurityTests.swift */; };
 		74554CCC6E39DFED46437C7C /* BrandColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5449565520B6E5CF68C78D6B /* BrandColors.swift */; };
-		77B7D62B808F69AD4A23279A /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2926A000DAF31581D97F6ACF /* OnboardingView.swift */; };
 		7A565742375608A744388912 /* SaneClipIOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ECEE64E98BCC2FC7D58874A /* SaneClipIOSApp.swift */; };
 		7C2DB9FDEE7F3D537CF02CA1 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 0668E59A15F0F31C5BE746B0 /* KeyboardShortcuts */; };
 		7E6E29E295A478AD08C4DB0E /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73D02F6E4DBB9312E67A0AD /* ClipboardManager.swift */; };
@@ -71,7 +70,6 @@
 		D9E962C435414799E3C255BD /* ClipboardRulesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B94CC9C6F7E02316FEE7E6C4 /* ClipboardRulesManager.swift */; };
 		DA1E360C2BD5254C912633BE /* ClipboardHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581B9D70FB3BBB83D6583386 /* ClipboardHistoryView.swift */; };
 		DAB08CE697B1C069882BF53B /* SnippetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FBE5E8C8A623FA0C27ECBE /* SnippetManager.swift */; };
-		DCCB437A7D9404CB8330057C /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E776995068A491A32269B2E /* OnboardingView.swift */; };
 		DD0A52895A6DC74A92D88CE0 /* SaneClipIOSWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2BF58DEC0153C26EA351A8 /* SaneClipIOSWidgets.swift */; };
 		DD741ED4E799B3DE999D2A65 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6709551974949109A6A239 /* EmptyStateView.swift */; };
 		DE0D1479DE595F1FA651F71F /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
@@ -157,7 +155,6 @@
 		19827830127FF21617618069 /* RecentClipsIOSWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentClipsIOSWidget.swift; sourceTree = "<group>"; };
 		2330CDCBAA8760CAF780861E /* SaneClipShareDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipShareDebug.entitlements; sourceTree = "<group>"; };
 		25007B56789ED465BA3544BA /* Snippet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snippet.swift; sourceTree = "<group>"; };
-		2926A000DAF31581D97F6ACF /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		29612677A8240D0E5F68DAAF /* DiagnosticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsService.swift; sourceTree = "<group>"; };
 		2FA17931D596332935591539 /* SaneClipIOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipIOS.entitlements; sourceTree = "<group>"; };
 		305BB1EB756CA0FC1DAAFFAD /* SaneClipIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipIntents.swift; sourceTree = "<group>"; };
@@ -196,7 +193,6 @@
 		9371FC1CADBC7CB49A105A80 /* SnippetsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetsSettingsView.swift; sourceTree = "<group>"; };
 		9381D3ACF3CE661318DF305D /* WebhookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookService.swift; sourceTree = "<group>"; };
 		96D8AACBEE2BC4471F934DC2 /* SaneClipIOSDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipIOSDebug.entitlements; sourceTree = "<group>"; };
-		9E776995068A491A32269B2E /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		A06A5E6F4A48C14D539ABD91 /* PinnedClipsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedClipsWidget.swift; sourceTree = "<group>"; };
 		A0EAEDB65797C08836E1259B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A32272353D437FBA78581647 /* URLSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSchemeHandler.swift; sourceTree = "<group>"; };
@@ -273,7 +269,6 @@
 				35354A7D3201B61455110B3F /* ClipboardItemCell.swift */,
 				AA6709551974949109A6A239 /* EmptyStateView.swift */,
 				CE95B8CE57324347C7B10C45 /* HistoryTab.swift */,
-				9E776995068A491A32269B2E /* OnboardingView.swift */,
 				18ED2363F109AC56BCE47BE7 /* PinnedTab.swift */,
 				A942FCE8A60E673C341FFB02 /* SettingsTab.swift */,
 			);
@@ -496,7 +491,6 @@
 		EF9F2A370A8D84D83B0076AA /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
-				2926A000DAF31581D97F6ACF /* OnboardingView.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -780,7 +774,6 @@
 				CEBF533F549AFC2E4D6AE9CE /* HistoryEncryption.swift in Sources */,
 				1A782BC1D0E5F568F0612625 /* HistoryTab.swift in Sources */,
 				4B2B8214AB250D15350054F9 /* KeychainHelper.swift in Sources */,
-				DCCB437A7D9404CB8330057C /* OnboardingView.swift in Sources */,
 				2D7734F853064823CB26BD26 /* PinnedTab.swift in Sources */,
 				7A565742375608A744388912 /* SaneClipIOSApp.swift in Sources */,
 				B2476ABD47BB178A8C73E879 /* SaneClipShortcuts.swift in Sources */,
@@ -818,7 +811,6 @@
 				F6C0F161CBEAFA2C67714A57 /* DiagnosticsService.swift in Sources */,
 				DFC8A7437D713D82B5224D1E /* HistoryEncryption.swift in Sources */,
 				281630B49BCFA5B27C0C93B4 /* KeychainHelper.swift in Sources */,
-				77B7D62B808F69AD4A23279A /* OnboardingView.swift in Sources */,
 				3EF2F8F390E9B433A6DA76B7 /* ProFeature.swift in Sources */,
 				B3761DF4123417A5EA8C0DF3 /* SaneClipApp.swift in Sources */,
 				95711D419E5C0F66ED022198 /* SaneClipIntents.swift in Sources */,

@@ -9,15 +9,21 @@
     
 
                     
-                <item>
+        <item>
             <title>2.2.2</title>
             <pubDate>Fri, 27 Feb 2026 13:35:56 -0500</pubDate>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>2202</sparkle:minimumAutoupdateVersion>
+            <sparkle:ignoreSkippedUpgradesBelowVersion>2202</sparkle:ignoreSkippedUpgradesBelowVersion>
+            <sparkle:criticalUpdate/>
             <description>
                 <![CDATA[
                 <h2>What's New</h2>
                 <ul>
-                <li>Critical quality update: clearer onboarding, stronger permission reliability, robust Basic/Pro gating, and polished settings UX.</li>
+                <li>Recommended update for all users: better core reliability and setup.</li>
+                <li>Faster, more consistent copy and paste in daily use.</li>
+                <li>New guided setup with smarter permission recovery.</li>
+                <li>Cleaner settings and menu polish for a smoother workflow.</li>
                 </ul>
                 ]]>
             </description>

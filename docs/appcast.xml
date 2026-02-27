@@ -9,7 +9,26 @@
     
 
                     
-        <item>
+                <item>
+            <title>2.2.2</title>
+            <pubDate>Fri, 27 Feb 2026 13:35:56 -0500</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Critical quality update: clearer onboarding, stronger permission reliability, robust Basic/Pro gating, and polished settings UX.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.2.2.zip"
+                       sparkle:version="2202"
+                       sparkle:shortVersionString="2.2.2"
+                       length="2969045"
+                       type="application/octet-stream"
+                       sparkle:edSignature="ence65WpJkFLBJ1YvsfRpUGkNWg4A+ALlfE7oinP0CbDSpnL0jI3fQ3/zp0x0+k9svq49GrHSxKn3Kl488uUDg=="/>
+        </item>
+<item>
             <title>2.1.2</title>
             <pubDate>Mon, 23 Feb 2026 21:07:14 -0500</pubDate>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>

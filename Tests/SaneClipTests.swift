@@ -184,6 +184,31 @@ struct SaneClipTests {
         #expect(ClipboardManager.historyLimit(maxHistorySize: 50, isPro: true) == 50)
     }
 
+    @Test("Snippet intents require Pro")
+    @MainActor
+    func snippetIntentsRequirePro() async {
+        let listIntent = ListSnippetsIntent()
+        do {
+            _ = try await listIntent.perform()
+            #expect(Bool(false))
+        } catch IntentError.proFeatureRequiresPro {
+            #expect(true)
+        } catch {
+            #expect(Bool(false))
+        }
+
+        var pasteIntent = PasteSnippetIntent()
+        pasteIntent.snippetName = "any"
+        do {
+            _ = try await pasteIntent.perform()
+            #expect(Bool(false))
+        } catch IntentError.proFeatureRequiresPro {
+            #expect(true)
+        } catch {
+            #expect(Bool(false))
+        }
+    }
+
     @Test("SettingsModel excludes apps correctly")
     @MainActor
     func settingsModelExcludedApps() {
@@ -200,6 +225,15 @@ struct SaneClipTests {
 
         // Restore original state
         settings.excludedApps = originalExcluded
+    }
+
+    @Test("SettingsModel normalizes unsupported capture size values")
+    func settingsModelNormalizesCaptureSizes() {
+        #expect(SettingsModel.normalizedCaptureTextBytes(64 * 1024) == 64 * 1024)
+        #expect(SettingsModel.normalizedCaptureTextBytes(123_456) == 256 * 1024)
+
+        #expect(SettingsModel.normalizedCaptureImageBytes(10 * 1024 * 1024) == 10 * 1024 * 1024)
+        #expect(SettingsModel.normalizedCaptureImageBytes(7_654_321) == 5 * 1024 * 1024)
     }
 
     @Test("URL tracking parameters are stripped")

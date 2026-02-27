@@ -1085,6 +1085,12 @@ class ClipboardManager {
     }
 
     func togglePin(item: ClipboardItem) {
+        guard licenseService?.isPro == true else {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
+            }
+            return
+        }
         if pinnedItems.contains(where: { $0.id == item.id }) {
             pinnedItems.removeAll { $0.id == item.id }
         } else {
@@ -1145,6 +1151,12 @@ class ClipboardManager {
 
     /// Update an item's note
     func updateItemNote(id: UUID, note: String?) {
+        guard licenseService?.isPro == true else {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.itemNotes, licenseService: ls)
+            }
+            return
+        }
         let trimmedNote = note?.trimmingCharacters(in: .whitespacesAndNewlines)
         let finalNote = (trimmedNote?.isEmpty ?? true) ? nil : trimmedNote
 
@@ -1162,6 +1174,12 @@ class ClipboardManager {
     }
 
     func updateItemTitle(id: UUID, title: String?) {
+        guard licenseService?.isPro == true else {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
+            }
+            return
+        }
         let trimmedTitle = title?.trimmingCharacters(in: .whitespacesAndNewlines)
         let finalTitle = (trimmedTitle?.isEmpty ?? true) ? nil : trimmedTitle
 
@@ -1176,6 +1194,12 @@ class ClipboardManager {
     }
 
     func updateItemTags(id: UUID, tags: [String]) {
+        guard licenseService?.isPro == true else {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
+            }
+            return
+        }
         let normalized = Array(
             Set(
                 tags
@@ -1196,6 +1220,12 @@ class ClipboardManager {
     }
 
     func updateItemCollection(id: UUID, collection: String) {
+        guard licenseService?.isPro == true else {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
+            }
+            return
+        }
         let trimmed = collection.trimmingCharacters(in: .whitespacesAndNewlines)
         let finalCollection = trimmed.isEmpty ? "Default" : trimmed
 

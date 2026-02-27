@@ -322,7 +322,8 @@
                     deviceName: deviceName
                 )
 
-                return try SyncDataModel.encode(shared, encrypt: SettingsModel.shared.encryptHistory)
+                let canUseHistoryEncryption = (manager.licenseService?.isPro == true) && SettingsModel.shared.encryptHistory
+                return try SyncDataModel.encode(shared, encrypt: canUseHistoryEncryption)
             #else
                 // iOS is receive-only for now — no local clipboard items to upload
                 return nil

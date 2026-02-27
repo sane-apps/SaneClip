@@ -887,7 +887,6 @@ struct AboutSettingsView: View {
     @State private var showLicenses = false
     @State private var showSupport = false
     @State private var showFeedback = false
-    @State private var didCopyDiagnostics = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -903,12 +902,12 @@ struct AboutSettingsView: View {
                 Text("SaneClip")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.white)
 
                 if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
                     Text("Version \(version)")
                         .font(.body)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.white.opacity(0.92))
                 }
             }
 
@@ -922,66 +921,53 @@ struct AboutSettingsView: View {
                 Text("No Analytics")
             }
             .font(.callout)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.white.opacity(0.92))
             .padding(.top, 4)
 
-            // Links row
-            HStack(spacing: 16) {
-                Link(destination: URL(string: "https://github.com/sane-apps/SaneClip")!) {
-                    Label("GitHub", systemImage: "link")
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
+            // Action grid (two clean rows)
+            VStack(spacing: 10) {
+                HStack(spacing: 12) {
+                    Link(destination: URL(string: "https://github.com/sane-apps/SaneClip")!) {
+                        Label("GitHub", systemImage: "link")
+                    }
 
-                Button {
-                    showLicenses = true
-                } label: {
-                    Label("Licenses", systemImage: "doc.text")
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
+                    Button {
+                        showLicenses = true
+                    } label: {
+                        Label("Licenses", systemImage: "doc.text")
+                    }
 
-                Button {
-                    showSupport = true
-                } label: {
-                    Label {
-                        Text("Support")
-                    } icon: {
-                        Image(systemName: "heart.fill")
-                            .foregroundStyle(.red)
+                    Button {
+                        showSupport = true
+                    } label: {
+                        Label {
+                            Text("Support")
+                        } icon: {
+                            Image(systemName: "heart.fill")
+                                .foregroundStyle(.red)
+                        }
                     }
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
 
-                Button {
-                    showFeedback = true
-                } label: {
-                    Label("Report Issue", systemImage: "ladybug")
+                HStack(spacing: 12) {
+                    Button {
+                        showFeedback = true
+                    } label: {
+                        Label("Report Issue", systemImage: "ladybug")
+                    }
+
+                    Link(destination: URL(string: "https://github.com/sane-apps/SaneClip/issues")!) {
+                        Label("View Issues", systemImage: "arrow.up.right.square")
+                    }
+
+                    Link(destination: URL(string: "mailto:hi@saneapps.com")!) {
+                        Label("Email Me", systemImage: "envelope")
+                    }
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
             }
+            .buttonStyle(.bordered)
+            .controlSize(.regular)
             .padding(.top, 12)
-
-            // Diagnostics + Email row
-            HStack(spacing: 16) {
-                Button {
-                    copyDiagnostics()
-                } label: {
-                    Label(
-                        didCopyDiagnostics ? "Copied!" : "Copy Diagnostics",
-                        systemImage: didCopyDiagnostics ? "checkmark" : "doc.on.doc"
-                    )
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.regular)
-
-                Link("Email Us", destination: URL(string: "mailto:hi@saneapps.com")!)
-                    .buttonStyle(.bordered)
-                    .controlSize(.regular)
-            }
-            .padding(.top, 4)
 
             #if !APP_STORE
                 // Check for Updates
@@ -1006,22 +992,6 @@ struct AboutSettingsView: View {
         }
         .sheet(isPresented: $showFeedback) {
             SaneFeedbackView(diagnosticsService: .shared)
-        }
-    }
-
-    private func copyDiagnostics() {
-        Task {
-            let report = await SaneDiagnosticsService.shared.collectDiagnostics()
-            let markdown = report.toMarkdown(userDescription: "<describe what happened here>")
-            await MainActor.run {
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(markdown, forType: .string)
-                didCopyDiagnostics = true
-            }
-            try? await Task.sleep(for: .seconds(2))
-            await MainActor.run {
-                didCopyDiagnostics = false
-            }
         }
     }
 

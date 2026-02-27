@@ -39,6 +39,30 @@ enum PasteMode: String, CaseIterable {
 class SettingsModel {
     static let shared = SettingsModel()
 
+    nonisolated static let allowedMaxCaptureTextBytes: Set<Int> = [
+        0,
+        64 * 1024,
+        256 * 1024,
+        512 * 1024,
+        1024 * 1024
+    ]
+
+    nonisolated static let allowedMaxCaptureImageBytes: Set<Int> = [
+        0,
+        2 * 1024 * 1024,
+        5 * 1024 * 1024,
+        10 * 1024 * 1024,
+        25 * 1024 * 1024
+    ]
+
+    nonisolated static func normalizedCaptureTextBytes(_ value: Int) -> Int {
+        allowedMaxCaptureTextBytes.contains(value) ? value : 256 * 1024
+    }
+
+    nonisolated static func normalizedCaptureImageBytes(_ value: Int) -> Int {
+        allowedMaxCaptureImageBytes.contains(value) ? value : 5 * 1024 * 1024
+    }
+
     var maxHistorySize: Int {
         didSet {
             UserDefaults.standard.set(maxHistorySize, forKey: "maxHistorySize")
@@ -162,11 +186,24 @@ class SettingsModel {
         }
         menuBarIcon = UserDefaults.standard.object(forKey: "menuBarIcon") as? String ?? "list.clipboard.fill"
         autoExpireHours = UserDefaults.standard.object(forKey: "autoExpireHours") as? Int ?? 0
-        encryptHistory = UserDefaults.standard.object(forKey: "encryptHistory") as? Bool ?? true
+        // Basic default must be non-contradictory with Pro gating.
+        encryptHistory = UserDefaults.standard.object(forKey: "encryptHistory") as? Bool ?? false
         pasteStackReversed = UserDefaults.standard.object(forKey: "pasteStackReversed") as? Bool ?? false
         defaultPasteMode = PasteMode(rawValue: UserDefaults.standard.string(forKey: "defaultPasteMode") ?? "") ?? .standard
-        maxCaptureTextBytes = UserDefaults.standard.object(forKey: "maxCaptureTextBytes") as? Int ?? 262_144
-        maxCaptureImageBytes = UserDefaults.standard.object(forKey: "maxCaptureImageBytes") as? Int ?? 5_000_000
+        let savedTextBytes = UserDefaults.standard.object(forKey: "maxCaptureTextBytes") as? Int ?? 262_144
+        let normalizedTextBytes = Self.normalizedCaptureTextBytes(savedTextBytes)
+        maxCaptureTextBytes = normalizedTextBytes
+
+        let savedImageBytes = UserDefaults.standard.object(forKey: "maxCaptureImageBytes") as? Int ?? 5_000_000
+        let normalizedImageBytes = Self.normalizedCaptureImageBytes(savedImageBytes)
+        maxCaptureImageBytes = normalizedImageBytes
+
+        if normalizedTextBytes != savedTextBytes {
+            UserDefaults.standard.set(normalizedTextBytes, forKey: "maxCaptureTextBytes")
+        }
+        if normalizedImageBytes != savedImageBytes {
+            UserDefaults.standard.set(normalizedImageBytes, forKey: "maxCaptureImageBytes")
+        }
         applyDockVisibility()
     }
 
@@ -268,10 +305,10 @@ class SettingsModel {
             defaultPasteMode = mode
         }
         if let value = settings["maxCaptureTextBytes"] as? Int {
-            maxCaptureTextBytes = value
+            maxCaptureTextBytes = Self.normalizedCaptureTextBytes(value)
         }
         if let value = settings["maxCaptureImageBytes"] as? Int {
-            maxCaptureImageBytes = value
+            maxCaptureImageBytes = Self.normalizedCaptureImageBytes(value)
         }
 
         // Apply clipboard rules if present

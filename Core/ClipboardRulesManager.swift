@@ -42,9 +42,9 @@ class ClipboardRulesManager {
     // MARK: - Initialization
 
     private init() {
-        // Set default for stripTrackingParams if not set
+        // Keep first-launch defaults aligned with Basic (all Pro rules off).
         if UserDefaults.standard.object(forKey: "rule.stripTrackingParams") == nil {
-            UserDefaults.standard.set(true, forKey: "rule.stripTrackingParams")
+            UserDefaults.standard.set(false, forKey: "rule.stripTrackingParams")
         }
     }
 

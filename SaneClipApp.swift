@@ -65,21 +65,21 @@ private let appLogger = Logger(subsystem: "com.saneclip.app", category: "App")
 // MARK: - Keyboard Shortcuts Extension
 
 extension KeyboardShortcuts.Name {
-    static let showClipboardHistory = Self("showClipboardHistory", default: .init(.v, modifiers: [.command, .shift]))
-    static let pasteAsPlainText = Self("pasteAsPlainText", default: .init(.v, modifiers: [.command, .shift, .option]))
-    static let pasteFromStack = Self("pasteFromStack", default: .init(.v, modifiers: [.command, .control]))
-    static let pasteSmartMode = Self("pasteSmartMode", default: .init(.v, modifiers: [.command, .shift, .control]))
-    static let ignoreNextCopy = Self("ignoreNextCopy", default: .init(.i, modifiers: [.command, .shift, .control]))
+    static let showClipboardHistory = Self("showClipboardHistory")
+    static let pasteAsPlainText = Self("pasteAsPlainText")
+    static let pasteFromStack = Self("pasteFromStack")
+    static let pasteSmartMode = Self("pasteSmartMode")
+    static let ignoreNextCopy = Self("ignoreNextCopy")
     // Quick paste shortcuts for items 1-9
-    static let pasteItem1 = Self("pasteItem1", default: .init(.one, modifiers: [.command, .control]))
-    static let pasteItem2 = Self("pasteItem2", default: .init(.two, modifiers: [.command, .control]))
-    static let pasteItem3 = Self("pasteItem3", default: .init(.three, modifiers: [.command, .control]))
-    static let pasteItem4 = Self("pasteItem4", default: .init(.four, modifiers: [.command, .control]))
-    static let pasteItem5 = Self("pasteItem5", default: .init(.five, modifiers: [.command, .control]))
-    static let pasteItem6 = Self("pasteItem6", default: .init(.six, modifiers: [.command, .control]))
-    static let pasteItem7 = Self("pasteItem7", default: .init(.seven, modifiers: [.command, .control]))
-    static let pasteItem8 = Self("pasteItem8", default: .init(.eight, modifiers: [.command, .control]))
-    static let pasteItem9 = Self("pasteItem9", default: .init(.nine, modifiers: [.command, .control]))
+    static let pasteItem1 = Self("pasteItem1")
+    static let pasteItem2 = Self("pasteItem2")
+    static let pasteItem3 = Self("pasteItem3")
+    static let pasteItem4 = Self("pasteItem4")
+    static let pasteItem5 = Self("pasteItem5")
+    static let pasteItem6 = Self("pasteItem6")
+    static let pasteItem7 = Self("pasteItem7")
+    static let pasteItem8 = Self("pasteItem8")
+    static let pasteItem9 = Self("pasteItem9")
 }
 
 // MARK: - AppDelegate
@@ -287,28 +287,33 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setDefaultShortcutsIfNeeded() {
+        clearLegacyProShortcutDefaultsForBasicUsers()
+
         // Show clipboard history: Cmd+Shift+V
         if KeyboardShortcuts.getShortcut(for: .showClipboardHistory) == nil {
             KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .shift]), for: .showClipboardHistory)
             appLogger.info("Set default shortcut: Cmd+Shift+V for clipboard history")
         }
 
-        // Paste as plain text: Cmd+Shift+Option+V
-        if KeyboardShortcuts.getShortcut(for: .pasteAsPlainText) == nil {
-            KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .shift, .option]), for: .pasteAsPlainText)
-            appLogger.info("Set default shortcut: Cmd+Shift+Option+V for paste as plain text")
-        }
+        // Pro-only defaults should not be assigned for Basic users.
+        if licenseService.isPro {
+            // Paste as plain text: Cmd+Shift+Option+V
+            if KeyboardShortcuts.getShortcut(for: .pasteAsPlainText) == nil {
+                KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .shift, .option]), for: .pasteAsPlainText)
+                appLogger.info("Set default shortcut: Cmd+Shift+Option+V for paste as plain text")
+            }
 
-        // Paste from stack: Cmd+Ctrl+V
-        if KeyboardShortcuts.getShortcut(for: .pasteFromStack) == nil {
-            KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .control]), for: .pasteFromStack)
-            appLogger.info("Set default shortcut: Cmd+Ctrl+V for paste from stack")
-        }
+            // Paste from stack: Cmd+Ctrl+V
+            if KeyboardShortcuts.getShortcut(for: .pasteFromStack) == nil {
+                KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .control]), for: .pasteFromStack)
+                appLogger.info("Set default shortcut: Cmd+Ctrl+V for paste from stack")
+            }
 
-        // Smart paste: Cmd+Shift+Ctrl+V
-        if KeyboardShortcuts.getShortcut(for: .pasteSmartMode) == nil {
-            KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .shift, .control]), for: .pasteSmartMode)
-            appLogger.info("Set default shortcut: Cmd+Shift+Ctrl+V for smart paste")
+            // Smart paste: Cmd+Shift+Ctrl+V
+            if KeyboardShortcuts.getShortcut(for: .pasteSmartMode) == nil {
+                KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .shift, .control]), for: .pasteSmartMode)
+                appLogger.info("Set default shortcut: Cmd+Shift+Ctrl+V for smart paste")
+            }
         }
 
         if KeyboardShortcuts.getShortcut(for: .ignoreNextCopy) == nil {
@@ -324,6 +329,25 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         ]
         for (key, shortcut) in zip(keys, shortcuts) where KeyboardShortcuts.getShortcut(for: shortcut) == nil {
             KeyboardShortcuts.setShortcut(.init(key, modifiers: [.command, .control]), for: shortcut)
+        }
+    }
+
+    /// Migration cleanup: old builds auto-assigned Pro shortcuts even for Basic users.
+    /// Remove only those legacy defaults (preserves intentional custom mappings).
+    private func clearLegacyProShortcutDefaultsForBasicUsers() {
+        guard !licenseService.isPro else { return }
+
+        let legacyDefaults: [(name: KeyboardShortcuts.Name, shortcut: KeyboardShortcuts.Shortcut)] = [
+            (.pasteAsPlainText, .init(.v, modifiers: [.command, .shift, .option])),
+            (.pasteFromStack, .init(.v, modifiers: [.command, .control])),
+            (.pasteSmartMode, .init(.v, modifiers: [.command, .shift, .control]))
+        ]
+
+        for legacy in legacyDefaults {
+            if KeyboardShortcuts.getShortcut(for: legacy.name) == legacy.shortcut {
+                KeyboardShortcuts.reset(legacy.name)
+                appLogger.info("Cleared legacy Pro shortcut for Basic user")
+            }
         }
     }
 
@@ -438,6 +462,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
+
+        #if !APP_STORE
+            let updatesItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
+            updatesItem.target = self
+            menu.addItem(updatesItem)
+        #endif
 
         menu.addItem(NSMenuItem.separator())
 

@@ -390,51 +390,59 @@ struct ClipboardItemRow: View {
                 }
             }
 
-            Menu("Move to Collection") {
-                ForEach(clipboardManager.availableCollections(), id: \.self) { collection in
-                    Button(collection) {
-                        clipboardManager.updateItemCollection(id: item.id, collection: collection)
+            if isPro {
+                Menu("Move to Collection") {
+                    ForEach(clipboardManager.availableCollections(), id: \.self) { collection in
+                        Button(collection) {
+                            clipboardManager.updateItemCollection(id: item.id, collection: collection)
+                        }
+                    }
+                    Divider()
+                    Button("New Collection...") {
+                        customCollection = ""
+                        showCollectionSheet = true
                     }
                 }
-                Divider()
-                Button("New Collection...") {
-                    customCollection = ""
-                    showCollectionSheet = true
-                }
-            }
 
-            // Edit (text only)
-            if case let .text(text) = item.content {
-                Button("Edit...") {
-                    editText = text
+                // Edit (text only)
+                if case let .text(text) = item.content {
+                    Button("Edit...") {
+                        editText = text
+                        editTitle = item.title ?? ""
+                        editTags = item.tags.joined(separator: ", ")
+                        editCollection = item.collection
+                        editNote = item.note ?? ""
+                        showEditSheet = true
+                    }
+                }
+
+                Button("Rename...") {
+                    if case let .text(text) = item.content {
+                        editText = text
+                    }
                     editTitle = item.title ?? ""
                     editTags = item.tags.joined(separator: ", ")
                     editCollection = item.collection
                     editNote = item.note ?? ""
                     showEditSheet = true
                 }
-            }
 
-            Button("Rename...") {
-                if case let .text(text) = item.content {
-                    editText = text
+                Button("Edit Tags...") {
+                    if case let .text(text) = item.content {
+                        editText = text
+                    }
+                    editTitle = item.title ?? ""
+                    editTags = item.tags.joined(separator: ", ")
+                    editCollection = item.collection
+                    editNote = item.note ?? ""
+                    showEditSheet = true
                 }
-                editTitle = item.title ?? ""
-                editTags = item.tags.joined(separator: ", ")
-                editCollection = item.collection
-                editNote = item.note ?? ""
-                showEditSheet = true
-            }
-
-            Button("Edit Tags...") {
-                if case let .text(text) = item.content {
-                    editText = text
+            } else {
+                Button("Organize Items \u{1F512}") {
+                    if let ls = licenseService {
+                        ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
+                    }
                 }
-                editTitle = item.title ?? ""
-                editTags = item.tags.joined(separator: ", ")
-                editCollection = item.collection
-                editNote = item.note ?? ""
-                showEditSheet = true
             }
 
             // Notes — Pro only
@@ -472,15 +480,27 @@ struct ClipboardItemRow: View {
                         ProUpsellWindow.show(feature: ProFeature.itemNotes, licenseService: ls)
                     }
                 }
-                Button("Remove Note") {
-                    clipboardManager.updateItemNote(id: item.id, note: nil)
+                if isPro {
+                    Button("Remove Note") {
+                        clipboardManager.updateItemNote(id: item.id, note: nil)
+                    }
+                } else {
+                    Button("Remove Note \u{1F512}") {
+                        if let ls = licenseService {
+                            ProUpsellWindow.show(feature: ProFeature.itemNotes, licenseService: ls)
+                        }
+                    }
                 }
             }
 
             Divider()
 
             // Export & share
-            Button("Share...") { shareItem() }
+            Button {
+                shareItem()
+            } label: {
+                Label("Share...", systemImage: "square.and.arrow.up")
+            }
             if case .text = item.content {
                 Button("Save as PDF...") {
                     clipboardManager.exportItemAsPDF(item: item)
@@ -504,14 +524,16 @@ struct ClipboardItemRow: View {
                     if !isImageItem {
                         clipboardManager.updateItemContent(id: item.id, newContent: editText)
                     }
-                    clipboardManager.updateItemTitle(id: item.id, title: editTitle)
-                    let parsedTags = editTags
-                        .split(separator: ",")
-                        .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
-                        .filter { !$0.isEmpty }
-                    clipboardManager.updateItemTags(id: item.id, tags: parsedTags)
-                    clipboardManager.updateItemCollection(id: item.id, collection: editCollection)
-                    clipboardManager.updateItemNote(id: item.id, note: editNote)
+                    if isPro {
+                        clipboardManager.updateItemTitle(id: item.id, title: editTitle)
+                        let parsedTags = editTags
+                            .split(separator: ",")
+                            .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+                            .filter { !$0.isEmpty }
+                        clipboardManager.updateItemTags(id: item.id, tags: parsedTags)
+                        clipboardManager.updateItemCollection(id: item.id, collection: editCollection)
+                        clipboardManager.updateItemNote(id: item.id, note: editNote)
+                    }
                     showEditSheet = false
                 },
                 onCancel: {

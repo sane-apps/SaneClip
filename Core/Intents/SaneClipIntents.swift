@@ -166,6 +166,10 @@ struct PasteSnippetIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
+        guard ClipboardManager.shared?.licenseService?.isPro == true else {
+            throw IntentError.proFeatureRequiresPro
+        }
+
         let snippetManager = SnippetManager.shared
 
         guard let snippet = snippetManager.snippets.first(where: {
@@ -199,6 +203,10 @@ struct ListSnippetsIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<[String]> {
+        guard ClipboardManager.shared?.licenseService?.isPro == true else {
+            throw IntentError.proFeatureRequiresPro
+        }
+
         let snippetManager = SnippetManager.shared
         let names = snippetManager.snippets.map { $0.name }
         return .result(value: names)
@@ -211,6 +219,7 @@ enum IntentError: Error, CustomLocalizedStringResourceConvertible {
     case clipboardUnavailable
     case indexOutOfBounds
     case snippetNotFound
+    case proFeatureRequiresPro
 
     var localizedStringResource: LocalizedStringResource {
         switch self {
@@ -220,6 +229,8 @@ enum IntentError: Error, CustomLocalizedStringResourceConvertible {
             return "Index is out of bounds"
         case .snippetNotFound:
             return "Snippet not found"
+        case .proFeatureRequiresPro:
+            return "This feature requires SaneClip Pro"
         }
     }
 }

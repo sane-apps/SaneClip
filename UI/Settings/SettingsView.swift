@@ -1,7 +1,6 @@
 import KeyboardShortcuts
 import LocalAuthentication
 import SaneUI
-import ServiceManagement
 import SwiftUI
 
 // MARK: - Notifications
@@ -119,7 +118,6 @@ struct SettingsView: View {
 struct GeneralSettingsView: View {
     var licenseService: LicenseService?
     @State private var settings = SettingsModel.shared
-    @State private var launchAtLogin = false
     #if !APP_STORE
         @State private var autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
     #else
@@ -133,15 +131,9 @@ struct GeneralSettingsView: View {
         ScrollView {
             VStack(spacing: 24) {
                 CompactSection("Startup") {
-                    CompactToggle(label: "Start automatically at login", isOn: Binding(
-                        get: { launchAtLogin },
-                        set: { newValue in
-                            launchAtLogin = newValue
-                            setLaunchAtLogin(newValue)
-                        }
-                    ))
+                    SaneLoginItemToggle()
                     CompactDivider()
-                    CompactToggle(label: "Show app in Dock", isOn: Binding(
+                    SaneDockIconToggle(showDockIcon: Binding(
                         get: { settings.showInDock },
                         set: { settings.showInDock = $0 }
                     ))
@@ -293,21 +285,16 @@ struct GeneralSettingsView: View {
 
                 #if !APP_STORE
                     CompactSection("Software Updates") {
-                        CompactToggle(label: "Check for updates automatically", isOn: Binding(
-                            get: { autoCheckUpdates },
-                            set: { newValue in
-                                autoCheckUpdates = newValue
-                                UpdateService.shared.automaticallyChecksForUpdates = newValue
-                            }
-                        ))
-                        CompactDivider()
-                        CompactRow("Actions") {
-                            Button("Check Now") {
-                                UpdateService.shared.checkForUpdates()
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                        }
+                        SaneSparkleRow(
+                            automaticallyChecks: Binding(
+                                get: { autoCheckUpdates },
+                                set: { newValue in
+                                    autoCheckUpdates = newValue
+                                    UpdateService.shared.automaticallyChecksForUpdates = newValue
+                                }
+                            ),
+                            onCheckNow: { UpdateService.shared.checkForUpdates() }
+                        )
                     }
                 #endif
 
@@ -405,29 +392,10 @@ struct GeneralSettingsView: View {
             .padding(20)
         }
         .onAppear {
-            checkLaunchAtLogin()
             #if !APP_STORE
                 autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
             #endif
         }
-    }
-
-    private func setLaunchAtLogin(_ enabled: Bool) {
-        do {
-            if enabled {
-                try SMAppService.mainApp.register()
-            } else {
-                try SMAppService.mainApp.unregister()
-            }
-        } catch {
-            print("Failed to set launch at login: \(error)")
-            launchAtLogin = !launchAtLogin
-        }
-    }
-
-    private func checkLaunchAtLogin() {
-        let status = SMAppService.mainApp.status
-        launchAtLogin = (status == .enabled)
     }
 
     @MainActor
@@ -898,13 +866,13 @@ struct AboutSettingsView: View {
             supportSheet
         }
         .sheet(isPresented: $showFeedback) {
-            FeedbackView()
+            SaneFeedbackView(diagnosticsService: .shared)
         }
     }
 
     private func copyDiagnostics() {
         Task {
-            let report = await DiagnosticsService.shared.collectDiagnostics()
+            let report = await SaneDiagnosticsService.shared.collectDiagnostics()
             let markdown = report.toMarkdown(userDescription: "<describe what happened here>")
             await MainActor.run {
                 NSPasteboard.general.clearContents()

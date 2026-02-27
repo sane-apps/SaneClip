@@ -37,7 +37,6 @@
 		60E0917C7EE6C533E0E339D6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E0713E5848E1A9394B7528D /* SettingsView.swift */; };
 		688027DE4259A7F8C38DA1C4 /* CopyClipIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FCC4B9D9BD539DC99A6AD4D /* CopyClipIntent.swift */; };
 		6B47CA6E1CF35E4F6F645980 /* SecurityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1775AC6444F4E26AD66FA435 /* SecurityTests.swift */; };
-		72BA7458DAD9665A1C2D2D88 /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD97F0C64EB8A27CB792DD37 /* FeedbackView.swift */; };
 		74554CCC6E39DFED46437C7C /* BrandColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5449565520B6E5CF68C78D6B /* BrandColors.swift */; };
 		77B7D62B808F69AD4A23279A /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2926A000DAF31581D97F6ACF /* OnboardingView.swift */; };
 		7A565742375608A744388912 /* SaneClipIOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ECEE64E98BCC2FC7D58874A /* SaneClipIOSApp.swift */; };
@@ -54,7 +53,6 @@
 		959A8C26A75136D338B643F4 /* PinnedClipsIOSWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CAE73B92B88E86164C13BE4 /* PinnedClipsIOSWidget.swift */; };
 		97C7F0E599822C25790FE644 /* SyncConflictResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098AA40BC8DC5C2501EECC1C /* SyncConflictResolver.swift */; };
 		9ABA34BEB2F16A4A3646750C /* StorageStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE7465DE4D6ABC7FA43FECC8 /* StorageStatsView.swift */; };
-		9AE9193A4B91AF9225D37A06 /* MoveToApplications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A33BA21C41E9F3415FFB0D /* MoveToApplications.swift */; };
 		A1E34C40B6B4693E554DB614 /* SharedClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB6B85899467ECE68DDCE6E /* SharedClipboardItem.swift */; };
 		A2DA6F029DD4A6EEEA2396AF /* RecentClipsIOSWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19827830127FF21617618069 /* RecentClipsIOSWidget.swift */; };
 		A7C25C4197EB4F9E316E7BE7 /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
@@ -191,7 +189,6 @@
 		7D5C28D690980C222E8B0E03 /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		817694FD0F55D259B3F10FDA /* SaneClipWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipWidgets.swift; sourceTree = "<group>"; };
 		82FA89438430FB80B145A7C5 /* HistoryEncryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEncryption.swift; sourceTree = "<group>"; };
-		84A33BA21C41E9F3415FFB0D /* MoveToApplications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveToApplications.swift; sourceTree = "<group>"; };
 		8607149CD7305298C711068F /* ProFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProFeature.swift; sourceTree = "<group>"; };
 		8D2D1E638F1E9A0D4C8C9E45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8FCC4B9D9BD539DC99A6AD4D /* CopyClipIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyClipIntent.swift; sourceTree = "<group>"; };
@@ -213,7 +210,6 @@
 		B94CC9C6F7E02316FEE7E6C4 /* ClipboardRulesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardRulesManager.swift; sourceTree = "<group>"; };
 		BE7465DE4D6ABC7FA43FECC8 /* StorageStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageStatsView.swift; sourceTree = "<group>"; };
 		C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetClipboardItem.swift; sourceTree = "<group>"; };
-		CD97F0C64EB8A27CB792DD37 /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackView.swift; sourceTree = "<group>"; };
 		CE95B8CE57324347C7B10C45 /* HistoryTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTab.swift; sourceTree = "<group>"; };
 		CF6FECCD60F5BFD8E7FD9484 /* GetRecentClipsIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetRecentClipsIntent.swift; sourceTree = "<group>"; };
 		D10F261894209685FFC6BF8E /* ClipboardHistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryViewModel.swift; sourceTree = "<group>"; };
@@ -314,15 +310,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		3DA3DCD92F8A3621E23C93AE /* shared */ = {
-			isa = PBXGroup;
-			children = (
-				84A33BA21C41E9F3415FFB0D /* MoveToApplications.swift */,
-			);
-			name = shared;
-			path = ../../infra/SaneProcess/shared;
-			sourceTree = "<group>";
-		};
 		421E2940F20104B95C6C67C8 = {
 			isa = PBXGroup;
 			children = (
@@ -336,7 +323,6 @@
 				493F4E3FD878CCDE2141E89E /* Packages */,
 				317C3B96EA035EB98F83B6DF /* Resources */,
 				1B130F3074655C63B056F11C /* Shared */,
-				3DA3DCD92F8A3621E23C93AE /* shared */,
 				A1F5CB5A388610A825BF634E /* Tests */,
 				D9D0EFB2C3ADEBAA6D5BF62C /* UI */,
 				F661AFAC01CB909BE6438415 /* Widgets */,
@@ -429,7 +415,6 @@
 		A8D8AAF79390D8CCEB64615E /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				CD97F0C64EB8A27CB792DD37 /* FeedbackView.swift */,
 				6E0713E5848E1A9394B7528D /* SettingsView.swift */,
 				9371FC1CADBC7CB49A105A80 /* SnippetsSettingsView.swift */,
 				BE7465DE4D6ABC7FA43FECC8 /* StorageStatsView.swift */,
@@ -831,10 +816,8 @@
 				7E6E29E295A478AD08C4DB0E /* ClipboardManager.swift in Sources */,
 				D9E962C435414799E3C255BD /* ClipboardRulesManager.swift in Sources */,
 				F6C0F161CBEAFA2C67714A57 /* DiagnosticsService.swift in Sources */,
-				72BA7458DAD9665A1C2D2D88 /* FeedbackView.swift in Sources */,
 				DFC8A7437D713D82B5224D1E /* HistoryEncryption.swift in Sources */,
 				281630B49BCFA5B27C0C93B4 /* KeychainHelper.swift in Sources */,
-				9AE9193A4B91AF9225D37A06 /* MoveToApplications.swift in Sources */,
 				77B7D62B808F69AD4A23279A /* OnboardingView.swift in Sources */,
 				3EF2F8F390E9B433A6DA76B7 /* ProFeature.swift in Sources */,
 				B3761DF4123417A5EA8C0DF3 /* SaneClipApp.swift in Sources */,
@@ -903,7 +886,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShareDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -923,7 +906,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShare.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1007,7 +990,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
@@ -1114,7 +1097,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1137,7 +1120,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShare.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1176,7 +1159,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1199,7 +1182,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
@@ -1289,7 +1272,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
@@ -1372,7 +1355,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOSDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -1400,7 +1383,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SaneClip/Info.plist;
@@ -1429,7 +1412,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SaneClip/Info.plist;
@@ -1457,7 +1440,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SaneClip/Info.plist;
@@ -1482,7 +1465,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1505,7 +1488,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1533,7 +1516,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SaneClip/Info.plist;
@@ -1558,7 +1541,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOS.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -1584,7 +1567,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -1645,7 +1628,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
@@ -1664,7 +1647,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgetsDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1690,7 +1673,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 220;
+				CURRENT_PROJECT_VERSION = 2200;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";

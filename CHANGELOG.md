@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.2.1] - 2026-02-27
+
+Reliability and compatibility update. Improves license gating, update delivery, and setup stability.
+
+---
+
 ## [2.1] - 2026-02-20
 
 ### Added

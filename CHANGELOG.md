@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.2.2] - 2026-02-27
+
+Critical quality update: clearer onboarding, stronger permission reliability, robust Basic/Pro gating, and polished settings UX.
+
+---
+
 ## [2.2.1] - 2026-02-27
 
 Reliability and compatibility update. Improves license gating, update delivery, and setup stability.

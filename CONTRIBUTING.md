@@ -162,7 +162,7 @@ This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). Please be r
 
 ## Questions?
 
-- Open a [GitHub Issue](https://github.com/sane-apps/SaneClip/issues)
+- Open a [GitHub Issue](https://github.com/sane-apps/SaneClip/issues/new?template=bug_report.md)
 - Check [GitHub Issues](https://github.com/sane-apps/SaneClip/issues) for feature status
 
 Thank you for contributing!
@@ -191,7 +191,7 @@ Please do this for me:
 2) Make the smallest safe fix.
 3) Open a pull request to https://github.com/sane-apps/SaneClip
 4) Give me the pull request link.
-5) Open a GitHub issue in https://github.com/sane-apps/SaneClip/issues that includes:
+5) Open a GitHub issue in https://github.com/sane-apps/SaneClip/issues/new?template=bug_report.md that includes:
    - the pull request link
    - a short summary of what changed and why
 6) Also give me the exact issue link.

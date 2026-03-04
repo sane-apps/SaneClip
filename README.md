@@ -67,7 +67,8 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 - ✅ **HTTPS Enforcement** — Webhooks must use HTTPS
 - ✅ **Seamless Migration** — Existing plaintext data auto-migrates to encrypted format
 - ✅ **Paste Stack Order** — FIFO/LIFO modes for paste stack
-- ✅ **iOS Companion App** — Free iPhone/iPad app with iCloud sync (coming to the App Store)
+- ✅ **Open at Cursor Mode** — Optional setting to open history at your mouse cursor
+- ✅ **iOS Companion App** — Free iPhone/iPad app with iCloud sync (now live on the App Store)
 - ✅ **macOS & iOS Widgets** — Recent and Pinned clips on your desktop and Home Screen
 
 ---
@@ -78,6 +79,7 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 - Clipboard history (last 50 items)
 - Standard paste with original formatting
 - Search and source-aware filtering
+- Optional "open at mouse cursor" launch mode
 - iPhone companion app with iCloud sync
 - On-device privacy defaults
 
@@ -89,7 +91,8 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 - Text transforms
 - Paste stack (FIFO/LIFO)
 - Snippets with placeholders
-- Pinning, notes, clipboard rules
+- Pin items + item notes
+- Clipboard rules
 - Export and import
 
 ---
@@ -458,7 +461,7 @@ Please do this for me:
 2) Make the smallest safe fix.
 3) Open a pull request to https://github.com/sane-apps/SaneClip
 4) Give me the pull request link.
-5) Open a GitHub issue in https://github.com/sane-apps/SaneClip/issues that includes:
+5) Open a GitHub issue in https://github.com/sane-apps/SaneClip/issues/new?template=bug_report.md that includes:
    - the pull request link
    - a short summary of what changed and why
 6) Also give me the exact issue link.

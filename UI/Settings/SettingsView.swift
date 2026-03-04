@@ -118,6 +118,8 @@ struct SettingsView: View {
 struct GeneralSettingsView: View {
     var licenseService: LicenseService?
     @State private var settings = SettingsModel.shared
+    @State private var appPresetBundleID = ""
+    @State private var appPresetMode: PasteMode = .standard
     #if !APP_STORE
         @State private var autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
     #else
@@ -184,6 +186,21 @@ struct GeneralSettingsView: View {
                             set: { settings.pasteStackReversed = $0 }
                         ))
                         CompactDivider()
+                        CompactToggle(label: "Keep stack panel open while pasting", isOn: Binding(
+                            get: { settings.keepPasteStackOpenBetweenPastes },
+                            set: { settings.keepPasteStackOpenBetweenPastes = $0 }
+                        ))
+                        CompactDivider()
+                        CompactToggle(label: "Auto-close panel when stack is empty", isOn: Binding(
+                            get: { settings.autoClosePasteStackWhenEmpty },
+                            set: { settings.autoClosePasteStackWhenEmpty = $0 }
+                        ))
+                        CompactDivider()
+                        CompactToggle(label: "Collapse duplicate stack items", isOn: Binding(
+                            get: { settings.collapseDuplicatePasteStackItems },
+                            set: { settings.collapseDuplicatePasteStackItems = $0 }
+                        ))
+                        CompactDivider()
                         CompactRow("Default paste mode") {
                             Picker("", selection: Binding(
                                 get: { SettingsModel.shared.defaultPasteMode },
@@ -201,6 +218,56 @@ struct GeneralSettingsView: View {
                             Text(SettingsModel.shared.defaultPasteMode.description)
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(.white)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.bottom, 4)
+
+                        CompactRow("Per-app paste mode") {
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack(spacing: 6) {
+                                    TextField("com.apple.TextEdit", text: $appPresetBundleID)
+                                        .textFieldStyle(.roundedBorder)
+                                        .frame(width: 190)
+                                    Picker("", selection: $appPresetMode) {
+                                        ForEach(PasteMode.allCases, id: \.self) { mode in
+                                            Text(mode.rawValue).tag(mode)
+                                        }
+                                    }
+                                    .pickerStyle(.menu)
+                                    .frame(width: 110)
+                                    Button("Save") {
+                                        let key = appPresetBundleID.trimmingCharacters(in: .whitespacesAndNewlines)
+                                        guard !key.isEmpty else { return }
+                                        settings.setPasteMode(appPresetMode, for: key)
+                                        appPresetBundleID = ""
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .controlSize(.small)
+                                }
+
+                                if settings.perAppPasteModes.isEmpty {
+                                    Text("No overrides configured")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                } else {
+                                    ForEach(settings.perAppPasteModes.keys.sorted(), id: \.self) { bundleID in
+                                        HStack(spacing: 8) {
+                                            Text(bundleID)
+                                                .font(.system(size: 11, design: .monospaced))
+                                                .lineLimit(1)
+                                            Spacer(minLength: 8)
+                                            Text(settings.perAppPasteModes[bundleID] ?? "")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                            Button("Remove") {
+                                                settings.setPasteMode(nil, for: bundleID)
+                                            }
+                                            .buttonStyle(.plain)
+                                            .font(.caption)
+                                        }
+                                    }
+                                }
+                            }
                         }
                         .padding(.horizontal, 12)
                         .padding(.bottom, 8)
@@ -809,6 +876,11 @@ struct ShortcutsSettingsView: View {
                         KeyboardShortcuts.Recorder(for: .showClipboardHistory)
                     }
                     CompactDivider()
+                    CompactToggle(label: "Open history at mouse cursor", isOn: Binding(
+                        get: { SettingsModel.shared.openHistoryAtCursor },
+                        set: { SettingsModel.shared.openHistoryAtCursor = $0 }
+                    ))
+                    CompactDivider()
                     if isPro {
                         CompactRow("Paste as Plain Text") {
                             KeyboardShortcuts.Recorder(for: .pasteAsPlainText)
@@ -956,7 +1028,7 @@ struct AboutSettingsView: View {
                         Label("Report Issue", systemImage: "ladybug")
                     }
 
-                    Link(destination: URL(string: "https://github.com/sane-apps/SaneClip/issues")!) {
+                    Link(destination: URL(string: "https://github.com/sane-apps/SaneClip/issues/new?template=bug_report.md")!) {
                         Label("View Issues", systemImage: "arrow.up.right.square")
                     }
 

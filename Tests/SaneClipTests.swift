@@ -227,6 +227,25 @@ struct SaneClipTests {
         settings.excludedApps = originalExcluded
     }
 
+    @Test("SettingsModel round-trips open-history-at-cursor preference")
+    @MainActor
+    func settingsModelOpenHistoryAtCursorRoundTrip() throws {
+        let settings = SettingsModel.shared
+        let original = settings.openHistoryAtCursor
+        defer { settings.openHistoryAtCursor = original }
+
+        let payload: [String: Any] = [
+            "version": 1,
+            "openHistoryAtCursor": true
+        ]
+        let exported = try JSONSerialization.data(withJSONObject: payload)
+
+        settings.openHistoryAtCursor = false
+        try settings.importSettings(from: exported)
+
+        #expect(settings.openHistoryAtCursor == true)
+    }
+
     @Test("SettingsModel normalizes unsupported capture size values")
     func settingsModelNormalizesCaptureSizes() {
         #expect(SettingsModel.normalizedCaptureTextBytes(64 * 1024) == 64 * 1024)

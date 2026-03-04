@@ -1,6 +1,8 @@
-@preconcurrency import ApplicationServices
 import Foundation
 import SaneUI
+#if !APP_STORE
+    @preconcurrency import ApplicationServices
+#endif
 
 // MARK: - SaneClip Diagnostics
 
@@ -21,16 +23,21 @@ extension SaneDiagnosticsService {
 @MainActor
 private func collectSaneClipSettings() -> String {
     let settings = SettingsModel.shared
+    #if APP_STORE
+        let accessibilityStatus = "not_applicable_app_store"
+    #else
+        let accessibilityStatus = "\(AXIsProcessTrusted())"
+    #endif
 
     guard let manager = ClipboardManager.shared else {
         return """
-        accessibilityGranted: \(AXIsProcessTrusted())
+        accessibilityGranted: \(accessibilityStatus)
         clipboardManager: NOT_INITIALIZED
         """
     }
 
     return """
-    accessibilityGranted: \(AXIsProcessTrusted())
+    accessibilityGranted: \(accessibilityStatus)
     historyCount: \(manager.history.count)
     pinnedCount: \(manager.pinnedItems.count)
     pasteStackCount: \(manager.pasteStack.count)

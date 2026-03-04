@@ -1,39 +1,31 @@
 ---
 name: Bug Report
-about: Report something that isn't working correctly
-title: '[Bug] '
+about: Help me fix a technical issue quickly
+title: "[Bug]: "
 labels: bug
-assignees: ''
 ---
 
-## Describe the Bug
+## What happened?
 
-<!-- A clear description of what the bug is -->
+<!-- Tell me what you saw in plain language -->
+
+## What did you expect to happen?
+
+<!-- What should have happened instead -->
 
 ## Steps to Reproduce
 
-1. Go to '...'
-2. Click on '...'
-3. See error
+1.
+2.
+3.
 
-## Expected Behavior
+## App + Mac details
 
-<!-- What should happen -->
+- App version:
+- macOS version:
+- Mac model / chip:
 
-## Actual Behavior
+## Optional diagnostics (helps a lot)
 
-<!-- What actually happens -->
-
-## Screenshots
-
-<!-- If applicable, add screenshots -->
-
-## Environment
-
-- **macOS Version**: <!-- e.g., Sonoma 14.2 -->
-- **SaneClip Version**: <!-- e.g., 1.0.1 -->
-- **Mac Model**: <!-- e.g., MacBook Pro M3 -->
-
-## Additional Context
-
-<!-- Any other relevant information -->
+- If available, paste in-app diagnostics or relevant logs.
+- If you already emailed support, include that thread date/email so I can cross-reference quickly.

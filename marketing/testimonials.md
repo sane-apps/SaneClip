@@ -19,14 +19,14 @@
 
 | Quote | Source | Date | Platform |
 |-------|--------|------|----------|
-| | | | |
+| "The app and setup are extremely polished and professional, the best on the market by far." | Glenn C. | Feb 2026 | Email |
 
 ---
 
 ## Pull Quotes (Ready for Website)
 
 ```
-"Quote here" — Source
+"The app and setup are extremely polished and professional, the best on the market by far." — Glenn C. (Email)
 ```
 
 ---

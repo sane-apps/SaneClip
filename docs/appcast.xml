@@ -6,228 +6,31 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-    
-
-                    
-        <item>
-            <title>2.2.2</title>
-            <pubDate>Fri, 27 Feb 2026 13:35:56 -0500</pubDate>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <sparkle:minimumAutoupdateVersion>2202</sparkle:minimumAutoupdateVersion>
-            <sparkle:ignoreSkippedUpgradesBelowVersion>2202</sparkle:ignoreSkippedUpgradesBelowVersion>
-            <sparkle:criticalUpdate/>
-            <description>
-                <![CDATA[
-                <h2>What's New</h2>
-                <ul>
-                <li>Recommended update for all users: better core reliability and setup.</li>
-                <li>Faster, more consistent copy and paste in daily use.</li>
-                <li>New guided setup with smarter permission recovery.</li>
-                <li>Cleaner settings and menu polish for a smoother workflow.</li>
-                </ul>
-                ]]>
-            </description>
-            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.2.2.zip"
-                       sparkle:version="2202"
-                       sparkle:shortVersionString="2.2.2"
-                       length="2969045"
-                       type="application/octet-stream"
-                       sparkle:edSignature="ence65WpJkFLBJ1YvsfRpUGkNWg4A+ALlfE7oinP0CbDSpnL0jI3fQ3/zp0x0+k9svq49GrHSxKn3Kl488uUDg=="/>
-        </item>
-<item>
-            <title>2.1.2</title>
-            <pubDate>Mon, 23 Feb 2026 21:07:14 -0500</pubDate>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <sparkle:minimumAutoupdateVersion>2102</sparkle:minimumAutoupdateVersion>
-            <sparkle:criticalUpdate/>
-            <description>
-                <![CDATA[
-                <h2>Changes</h2>
-                <p>Corrective release: align binary metadata with appcast and App Store pipeline.</p>
-                ]]>
-            </description>
-            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.1.2.zip"
-                       sparkle:version="2102"
-                       sparkle:shortVersionString="2.1.2"
-                       length="2701707"
-                       type="application/octet-stream"
-                       sparkle:edSignature="IGjv+rFkGLPycEtaeDrPPrgdLLQOr5yPdvttd13NyQlOW6buYYLr6AxeYx/HysnMdIAFXi0g9HpwcKA9U5vnDg=="/>
-        </item>
-<item>
-            <title>2.1</title>
-            <pubDate>Fri, 20 Feb 2026 19:00:53 -0500</pubDate>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description>
-                <![CDATA[
-                <h2>Changes</h2>
-                <p>Update to version 2.1</p>
-                ]]>
-            </description>
-            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.1.zip"
-                       sparkle:version="21"
-                       sparkle:shortVersionString="2.1"
-                       length="2632371"
-                       type="application/octet-stream"
-                       sparkle:edSignature="f8se1U20luUU44XG5JylQOfbxhNRwgzwBw554s0pIHZcxaKf3puPhBAkzLh0uwfYXLo+wAi84qp/89f0O8a+AQ=="/>
-        </item>
-<item>
-      <title>Version 2.0</title>
-      <link>https://saneclip.com</link>
-      <sparkle:version>7</sparkle:version>
-      <sparkle:shortVersionString>2.0</sparkle:shortVersionString>
-      <description><![CDATA[
-        <h2>SaneClip 2.0 - Cross-Device Sync & Smart Paste</h2>
-        <h3>New Features</h3>
-        <ul>
-          <li><strong>Cross-Device Sync</strong> - iCloud sync via CKSyncEngine keeps clipboard history in sync across your Mac and iPhone</li>
-          <li><strong>Smart Paste Modes</strong> - Auto-detects code (pastes plain), URLs (strips tracking params), or standard text</li>
-          <li><strong>Paste Stack</strong> - Queue multiple items and paste them in FIFO or LIFO order</li>
-          <li><strong>Source-Aware Colors</strong> - Color-coded bars show which app each clip came from (12 app colors)</li>
-          <li><strong>iOS Companion App</strong> - View, search, and manage clipboard history from your iPhone with Siri Shortcuts and widgets</li>
-        </ul>
-        <h3>Improvements</h3>
-        <ul>
-          <li>Default paste mode setting (Standard, Plain Text, or Smart)</li>
-          <li>URL tracking parameter stripping (utm_*, fbclid, gclid, and more)</li>
-          <li>App Store availability as Universal Purchase (one purchase for Mac + iPhone)</li>
-        </ul>
-      ]]></description>
-      <pubDate>Mon, 09 Feb 2026 22:38:06 -0500</pubDate>
-      <enclosure
-        url="https://dist.saneclip.com/updates/SaneClip-2.0.dmg"
-        sparkle:edSignature="hfb2sW7oiBMrPuzczd4cbAkSRQ6z4xZCCtWWu+3PK4U/sVA1oHbAHpqhw5B6U7QAMQchFOUaFmGwoqSlEOFvDQ=="
-        length="3005400"
-        type="application/octet-stream" />
-      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-    </item>
-
     <item>
-      <title>Version 1.4</title>
-      <link>https://saneclip.com</link>
-      <sparkle:version>6</sparkle:version>
-      <sparkle:shortVersionString>1.4</sparkle:shortVersionString>
-      <description><![CDATA[
-        <h2>SaneClip 1.4 - Security Hardening</h2>
-        <h3>Security Enhancements</h3>
-        <ul>
-          <li><strong>Keychain Integration</strong> - All secrets (webhook keys, encryption keys) now stored securely in macOS Keychain</li>
-          <li><strong>History Encryption-at-Rest</strong> - AES-256-GCM encryption for clipboard history (enabled by default)</li>
-          <li><strong>URL Scheme Confirmation</strong> - Destructive commands (copy, paste, clear) require user confirmation</li>
-          <li><strong>HTTPS Enforcement</strong> - Webhooks must use HTTPS (localhost exempt for testing)</li>
-          <li><strong>Seamless Migration</strong> - Existing plaintext data auto-migrates to encrypted format on first launch</li>
-        </ul>
-        <h3>Technical</h3>
-        <ul>
-          <li>New KeychainHelper with Sendable conformance for secure credential storage</li>
-          <li>New HistoryEncryption service using CryptoKit AES-GCM</li>
-          <li>Enhanced URLSchemeHandler with command parsing and confirmation requirements</li>
-          <li>47 tests passing (22 new security tests added)</li>
-        </ul>
-      ]]></description>
-      <pubDate>Mon, 03 Feb 2026 20:05:00 -0500</pubDate>
-      <enclosure
-        url="https://dist.saneclip.com/updates/SaneClip-1.4.dmg"
-        sparkle:edSignature="opEhZGHtZgwTiHXRt63XW/QiO/Ft8gorj0djRIez7v++32gT6rG0hAQzgHXfI8ziJQSv2opQjcz9wv6Uay+TAg=="
-        length="2850157"
-        type="application/octet-stream" />
-      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-    </item>
-
-    <item>
-      <title>Version 1.3</title>
-      <link>https://saneclip.com</link>
-      <sparkle:version>5</sparkle:version>
-      <sparkle:shortVersionString>1.3</sparkle:shortVersionString>
-      <description><![CDATA[
-        <h2>SaneClip 1.3</h2>
-        <h3>Improvements</h3>
-        <ul>
-          <li><strong>New app icon</strong> - Redesigned opaque icon with proper dark background for crisp display in Dock and Finder</li>
-          <li><strong>DMG installer</strong> - Clean layout with correct icon rendering</li>
-          <li><strong>Default keyboard shortcuts</strong> - Sensible defaults configured out of the box</li>
-          <li><strong>Trust line</strong> - "Made with ❤️ in 🇺🇸 · 100% On-Device · No Analytics" in About</li>
-          <li><strong>2D menu bar icons</strong> - Cleaner, simpler icon style</li>
-        </ul>
-        <h3>Under the Hood</h3>
-        <ul>
-          <li><strong>App Store preparation</strong> - Conditional compilation for dual distribution</li>
-          <li><strong>Privacy manifest</strong> - Apple-required API usage declarations</li>
-          <li><strong>Secure distribution</strong> - All updates served from Cloudflare R2</li>
-        </ul>
-      ]]></description>
-      <pubDate>Mon, 27 Jan 2026 01:25:00 -0500</pubDate>
-      <enclosure
-        url="https://dist.saneclip.com/updates/SaneClip-1.3.dmg"
-        sparkle:edSignature="9FVFsH9jrCZBEv3bbgwA/eZnwqtp37AOcqS/2wC+hDsB0GimgndU9MeCkUb3KwcQ5yQdG+x8gszEDq7kZNHlAQ=="
-        length="2452458"
-        type="application/octet-stream" />
-      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-    </item>
-
-    <item>
-      <title>Version 1.2</title>
-      <link>https://saneclip.com</link>
-      <sparkle:version>4</sparkle:version>
-      <sparkle:shortVersionString>1.2</sparkle:shortVersionString>
-      <description><![CDATA[
-        <h2>SaneClip 1.2 - Sparkle Update Test</h2>
-        <p>Testing notarized Sparkle updates via Cloudflare R2 distribution.</p>
-      ]]></description>
-      <pubDate>Fri, 24 Jan 2026 12:23:00 -0500</pubDate>
-      <enclosure
-        url="https://dist.saneclip.com/updates/SaneClip-1.2.dmg"
-        sparkle:edSignature="SiluSWGtijarKMxFtcJn4uvBb38K/cQbS7aoa/nT/V9qq03KR5OqeN6FZLoZZJqwJwo+9sy3kqcrj19ldXO3Cw=="
-        length="2698628"
-        type="application/octet-stream" />
-      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-    </item>
-
-    <item>
-      <title>Version 1.1</title>
-      <link>https://saneclip.com</link>
-      <sparkle:version>3</sparkle:version>
-      <sparkle:shortVersionString>1.1</sparkle:shortVersionString>
-      <description><![CDATA[
-        <h2>SaneClip 1.1 - Phase 1 Polish</h2>
-        <h3>New Features</h3>
-        <ul>
-          <li><strong>First-launch onboarding</strong> - Welcome tutorial with permissions setup and keyboard shortcuts guide</li>
-          <li><strong>App source attribution</strong> - See which app each clip came from with app icon</li>
-          <li><strong>Excluded apps list</strong> - Block sensitive apps (1Password, banking apps) from clipboard capture</li>
-          <li><strong>Duplicate detection</strong> - Automatically consolidate identical clips</li>
-          <li><strong>Keyboard navigation</strong> - Arrow keys and vim-style j/k navigation in history</li>
-          <li><strong>Paste count badges</strong> - Track how many times each item was pasted</li>
-          <li><strong>Menu bar icon options</strong> - Choose between List and Minimal icon styles</li>
-          <li><strong>Sound effects toggle</strong> - Optional paste confirmation sounds</li>
-        </ul>
-        <h3>Improvements</h3>
-        <ul>
-          <li><strong>Security-by-default</strong> - Authentication required to reduce security settings</li>
-          <li><strong>Smarter time display</strong> - Compact format (41s, 15m, 2h, 3d)</li>
-          <li><strong>Compact stats</strong> - Shows "wd · ch" format for word and character counts</li>
-          <li><strong>Aligned metadata</strong> - Fixed-width columns for cleaner visual scanning</li>
-          <li><strong>Renamed setting</strong> - "Detect & skip passwords" for clarity</li>
-        </ul>
-        <h3>Bug Fixes</h3>
-        <ul>
-          <li><strong>Metadata no longer wraps</strong> - Single-line metadata regardless of content length</li>
-          <li><strong>Pinned items now persist</strong> - Pinned items survive app restart</li>
-        </ul>
-        <h3>UI/UX</h3>
-        <ul>
-          <li><strong>URL tracking stripping</strong> - Auto-removes utm_*, fbclid, gclid from URLs</li>
-          <li><strong>Hover highlighting</strong> - Glass material effect with animation on hover</li>
-          <li><strong>Content-type icons</strong> - Link, code, or text icons for faster scanning</li>
-        </ul>
-      ]]></description>
-      <pubDate>Sun, 19 Jan 2026 17:20:00 -0500</pubDate>
-      <enclosure
-        url="https://dist.saneclip.com/updates/SaneClip-1.1.dmg"
-        sparkle:edSignature="RSfKn9TH87Lhvh5SsWJBd9evYzJYRnQysC25jrJNleZx2DdBSLzrO8y+98TF16uwdcBOgq22ZRVjzozdXmPrCQ=="
-        length="2037596"
-        type="application/octet-stream" />
-      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-    </item>
+                <title>2.2.2</title>
+                <pubDate>Fri, 27 Feb 2026 13:35:56 -0500</pubDate>
+                <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+                <sparkle:minimumAutoupdateVersion>2202</sparkle:minimumAutoupdateVersion>
+                <sparkle:ignoreSkippedUpgradesBelowVersion>2202</sparkle:ignoreSkippedUpgradesBelowVersion>
+                <sparkle:criticalUpdate/>
+                <description>
+                    <![CDATA[
+                    <h2>What's New</h2>
+                    <ul>
+                    <li>Recommended update for all users: better core reliability and setup.</li>
+                    <li>Faster, more consistent copy and paste in daily use.</li>
+                    <li>New guided setup with smarter permission recovery.</li>
+                    <li>Cleaner settings and menu polish for a smoother workflow.</li>
+                    </ul>
+                    ]]>
+                </description>
+                <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.2.2.zip"
+                           sparkle:version="2202"
+                           sparkle:shortVersionString="2.2.2"
+                           length="2969045"
+                           type="application/octet-stream"
+                           sparkle:edSignature="ence65WpJkFLBJ1YvsfRpUGkNWg4A+ALlfE7oinP0CbDSpnL0jI3fQ3/zp0x0+k9svq49GrHSxKn3Kl488uUDg=="/>
+            </item>
 
   </channel>
 </rss>

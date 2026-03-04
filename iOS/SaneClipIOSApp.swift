@@ -4,6 +4,10 @@ import SwiftUI
 struct SaneClipIOSApp: App {
     @StateObject private var viewModel = ClipboardHistoryViewModel()
     @AppStorage("hasCompletedOnboardingIOS") private var hasCompletedOnboarding = false
+    private let launchArgs = Set(ProcessInfo.processInfo.arguments)
+
+    private var forceOnboarding: Bool { launchArgs.contains("--force-onboarding") }
+    private var skipOnboarding: Bool { launchArgs.contains("--skip-onboarding") }
 
     var body: some Scene {
         WindowGroup {
@@ -12,7 +16,11 @@ struct SaneClipIOSApp: App {
                 .tint(.teal)
                 .preferredColorScheme(.dark)
                 .fullScreenCover(isPresented: Binding(
-                    get: { !hasCompletedOnboarding },
+                    get: {
+                        if forceOnboarding { return true }
+                        if skipOnboarding { return false }
+                        return !hasCompletedOnboarding
+                    },
                     set: { if $0 { hasCompletedOnboarding = false } }
                 )) {
                     OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
@@ -25,7 +33,7 @@ struct SaneClipIOSApp: App {
 struct ContentView: View {
     @EnvironmentObject var viewModel: ClipboardHistoryViewModel
     @Environment(\.horizontalSizeClass) private var sizeClass
-    @State private var selectedTab = 0
+    @State private var selectedTab = LaunchOptions.initialTabIndex
 
     private var isIPad: Bool { sizeClass == .regular }
 
@@ -88,21 +96,46 @@ struct ContentView: View {
     // MARK: - iPhone: Standard TabView
 
     private var iPhoneLayout: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             HistoryTab()
+                .tag(0)
                 .tabItem {
                     Label("History", systemImage: "doc.on.clipboard")
                 }
 
             PinnedTab()
+                .tag(1)
                 .tabItem {
                     Label("Pinned", systemImage: "pin.fill")
                 }
 
             SettingsTab()
+                .tag(2)
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }
+        }
+    }
+}
+
+private enum LaunchOptions {
+    static var initialTabIndex: Int {
+        let args = ProcessInfo.processInfo.arguments
+        guard let markerIndex = args.firstIndex(of: "--screenshot-tab"),
+              markerIndex + 1 < args.count
+        else {
+            return 0
+        }
+
+        switch args[markerIndex + 1].lowercased() {
+        case "history":
+            return 0
+        case "pinned":
+            return 1
+        case "settings":
+            return 2
+        default:
+            return 0
         }
     }
 }

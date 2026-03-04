@@ -9,6 +9,7 @@ extension Notification.Name {
     static let showHistory = Notification.Name("SaneClipShowHistory")
     static let pasteAtIndex = Notification.Name("SaneClipPasteAtIndex")
     static let dismissForPaste = Notification.Name("SaneClipDismissForPaste")
+    static let reopenHistoryAfterPaste = Notification.Name("SaneClipReopenHistoryAfterPaste")
 }
 
 /// Parsed URL scheme command for testability

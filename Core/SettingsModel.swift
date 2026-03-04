@@ -69,6 +69,13 @@ class SettingsModel {
         }
     }
 
+    /// When enabled, opening history anchors near current mouse cursor instead of menu bar icon.
+    var openHistoryAtCursor: Bool {
+        didSet {
+            UserDefaults.standard.set(openHistoryAtCursor, forKey: "openHistoryAtCursor")
+        }
+    }
+
     var showInDock: Bool {
         didSet {
             UserDefaults.standard.set(showInDock, forKey: "showInDock")
@@ -107,6 +114,41 @@ class SettingsModel {
     var pasteStackReversed: Bool {
         didSet {
             UserDefaults.standard.set(pasteStackReversed, forKey: "pasteStackReversed")
+        }
+    }
+
+    /// Keep the history panel visible between paste-stack actions by reopening it after each paste.
+    var keepPasteStackOpenBetweenPastes: Bool {
+        didSet {
+            UserDefaults.standard.set(keepPasteStackOpenBetweenPastes, forKey: "keepPasteStackOpenBetweenPastes")
+        }
+    }
+
+    /// When enabled, close the history panel after the last stack item is consumed.
+    var autoClosePasteStackWhenEmpty: Bool {
+        didSet {
+            UserDefaults.standard.set(autoClosePasteStackWhenEmpty, forKey: "autoClosePasteStackWhenEmpty")
+        }
+    }
+
+    /// Temporarily disable consuming items from the paste stack.
+    var pausePasteStackConsumption: Bool {
+        didSet {
+            UserDefaults.standard.set(pausePasteStackConsumption, forKey: "pausePasteStackConsumption")
+        }
+    }
+
+    /// Collapse duplicate entries in the paste stack by content hash.
+    var collapseDuplicatePasteStackItems: Bool {
+        didSet {
+            UserDefaults.standard.set(collapseDuplicatePasteStackItems, forKey: "collapseDuplicatePasteStackItems")
+        }
+    }
+
+    /// Optional per-app paste mode overrides keyed by source bundle ID.
+    var perAppPasteModes: [String: String] {
+        didSet {
+            UserDefaults.standard.set(perAppPasteModes, forKey: "perAppPasteModes")
         }
     }
 
@@ -171,6 +213,7 @@ class SettingsModel {
 
     init() {
         maxHistorySize = UserDefaults.standard.object(forKey: "maxHistorySize") as? Int ?? 50
+        openHistoryAtCursor = UserDefaults.standard.object(forKey: "openHistoryAtCursor") as? Bool ?? false
         showInDock = UserDefaults.standard.object(forKey: "showInDock") as? Bool ?? false
         protectPasswords = UserDefaults.standard.object(forKey: "protectPasswords") as? Bool ?? true
         requireTouchID = UserDefaults.standard.object(forKey: "requireTouchID") as? Bool ?? false
@@ -189,6 +232,11 @@ class SettingsModel {
         // Basic default must be non-contradictory with Pro gating.
         encryptHistory = UserDefaults.standard.object(forKey: "encryptHistory") as? Bool ?? false
         pasteStackReversed = UserDefaults.standard.object(forKey: "pasteStackReversed") as? Bool ?? false
+        keepPasteStackOpenBetweenPastes = UserDefaults.standard.object(forKey: "keepPasteStackOpenBetweenPastes") as? Bool ?? true
+        autoClosePasteStackWhenEmpty = UserDefaults.standard.object(forKey: "autoClosePasteStackWhenEmpty") as? Bool ?? true
+        pausePasteStackConsumption = UserDefaults.standard.object(forKey: "pausePasteStackConsumption") as? Bool ?? false
+        collapseDuplicatePasteStackItems = UserDefaults.standard.object(forKey: "collapseDuplicatePasteStackItems") as? Bool ?? true
+        perAppPasteModes = UserDefaults.standard.object(forKey: "perAppPasteModes") as? [String: String] ?? [:]
         defaultPasteMode = PasteMode(rawValue: UserDefaults.standard.string(forKey: "defaultPasteMode") ?? "") ?? .standard
         let savedTextBytes = UserDefaults.standard.object(forKey: "maxCaptureTextBytes") as? Int ?? 262_144
         let normalizedTextBytes = Self.normalizedCaptureTextBytes(savedTextBytes)
@@ -232,6 +280,7 @@ class SettingsModel {
         let settings: [String: Any] = [
             "version": 1, // For future format versioning
             "maxHistorySize": maxHistorySize,
+            "openHistoryAtCursor": openHistoryAtCursor,
             "showInDock": showInDock,
             "protectPasswords": protectPasswords,
             "requireTouchID": requireTouchID,
@@ -241,7 +290,12 @@ class SettingsModel {
             "autoExpireHours": autoExpireHours,
             "encryptHistory": encryptHistory,
             "pasteStackReversed": pasteStackReversed,
+            "keepPasteStackOpenBetweenPastes": keepPasteStackOpenBetweenPastes,
+            "autoClosePasteStackWhenEmpty": autoClosePasteStackWhenEmpty,
+            "pausePasteStackConsumption": pausePasteStackConsumption,
+            "collapseDuplicatePasteStackItems": collapseDuplicatePasteStackItems,
             "defaultPasteMode": defaultPasteMode.rawValue,
+            "perAppPasteModes": perAppPasteModes,
             "maxCaptureTextBytes": maxCaptureTextBytes,
             "maxCaptureImageBytes": maxCaptureImageBytes,
             // Include clipboard rules
@@ -269,6 +323,9 @@ class SettingsModel {
         // Apply each setting if present
         if let value = settings["maxHistorySize"] as? Int {
             maxHistorySize = value
+        }
+        if let value = settings["openHistoryAtCursor"] as? Bool {
+            openHistoryAtCursor = value
         }
         if let value = settings["showInDock"] as? Bool {
             showInDock = value
@@ -300,9 +357,24 @@ class SettingsModel {
         if let value = settings["pasteStackReversed"] as? Bool {
             pasteStackReversed = value
         }
+        if let value = settings["keepPasteStackOpenBetweenPastes"] as? Bool {
+            keepPasteStackOpenBetweenPastes = value
+        }
+        if let value = settings["autoClosePasteStackWhenEmpty"] as? Bool {
+            autoClosePasteStackWhenEmpty = value
+        }
+        if let value = settings["pausePasteStackConsumption"] as? Bool {
+            pausePasteStackConsumption = value
+        }
+        if let value = settings["collapseDuplicatePasteStackItems"] as? Bool {
+            collapseDuplicatePasteStackItems = value
+        }
         if let value = settings["defaultPasteMode"] as? String,
            let mode = PasteMode(rawValue: value) {
             defaultPasteMode = mode
+        }
+        if let value = settings["perAppPasteModes"] as? [String: String] {
+            perAppPasteModes = value
         }
         if let value = settings["maxCaptureTextBytes"] as? Int {
             maxCaptureTextBytes = Self.normalizedCaptureTextBytes(value)
@@ -330,5 +402,23 @@ class SettingsModel {
                 rulesManager.lowercaseURLs = value
             }
         }
+    }
+
+    func pasteMode(for bundleID: String?) -> PasteMode? {
+        guard let bundleID,
+              let raw = perAppPasteModes[bundleID],
+              let mode = PasteMode(rawValue: raw)
+        else { return nil }
+        return mode
+    }
+
+    func setPasteMode(_ mode: PasteMode?, for bundleID: String) {
+        var map = perAppPasteModes
+        if let mode {
+            map[bundleID] = mode.rawValue
+        } else {
+            map.removeValue(forKey: bundleID)
+        }
+        perAppPasteModes = map
     }
 }

@@ -139,11 +139,14 @@ class ClipboardHistoryViewModel: ObservableObject {
         }
 
         let demoItems: [DemoItem] = [
-            DemoItem(text: "https://developer.apple.com/documentation/swiftui", app: "Safari", offset: -60),
-            DemoItem(text: "Meeting notes: Discussed Q1 roadmap and feature priorities for the next release.", app: "Notes", offset: -300),
-            DemoItem(text: "func greet(name: String) -> String {\n    return \"Hello, \\(name)!\"\n}", app: "Xcode", offset: -900),
-            DemoItem(text: "The quick brown fox jumps over the lazy dog.", app: "TextEdit", offset: -1800),
-            DemoItem(text: "support@example.com", app: "Mail", offset: -3600)
+            DemoItem(text: "Can you grab oat milk and pasta on your way home?", app: "Messages", offset: -60),
+            DemoItem(text: "Tell mom about SaneBar to manage her menu bar icons.", app: "Messages", offset: -180),
+            DemoItem(text: "Your dentist appointment is confirmed for Tuesday at 2:30 PM.", app: "Mail", offset: -420),
+            DemoItem(text: "Weekend plan: hike Saturday, meal prep Sunday, call mom.", app: "Notes", offset: -900),
+            DemoItem(text: "123 Main St, Tampa, FL 33602", app: "Maps", offset: -1500),
+            DemoItem(text: "SaneSales looks clean on iPhone, iPad, and Mac.", app: "Messages", offset: -2400),
+            DemoItem(text: "SaneClick is perfect for quick right-click actions.", app: "Messages", offset: -3000),
+            DemoItem(text: "Download SaneApps apps later when I'm back at my Mac.", app: "Safari", offset: -3600)
         ]
 
         history = demoItems.map { demo in
@@ -161,10 +164,28 @@ class ClipboardHistoryViewModel: ObservableObject {
         pinnedItems = [
             SharedClipboardItem(
                 id: UUID(),
-                content: .text("My frequently used snippet — pinned for quick access"),
+                content: .text("Mom's birthday checklist: flowers, card, dinner reservation."),
                 timestamp: now.addingTimeInterval(-7200),
-                sourceAppName: "Notes",
+                sourceAppName: "Reminders",
                 pasteCount: 3,
+                deviceId: "demo",
+                deviceName: "Demo"
+            ),
+            SharedClipboardItem(
+                id: UUID(),
+                content: .text("House essentials: trash bags, eggs, coffee beans."),
+                timestamp: now.addingTimeInterval(-7800),
+                sourceAppName: "Notes",
+                pasteCount: 2,
+                deviceId: "demo",
+                deviceName: "Demo"
+            ),
+            SharedClipboardItem(
+                id: UUID(),
+                content: .text("SaneApps download page - save for later."),
+                timestamp: now.addingTimeInterval(-8400),
+                sourceAppName: "Safari",
+                pasteCount: 4,
                 deviceId: "demo",
                 deviceName: "Demo"
             )

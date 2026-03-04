@@ -1,10 +1,12 @@
 import AppKit
-@preconcurrency import ApplicationServices
 import Combine
 import os.log
 import SaneUI
 import SwiftUI
 import UniformTypeIdentifiers
+#if !APP_STORE
+    @preconcurrency import ApplicationServices
+#endif
 #if APP_STORE
     import UserNotifications
 #endif
@@ -16,11 +18,13 @@ import WidgetKit
 class ClipboardManager {
     static var shared: ClipboardManager!
 
-    nonisolated static let accessibilityAlertTitle = "Auto-Paste Needs Access"
-    nonisolated static let accessibilityAlertMessage = "Clip copied. Enable Accessibility for one-key paste.\nAlready enabled? Quit and reopen."
-    nonisolated static let accessibilityOpenButtonTitle = "Open Access"
-    nonisolated static let accessibilityRetryButtonTitle = "Retry"
-    nonisolated static let accessibilityManualButtonTitle = "Manual"
+    #if !APP_STORE
+        nonisolated static let accessibilityAlertTitle = "Auto-Paste Needs Access"
+        nonisolated static let accessibilityAlertMessage = "Clip copied. Enable Accessibility for one-key paste.\nAlready enabled? Quit and reopen."
+        nonisolated static let accessibilityOpenButtonTitle = "Open Access"
+        nonisolated static let accessibilityRetryButtonTitle = "Retry"
+        nonisolated static let accessibilityManualButtonTitle = "Manual"
+    #endif
 
     /// Free tier history cap — Pro users get unlimited.
     nonisolated static let freeHistoryCap = 50
@@ -35,7 +39,9 @@ class ClipboardManager {
     var pinnedItems: [ClipboardItem] = []
     var pasteStack: [ClipboardItem] = []
     var isPasteStackMode: Bool { !pasteStack.isEmpty }
+    var canUndoLastStackPaste: Bool { lastPastedFromStack != nil }
     private var lastChangeCount: Int = 0
+    private var lastPastedFromStack: ClipboardItem?
 
     /// License service for Pro feature gating.
     var licenseService: LicenseService? {
@@ -109,6 +115,7 @@ class ClipboardManager {
         lastChangeCount = NSPasteboard.general.changeCount
         startMonitoring()
         loadHistory()
+        loadPasteStack()
     }
 
     private func startMonitoring() {
@@ -665,6 +672,10 @@ class ClipboardManager {
     }
 
     func paste(item: ClipboardItem) {
+        paste(item: item, dismissPopover: true, reopenPopoverAfterPaste: false)
+    }
+
+    private func paste(item: ClipboardItem, dismissPopover: Bool, reopenPopoverAfterPaste: Bool) {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
 
@@ -687,7 +698,9 @@ class ClipboardManager {
         }
 
         SettingsModel.shared.pasteSound.play()
-        dismissAndPaste()
+        if dismissPopover {
+            dismissAndPaste(reopenPopoverAfterPaste: reopenPopoverAfterPaste)
+        }
     }
 
     /// Paste most recent item as plain text (for global shortcut)
@@ -834,8 +847,12 @@ class ClipboardManager {
             }
             return
         }
+        if SettingsModel.shared.collapseDuplicatePasteStackItems {
+            pasteStack.removeAll { $0.contentHash == item.contentHash }
+        }
         pasteStack.append(item)
         SettingsModel.shared.pasteSound.play()
+        savePasteStack()
     }
 
     /// Paste the next item from the stack (FIFO or LIFO based on settings) — Pro only
@@ -846,22 +863,104 @@ class ClipboardManager {
             }
             return
         }
+        guard !SettingsModel.shared.pausePasteStackConsumption else { return }
         guard !pasteStack.isEmpty else { return }
-        let item: ClipboardItem = if SettingsModel.shared.pasteStackReversed {
-            pasteStack.removeLast()
-        } else {
-            pasteStack.removeFirst()
+        let index = SettingsModel.shared.pasteStackReversed ? (pasteStack.count - 1) : 0
+        pasteFromStack(at: index)
+    }
+
+    func pasteFromStackItem(id: UUID) {
+        guard licenseService?.isPro == true else {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.pasteStack, licenseService: ls)
+            }
+            return
         }
-        paste(item: item)
+        guard !SettingsModel.shared.pausePasteStackConsumption else { return }
+        guard let index = pasteStack.firstIndex(where: { $0.id == id }) else { return }
+        pasteFromStack(at: index)
+    }
+
+    private func pasteFromStack(at index: Int) {
+        guard index >= 0, index < pasteStack.count else { return }
+        let item = pasteStack.remove(at: index)
+        lastPastedFromStack = item
+        savePasteStack()
+
+        let shouldReopenAfterPaste = SettingsModel.shared.keepPasteStackOpenBetweenPastes &&
+            (!pasteStack.isEmpty || !SettingsModel.shared.autoClosePasteStackWhenEmpty)
+        let mode = resolvedPasteModeForForegroundApp()
+        switch mode {
+        case .standard:
+            paste(item: item, dismissPopover: true, reopenPopoverAfterPaste: shouldReopenAfterPaste)
+        case .plain:
+            pasteAsPlainText(item: item)
+            if shouldReopenAfterPaste {
+                NotificationCenter.default.post(name: .reopenHistoryAfterPaste, object: nil)
+            }
+        case .smart:
+            pasteSmartMode(item: item)
+            if shouldReopenAfterPaste {
+                NotificationCenter.default.post(name: .reopenHistoryAfterPaste, object: nil)
+            }
+        }
+    }
+
+    func undoLastPasteFromStack() {
+        guard let item = lastPastedFromStack else { return }
+        if SettingsModel.shared.pasteStackReversed {
+            pasteStack.append(item)
+        } else {
+            pasteStack.insert(item, at: 0)
+        }
+        lastPastedFromStack = nil
+        savePasteStack()
+    }
+
+    func movePasteStackItems(from source: IndexSet, to destination: Int) {
+        pasteStack.move(fromOffsets: source, toOffset: destination)
+        savePasteStack()
+    }
+
+    func movePasteStackItemUp(id: UUID) {
+        guard let index = pasteStack.firstIndex(where: { $0.id == id }), index > 0 else { return }
+        let item = pasteStack.remove(at: index)
+        pasteStack.insert(item, at: index - 1)
+        savePasteStack()
+    }
+
+    func movePasteStackItemDown(id: UUID) {
+        guard let index = pasteStack.firstIndex(where: { $0.id == id }), index < (pasteStack.count - 1) else { return }
+        let item = pasteStack.remove(at: index)
+        pasteStack.insert(item, at: index + 1)
+        savePasteStack()
+    }
+
+    func movePasteStackItemToTop(id: UUID) {
+        guard let index = pasteStack.firstIndex(where: { $0.id == id }) else { return }
+        let item = pasteStack.remove(at: index)
+        if SettingsModel.shared.pasteStackReversed {
+            pasteStack.append(item)
+        } else {
+            pasteStack.insert(item, at: 0)
+        }
+        savePasteStack()
+    }
+
+    func removeFromPasteStack(id: UUID) {
+        pasteStack.removeAll { $0.id == id }
+        savePasteStack()
     }
 
     /// Clear all items from the paste stack
     func clearPasteStack() {
         pasteStack.removeAll()
+        lastPastedFromStack = nil
+        savePasteStack()
     }
 
     /// Dismiss the popover (so Cmd+V targets the correct app) then simulate paste.
-    private func dismissAndPaste() {
+    private func dismissAndPaste(reopenPopoverAfterPaste: Bool = false) {
         guard !isPasting else {
             logger.debug("Paste already in flight — skipping duplicate")
             return
@@ -870,11 +969,17 @@ class ClipboardManager {
         NotificationCenter.default.post(name: .dismissForPaste, object: nil)
         #if APP_STORE
             showCopiedNotification()
+            if reopenPopoverAfterPaste {
+                NotificationCenter.default.post(name: .reopenHistoryAfterPaste, object: nil)
+            }
             isPasting = false
         #else
             Task { @MainActor in
                 try? await Task.sleep(for: .milliseconds(300))
                 self.simulatePaste()
+                if reopenPopoverAfterPaste {
+                    NotificationCenter.default.post(name: .reopenHistoryAfterPaste, object: nil)
+                }
                 self.isPasting = false
             }
         #endif
@@ -1023,7 +1128,9 @@ class ClipboardManager {
 
         history.removeAll { $0.id == item.id }
         pinnedItems.removeAll { $0.id == item.id }
+        pasteStack.removeAll { $0.id == item.id }
         saveHistory()
+        savePasteStack()
 
         #if ENABLE_SYNC
             SyncCoordinator.shared.queueDeleteForSync(itemID: item.id)
@@ -1076,7 +1183,10 @@ class ClipboardManager {
             }
         }
         history.removeAll()
+        pasteStack.removeAll()
+        lastPastedFromStack = nil
         saveHistory()
+        savePasteStack()
     }
 
     func pasteItemAt(index: Int) {
@@ -1143,6 +1253,10 @@ class ClipboardManager {
             if let pinnedIndex = pinnedItems.firstIndex(where: { $0.id == id }) {
                 pinnedItems[pinnedIndex] = updatedItem
             }
+            if let stackIndex = pasteStack.firstIndex(where: { $0.id == id }) {
+                pasteStack[stackIndex] = updatedItem
+                savePasteStack()
+            }
 
             saveHistory()
             logger.debug("Updated content for item \(id)")
@@ -1167,6 +1281,10 @@ class ClipboardManager {
             if let pinnedIndex = pinnedItems.firstIndex(where: { $0.id == id }) {
                 pinnedItems[pinnedIndex].note = finalNote
             }
+            if let stackIndex = pasteStack.firstIndex(where: { $0.id == id }) {
+                pasteStack[stackIndex].note = finalNote
+                savePasteStack()
+            }
 
             saveHistory()
             logger.debug("Updated note for item \(id)")
@@ -1188,9 +1306,34 @@ class ClipboardManager {
             if let pinnedIndex = pinnedItems.firstIndex(where: { $0.id == id }) {
                 pinnedItems[pinnedIndex].title = finalTitle
             }
+            if let stackIndex = pasteStack.firstIndex(where: { $0.id == id }) {
+                pasteStack[stackIndex].title = finalTitle
+                savePasteStack()
+            }
             saveHistory()
             logger.debug("Updated title for item \(id)")
         }
+    }
+
+    private func resolvedPasteModeForForegroundApp() -> PasteMode {
+        let bundleID = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
+        return SettingsModel.shared.pasteMode(for: bundleID) ?? SettingsModel.shared.defaultPasteMode
+    }
+
+    private func savePasteStack() {
+        let ids = pasteStack.map { $0.id.uuidString }
+        UserDefaults.standard.set(ids, forKey: "pasteStackIDs")
+    }
+
+    private func loadPasteStack() {
+        guard let ids = UserDefaults.standard.array(forKey: "pasteStackIDs") as? [String] else {
+            pasteStack = []
+            return
+        }
+        let map = Dictionary(uniqueKeysWithValues: history.map { ($0.id, $0) })
+        pasteStack = ids
+            .compactMap(UUID.init(uuidString:))
+            .compactMap { map[$0] }
     }
 
     func updateItemTags(id: UUID, tags: [String]) {

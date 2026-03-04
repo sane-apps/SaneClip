@@ -5,33 +5,70 @@ struct OnboardingView: View {
     @State private var currentPage = 0
     @Environment(\.horizontalSizeClass) private var sizeClass
 
+    private let totalPages = 7
     private var isIPad: Bool { sizeClass == .regular }
 
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [
-                    Color.teal.opacity(0.12),
-                    Color.teal.opacity(0.08),
-                    Color.teal.opacity(0.05)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+        VStack(spacing: 0) {
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color.teal.opacity(0.12),
+                        Color.teal.opacity(0.08),
+                        Color.teal.opacity(0.05)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
 
-            TabView(selection: $currentPage) {
-                WelcomePageIOS(isIPad: isIPad)
-                    .tag(0)
-
-                FeaturesPageIOS(isIPad: isIPad)
-                    .tag(1)
-
-                SanePromisePageIOS(hasCompletedOnboarding: $hasCompletedOnboarding, isIPad: isIPad)
-                    .tag(2)
+                TabView(selection: $currentPage) {
+                    WelcomePageIOS(isIPad: isIPad).tag(0)
+                    DontSkipPageIOS(isIPad: isIPad).tag(1)
+                    CoreWorkflowPageIOS(isIPad: isIPad).tag(2)
+                    AdvancedWorkflowPageIOS(isIPad: isIPad).tag(3)
+                    SanePhilosophyPageIOS(isIPad: isIPad).tag(4)
+                    PermissionsPageIOS(isIPad: isIPad).tag(5)
+                    PlanUpgradePageIOS(isIPad: isIPad).tag(6)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .always))
+                .indexViewStyle(.page(backgroundDisplayMode: .always))
             }
-            .tabViewStyle(.page(indexDisplayMode: .always))
-            .indexViewStyle(.page(backgroundDisplayMode: .always))
+
+            HStack {
+                if currentPage > 0 {
+                    Button("Back") {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            currentPage -= 1
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.white.opacity(0.25))
+                    .foregroundStyle(.white)
+                }
+
+                Spacer()
+
+                if currentPage < totalPages - 1 {
+                    Button("Next") {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            currentPage += 1
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.teal)
+                } else {
+                    Button("Get Started") {
+                        hasCompletedOnboarding = true
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.teal)
+                }
+            }
+            .font(.system(size: isIPad ? 20 : 16, weight: .semibold))
+            .padding(.horizontal, isIPad ? 28 : 20)
+            .padding(.vertical, isIPad ? 18 : 14)
+            .background(Color.black.opacity(0.28))
         }
     }
 }
@@ -43,46 +80,42 @@ private struct WelcomePageIOS: View {
 
     var body: some View {
         GeometryReader { geo in
-            let width = geo.size.width
-
-            VStack(spacing: 0) {
+            VStack(spacing: isIPad ? 26 : 18) {
                 Spacer()
 
-                // Hero section — icon, title, subtitle
-                VStack(spacing: isIPad ? 24 : 16) {
-                    Image("AppIconImage")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(
-                            width: isIPad ? 200 : 120,
-                            height: isIPad ? 200 : 120
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: isIPad ? 44 : 26))
-                        .shadow(color: Color.teal.opacity(0.4), radius: 20, x: 0, y: 8)
+                Image("AppIconImage")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: isIPad ? 180 : 120, height: isIPad ? 180 : 120)
+                    .clipShape(RoundedRectangle(cornerRadius: isIPad ? 40 : 26))
+                    .shadow(color: Color.teal.opacity(0.35), radius: 20, x: 0, y: 8)
 
-                    Text("Welcome to SaneClip")
-                        .font(.system(size: isIPad ? 52 : 34, weight: .bold))
-                        .foregroundStyle(.white)
+                Text("Welcome to SaneClip")
+                    .font(.system(size: isIPad ? 50 : 34, weight: .bold))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
 
-                    Text("Everything you copy, saved automatically.\nText, images, links — always one tap away.")
-                        .multilineTextAlignment(.center)
-                        .font(.system(size: isIPad ? 24 : 18))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, isIPad ? 80 : 24)
-                }
+                Text("Clipboard history that stays calm, private, and fast.")
+                    .font(.system(size: isIPad ? 24 : 18, weight: .medium))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, isIPad ? 80 : 24)
+
+                Text("Seven quick screens. Follow them in order.")
+                    .font(.system(size: isIPad ? 18 : 14, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.95))
 
                 Spacer()
 
-                // Trust badges — anchored in lower area
-                HStack(spacing: isIPad ? 24 : 12) {
+                HStack(spacing: isIPad ? 20 : 12) {
                     TrustBadgeIOS(icon: "lock.shield.fill", label: "100% Private", isIPad: isIPad)
-                    TrustBadgeIOS(icon: "dollarsign.circle.fill", label: "No Subscription", isIPad: isIPad)
-                    TrustBadgeIOS(icon: "chevron.left.forwardslash.chevron.right", label: "100% Transparent Code", isIPad: isIPad)
+                    TrustBadgeIOS(icon: "dollarsign.circle.fill", label: "Pay Once", isIPad: isIPad)
+                    TrustBadgeIOS(icon: "chevron.left.forwardslash.chevron.right", label: "Transparent", isIPad: isIPad)
                 }
                 .padding(.horizontal, isIPad ? 60 : 20)
-                .padding(.bottom, isIPad ? 60 : 40)
+                .padding(.bottom, isIPad ? 56 : 36)
             }
-            .frame(width: width)
+            .frame(width: geo.size.width)
         }
     }
 }
@@ -95,97 +128,137 @@ private struct TrustBadgeIOS: View {
     var body: some View {
         VStack(spacing: isIPad ? 12 : 8) {
             Image(systemName: icon)
-                .font(.system(size: isIPad ? 32 : 22))
-                .foregroundStyle(Color.teal)
+                .font(.system(size: isIPad ? 30 : 22))
+                .foregroundStyle(.teal)
             Text(label)
-                .font(.system(size: isIPad ? 20 : 16, weight: .semibold))
+                .font(.system(size: isIPad ? 18 : 14, weight: .semibold))
                 .foregroundStyle(.white)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, isIPad ? 24 : 16)
+        .padding(.vertical, isIPad ? 22 : 14)
         .background(Color.white.opacity(0.08))
-        .clipShape(RoundedRectangle(cornerRadius: isIPad ? 18 : 12))
+        .clipShape(RoundedRectangle(cornerRadius: isIPad ? 16 : 12))
     }
 }
 
-// MARK: - Page 2: Features
+// MARK: - Page 2: Don't Skip
 
-private struct FeaturesPageIOS: View {
+private struct DontSkipPageIOS: View {
     let isIPad: Bool
 
-    private let features: [(icon: String, color: Color, title: String, description: String)] = [
-        ("doc.on.clipboard", .teal, "Clipboard History", "Every copy saved automatically"),
-        ("pin.fill", .orange, "Pin & Annotate", "Pin favorites and add notes"),
-        ("touchid", .red, "Touch ID & Encryption", "AES-256 encryption, biometric lock"),
-        ("icloud", .blue, "iCloud Sync", "Your clips on all your devices"),
-        ("exclamationmark.shield.fill", .yellow, "Sensitive Data Detection", "Flags passwords, credit cards, API keys"),
-        ("photo", .green, "Images & Text", "Copies images too, not just text"),
-        ("widget.small", .teal, "Home Screen Widgets", "Quick access without opening the app"),
-        ("magnifyingglass", .white, "Instant Search", "Find anything you ever copied")
+    var body: some View {
+        VStack(spacing: isIPad ? 28 : 20) {
+            Spacer()
+
+            Image(systemName: "hand.wave.fill")
+                .font(.system(size: isIPad ? 66 : 46))
+                .foregroundStyle(.teal)
+
+            Text("Don't skip this.")
+                .font(.system(size: isIPad ? 52 : 34, weight: .bold))
+                .foregroundStyle(.white)
+
+            Text("It's only a few screens and you'll be confused if you rush through.")
+                .font(.system(size: isIPad ? 24 : 18))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, isIPad ? 100 : 26)
+
+            Text("— Mr. Sane")
+                .font(.system(size: isIPad ? 20 : 15, weight: .medium, design: .serif))
+                .foregroundStyle(.white.opacity(0.95))
+
+            Spacer()
+        }
+    }
+}
+
+// MARK: - Page 3: Core Workflow
+
+private struct CoreWorkflowPageIOS: View {
+    let isIPad: Bool
+
+    private let steps: [(icon: String, color: Color, title: String, description: String)] = [
+        ("doc.on.doc", .teal, "Copy Anything", "Text, links, and images are saved automatically"),
+        ("line.3.horizontal.decrease.circle", .cyan, "Find Fast", "Search by content, app source, or date"),
+        ("pin.fill", .orange, "Pin Important", "Keep your high-value clips at the top"),
+        ("keyboard", .green, "Paste Quickly", "Use shortcuts to paste exactly what you want"),
+        ("iphone", .blue, "Stay in Sync", "Use companion apps with iCloud when enabled")
     ]
 
     var body: some View {
-        GeometryReader { geo in
-            let width = geo.size.width
+        WorkflowListPageIOS(
+            titlePrefix: "Core ",
+            titleAccent: "Workflow",
+            subtitle: "The daily loop: capture, find, and paste.",
+            rows: steps,
+            isIPad: isIPad
+        )
+    }
+}
 
-            VStack(spacing: 0) {
-                Spacer()
+// MARK: - Page 4: Advanced Workflow
 
-                Text("What You Get")
-                    .font(.system(size: isIPad ? 46 : 30, weight: .bold))
-                    .foregroundStyle(.white)
-                    .padding(.bottom, isIPad ? 48 : 24)
+private struct AdvancedWorkflowPageIOS: View {
+    let isIPad: Bool
 
-                if isIPad {
-                    // iPad: 2-column grid with generous spacing
-                    let leftColumn = Array(features.prefix(4))
-                    let rightColumn = Array(features.suffix(4))
+    private let steps: [(icon: String, color: Color, title: String, description: String)] = [
+        ("wand.and.stars", .teal, "Smart Paste", "Clean trackers and format text before pasting"),
+        ("square.stack.3d.up", .indigo, "Paste Stack", "Queue clips and paste FIFO or LIFO"),
+        ("text.quote", .mint, "Snippets", "Reusable templates with placeholders"),
+        ("ruler", .yellow, "Clipboard Rules", "Normalize and clean copied content automatically"),
+        ("lock.shield.fill", .red, "Privacy Controls", "Encryption and sensitive data protections")
+    ]
 
-                    HStack(alignment: .top, spacing: 32) {
-                        VStack(spacing: 28) {
-                            ForEach(leftColumn.indices, id: \.self) { i in
-                                FeatureRowIOS(
-                                    icon: leftColumn[i].icon,
-                                    color: leftColumn[i].color,
-                                    title: leftColumn[i].title,
-                                    description: leftColumn[i].description,
-                                    isIPad: true
-                                )
-                            }
-                        }
+    var body: some View {
+        WorkflowListPageIOS(
+            titlePrefix: "Advanced ",
+            titleAccent: "Workflow",
+            subtitle: "Power tools you configure once.",
+            rows: steps,
+            isIPad: isIPad
+        )
+    }
+}
 
-                        VStack(spacing: 28) {
-                            ForEach(rightColumn.indices, id: \.self) { i in
-                                FeatureRowIOS(
-                                    icon: rightColumn[i].icon,
-                                    color: rightColumn[i].color,
-                                    title: rightColumn[i].title,
-                                    description: rightColumn[i].description,
-                                    isIPad: true
-                                )
-                            }
-                        }
+private struct WorkflowListPageIOS: View {
+    let titlePrefix: String
+    let titleAccent: String
+    let subtitle: String
+    let rows: [(icon: String, color: Color, title: String, description: String)]
+    let isIPad: Bool
+
+    var body: some View {
+        VStack(spacing: isIPad ? 18 : 12) {
+            Spacer(minLength: isIPad ? 24 : 14)
+
+            (Text(titlePrefix).foregroundStyle(.white) + Text(titleAccent).foregroundStyle(.teal))
+                .font(.system(size: isIPad ? 46 : 30, weight: .bold))
+                .multilineTextAlignment(.center)
+
+            Text(subtitle)
+                .font(.system(size: isIPad ? 22 : 16, weight: .medium))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, isIPad ? 60 : 20)
+
+            ScrollView {
+                VStack(spacing: isIPad ? 16 : 12) {
+                    ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                        FeatureRowIOS(
+                            icon: row.icon,
+                            color: row.color,
+                            title: row.title,
+                            description: row.description,
+                            isIPad: isIPad
+                        )
                     }
-                    .padding(.horizontal, 80)
-                } else {
-                    // iPhone: single column
-                    VStack(spacing: 16) {
-                        ForEach(features.indices, id: \.self) { i in
-                            FeatureRowIOS(
-                                icon: features[i].icon,
-                                color: features[i].color,
-                                title: features[i].title,
-                                description: features[i].description,
-                                isIPad: false
-                            )
-                        }
-                    }
-                    .padding(.horizontal, 20)
                 }
-
-                Spacer()
+                .padding(.horizontal, isIPad ? 70 : 20)
+                .padding(.vertical, 8)
             }
-            .frame(width: width)
+
+            Spacer(minLength: isIPad ? 18 : 10)
         }
     }
 }
@@ -195,123 +268,100 @@ private struct FeatureRowIOS: View {
     let color: Color
     let title: String
     let description: String
-    var isIPad: Bool = false
+    let isIPad: Bool
 
     var body: some View {
-        HStack(spacing: isIPad ? 16 : 12) {
+        HStack(spacing: isIPad ? 14 : 10) {
             Image(systemName: icon)
-                .font(.system(size: isIPad ? 24 : 18))
+                .font(.system(size: isIPad ? 22 : 16))
                 .foregroundStyle(color)
-                .frame(
-                    width: isIPad ? 52 : 36,
-                    height: isIPad ? 52 : 36
-                )
-                .background(color.opacity(0.15))
+                .frame(width: isIPad ? 50 : 36, height: isIPad ? 50 : 36)
+                .background(color.opacity(0.16))
                 .clipShape(RoundedRectangle(cornerRadius: isIPad ? 12 : 8))
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(title)
-                    .font(.system(size: isIPad ? 22 : 17, weight: .semibold))
+                    .font(.system(size: isIPad ? 20 : 15, weight: .semibold))
                     .foregroundStyle(.white)
                 Text(description)
-                    .font(.system(size: isIPad ? 18 : 15))
-                    .foregroundStyle(.white)
+                    .font(.system(size: isIPad ? 17 : 13))
+                    .foregroundStyle(.white.opacity(0.96))
             }
 
             Spacer()
         }
+        .padding(.horizontal, isIPad ? 14 : 10)
+        .padding(.vertical, isIPad ? 10 : 8)
+        .background(Color.white.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: isIPad ? 14 : 10))
     }
 }
 
-// MARK: - Page 3: Sane Promise
+// MARK: - Page 5: Sane Philosophy
 
-private struct SanePromisePageIOS: View {
-    @Binding var hasCompletedOnboarding: Bool
+private struct SanePhilosophyPageIOS: View {
     let isIPad: Bool
 
     var body: some View {
-        GeometryReader { geo in
-            let width = geo.size.width
+        VStack(spacing: isIPad ? 24 : 16) {
+            Spacer(minLength: isIPad ? 24 : 14)
 
-            VStack(spacing: isIPad ? 28 : 16) {
-                Spacer()
+            Text("Our Sane Philosophy")
+                .font(.system(size: isIPad ? 44 : 30, weight: .bold))
+                .foregroundStyle(.white)
 
-                Text("Our Sane Philosophy")
-                    .font(.system(size: isIPad ? 46 : 30, weight: .bold))
+            VStack(spacing: isIPad ? 8 : 6) {
+                Text("\"For God has not given us a spirit of fear,")
+                    .font(.system(size: isIPad ? 22 : 16))
                     .foregroundStyle(.white)
-
-                VStack(spacing: isIPad ? 8 : 6) {
-                    Text("\"For God has not given us a spirit of fear,")
-                        .font(.system(size: isIPad ? 24 : 17))
-                        .foregroundStyle(.white)
-                    Text("but of power and of love and of a sound mind.\"")
-                        .font(.system(size: isIPad ? 24 : 17))
-                        .foregroundStyle(.white)
-                    Text("— 2 Timothy 1:7")
-                        .font(.system(size: isIPad ? 20 : 15, weight: .medium))
-                        .foregroundStyle(.white)
-                        .padding(.top, 4)
-                }
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, isIPad ? 60 : 16)
-
-                // Pillar cards — sized to content, not stretched
-                HStack(alignment: .top, spacing: isIPad ? 20 : 10) {
-                    SanePillarCardIOS(
-                        icon: "bolt.fill",
-                        color: .yellow,
-                        title: "Power",
-                        lines: [
-                            "Your data stays on-device",
-                            "100% Transparent Code",
-                            "Actively maintained"
-                        ],
-                        isIPad: isIPad
-                    )
-
-                    SanePillarCardIOS(
-                        icon: "heart.fill",
-                        color: .pink,
-                        title: "Love",
-                        lines: [
-                            "Built to serve you",
-                            "No subscriptions",
-                            "No ads, ever"
-                        ],
-                        isIPad: isIPad
-                    )
-
-                    SanePillarCardIOS(
-                        icon: "brain.head.profile",
-                        color: .teal,
-                        title: "Sound Mind",
-                        lines: [
-                            "Calm and focused",
-                            "Does one thing well",
-                            "No clutter"
-                        ],
-                        isIPad: isIPad
-                    )
-                }
-                .padding(.horizontal, isIPad ? 60 : 12)
-
-                Spacer()
-
-                Button {
-                    hasCompletedOnboarding = true
-                } label: {
-                    Text("Get Started")
-                        .font(.system(size: isIPad ? 22 : 18, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: isIPad ? 440 : .infinity)
-                        .padding(.vertical, isIPad ? 18 : 14)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(Color.teal)
-                .padding(.horizontal, isIPad ? 100 : 40)
-                .padding(.bottom, isIPad ? 50 : 36)
+                Text("but of power and of love and of a sound mind.\"")
+                    .font(.system(size: isIPad ? 22 : 16))
+                    .foregroundStyle(.white)
+                Text("— 2 Timothy 1:7")
+                    .font(.system(size: isIPad ? 19 : 14, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.95))
             }
-            .frame(width: width)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, isIPad ? 60 : 16)
+
+            HStack(alignment: .top, spacing: isIPad ? 16 : 8) {
+                SanePillarCardIOS(
+                    icon: "bolt.fill",
+                    color: .yellow,
+                    title: "Power",
+                    lines: [
+                        "Your data stays on your device.",
+                        "100% transparent code.",
+                        "Actively maintained."
+                    ],
+                    isIPad: isIPad
+                )
+                SanePillarCardIOS(
+                    icon: "heart.fill",
+                    color: .pink,
+                    title: "Love",
+                    lines: [
+                        "Built to serve you.",
+                        "Pay once, yours forever.",
+                        "No subscriptions. No ads."
+                    ],
+                    isIPad: isIPad
+                )
+                SanePillarCardIOS(
+                    icon: "brain.head.profile",
+                    color: .teal,
+                    title: "Sound Mind",
+                    lines: [
+                        "Calm and focused.",
+                        "Does one thing well.",
+                        "No clutter."
+                    ],
+                    isIPad: isIPad
+                )
+            }
+            .padding(.horizontal, isIPad ? 50 : 8)
+
+            Spacer(minLength: isIPad ? 24 : 12)
         }
     }
 }
@@ -321,28 +371,28 @@ private struct SanePillarCardIOS: View {
     let color: Color
     let title: String
     let lines: [String]
-    var isIPad: Bool = false
+    let isIPad: Bool
 
     var body: some View {
-        VStack(spacing: isIPad ? 12 : 8) {
+        VStack(spacing: isIPad ? 10 : 7) {
             Image(systemName: icon)
-                .font(.system(size: isIPad ? 36 : 26))
+                .font(.system(size: isIPad ? 30 : 22))
                 .foregroundStyle(color)
 
             Text(title)
-                .font(.system(size: isIPad ? 24 : 18, weight: .bold))
+                .font(.system(size: isIPad ? 20 : 15, weight: .bold))
                 .foregroundStyle(.white)
 
-            VStack(alignment: .leading, spacing: isIPad ? 8 : 5) {
+            VStack(alignment: .leading, spacing: isIPad ? 6 : 4) {
                 ForEach(lines, id: \.self) { line in
-                    HStack(alignment: .top, spacing: 8) {
+                    HStack(alignment: .top, spacing: 6) {
                         Image(systemName: "checkmark")
-                            .font(.system(size: isIPad ? 14 : 11, weight: .bold))
+                            .font(.system(size: isIPad ? 13 : 10, weight: .bold))
                             .foregroundStyle(.green)
-                            .frame(width: isIPad ? 18 : 14)
-                            .padding(.top, isIPad ? 4 : 3)
+                            .frame(width: isIPad ? 16 : 12)
+                            .padding(.top, 2)
                         Text(line)
-                            .font(.system(size: isIPad ? 18 : 15))
+                            .font(.system(size: isIPad ? 15 : 12))
                             .foregroundStyle(.white)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -350,10 +400,142 @@ private struct SanePillarCardIOS: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .top)
-        .padding(.vertical, isIPad ? 28 : 16)
-        .padding(.horizontal, isIPad ? 16 : 8)
+        .padding(.vertical, isIPad ? 18 : 12)
+        .padding(.horizontal, isIPad ? 12 : 8)
         .background(Color.white.opacity(0.08))
-        .clipShape(RoundedRectangle(cornerRadius: isIPad ? 20 : 14))
+        .clipShape(RoundedRectangle(cornerRadius: isIPad ? 18 : 12))
+    }
+}
+
+// MARK: - Page 6: Permissions
+
+private struct PermissionsPageIOS: View {
+    let isIPad: Bool
+
+    var body: some View {
+        VStack(spacing: isIPad ? 22 : 16) {
+            Spacer()
+
+            Image(systemName: "lock.shield.fill")
+                .font(.system(size: isIPad ? 62 : 44))
+                .foregroundStyle(.teal)
+
+            Text("Permissions")
+                .font(.system(size: isIPad ? 46 : 30, weight: .bold))
+                .foregroundStyle(.white)
+
+            VStack(alignment: .leading, spacing: isIPad ? 12 : 10) {
+                permissionRow(icon: "video.slash.fill", text: "No screen recording needed.", isIPad: isIPad)
+                permissionRow(icon: "eye.slash.fill", text: "No screenshots collected.", isIPad: isIPad)
+                permissionRow(icon: "icloud.slash", text: "No data sold. You control sync.", isIPad: isIPad)
+            }
+            .padding(.horizontal, isIPad ? 90 : 24)
+
+            Text("Enable only what you need in iOS Settings.")
+                .font(.system(size: isIPad ? 19 : 14, weight: .medium))
+                .foregroundStyle(.white.opacity(0.95))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, isIPad ? 100 : 24)
+
+            Spacer()
+        }
+    }
+
+    private func permissionRow(icon: String, text: String, isIPad: Bool) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: isIPad ? 20 : 16))
+                .foregroundStyle(.teal)
+                .frame(width: isIPad ? 28 : 22)
+            Text(text)
+                .font(.system(size: isIPad ? 19 : 14, weight: .medium))
+                .foregroundStyle(.white)
+            Spacer()
+        }
+        .padding(.horizontal, isIPad ? 16 : 12)
+        .padding(.vertical, isIPad ? 12 : 10)
+        .background(Color.white.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: isIPad ? 14 : 10))
+    }
+}
+
+// MARK: - Page 7: Plan / Upgrade
+
+private struct PlanUpgradePageIOS: View {
+    let isIPad: Bool
+
+    var body: some View {
+        VStack(spacing: isIPad ? 20 : 14) {
+            Spacer(minLength: isIPad ? 24 : 16)
+
+            (Text("Choose ").foregroundStyle(.white) + Text("Your Plan").foregroundStyle(.teal))
+                .font(.system(size: isIPad ? 44 : 30, weight: .bold))
+                .multilineTextAlignment(.center)
+
+            HStack(alignment: .top, spacing: isIPad ? 18 : 10) {
+                planCard(
+                    title: "Basic",
+                    subtitle: "$0",
+                    lines: [
+                        "Clipboard history (50 items)",
+                        "Search and source filters",
+                        "iCloud sync + iPhone/iPad app"
+                    ],
+                    accent: .white
+                )
+
+                planCard(
+                    title: "Pro",
+                    subtitle: "One-time unlock",
+                    lines: [
+                        "Paste Stack + Snippets",
+                        "Clipboard Rules + Item Notes",
+                        "Touch ID lock + encryption"
+                    ],
+                    accent: .teal
+                )
+            }
+            .padding(.horizontal, isIPad ? 60 : 12)
+
+            Text("You can start free and upgrade later.")
+                .font(.system(size: isIPad ? 19 : 14, weight: .medium))
+                .foregroundStyle(.white.opacity(0.95))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, isIPad ? 80 : 22)
+
+            Spacer(minLength: isIPad ? 18 : 10)
+        }
+    }
+
+    private func planCard(title: String, subtitle: String, lines: [String], accent: Color) -> some View {
+        VStack(alignment: .leading, spacing: isIPad ? 10 : 8) {
+            Text(title)
+                .font(.system(size: isIPad ? 24 : 18, weight: .bold))
+                .foregroundStyle(accent)
+
+            Text(subtitle)
+                .font(.system(size: isIPad ? 16 : 13, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.95))
+
+            Divider().overlay(Color.white.opacity(0.25))
+
+            ForEach(lines, id: \.self) { line in
+                HStack(alignment: .top, spacing: 6) {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: isIPad ? 12 : 10, weight: .bold))
+                        .foregroundStyle(.green)
+                        .padding(.top, 3)
+                    Text(line)
+                        .font(.system(size: isIPad ? 15 : 12))
+                        .foregroundStyle(.white)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .padding(isIPad ? 16 : 12)
+        .background(Color.white.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: isIPad ? 16 : 12))
     }
 }
 

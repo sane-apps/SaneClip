@@ -1,5 +1,26 @@
 # Session Handoff - 2026-02-17
 
+## Addendum - 2026-03-04 (Planned Next Session)
+
+### New Customer Feature Request
+- Email #205 (Court Hubbard): request an option to open clipboard history at current mouse cursor location.
+- Planned implementation: **optional setting**, default OFF, no behavior change unless enabled.
+
+### Tomorrow Release Upgrade Checklist (SaneClip)
+- Run full Mini E2E for latest SaneClip features before release decision.
+- Verify free vs Pro gates end-to-end on Mini.
+- Verify iOS/iPad App Store lane metadata correctness (description, subtitle, accessibility declaration display).
+- Confirm website copy + screenshots match current feature set before publish.
+
+### Mini E2E Regression List (must run)
+1. Open history via shortcut with default setting (anchor at menu bar icon).
+2. Enable `Open history at mouse cursor`; verify opens near cursor on primary and secondary display.
+3. Verify popover remains fully on-screen at all 4 screen corners (clamped positioning).
+4. Verify Touch ID-protected history still prompts correctly and opens in expected position.
+5. Verify `reopen history after paste` still reopens correctly with cursor mode ON/OFF.
+6. Verify Pro-only shortcuts and settings remain gated in Basic mode.
+7. Verify core complaints path: drag/move/visibility behavior on SaneBar remains unaffected (cross-app sanity check).
+
 ## Current State: v2.1 (code) — v2.0 Released (DMG) — App Store REJECTED — Needs Resubmission
 
 ### What Was Done This Session (Feb 17)

@@ -206,9 +206,18 @@ targets:
             /usr/libexec/PlistBuddy -c "Delete :SUEnableSystemProfiling" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             # Strip NSServices (not applicable in sandbox)
             /usr/libexec/PlistBuddy -c "Delete :NSServices" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
-            # Strip Apple Events usage description (no longer needed without paste simulation)
+            # Strip automation-related usage descriptions (not used in App Store build)
             /usr/libexec/PlistBuddy -c "Delete :NSAppleEventsUsageDescription" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
-            echo "App Store build: Sparkle, NSServices, and Apple Events keys removed"
+            /usr/libexec/PlistBuddy -c "Delete :NSAccessibilityUsageDescription" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+            # Sparkle can still be strongly linked by SPM; weaken it to prevent launch crashes when framework is stripped.
+            APP_BIN="${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}"
+            WEAKEN_SCRIPT="${SRCROOT}/../../infra/SaneProcess/scripts/weaken_sparkle.rb"
+            if [ -f "${APP_BIN}" ] && [ -f "${WEAKEN_SCRIPT}" ]; then
+              if otool -L "${APP_BIN}" 2>/dev/null | grep -q "Sparkle.framework"; then
+                ruby "${WEAKEN_SCRIPT}" "${APP_BIN}" || exit 1
+              fi
+            fi
+            echo "App Store build: Sparkle, NSServices, and automation-related keys removed"
           fi
         name: Strip Sparkle for App Store
         basedOnDependencyAnalysis: false

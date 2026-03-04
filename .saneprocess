@@ -52,14 +52,23 @@ mcps:
 appstore:
   enabled: true
   app_id: "6758898132"
+  product_id: "com.saneclip.app.pro.unlock"
   configuration: Release-AppStore
   platforms: [macos, ios]
   ios_scheme: SaneClipIOS
   category: public.app-category.productivity
   age_rating: "4+"
+  description: "SaneClip keeps your clipboard organized in a fast searchable history. Open history with a shortcut, pick any item, and paste where you need it. Free mode gives you the essentials. Pro unlock adds advanced power features."
+  keywords: "clipboard,copy,paste,history,productivity,snippets,search"
   privacy_policy_url: "https://saneclip.com/privacy"
   support_url: "https://saneclip.com/support"
-  review_notes: "SaneClip uses Accessibility permission to paste clipboard items directly into the frontmost application. Without this permission, the app still functions as a clipboard viewer/copier but cannot perform paste actions. To test: grant Accessibility in System Settings > Privacy & Security > Accessibility, then use the global hotkey (Cmd+Shift+V) to open history and click any item to paste it."
+  review_notes: "SaneClip App Store build does not request Accessibility access and does not simulate keyboard events. Selecting a clipboard item copies it to the clipboard and shows a local notification asking the user to press Cmd+V manually in the frontmost app. To test: open history with Cmd+Shift+V, select any item, then paste with Cmd+V."
+  accessibility_declarations:
+    publish: true
+    iphone:
+      supports_dark_interface: true
+    ipad:
+      supports_dark_interface: true
   screenshots:
     macos: docs/images/screenshot-[!i]*.png
     ios: docs/images/screenshot-ios-*-dark.png

@@ -6,7 +6,26 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-    <item>
+            <item>
+            <title>2.2.3</title>
+            <pubDate>Wed, 04 Mar 2026 11:59:46 -0500</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Stability improvements, launch reliability hardening, and updated public feature coverage.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.2.3.zip"
+                       sparkle:version="2203"
+                       sparkle:shortVersionString="2.2.3"
+                       length="3044051"
+                       type="application/octet-stream"
+                       sparkle:edSignature="HXY4M+YRPoq4hhQiCYNC45zLyOwg9Tus9QOhiqgObJYdtxlAlwTTXK5UOTR/E9LI4gwrnovsgxt+9TMP0975BA=="/>
+        </item>
+<item>
                 <title>2.2.2</title>
                 <pubDate>Fri, 27 Feb 2026 13:35:56 -0500</pubDate>
                 <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>

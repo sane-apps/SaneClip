@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.2.3] - 2026-03-04
+
+Stability improvements, launch reliability hardening, and updated public feature coverage.
+
+---
+
 ## [2.2.2] - 2026-02-27
 
 Critical quality update: clearer onboarding, stronger permission reliability, robust Basic/Pro gating, and polished settings UX.

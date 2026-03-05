@@ -19,7 +19,6 @@ private let appLogger = Logger(subsystem: "com.saneclip.app", category: "App")
         static let shared = UpdateService()
 
         private var updaterController: SPUStandardUpdaterController?
-        private let enforcedUpdateCheckInterval: TimeInterval = 60 * 60 * 6
 
         override init() {
             super.init()
@@ -40,23 +39,22 @@ private let appLogger = Logger(subsystem: "com.saneclip.app", category: "App")
 
         private func configureUpdatePolicy() {
             guard let updater = updaterController?.updater else { return }
-            updater.automaticallyChecksForUpdates = true
             updater.automaticallyDownloadsUpdates = true
-
-            if updater.updateCheckInterval > enforcedUpdateCheckInterval {
-                updater.updateCheckInterval = enforcedUpdateCheckInterval
-            }
+            updater.updateCheckInterval = SaneSparkleCheckFrequency.normalizedInterval(from: updater.updateCheckInterval)
         }
 
         var automaticallyChecksForUpdates: Bool {
-            get { true }
+            get { updaterController?.updater.automaticallyChecksForUpdates ?? true }
+            set { updaterController?.updater.automaticallyChecksForUpdates = newValue }
+        }
+
+        var updateCheckFrequency: SaneSparkleCheckFrequency {
+            get {
+                let interval = updaterController?.updater.updateCheckInterval ?? SaneSparkleCheckFrequency.daily.interval
+                return SaneSparkleCheckFrequency.resolve(updateCheckInterval: interval)
+            }
             set {
-                if newValue {
-                    updaterController?.updater.automaticallyChecksForUpdates = true
-                } else {
-                    appLogger.info("Ignoring request to disable automatic update checks")
-                    updaterController?.updater.automaticallyChecksForUpdates = true
-                }
+                updaterController?.updater.updateCheckInterval = newValue.interval
             }
         }
     }

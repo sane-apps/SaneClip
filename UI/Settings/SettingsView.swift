@@ -122,6 +122,7 @@ struct GeneralSettingsView: View {
     @State private var appPresetMode: PasteMode = .standard
     #if !APP_STORE
         @State private var autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
+        @State private var updateCheckFrequency = UpdateService.shared.updateCheckFrequency
     #else
         @State private var autoCheckUpdates = false
     #endif
@@ -370,6 +371,13 @@ struct GeneralSettingsView: View {
                                     UpdateService.shared.automaticallyChecksForUpdates = newValue
                                 }
                             ),
+                            checkFrequency: Binding(
+                                get: { updateCheckFrequency },
+                                set: { newValue in
+                                    updateCheckFrequency = newValue
+                                    UpdateService.shared.updateCheckFrequency = newValue
+                                }
+                            ),
                             onCheckNow: { UpdateService.shared.checkForUpdates() }
                         )
                     }
@@ -547,6 +555,7 @@ struct GeneralSettingsView: View {
         .onAppear {
             #if !APP_STORE
                 autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
+                updateCheckFrequency = UpdateService.shared.updateCheckFrequency
             #endif
         }
     }
@@ -1033,7 +1042,7 @@ struct AboutSettingsView: View {
                     }
 
                     Link(destination: URL(string: "mailto:hi@saneapps.com")!) {
-                        Label("Email Me", systemImage: "envelope")
+                        Label("Questions", systemImage: "envelope")
                     }
                 }
             }

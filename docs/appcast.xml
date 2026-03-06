@@ -6,7 +6,26 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                    <item>
+                            <item>
+            <title>2.2.5</title>
+            <pubDate>Fri, 06 Mar 2026 14:41:13 -0500</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Fix website iCloud sync release, clean up onboarding layout, and harden sync startup across builds.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.2.5.zip"
+                       sparkle:version="2205"
+                       sparkle:shortVersionString="2.2.5"
+                       length="3104345"
+                       type="application/octet-stream"
+                       sparkle:edSignature="hFWZ7fbFRlVc3vI8biGoksYQxTUQn4vs82TrPjftFIvfy1TcMM2QBbYIbOlb/JojWjbRFJsCXdyFS4BPR9DgCg=="/>
+        </item>
+<item>
             <title>2.2.4</title>
             <pubDate>Fri, 06 Mar 2026 09:55:55 -0500</pubDate>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>

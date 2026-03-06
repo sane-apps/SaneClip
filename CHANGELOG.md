@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.2.4] - 2026-03-06
+
+Improved iCloud sync setup across Mac, iPhone, and iPad. Fixed App Store metadata and review details. Reliability and stability improvements.
+
+---
+
 ## [2.2.3] - 2026-03-04
 
 Stability improvements, launch reliability hardening, and updated public feature coverage.

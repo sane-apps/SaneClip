@@ -45,7 +45,7 @@
 		802474EB5319EC0BE29B5D80 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 197F40B4EAA11C09CD1A5801 /* PrivacyInfo.xcprivacy */; };
 		88429CF77152B054F581B567 /* WebhookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9381D3ACF3CE661318DF305D /* WebhookService.swift */; };
 		8941A3DAF4AF4FC8A5F19C3F /* BrandColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5449565520B6E5CF68C78D6B /* BrandColors.swift */; };
-		8B41EC7476C54EDF1695272D /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C104FF18269706174A84ADDF /* Sparkle */; settings = {ATTRIBUTES = (Weak, ); }; };
+		8B41EC7476C54EDF1695272D /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C104FF18269706174A84ADDF /* Sparkle */; };
 		8B91331218ABFBC1D64F05B7 /* SavedClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576DAA4FC86516A7F31F8B5F /* SavedClipboardItem.swift */; };
 		8D5889EE4B31459E191B26C8 /* URLSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32272353D437FBA78581647 /* URLSchemeHandler.swift */; };
 		95711D419E5C0F66ED022198 /* SaneClipIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305BB1EB756CA0FC1DAAFFAD /* SaneClipIntents.swift */; };
@@ -730,7 +730,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-				shellScript = "if [ \"$CONFIGURATION\" == \"Release-AppStore\" ]; then\n  echo \"App Store build: stripping Sparkle framework and keys...\"\n  # Remove Sparkle framework from app bundle\n  rm -rf \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework\"\n  # Strip Sparkle keys from built Info.plist\n  /usr/libexec/PlistBuddy -c \"Delete :SUFeedURL\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUPublicEDKey\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUEnableAutomaticChecks\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUEnableSystemProfiling\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Strip NSServices (not applicable in sandbox)\n  /usr/libexec/PlistBuddy -c \"Delete :NSServices\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Strip automation-related usage descriptions (not used in App Store build)\n  /usr/libexec/PlistBuddy -c \"Delete :NSAppleEventsUsageDescription\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :NSAccessibilityUsageDescription\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Sparkle can still be strongly linked by SPM; weaken it to prevent launch crashes when framework is stripped.\n  APP_BIN=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\n  WEAKEN_SCRIPT=\"${SRCROOT}/../../infra/SaneProcess/scripts/weaken_sparkle.rb\"\n  if [ -f \"${APP_BIN}\" ] && [ -f \"${WEAKEN_SCRIPT}\" ]; then\n    if otool -L \"${APP_BIN}\" 2>/dev/null | grep -q \"Sparkle.framework\"; then\n      ruby \"${WEAKEN_SCRIPT}\" \"${APP_BIN}\" || exit 1\n    fi\n  fi\n  echo \"App Store build: Sparkle, NSServices, and automation-related keys removed\"\nfi\n";
+			shellScript = "if [ \"$CONFIGURATION\" == \"Release-AppStore\" ]; then\n  echo \"App Store build: stripping Sparkle framework and keys...\"\n  # Remove Sparkle framework from app bundle\n  rm -rf \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework\"\n  # Strip Sparkle keys from built Info.plist\n  /usr/libexec/PlistBuddy -c \"Delete :SUFeedURL\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUPublicEDKey\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUEnableAutomaticChecks\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUEnableSystemProfiling\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Strip NSServices (not applicable in sandbox)\n  /usr/libexec/PlistBuddy -c \"Delete :NSServices\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Strip automation-related usage descriptions (not used in App Store build)\n  /usr/libexec/PlistBuddy -c \"Delete :NSAppleEventsUsageDescription\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :NSAccessibilityUsageDescription\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Sparkle can still be strongly linked by SPM; weaken it to prevent launch crashes when framework is stripped.\n  APP_BIN=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\n  WEAKEN_SCRIPT=\"${SRCROOT}/../../infra/SaneProcess/scripts/weaken_sparkle.rb\"\n  if [ -f \"${APP_BIN}\" ] && [ -f \"${WEAKEN_SCRIPT}\" ]; then\n    if otool -L \"${APP_BIN}\" 2>/dev/null | grep -q \"Sparkle.framework\"; then\n      ruby \"${WEAKEN_SCRIPT}\" \"${APP_BIN}\" || exit 1\n    fi\n  fi\n  echo \"App Store build: Sparkle, NSServices, and automation-related keys removed\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1374,6 +1374,7 @@
 				CURRENT_PROJECT_VERSION = 2203;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SaneClip/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1381,6 +1382,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 2.2.3;
+				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip Developer ID";
@@ -1403,6 +1405,7 @@
 				CURRENT_PROJECT_VERSION = 2203;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SaneClip/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1410,6 +1413,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 2.2.3;
+				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = macosx;
@@ -1431,6 +1435,7 @@
 				CURRENT_PROJECT_VERSION = 2203;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SaneClip/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1507,6 +1512,7 @@
 				CURRENT_PROJECT_VERSION = 2203;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SaneClip/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1514,6 +1520,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 2.2.3;
+				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = macosx;

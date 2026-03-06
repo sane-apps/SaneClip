@@ -266,6 +266,10 @@ class ClipboardHistoryViewModel: ObservableObject {
         saveToWidgetContainer()
         savedItemID = newItem.id
 
+        #if ENABLE_SYNC
+            SyncCoordinator.shared.queueItemForSync(newItem)
+        #endif
+
         Task {
             try? await Task.sleep(for: .seconds(1.5))
             if savedItemID == newItem.id {
@@ -366,7 +370,11 @@ class ClipboardHistoryViewModel: ObservableObject {
         loadFromSharedContainer()
 
         #if ENABLE_SYNC
-            mergeFromSync(SyncCoordinator.shared)
+            let coordinator = SyncCoordinator.shared
+            if coordinator.isSyncEnabled {
+                await coordinator.syncNow()
+            }
+            mergeFromSync(coordinator)
         #endif
 
         isLoading = false

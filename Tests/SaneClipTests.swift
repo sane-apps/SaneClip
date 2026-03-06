@@ -1,4 +1,5 @@
 import AppKit
+import CloudKit
 import Testing
 @testable import SaneClip
 
@@ -497,6 +498,16 @@ struct SaneClipTests {
 
         let shortNumbers = "My phone is 555-1234"
         #expect(!detector.detect(in: shortNumbers).contains(.creditCard))
+    }
+
+    @Test("SyncCoordinator maps not-authenticated errors to no-account status")
+    func syncCoordinatorNotAuthenticatedStatus() {
+        #expect(SyncCoordinator.status(for: .notAuthenticated) == .noAccount)
+    }
+
+    @Test("SyncCoordinator maps other CloudKit errors to generic error status")
+    func syncCoordinatorGenericErrorStatus() {
+        #expect(SyncCoordinator.status(for: .networkUnavailable) == .error)
     }
 
 }

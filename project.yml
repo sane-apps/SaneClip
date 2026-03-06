@@ -146,6 +146,7 @@ targets:
               default: "Save to SaneClip"
     settings:
       base:
+        GENERATE_INFOPLIST_FILE: NO
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
         MARKETING_VERSION: "2.2.3"
@@ -166,17 +167,20 @@ targets:
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipDebug.entitlements
+          OTHER_SWIFT_FLAGS: "-D ENABLE_SYNC"
         ProdDebug:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.dev
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipDebug.entitlements
+          OTHER_SWIFT_FLAGS: "-D ENABLE_SYNC"
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Developer ID Application"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClip.entitlements
           PROVISIONING_PROFILE_SPECIFIER: "SaneClip Developer ID"
+          OTHER_SWIFT_FLAGS: "-D ENABLE_SYNC"
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
           DEVELOPMENT_TEAM: M78L6FXD48
@@ -333,6 +337,8 @@ targets:
         LSApplicationCategoryType: "public.app-category.productivity"
         ITSAppUsesNonExemptEncryption: false
         UILaunchScreen: {}
+        UIBackgroundModes:
+          - remote-notification
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft

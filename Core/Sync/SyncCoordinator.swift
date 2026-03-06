@@ -55,6 +55,9 @@
         private let container = CKContainer(identifier: "iCloud.com.saneclip.app")
         private let logger = Logger(subsystem: "com.saneclip.app", category: "Sync")
         private var pendingRecordIDs: Set<CKRecord.ID> = []
+        #if os(iOS)
+            private var pendingIOSItemsByID: [UUID: SharedClipboardItem] = [:]
+        #endif
 
         private let deviceId: String = {
             #if os(macOS)
@@ -128,10 +131,28 @@
             logger.info("Sync engine started")
         }
 
-        func stopSync() {
+        func stopSync(setStatusToDisabled: Bool = true) {
             syncEngine = nil
-            syncStatus = .disabled
+            if setStatusToDisabled {
+                syncStatus = .disabled
+            }
             logger.info("Sync engine stopped")
+        }
+
+        func syncNow() async {
+            guard isSyncEnabled, let syncEngine else { return }
+
+            syncStatus = .syncing
+
+            do {
+                try await syncEngine.sendChanges()
+                try await syncEngine.fetchChanges()
+            } catch let error as CKError {
+                applySyncFailure(for: error, message: "Manual sync failed")
+            } catch {
+                syncStatus = .error
+                logger.error("Manual sync failed: \(error.localizedDescription)")
+            }
         }
 
         // MARK: - Queue Local Changes
@@ -145,6 +166,9 @@
                 zoneID: SyncDataModel.zoneID
             )
             pendingRecordIDs.insert(recordID)
+            #if os(iOS)
+                pendingIOSItemsByID[item.id] = item
+            #endif
 
             syncEngine.state.add(pendingRecordZoneChanges: [
                 .saveRecord(recordID)
@@ -165,6 +189,9 @@
             syncEngine.state.add(pendingRecordZoneChanges: [
                 .deleteRecord(recordID)
             ])
+            #if os(iOS)
+                pendingIOSItemsByID.removeValue(forKey: itemID)
+            #endif
 
             logger.debug("Queued delete for sync: \(itemID)")
         }
@@ -225,8 +252,11 @@
             case let .sentDatabaseChanges(sentDB):
                 handleSentDatabaseChanges(sentDB)
 
+            case let .didFetchRecordZoneChanges(fetchResult):
+                handleDidFetchRecordZoneChanges(fetchResult)
+
             case .willFetchChanges, .willFetchRecordZoneChanges,
-                 .didFetchRecordZoneChanges, .willSendChanges, .didSendChanges,
+                 .willSendChanges, .didSendChanges,
                  .didFetchChanges:
                 break // Progress events we don't need to act on
 
@@ -273,6 +303,11 @@
             // Remove successful saves from pending
             for saved in sentChanges.savedRecords {
                 pendingRecordIDs.remove(saved.recordID)
+                #if os(iOS)
+                    if let savedID = UUID(uuidString: saved.recordID.recordName) {
+                        pendingIOSItemsByID.removeValue(forKey: savedID)
+                    }
+                #endif
             }
 
             // Handle failures
@@ -294,8 +329,20 @@
                         // If nil, server won — no action needed
                     }
                 } else {
-                    logger.error("Failed to save record \(failure.record.recordID): \(error.localizedDescription)")
+                    applySyncFailure(for: error, message: "Failed to save record \(failure.record.recordID)")
                 }
+            }
+
+            for (recordID, error) in sentChanges.failedRecordDeletes {
+                applySyncFailure(for: error, message: "Failed to delete record \(recordID)")
+            }
+
+            let hadFailures = !sentChanges.failedRecordSaves.isEmpty || !sentChanges.failedRecordDeletes.isEmpty
+            guard !hadFailures else {
+                if syncStatus == .syncing {
+                    syncStatus = .error
+                }
+                return
             }
 
             lastSyncDate = Date()
@@ -325,8 +372,12 @@
                 let canUseHistoryEncryption = (manager.licenseService?.isPro == true) && SettingsModel.shared.encryptHistory
                 return try SyncDataModel.encode(shared, encrypt: canUseHistoryEncryption)
             #else
-                // iOS is receive-only for now — no local clipboard items to upload
-                return nil
+                guard let itemID = UUID(uuidString: recordID.recordName),
+                      let item = pendingIOSItemsByID[itemID]
+                else {
+                    return nil
+                }
+                return try SyncDataModel.encode(item, encrypt: false)
             #endif
         }
 
@@ -343,8 +394,28 @@
                 logger.info("Zone created on server: \(saved.zoneID.zoneName)")
             }
             for failure in changes.failedZoneSaves {
-                logger.error("Failed to create zone: \(failure.error.localizedDescription)")
+                applySyncFailure(for: failure.error, message: "Failed to create zone")
             }
+            for (zoneID, error) in changes.failedZoneDeletes {
+                applySyncFailure(for: error, message: "Failed to delete zone \(zoneID.zoneName)")
+            }
+
+            let hadFailures = !changes.failedZoneSaves.isEmpty || !changes.failedZoneDeletes.isEmpty
+            guard !hadFailures else {
+                if syncStatus == .syncing {
+                    syncStatus = .error
+                }
+                return
+            }
+            if !changes.savedZones.isEmpty || !changes.deletedZoneIDs.isEmpty {
+                lastSyncDate = Date()
+                syncStatus = .idle
+            }
+        }
+
+        private func handleDidFetchRecordZoneChanges(_ fetchResult: CKSyncEngine.Event.DidFetchRecordZoneChanges) {
+            guard let error = fetchResult.error else { return }
+            applySyncFailure(for: error, message: "Failed to fetch zone changes")
         }
 
         // MARK: - Account Changes
@@ -364,10 +435,24 @@
             case .signOut:
                 logger.info("iCloud account signed out")
                 syncStatus = .noAccount
-                stopSync()
+                stopSync(setStatusToDisabled: false)
             @unknown default:
                 break
             }
+        }
+
+        nonisolated static func status(for errorCode: CKError.Code) -> SyncStatus {
+            switch errorCode {
+            case .notAuthenticated:
+                return .noAccount
+            default:
+                return .error
+            }
+        }
+
+        private func applySyncFailure(for error: CKError, message: String) {
+            syncStatus = Self.status(for: error.code)
+            logger.error("\(message): \(error.localizedDescription)")
         }
 
         // MARK: - Notifications to Local Data Layer

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.2.5] - 2026-03-06
+
+Fixes the direct-download sync release, cleans up onboarding layout, and hardens sync startup across builds.
+
+---
+
 ## [2.2.4] - 2026-03-06
 
 Improved iCloud sync setup across Mac, iPhone, and iPad. Fixed App Store metadata and review details. Reliability and stability improvements.

@@ -195,6 +195,7 @@ struct SettingsTab: View {
             case .error: .red
             case .disabled: .gray
             case .noAccount: .orange
+            case .unavailable: .orange
             }
         }
     #endif

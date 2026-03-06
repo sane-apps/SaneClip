@@ -126,6 +126,9 @@
             case .noAccount:
                 Image(systemName: "person.crop.circle.badge.exclamationmark")
                     .foregroundStyle(.orange)
+            case .unavailable:
+                Image(systemName: "icloud.slash")
+                    .foregroundStyle(.orange)
             }
         }
 

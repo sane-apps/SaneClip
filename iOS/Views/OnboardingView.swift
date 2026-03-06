@@ -229,36 +229,39 @@ private struct WorkflowListPageIOS: View {
     let isIPad: Bool
 
     var body: some View {
-        VStack(spacing: isIPad ? 18 : 12) {
-            Spacer(minLength: isIPad ? 24 : 14)
+        GeometryReader { geo in
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: isIPad ? 20 : 14) {
+                    (Text(titlePrefix).foregroundStyle(.white) + Text(titleAccent).foregroundStyle(.teal))
+                        .font(.system(size: isIPad ? 44 : 28, weight: .bold))
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
 
-            (Text(titlePrefix).foregroundStyle(.white) + Text(titleAccent).foregroundStyle(.teal))
-                .font(.system(size: isIPad ? 46 : 30, weight: .bold))
-                .multilineTextAlignment(.center)
+                    Text(subtitle)
+                        .font(.system(size: isIPad ? 21 : 15, weight: .medium))
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: isIPad ? 720 : 320)
 
-            Text(subtitle)
-                .font(.system(size: isIPad ? 22 : 16, weight: .medium))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, isIPad ? 60 : 20)
-
-            ScrollView {
-                VStack(spacing: isIPad ? 16 : 12) {
-                    ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
-                        FeatureRowIOS(
-                            icon: row.icon,
-                            color: row.color,
-                            title: row.title,
-                            description: row.description,
-                            isIPad: isIPad
-                        )
+                    VStack(spacing: isIPad ? 16 : 10) {
+                        ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                            FeatureRowIOS(
+                                icon: row.icon,
+                                color: row.color,
+                                title: row.title,
+                                description: row.description,
+                                isIPad: isIPad
+                            )
+                        }
                     }
+                    .frame(maxWidth: isIPad ? 760 : 340)
                 }
-                .padding(.horizontal, isIPad ? 70 : 20)
-                .padding(.vertical, 8)
+                .frame(minHeight: geo.size.height, alignment: .top)
+                .frame(maxWidth: .infinity, alignment: .top)
+                .padding(.horizontal, isIPad ? 52 : 20)
+                .padding(.top, isIPad ? 28 : 18)
+                .padding(.bottom, isIPad ? 30 : 16)
             }
-
-            Spacer(minLength: isIPad ? 18 : 10)
         }
     }
 }
@@ -286,6 +289,7 @@ private struct FeatureRowIOS: View {
                 Text(description)
                     .font(.system(size: isIPad ? 17 : 13))
                     .foregroundStyle(.white.opacity(0.96))
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             Spacer()
@@ -294,6 +298,7 @@ private struct FeatureRowIOS: View {
         .padding(.vertical, isIPad ? 10 : 8)
         .background(Color.white.opacity(0.08))
         .clipShape(RoundedRectangle(cornerRadius: isIPad ? 14 : 10))
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

@@ -3,6 +3,9 @@
     import CloudKit
     import Foundation
     import os.log
+    #if os(macOS)
+        import Security
+    #endif
 
     #if os(iOS)
         import UIKit
@@ -47,17 +50,19 @@
             case error = "Error"
             case disabled = "Disabled"
             case noAccount = "No iCloud Account"
+            case unavailable = "Unavailable in This Build"
         }
 
         // MARK: - Private State
 
         private var syncEngine: CKSyncEngine?
-        private let container = CKContainer(identifier: "iCloud.com.saneclip.app")
+        private var container: CKContainer?
         private let logger = Logger(subsystem: "com.saneclip.app", category: "Sync")
         private var pendingRecordIDs: Set<CKRecord.ID> = []
         #if os(iOS)
             private var pendingIOSItemsByID: [UUID: SharedClipboardItem] = [:]
         #endif
+        private static let containerIdentifier = "iCloud.com.saneclip.app"
 
         private let deviceId: String = {
             #if os(macOS)
@@ -104,13 +109,33 @@
             let savedEnabled = UserDefaults.standard.bool(forKey: "syncEnabled")
             super.init()
             isSyncEnabled = savedEnabled
-            if savedEnabled {
+            if savedEnabled, Self.hasCloudKitCapability {
                 startSync()
+            } else if savedEnabled {
+                isSyncEnabled = false
+                syncStatus = .unavailable
+                logger.error("CloudKit sync unavailable: missing iCloud/CloudKit entitlement for this build")
             }
         }
 
         func startSync() {
             guard syncEngine == nil else { return }
+            guard Self.hasCloudKitCapability else {
+                syncStatus = .unavailable
+                logger.error("CloudKit sync unavailable: missing iCloud/CloudKit entitlement for this build")
+                isSyncEnabled = false
+                return
+            }
+
+            if container == nil {
+                container = CKContainer(identifier: Self.containerIdentifier)
+            }
+            guard let container else {
+                syncStatus = .unavailable
+                logger.error("CloudKit sync unavailable: container initialization failed")
+                isSyncEnabled = false
+                return
+            }
 
             let previousState = loadStateSerialization()
             let configuration = CKSyncEngine.Configuration(
@@ -138,6 +163,45 @@
             }
             logger.info("Sync engine stopped")
         }
+
+        private static var hasCloudKitCapability: Bool {
+            #if os(iOS)
+                return true
+            #else
+            guard let task = SecTaskCreateFromSelf(nil) else { return false }
+
+            let containerIdentifiers = entitlementStrings(
+                for: "com.apple.developer.icloud-container-identifiers",
+                task: task
+            )
+            let services = entitlementStrings(
+                for: "com.apple.developer.icloud-services",
+                task: task
+            )
+
+            return containerIdentifiers.contains(containerIdentifier) && services.contains("CloudKit")
+            #endif
+        }
+
+        #if os(macOS)
+        private static func entitlementStrings(for key: String, task: SecTask) -> [String] {
+            var error: Unmanaged<CFError>?
+            guard let rawValue = SecTaskCopyValueForEntitlement(task, key as CFString, &error) else {
+                return []
+            }
+
+            if let values = rawValue as? [String] {
+                return values
+            }
+            if let value = rawValue as? String {
+                return [value]
+            }
+            if let values = rawValue as? NSArray {
+                return values.compactMap { $0 as? String }
+            }
+            return []
+        }
+        #endif
 
         func syncNow() async {
             guard isSyncEnabled, let syncEngine else { return }

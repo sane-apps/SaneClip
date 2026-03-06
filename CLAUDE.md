@@ -72,9 +72,16 @@ write_memory # Save important findings
 
 ---
 
-## Distribution — NO HOMEBREW
+## Distribution — Homebrew Policy
 
-SaneApps are distributed via **Cloudflare R2** (`dist.{app}.com`) + Sparkle auto-update. **Do NOT create Homebrew casks/formulas.** No `homebrew/` directory, no `.rb` formula files.
+Use the website + Sparkle path by default.
+
+Add GitHub + Homebrew only when all three are true:
+- The app is actively for sale
+- The Basic/Pro gate is real and verified
+- The paid path does not materially leak through the free install
+
+If an app is not for sale yet, or its gate is still soft, incomplete, or unverified, do not add a Homebrew cask for it yet.
 
 ---
 

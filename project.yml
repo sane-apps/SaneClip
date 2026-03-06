@@ -118,6 +118,9 @@ targets:
     info:
       path: SaneClip/Info.plist
       properties:
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        AppStoreProductID: com.saneclip.app.pro.unlock
         LSUIElement: true
         # Encryption exemption: AES-256-GCM is used solely for local data protection
         # (encrypting clipboard history at rest on the user's device). No encryption is used
@@ -187,6 +190,7 @@ targets:
           CODE_SIGN_STYLE: Automatic
           CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipAppStore.entitlements
+          INFOPLIST_KEY_AppStoreProductID: com.saneclip.app.pro.unlock
           OTHER_SWIFT_FLAGS: "-D APP_STORE -D ENABLE_SYNC"
     postCompileScripts:
       - script: |
@@ -264,6 +268,8 @@ targets:
       path: Widgets/Info.plist
       properties:
         CFBundleDisplayName: SaneClip Widgets
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     settings:
@@ -334,6 +340,9 @@ targets:
       path: iOS/Info.plist
       properties:
         CFBundleDisplayName: SaneClip
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        AppStoreProductID: com.saneclip.app.pro.unlock
         LSApplicationCategoryType: "public.app-category.productivity"
         ITSAppUsesNonExemptEncryption: false
         UILaunchScreen: {}
@@ -378,6 +387,7 @@ targets:
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_STYLE: Automatic
           CODE_SIGN_ENTITLEMENTS: iOS/SaneClipIOS.entitlements
+          INFOPLIST_KEY_AppStoreProductID: com.saneclip.app.pro.unlock
           OTHER_SWIFT_FLAGS: "-D APP_STORE -D ENABLE_SYNC"
 
   # iOS Widgets
@@ -394,6 +404,8 @@ targets:
       path: iOSWidgets/Info.plist
       properties:
         CFBundleDisplayName: SaneClip Widgets
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     settings:
@@ -440,6 +452,8 @@ targets:
       path: iOSShareExtension/Info.plist
       properties:
         CFBundleDisplayName: Save to SaneClip
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         NSExtension:
           NSExtensionPointIdentifier: com.apple.share-services
           NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).ShareViewController"

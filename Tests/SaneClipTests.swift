@@ -198,7 +198,7 @@ struct SaneClipTests {
             #expect(Bool(false))
         }
 
-        var pasteIntent = PasteSnippetIntent()
+        let pasteIntent = PasteSnippetIntent()
         pasteIntent.snippetName = "any"
         do {
             _ = try await pasteIntent.perform()
@@ -508,6 +508,125 @@ struct SaneClipTests {
     @Test("SyncCoordinator maps other CloudKit errors to generic error status")
     func syncCoordinatorGenericErrorStatus() {
         #expect(SyncCoordinator.status(for: .networkUnavailable) == .error)
+    }
+
+    @Test("SyncCoordinator seeds existing history records when sync starts fresh")
+    func syncCoordinatorInitialRecordSeeding() {
+        let first = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
+        let second = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
+
+        let recordNames = SyncCoordinator.initialRecordNamesToSeed(
+            historyIDs: [first, second],
+            pendingRecordNames: Set<String>()
+        )
+
+        #expect(recordNames == [first.uuidString, second.uuidString])
+    }
+
+    @Test("SyncCoordinator does not re-seed already pending history records")
+    func syncCoordinatorSkipsPendingRecordSeeds() {
+        let first = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
+        let second = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
+
+        let recordNames = SyncCoordinator.initialRecordNamesToSeed(
+            historyIDs: [first, second],
+            pendingRecordNames: [first.uuidString]
+        )
+
+        #expect(recordNames == [second.uuidString])
+    }
+
+    @Test("SyncCoordinator blocks remote deletions while initial local seed is pending")
+    func syncCoordinatorBlocksRemoteDeletesDuringInitialSeed() {
+        #expect(
+            SyncCoordinator.shouldApplyRemoteDeletions(
+                isInitialLocalSeedPending: true,
+                pendingRecordCount: 2
+            ) == false
+        )
+    }
+
+    @Test("SyncCoordinator allows remote deletions once initial seed is clear")
+    func syncCoordinatorAllowsRemoteDeletesAfterInitialSeed() {
+        #expect(
+            SyncCoordinator.shouldApplyRemoteDeletions(
+                isInitialLocalSeedPending: true,
+                pendingRecordCount: 0
+            ) == true
+        )
+    }
+
+    @Test("SyncCoordinator only tracks pending save record IDs")
+    func syncCoordinatorPendingSaveRecordIDs() {
+        let saveID = CKRecord.ID(
+            recordName: "11111111-1111-1111-1111-111111111111",
+            zoneID: SyncDataModel.zoneID
+        )
+        let deleteID = CKRecord.ID(
+            recordName: "22222222-2222-2222-2222-222222222222",
+            zoneID: SyncDataModel.zoneID
+        )
+
+        let pendingIDs = SyncCoordinator.pendingSaveRecordIDs(
+            from: [
+                .saveRecord(saveID),
+                .deleteRecord(deleteID),
+            ]
+        )
+
+        #expect(pendingIDs == [saveID])
+    }
+
+    @Test("ExcludedAppsInline reads bundle identifiers from selected app bundles")
+    func excludedAppsInlineReadsBundleIDFromAppURL() throws {
+        let tempRoot = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let appURL = tempRoot.appendingPathComponent("Fake.app", isDirectory: true)
+        let contentsURL = appURL.appendingPathComponent("Contents", isDirectory: true)
+        let plistURL = contentsURL.appendingPathComponent("Info.plist")
+
+        try FileManager.default.createDirectory(at: contentsURL, withIntermediateDirectories: true)
+
+        let plist: [String: Any] = [
+            "CFBundleIdentifier": "com.example.fake",
+            "CFBundleName": "Fake"
+        ]
+        let plistData = try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
+        try plistData.write(to: plistURL)
+        defer { try? FileManager.default.removeItem(at: tempRoot) }
+
+        #expect(ExcludedAppsInline.selectedBundleID(fromSelectedAppURL: appURL) == "com.example.fake")
+    }
+
+    @Test("ExcludedAppsInline rejects non-app selections")
+    func excludedAppsInlineRejectsNonAppSelections() throws {
+        let tempRoot = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: tempRoot, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: tempRoot) }
+
+        #expect(ExcludedAppsInline.selectedBundleID(fromSelectedAppURL: tempRoot) == nil)
+    }
+
+    @Test("ExcludedAppsInline avoids duplicate bundle IDs when adding exclusions")
+    func excludedAppsInlineDeduplicatesBundleIDs() {
+        let updated = ExcludedAppsInline.updatedExcludedApps(
+            afterAdding: "com.example.fake",
+            to: ["com.example.fake"]
+        )
+
+        #expect(updated == ["com.example.fake"])
+    }
+
+    @Test("SettingsModel round-trips excluded apps through fresh initialization")
+    @MainActor
+    func settingsModelExcludedAppsRoundTrip() {
+        let settings = SettingsModel.shared
+        let originalExcluded = settings.excludedApps
+        defer { settings.excludedApps = originalExcluded }
+
+        settings.excludedApps = ["com.test.one", "com.test.two"]
+
+        let reloaded = SettingsModel()
+        #expect(reloaded.excludedApps == ["com.test.one", "com.test.two"])
     }
 
 }

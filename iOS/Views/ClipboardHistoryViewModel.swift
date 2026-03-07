@@ -65,6 +65,8 @@ class ClipboardHistoryViewModel: ObservableObject {
             let syncedItems = coordinator.syncedItems
             guard !syncedItems.isEmpty else { return }
 
+            clearDemoDataIfNeeded()
+
             let existingIDs = Set(history.map(\.id))
             let newItems = syncedItems.filter { !existingIDs.contains($0.id) }
 
@@ -192,6 +194,13 @@ class ClipboardHistoryViewModel: ObservableObject {
         ]
     }
 
+    private func clearDemoDataIfNeeded() {
+        guard isShowingDemoData else { return }
+        history.removeAll()
+        pinnedItems.removeAll()
+        isShowingDemoData = false
+    }
+
     // MARK: - Save Clipboard
 
     /// Save the current iOS clipboard contents to history
@@ -213,6 +222,8 @@ class ClipboardHistoryViewModel: ObservableObject {
     }
 
     private func saveItem(text: String, sourceApp: String) {
+        clearDemoDataIfNeeded()
+
         // Don't add duplicates at the top
         if let first = history.first, first.fullText == text {
             return
@@ -251,6 +262,8 @@ class ClipboardHistoryViewModel: ObservableObject {
     }
 
     private func saveImageItem(data: Data, width: Int, height: Int) {
+        clearDemoDataIfNeeded()
+
         let newItem = SharedClipboardItem(
             id: UUID(),
             content: .imageData(data, width: width, height: height),

@@ -96,10 +96,17 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - License
 
-    let licenseService = LicenseService(
-        appName: "SaneClip",
-        checkoutURL: URL(string: "https://go.saneapps.com/buy/saneclip")!
-    )
+    #if APP_STORE
+        let licenseService = LicenseService(
+            appName: "SaneClip",
+            purchaseBackend: .appStore(productID: "com.saneclip.app.pro.unlock")
+        )
+    #else
+        let licenseService = LicenseService(
+            appName: "SaneClip",
+            checkoutURL: LicenseService.directCheckoutURL(appSlug: "saneclip")
+        )
+    #endif
 
     private let hasSeenWelcomeKey = "hasSeenWelcome"
     private var requiresHistoryAuth: Bool {
@@ -348,11 +355,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             (.pasteSmartMode, .init(.v, modifiers: [.command, .shift, .control]))
         ]
 
-        for legacy in legacyDefaults {
-            if KeyboardShortcuts.getShortcut(for: legacy.name) == legacy.shortcut {
-                KeyboardShortcuts.reset(legacy.name)
-                appLogger.info("Cleared legacy Pro shortcut for Basic user")
-            }
+        for legacy in legacyDefaults
+        where KeyboardShortcuts.getShortcut(for: legacy.name) == legacy.shortcut {
+            KeyboardShortcuts.reset(legacy.name)
+            appLogger.info("Cleared legacy Pro shortcut for Basic user")
         }
     }
 

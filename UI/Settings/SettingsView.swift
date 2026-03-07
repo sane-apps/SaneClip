@@ -113,6 +113,43 @@ struct SettingsView: View {
     }
 }
 
+@MainActor
+private func presentOpenPanel(_ panel: NSOpenPanel, onSelection: @escaping (URL) -> Void) {
+    if let window = NSApp.keyWindow ?? NSApp.mainWindow {
+        panel.beginSheetModal(for: window) { response in
+            guard response == .OK, let url = panel.url else { return }
+            onSelection(url)
+        }
+        return
+    }
+
+    guard panel.runModal() == .OK, let url = panel.url else { return }
+    onSelection(url)
+}
+
+@MainActor
+private func presentSavePanel(_ panel: NSSavePanel, onSelection: @escaping (URL) -> Void) {
+    if let window = NSApp.keyWindow ?? NSApp.mainWindow {
+        panel.beginSheetModal(for: window) { response in
+            guard response == .OK, let url = panel.url else { return }
+            onSelection(url)
+        }
+        return
+    }
+
+    guard panel.runModal() == .OK, let url = panel.url else { return }
+    onSelection(url)
+}
+
+@MainActor
+private func showSettingsWarning(message: String, info: String) {
+    let alert = NSAlert()
+    alert.messageText = message
+    alert.informativeText = info
+    alert.alertStyle = .warning
+    alert.runModal()
+}
+
 // MARK: - General Settings
 
 struct GeneralSettingsView: View {
@@ -590,7 +627,7 @@ struct GeneralSettingsView: View {
         panel.nameFieldStringValue = "clipboard-history.json"
         panel.title = "Export Clipboard History"
 
-        if panel.runModal() == .OK, let url = panel.url {
+        presentSavePanel(panel) { url in
             if let data = ClipboardManager.exportHistoryFromDisk() {
                 do {
                     try data.write(to: url)
@@ -610,25 +647,25 @@ struct GeneralSettingsView: View {
         panel.title = "Import Clipboard History"
         panel.message = "Select a previously exported clipboard history file"
 
-        guard panel.runModal() == .OK, let url = panel.url else { return }
+        presentOpenPanel(panel) { url in
+            // Show merge/replace confirmation
+            let alert = NSAlert()
+            alert.messageText = "Import Clipboard History"
+            alert.informativeText = "How would you like to import the history?"
+            alert.addButton(withTitle: "Merge")
+            alert.addButton(withTitle: "Replace All")
+            alert.addButton(withTitle: "Cancel")
+            alert.alertStyle = .informational
 
-        // Show merge/replace confirmation
-        let alert = NSAlert()
-        alert.messageText = "Import Clipboard History"
-        alert.informativeText = "How would you like to import the history?"
-        alert.addButton(withTitle: "Merge")
-        alert.addButton(withTitle: "Replace All")
-        alert.addButton(withTitle: "Cancel")
-        alert.alertStyle = .informational
-
-        let response = alert.runModal()
-        switch response {
-        case .alertFirstButtonReturn: // Merge
-            performImport(from: url, merge: true)
-        case .alertSecondButtonReturn: // Replace
-            performImport(from: url, merge: false)
-        default:
-            break
+            let response = alert.runModal()
+            switch response {
+            case .alertFirstButtonReturn: // Merge
+                performImport(from: url, merge: true)
+            case .alertSecondButtonReturn: // Replace
+                performImport(from: url, merge: false)
+            default:
+                break
+            }
         }
     }
 
@@ -658,22 +695,22 @@ struct GeneralSettingsView: View {
         panel.nameFieldStringValue = "saneclip-settings.json"
         panel.title = "Export Settings"
 
-        guard panel.runModal() == .OK, let url = panel.url else { return }
-
-        do {
-            let data = try settings.exportSettings()
-            try data.write(to: url)
-            let alert = NSAlert()
-            alert.messageText = "Settings Exported"
-            alert.informativeText = "Your settings have been saved."
-            alert.alertStyle = .informational
-            alert.runModal()
-        } catch {
-            let alert = NSAlert()
-            alert.messageText = "Export Failed"
-            alert.informativeText = error.localizedDescription
-            alert.alertStyle = .warning
-            alert.runModal()
+        presentSavePanel(panel) { url in
+            do {
+                let data = try settings.exportSettings()
+                try data.write(to: url)
+                let alert = NSAlert()
+                alert.messageText = "Settings Exported"
+                alert.informativeText = "Your settings have been saved."
+                alert.alertStyle = .informational
+                alert.runModal()
+            } catch {
+                let alert = NSAlert()
+                alert.messageText = "Export Failed"
+                alert.informativeText = error.localizedDescription
+                alert.alertStyle = .warning
+                alert.runModal()
+            }
         }
     }
 
@@ -686,22 +723,22 @@ struct GeneralSettingsView: View {
         panel.title = "Import Settings"
         panel.message = "Select a previously exported settings file"
 
-        guard panel.runModal() == .OK, let url = panel.url else { return }
-
-        do {
-            let data = try Data(contentsOf: url)
-            try settings.importSettings(from: data)
-            let alert = NSAlert()
-            alert.messageText = "Settings Imported"
-            alert.informativeText = "Your settings have been restored."
-            alert.alertStyle = .informational
-            alert.runModal()
-        } catch {
-            let alert = NSAlert()
-            alert.messageText = "Import Failed"
-            alert.informativeText = error.localizedDescription
-            alert.alertStyle = .warning
-            alert.runModal()
+        presentOpenPanel(panel) { url in
+            do {
+                let data = try Data(contentsOf: url)
+                try settings.importSettings(from: data)
+                let alert = NSAlert()
+                alert.messageText = "Settings Imported"
+                alert.informativeText = "Your settings have been restored."
+                alert.alertStyle = .informational
+                alert.runModal()
+            } catch {
+                let alert = NSAlert()
+                alert.messageText = "Import Failed"
+                alert.informativeText = error.localizedDescription
+                alert.alertStyle = .warning
+                alert.runModal()
+            }
         }
     }
 }
@@ -807,23 +844,47 @@ struct ExcludedAppsInline: View {
         }
     }
 
+    nonisolated static func selectedBundleID(fromSelectedAppURL url: URL) -> String? {
+        guard url.pathExtension == "app" else { return nil }
+        guard let bundleID = Bundle(url: url)?.bundleIdentifier?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+            !bundleID.isEmpty
+        else { return nil }
+        return bundleID
+    }
+
+    nonisolated static func updatedExcludedApps(afterAdding bundleID: String, to excludedApps: [String]) -> [String] {
+        guard !excludedApps.contains(bundleID) else { return excludedApps }
+        return excludedApps + [bundleID]
+    }
+
+    @MainActor
+    private func addSelectedApp(from url: URL) {
+        guard let bundleID = Self.selectedBundleID(fromSelectedAppURL: url) else {
+            showSettingsWarning(
+                message: "Invalid App Selection",
+                info: "Please choose a single .app bundle from Applications."
+            )
+            return
+        }
+        let updated = Self.updatedExcludedApps(afterAdding: bundleID, to: excludedApps)
+        guard updated != excludedApps else { return }
+        withAnimation(.easeInOut(duration: 0.2)) {
+            excludedApps = updated
+        }
+    }
+
     private func browseForApp() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.application]
+        panel.canChooseFiles = true
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
         panel.directoryURL = URL(fileURLWithPath: "/Applications")
         panel.message = "Select an app to exclude from clipboard history"
 
-        if panel.runModal() == .OK, let url = panel.url {
-            if let bundle = Bundle(url: url),
-               let bundleID = bundle.bundleIdentifier {
-                if !excludedApps.contains(bundleID) {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        excludedApps.append(bundleID)
-                    }
-                }
-            }
+        presentOpenPanel(panel) { url in
+            addSelectedApp(from: url)
         }
     }
 }

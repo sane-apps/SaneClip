@@ -2,6 +2,27 @@ import AppKit
 import Foundation
 import LocalAuthentication
 
+private final class LockedBool: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value: Bool
+
+    init(_ value: Bool) {
+        self.value = value
+    }
+
+    func set(_ newValue: Bool) {
+        lock.lock()
+        value = newValue
+        lock.unlock()
+    }
+
+    func get() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return value
+    }
+}
+
 /// Notification names for URL scheme actions
 extension Notification.Name {
     static let openSearchWithQuery = Notification.Name("SaneClipOpenSearchWithQuery")
@@ -179,13 +200,13 @@ final class URLSchemeHandler {
         }
 
         let semaphore = DispatchSemaphore(value: 0)
-        var success = false
+        let success = LockedBool(false)
 
         context.evaluatePolicy(
             .deviceOwnerAuthenticationWithBiometrics,
             localizedReason: "Authenticate to allow external clipboard access"
         ) { result, _ in
-            success = result
+            success.set(result)
             semaphore.signal()
         }
 
@@ -195,7 +216,7 @@ final class URLSchemeHandler {
             print("URLSchemeHandler: Touch ID authentication timed out")
             return false
         }
-        return success
+        return success.get()
     }
 
     // MARK: - Command Handlers

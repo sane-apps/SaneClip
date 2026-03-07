@@ -18,7 +18,7 @@
     /// Developer ID builds degrade gracefully — sync is simply unavailable.
     @MainActor
     @Observable
-    class SyncCoordinator: NSObject, @preconcurrency CKSyncEngineDelegate {
+    class SyncCoordinator: NSObject, CKSyncEngineDelegate {
         static let shared = SyncCoordinator()
 
         // MARK: - Published State
@@ -59,10 +59,16 @@
         private var container: CKContainer?
         private let logger = Logger(subsystem: "com.saneclip.app", category: "Sync")
         private var pendingRecordIDs: Set<CKRecord.ID> = []
+        private var isInitialLocalSeedPending = false {
+            didSet {
+                UserDefaults.standard.set(isInitialLocalSeedPending, forKey: Self.initialLocalSeedPendingKey)
+            }
+        }
         #if os(iOS)
             private var pendingIOSItemsByID: [UUID: SharedClipboardItem] = [:]
         #endif
         private static let containerIdentifier = "iCloud.com.saneclip.app"
+        private static let initialLocalSeedPendingKey = "syncInitialLocalSeedPending"
 
         private let deviceId: String = {
             #if os(macOS)
@@ -109,6 +115,7 @@
             let savedEnabled = UserDefaults.standard.bool(forKey: "syncEnabled")
             super.init()
             isSyncEnabled = savedEnabled
+            isInitialLocalSeedPending = UserDefaults.standard.bool(forKey: Self.initialLocalSeedPendingKey)
             if savedEnabled, Self.hasCloudKitCapability {
                 startSync()
             } else if savedEnabled {
@@ -152,12 +159,22 @@
                 CKRecordZone(zoneID: SyncDataModel.zoneID)
             )
             syncEngine?.state.add(pendingDatabaseChanges: [zoneChange])
+            if let syncEngine {
+                pendingRecordIDs = Self.pendingSaveRecordIDs(from: syncEngine.state.pendingRecordZoneChanges)
+            } else {
+                pendingRecordIDs.removeAll()
+            }
+            if isInitialLocalSeedPending, pendingRecordIDs.isEmpty, previousState != nil {
+                isInitialLocalSeedPending = false
+            }
+            seedExistingMacHistoryIfNeeded(previousState: previousState)
 
             logger.info("Sync engine started")
         }
 
         func stopSync(setStatusToDisabled: Bool = true) {
             syncEngine = nil
+            pendingRecordIDs.removeAll()
             if setStatusToDisabled {
                 syncStatus = .disabled
             }
@@ -202,6 +219,57 @@
             return []
         }
         #endif
+
+        nonisolated static func initialRecordNamesToSeed(
+            historyIDs: [UUID],
+            pendingRecordNames: Set<String>
+        ) -> [String] {
+            historyIDs.map(\.uuidString).filter { !pendingRecordNames.contains($0) }
+        }
+
+        nonisolated static func pendingSaveRecordIDs(
+            from changes: [CKSyncEngine.PendingRecordZoneChange]
+        ) -> Set<CKRecord.ID> {
+            Set(changes.compactMap { change in
+                guard case let .saveRecord(recordID) = change else { return nil }
+                return recordID
+            })
+        }
+
+        nonisolated static func shouldApplyRemoteDeletions(
+            isInitialLocalSeedPending: Bool,
+            pendingRecordCount: Int
+        ) -> Bool {
+            !isInitialLocalSeedPending || pendingRecordCount == 0
+        }
+
+        private func seedExistingMacHistoryIfNeeded(previousState: CKSyncEngine.State.Serialization?) {
+            #if os(macOS)
+                guard previousState == nil,
+                      let syncEngine,
+                      let manager = ClipboardManager.shared
+                else { return }
+
+                let pendingRecordNames = Set(
+                    Self.pendingSaveRecordIDs(from: syncEngine.state.pendingRecordZoneChanges).map(\.recordName)
+                )
+
+                let recordNames = Self.initialRecordNamesToSeed(
+                    historyIDs: manager.history.map(\.id),
+                    pendingRecordNames: pendingRecordNames
+                )
+                guard !recordNames.isEmpty else { return }
+
+                let recordIDs = Set(recordNames.map { recordName in
+                    CKRecord.ID(recordName: recordName, zoneID: SyncDataModel.zoneID)
+                })
+                let changes = recordIDs.map(CKSyncEngine.PendingRecordZoneChange.saveRecord)
+                syncEngine.state.add(pendingRecordZoneChanges: changes)
+                pendingRecordIDs.formUnion(recordIDs)
+                isInitialLocalSeedPending = true
+                logger.info("Queued \(recordNames.count) existing history items for initial sync")
+            #endif
+        }
 
         func syncNow() async {
             guard isSyncEnabled, let syncEngine else { return }
@@ -350,11 +418,18 @@
                 }
             }
 
-            for deletion in changes.deletions {
-                let itemID = UUID(uuidString: deletion.recordID.recordName)
-                if let itemID {
-                    notifyDeletedSyncedItem(itemID)
+            if Self.shouldApplyRemoteDeletions(
+                isInitialLocalSeedPending: isInitialLocalSeedPending,
+                pendingRecordCount: pendingRecordIDs.count
+            ) {
+                for deletion in changes.deletions {
+                    let itemID = UUID(uuidString: deletion.recordID.recordName)
+                    if let itemID {
+                        notifyDeletedSyncedItem(itemID)
+                    }
                 }
+            } else if !changes.deletions.isEmpty {
+                logger.warning("Skipping \(changes.deletions.count) remote deletions while initial local history seed is pending")
             }
 
             lastSyncDate = Date()
@@ -386,6 +461,7 @@
                             serverRecord: serverRecord
                         ) {
                             // Re-queue the merged record
+                            pendingRecordIDs.insert(merged.recordID)
                             syncEngine?.state.add(pendingRecordZoneChanges: [
                                 .saveRecord(merged.recordID)
                             ])
@@ -399,6 +475,10 @@
 
             for (recordID, error) in sentChanges.failedRecordDeletes {
                 applySyncFailure(for: error, message: "Failed to delete record \(recordID)")
+            }
+
+            if isInitialLocalSeedPending, pendingRecordIDs.isEmpty {
+                isInitialLocalSeedPending = false
             }
 
             let hadFailures = !sentChanges.failedRecordSaves.isEmpty || !sentChanges.failedRecordDeletes.isEmpty
@@ -494,11 +574,15 @@
                 // Clear local sync state for the old account
                 try? FileManager.default.removeItem(at: stateFileURL)
                 connectedDevices.removeAll()
+                pendingRecordIDs.removeAll()
+                isInitialLocalSeedPending = false
                 stopSync()
                 startSync()
             case .signOut:
                 logger.info("iCloud account signed out")
                 syncStatus = .noAccount
+                pendingRecordIDs.removeAll()
+                isInitialLocalSeedPending = false
                 stopSync(setStatusToDisabled: false)
             @unknown default:
                 break

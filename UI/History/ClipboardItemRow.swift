@@ -572,7 +572,7 @@ struct ClipboardItemRow: View {
     // MARK: - Share Helper
 
     private func shareItem() {
-        var shareContent: Any? = switch item.content {
+        let shareContent: Any? = switch item.content {
         case let .text(string):
             string
         case let .image(image):

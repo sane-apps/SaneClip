@@ -178,12 +178,12 @@ private struct DontSkipPageIOS: View {
 private struct CoreWorkflowPageIOS: View {
     let isIPad: Bool
 
-    private let steps: [(icon: String, color: Color, title: String, description: String)] = [
-        ("doc.on.doc", .teal, "Copy Anything", "Text, links, and images are saved automatically"),
-        ("line.3.horizontal.decrease.circle", .cyan, "Find Fast", "Search by content, app source, or date"),
-        ("pin.fill", .orange, "Pin Important", "Keep your high-value clips at the top"),
-        ("keyboard", .green, "Paste Quickly", "Use shortcuts to paste exactly what you want"),
-        ("iphone", .blue, "Stay in Sync", "Use companion apps with iCloud when enabled")
+    private let steps: [WorkflowStepIOS] = [
+        .init(icon: "doc.on.doc", color: .teal, title: "Copy Anything", description: "Text, links, and images are saved automatically"),
+        .init(icon: "line.3.horizontal.decrease.circle", color: .cyan, title: "Find Fast", description: "Search by content, app source, or date"),
+        .init(icon: "pin.fill", color: .orange, title: "Pin Important", description: "Keep your high-value clips at the top"),
+        .init(icon: "keyboard", color: .green, title: "Paste Quickly", description: "Use shortcuts to paste exactly what you want"),
+        .init(icon: "iphone", color: .blue, title: "Stay in Sync", description: "Use companion apps with iCloud when enabled")
     ]
 
     var body: some View {
@@ -202,12 +202,12 @@ private struct CoreWorkflowPageIOS: View {
 private struct AdvancedWorkflowPageIOS: View {
     let isIPad: Bool
 
-    private let steps: [(icon: String, color: Color, title: String, description: String)] = [
-        ("wand.and.stars", .teal, "Smart Paste", "Clean trackers and format text before pasting"),
-        ("square.stack.3d.up", .indigo, "Paste Stack", "Queue clips and paste FIFO or LIFO"),
-        ("text.quote", .mint, "Snippets", "Reusable templates with placeholders"),
-        ("ruler", .yellow, "Clipboard Rules", "Normalize and clean copied content automatically"),
-        ("lock.shield.fill", .red, "Privacy Controls", "Encryption and sensitive data protections")
+    private let steps: [WorkflowStepIOS] = [
+        .init(icon: "wand.and.stars", color: .teal, title: "Smart Paste", description: "Clean trackers and format text before pasting"),
+        .init(icon: "square.stack.3d.up", color: .indigo, title: "Paste Stack", description: "Queue clips and paste FIFO or LIFO"),
+        .init(icon: "text.quote", color: .mint, title: "Snippets", description: "Reusable templates with placeholders"),
+        .init(icon: "ruler", color: .yellow, title: "Clipboard Rules", description: "Normalize and clean copied content automatically"),
+        .init(icon: "lock.shield.fill", color: .red, title: "Privacy Controls", description: "Encryption and sensitive data protections")
     ]
 
     var body: some View {
@@ -221,11 +221,18 @@ private struct AdvancedWorkflowPageIOS: View {
     }
 }
 
+private struct WorkflowStepIOS {
+    let icon: String
+    let color: Color
+    let title: String
+    let description: String
+}
+
 private struct WorkflowListPageIOS: View {
     let titlePrefix: String
     let titleAccent: String
     let subtitle: String
-    let rows: [(icon: String, color: Color, title: String, description: String)]
+    let rows: [WorkflowStepIOS]
     let isIPad: Bool
 
     var body: some View {

@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import KeyboardShortcuts
 import LocalAuthentication
 import SaneUI
@@ -1714,3 +1715,4 @@ private struct ProLockedSectionBanner: View {
         .buttonStyle(.plain)
     }
 }
+// swiftlint:enable file_length

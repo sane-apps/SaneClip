@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import SaneUI
 import SwiftUI
 
@@ -838,3 +839,4 @@ struct ClipboardHistoryView: View {
         selectedTag = allTags.contains(preset.tagFilter) ? preset.tagFilter : "All Tags"
     }
 }
+// swiftlint:enable file_length

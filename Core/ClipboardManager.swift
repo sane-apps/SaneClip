@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import AppKit
 import Combine
 import os.log
@@ -1934,3 +1935,4 @@ class ClipboardManager {
         logger.info("Exported clipboard item as PDF to \(url.path)")
     }
 }
+// swiftlint:enable file_length

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.2.7] - 2026-03-10
+
+Fixes iCloud sync rollout and production schema issues, preserves local history more reliably when enabling sync, improves update reliability, and fixes edit-field keyboard shortcut handling.
+
+---
+
 ## [2.2.6] - 2026-03-07
 
 Improved iCloud sync bootstrap reliability across Mac, iPhone, and iPad. Fixed Excluded Apps picker behavior in Settings. Sample data now clears cleanly when real history arrives. Stability improvements.

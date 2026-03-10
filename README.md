@@ -4,7 +4,7 @@
 
 ### The Only Clipboard Manager That Takes Privacy Seriously
 
-**AES-256 encryption · Touch ID protection · 100% local · Zero analytics**
+**AES-256 encryption · Touch ID protection · On-device by default · Zero analytics**
 
 [![GitHub stars](https://img.shields.io/github/stars/sane-apps/SaneClip?style=flat-square)](https://github.com/sane-apps/SaneClip/stargazers)
 [![License: PolyForm Shield](https://img.shields.io/badge/License-PolyForm%20Shield-blue.svg?style=flat-square)](LICENSE)
@@ -53,7 +53,7 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 | **📵 App Exclusions** | Block 1Password, banking apps, or any sensitive app from clipboard capture entirely. |
 | **🕵️ Sensitive Data Detection** | Automatically flags credit cards, SSNs, API keys, passwords, private keys. |
 
-**100% local. Zero cloud. Zero analytics. Zero telemetry.**
+**On-device by default. Optional iCloud sync between your devices. Zero analytics. Zero telemetry.**
 
 ---
 
@@ -239,7 +239,9 @@ See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) for full details.
 
 ## 📦 Installation
 
-**SaneClip Basic is $0.** Clipboard history, standard paste, search, and iOS companion app are included.
+**SaneClip Basic is $0.** Clipboard history, standard paste, search, and the free iPhone/iPad companion app are included.
+
+**Mac Pro is a one-time unlock.** The iPhone/iPad companion remains a separate free App Store download that uses your iCloud account for sync.
 
 Want more? **[Upgrade to Pro ($6.99 once)](https://go.saneapps.com/buy/saneclip?ref=github-readme)** for unlimited history, Touch ID lock, encryption-at-rest, smart paste, snippets, and advanced rules.
 
@@ -334,7 +336,7 @@ Before opening a PR:
 | Other Clipboard Managers | SaneClip |
 |--------------------------|----------|
 | ❌ Plaintext storage | ✅ AES-256-GCM encryption |
-| ❌ Cloud sync (data exposure risk) | ✅ 100% local, zero servers |
+| ❌ Third-party cloud sync | ✅ Optional private iCloud sync between your devices only |
 | ❌ Analytics and telemetry | ✅ Zero tracking, zero telemetry |
 | ❌ Closed source | ✅ 100% Transparent Code (PolyForm Shield) |
 | ❌ Subscription pricing | ✅ $6.99 one-time, free updates |

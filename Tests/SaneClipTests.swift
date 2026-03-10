@@ -1,5 +1,8 @@
 import AppKit
 import CloudKit
+#if !APP_STORE
+    import Sparkle
+#endif
 import Testing
 @testable import SaneClip
 
@@ -170,6 +173,83 @@ struct SaneClipTests {
         #expect(ClipboardManager.accessibilityAlertTitle == "Auto-Paste Needs Access")
         #expect(ClipboardManager.accessibilityAlertMessage.contains("Clip copied."))
         #expect(!ClipboardManager.accessibilityAlertMessage.contains("Privacy & Security"))
+    }
+
+    @Test("History shortcuts stay disabled while a sheet is attached")
+    func historyShortcutGateBlocksForAttachedSheet() {
+        #expect(!HistoryShortcutGate.shouldHandleListShortcuts(hasAttachedSheet: true, firstResponder: nil))
+    }
+
+    @Test("History shortcuts stay disabled while text input is active")
+    @MainActor
+    func historyShortcutGateBlocksForTextInput() {
+        #expect(!HistoryShortcutGate.shouldHandleListShortcuts(hasAttachedSheet: false, firstResponder: NSTextView()))
+        #expect(!HistoryShortcutGate.shouldHandleListShortcuts(hasAttachedSheet: false, firstResponder: NSTextField()))
+    }
+
+    @Test("History shortcuts stay enabled for list navigation")
+    func historyShortcutGateAllowsListNavigation() {
+        #expect(HistoryShortcutGate.shouldHandleListShortcuts(hasAttachedSheet: false, firstResponder: nil))
+    }
+
+    @Test("Manual update fallback only triggers for actionable Sparkle failures")
+    func manualUpdateFallbackGate() {
+        let installError = NSError(domain: SUSparkleErrorDomain, code: Int(SparkleErrorCode.installation.rawValue))
+        let noUpdateError = NSError(domain: SUSparkleErrorDomain, code: Int(SparkleErrorCode.noUpdate.rawValue))
+        let otherDomainError = NSError(domain: NSCocoaErrorDomain, code: NSFileNoSuchFileError)
+
+        #expect(UpdateService.shouldOfferManualDownloadFallback(for: installError, updateCheck: .updates))
+        #expect(!UpdateService.shouldOfferManualDownloadFallback(for: noUpdateError, updateCheck: .updates))
+        #expect(!UpdateService.shouldOfferManualDownloadFallback(for: installError, updateCheck: .updatesInBackground))
+        #expect(!UpdateService.shouldOfferManualDownloadFallback(for: otherDomainError, updateCheck: .updates))
+    }
+
+    @Test("Sparkle updater stays disabled for XCTest host runs")
+    func sparkleUpdaterSkipsXCTestHosts() {
+        #expect(UpdateService.shouldInitialize(environment: [:]))
+        #expect(!UpdateService.shouldInitialize(environment: ["XCTestConfigurationFilePath": "/tmp/test.xctestconfiguration"]))
+        #expect(!UpdateService.shouldInitialize(environment: ["XCTestSessionIdentifier": "session-id"]))
+    }
+
+    @Test("Sparkle cache maintenance targets the per-user Sparkle cache folders")
+    func sparkleCacheMaintenancePaths() {
+        let homeURL = URL(fileURLWithPath: "/tmp/saneclip-home", isDirectory: true)
+        let urls = SparkleCacheMaintenance.staleArtifactURLs(
+            bundleIdentifier: "com.saneclip.app",
+            homeDirectoryURL: homeURL
+        )
+
+        #expect(urls.map(\.path) == [
+            "/tmp/saneclip-home/Library/Caches/com.saneclip.app/org.sparkle-project.Sparkle/Launcher",
+            "/tmp/saneclip-home/Library/Caches/com.saneclip.app/org.sparkle-project.Sparkle/Installation",
+            "/tmp/saneclip-home/Library/Caches/com.saneclip.app/org.sparkle-project.Sparkle/PersistentDownloads",
+        ])
+    }
+
+    @Test("Manual update check clears stale Sparkle cache artifacts")
+    func sparkleCacheMaintenanceClearsArtifacts() throws {
+        let fileManager = FileManager.default
+        let homeURL = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try fileManager.createDirectory(at: homeURL, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: homeURL) }
+
+        let staleFolders = SparkleCacheMaintenance.staleArtifactURLs(
+            bundleIdentifier: "com.saneclip.app",
+            homeDirectoryURL: homeURL
+        )
+        for folder in staleFolders {
+            try fileManager.createDirectory(at: folder, withIntermediateDirectories: true)
+            try Data("stale".utf8).write(to: folder.appendingPathComponent("artifact.txt"))
+        }
+
+        let removed = UpdateService.clearStaleSparkleArtifacts(
+            bundleIdentifier: "com.saneclip.app",
+            fileManager: fileManager,
+            homeDirectoryURL: homeURL
+        )
+
+        #expect(Set(removed) == Set(["Launcher", "Installation", "PersistentDownloads"]))
+        #expect(staleFolders.allSatisfy { !fileManager.fileExists(atPath: $0.path) })
     }
 
     @Test("ClipboardManager free tier history limit is capped at 50")
@@ -510,6 +590,61 @@ struct SaneClipTests {
         #expect(SyncCoordinator.status(for: .networkUnavailable) == .error)
     }
 
+    @Test("SyncCoordinator failure diagnostics include CloudKit domain and code")
+    func syncCoordinatorFailureDiagnostic() {
+        let error = CKError(.networkUnavailable)
+        let diagnostic = SyncCoordinator.failureDiagnostic(message: "Manual sync failed", error: error)
+
+        #expect(diagnostic.contains("Manual sync failed"))
+        #expect(diagnostic.contains("CKErrorDomain"))
+        #expect(diagnostic.contains("code=3"))
+        #expect(diagnostic.contains("status=Error"))
+    }
+
+    @Test("SharedClipboardItem text round-trips through stored iOS persistence")
+    func sharedClipboardItemStoredTextRoundTrip() throws {
+        let item = SharedClipboardItem(
+            id: UUID(uuidString: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")!,
+            content: .text("This is a long piece of text that should stay intact across relaunches."),
+            timestamp: Date(timeIntervalSince1970: 1_700_000_000),
+            sourceAppBundleID: "com.apple.MobileSMS",
+            sourceAppName: "Messages",
+            pasteCount: 2,
+            note: "keep this",
+            deviceId: "ios-device",
+            deviceName: "iPhone"
+        )
+
+        let stored = item.storedItem
+        let restored = try #require(SharedClipboardItem(storedItem: stored))
+
+        #expect(restored.fullText == item.fullText)
+        #expect(restored.note == "keep this")
+        #expect(restored.sourceAppName == "Messages")
+    }
+
+    @Test("SharedClipboardItem image round-trips through stored iOS persistence")
+    func sharedClipboardItemStoredImageRoundTrip() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03])
+        let item = SharedClipboardItem(
+            content: .imageData(data, width: 32, height: 18),
+            deviceId: "ios-device",
+            deviceName: "iPhone"
+        )
+
+        let stored = item.storedItem
+        let restored = try #require(SharedClipboardItem(storedItem: stored))
+
+        guard case let .imageData(restoredData, width, height) = restored.content else {
+            Issue.record("Expected restored image content")
+            return
+        }
+
+        #expect(restoredData == data)
+        #expect(width == 32)
+        #expect(height == 18)
+    }
+
     @Test("SyncCoordinator seeds existing history records when sync starts fresh")
     func syncCoordinatorInitialRecordSeeding() {
         let first = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
@@ -523,6 +658,38 @@ struct SaneClipTests {
         #expect(recordNames == [first.uuidString, second.uuidString])
     }
 
+    @Test("SyncCoordinator defers initial local seed until the zone bootstrap completes")
+    func syncCoordinatorDefersInitialSeedUntilZoneBootstrap() {
+        #expect(
+            SyncCoordinator.shouldQueueInitialLocalSeedAfterZoneBootstrap(
+                previousStateExists: false,
+                savedZoneCount: 1
+            )
+        )
+        #expect(
+            !SyncCoordinator.shouldQueueInitialLocalSeedAfterZoneBootstrap(
+                previousStateExists: true,
+                savedZoneCount: 1
+            )
+        )
+        #expect(
+            !SyncCoordinator.shouldQueueInitialLocalSeedAfterZoneBootstrap(
+                previousStateExists: false,
+                savedZoneCount: 0
+            )
+        )
+    }
+
+    @Test("SyncCoordinator relies on CKSyncEngine automatic send after bootstrap seeding")
+    func syncCoordinatorUsesAutomaticSendAfterBootstrapSeed() {
+        #expect(
+            SyncCoordinator.postBootstrapSeedFollowUp(seededRecordCount: 2) == .waitForAutomaticSend
+        )
+        #expect(
+            SyncCoordinator.postBootstrapSeedFollowUp(seededRecordCount: 0) == .none
+        )
+    }
+
     @Test("SyncCoordinator does not re-seed already pending history records")
     func syncCoordinatorSkipsPendingRecordSeeds() {
         let first = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
@@ -534,6 +701,26 @@ struct SaneClipTests {
         )
 
         #expect(recordNames == [second.uuidString])
+    }
+
+    @Test("SyncCoordinator keeps full local items when filtering seed candidates")
+    func syncCoordinatorFiltersInitialLocalSeedItems() {
+        let first = SharedClipboardItem(
+            id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
+            content: .text("first")
+        )
+        let second = SharedClipboardItem(
+            id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!,
+            content: .text("second")
+        )
+
+        let items = SyncCoordinator.initialLocalSeedItems(
+            items: [first, second],
+            pendingRecordNames: [first.id.uuidString]
+        )
+
+        #expect(items.map(\.id) == [second.id])
+        #expect(items.first?.fullText == "second")
     }
 
     @Test("SyncCoordinator blocks remote deletions while initial local seed is pending")
@@ -556,6 +743,25 @@ struct SaneClipTests {
         )
     }
 
+    @Test("SyncCoordinator resets state when the primary sync zone is deleted")
+    func syncCoordinatorResetsForPrimaryZoneDeletion() {
+        #expect(
+            SyncCoordinator.shouldResetSyncState(
+                forDeletedZoneIDs: [SyncDataModel.zoneID]
+            )
+        )
+    }
+
+    @Test("SyncCoordinator ignores unrelated zone deletions")
+    func syncCoordinatorIgnoresUnrelatedZoneDeletion() {
+        let otherZoneID = CKRecordZone.ID(zoneName: "other-zone", ownerName: CKCurrentUserDefaultName)
+        #expect(
+            !SyncCoordinator.shouldResetSyncState(
+                forDeletedZoneIDs: [otherZoneID]
+            )
+        )
+    }
+
     @Test("SyncCoordinator only tracks pending save record IDs")
     func syncCoordinatorPendingSaveRecordIDs() {
         let saveID = CKRecord.ID(
@@ -575,6 +781,22 @@ struct SaneClipTests {
         )
 
         #expect(pendingIDs == [saveID])
+    }
+
+    @Test("SaneClip launch eagerly initializes sync once clipboard history is ready")
+    func saneClipLaunchSyncBootstrapGate() {
+        #expect(!SaneClipAppDelegate.shouldInitializeSyncOnLaunch(
+            hasClipboardManager: false,
+            syncFeatureCompiled: true
+        ))
+        #expect(!SaneClipAppDelegate.shouldInitializeSyncOnLaunch(
+            hasClipboardManager: true,
+            syncFeatureCompiled: false
+        ))
+        #expect(SaneClipAppDelegate.shouldInitializeSyncOnLaunch(
+            hasClipboardManager: true,
+            syncFeatureCompiled: true
+        ))
     }
 
     @Test("ExcludedAppsInline reads bundle identifiers from selected app bundles")

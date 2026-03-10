@@ -62,48 +62,68 @@ class ShareViewController: SLComposeServiceViewController {
     }
 
     private func addToHistory(text: String, type: WidgetClipboardItem.ContentType) {
-        guard var container = WidgetDataContainer.load() else {
-            // Create new container with just this item
-            let item = WidgetClipboardItem(
-                id: UUID(),
-                preview: String(text.prefix(200)),
-                timestamp: Date(),
-                isPinned: false,
-                sourceAppName: "Shared",
-                contentType: type
-            )
-            let newContainer = WidgetDataContainer(
-                recentItems: [item],
-                pinnedItems: [],
-                lastUpdated: Date()
-            )
-            try? newContainer.save()
-            return
-        }
-
-        let newItem = WidgetClipboardItem(
+        let now = Date()
+        let widgetItem = WidgetClipboardItem(
             id: UUID(),
             preview: String(text.prefix(200)),
-            timestamp: Date(),
+            timestamp: now,
             isPinned: false,
             sourceAppName: "Shared",
             contentType: type
         )
+        let storedItem = StoredClipboardItem(
+            id: widgetItem.id,
+            contentKind: .text,
+            text: text,
+            imageData: nil,
+            imageWidth: nil,
+            imageHeight: nil,
+            timestamp: now,
+            sourceAppBundleID: nil,
+            sourceAppName: "Shared",
+            pasteCount: 0,
+            note: nil,
+            deviceId: "ios-share",
+            deviceName: UIDevice.current.name
+        )
 
-        // Prepend new item, keep max 50
-        var recent = container.recentItems
-        // Deduplicate - remove if same text already exists
-        recent.removeAll { $0.preview == newItem.preview }
-        recent.insert(newItem, at: 0)
-        if recent.count > 50 {
-            recent = Array(recent.prefix(50))
+        var widgetContainer = WidgetDataContainer.load() ?? WidgetDataContainer(
+            recentItems: [],
+            pinnedItems: [],
+            lastUpdated: now
+        )
+        var fullContainer = IOSHistoryDataContainer.load() ?? IOSHistoryDataContainer(
+            recentItems: [],
+            pinnedItems: [],
+            lastUpdated: now
+        )
+
+        var recentWidgetItems = widgetContainer.recentItems
+        recentWidgetItems.removeAll { $0.preview == widgetItem.preview }
+        recentWidgetItems.insert(widgetItem, at: 0)
+        if recentWidgetItems.count > 50 {
+            recentWidgetItems = Array(recentWidgetItems.prefix(50))
         }
 
-        let updated = WidgetDataContainer(
-            recentItems: recent,
-            pinnedItems: container.pinnedItems,
-            lastUpdated: Date()
+        var recentStoredItems = fullContainer.recentItems
+        recentStoredItems.removeAll { $0.text == text }
+        recentStoredItems.insert(storedItem, at: 0)
+        if recentStoredItems.count > 50 {
+            recentStoredItems = Array(recentStoredItems.prefix(50))
+        }
+
+        widgetContainer = WidgetDataContainer(
+            recentItems: recentWidgetItems,
+            pinnedItems: widgetContainer.pinnedItems,
+            lastUpdated: now
         )
-        try? updated.save()
+        fullContainer = IOSHistoryDataContainer(
+            recentItems: recentStoredItems,
+            pinnedItems: fullContainer.pinnedItems,
+            lastUpdated: now
+        )
+
+        try? widgetContainer.save()
+        try? fullContainer.save()
     }
 }

@@ -30,6 +30,14 @@ enum ContentTypeFilter: String, CaseIterable, Codable {
     case image = "Images"
 }
 
+enum HistoryShortcutGate {
+    static func shouldHandleListShortcuts(hasAttachedSheet: Bool, firstResponder: NSResponder?) -> Bool {
+        guard !hasAttachedSheet else { return false }
+        guard !(firstResponder is NSTextView), !(firstResponder is NSTextField) else { return false }
+        return true
+    }
+}
+
 struct HistoryFilterPreset: Codable, Identifiable, Hashable {
     let id: UUID
     var name: String
@@ -199,6 +207,14 @@ struct ClipboardHistoryView: View {
                 return false
             }
         }
+    }
+
+    private func shouldHandleListShortcuts() -> Bool {
+        let keyWindow = NSApp.keyWindow
+        return HistoryShortcutGate.shouldHandleListShortcuts(
+            hasAttachedSheet: keyWindow?.attachedSheet != nil,
+            firstResponder: keyWindow?.firstResponder
+        )
     }
 
     var body: some View {
@@ -411,15 +427,28 @@ struct ClipboardHistoryView: View {
                 }
                 .listStyle(.plain)
                 .focused($isListFocused)
-                .onKeyPress(.downArrow) { moveSelection(by: 1); return .handled }
-                .onKeyPress(.upArrow) { moveSelection(by: -1); return .handled }
+                .onKeyPress(.downArrow) {
+                    guard shouldHandleListShortcuts() else { return .ignored }
+                    moveSelection(by: 1)
+                    return .handled
+                }
+                .onKeyPress(.upArrow) {
+                    guard shouldHandleListShortcuts() else { return .ignored }
+                    moveSelection(by: -1)
+                    return .handled
+                }
                 .onKeyPress(characters: CharacterSet(charactersIn: "jJ")) { _ in
-                    moveSelection(by: 1); return .handled
+                    guard shouldHandleListShortcuts() else { return .ignored }
+                    moveSelection(by: 1)
+                    return .handled
                 }
                 .onKeyPress(characters: CharacterSet(charactersIn: "kK")) { _ in
-                    moveSelection(by: -1); return .handled
+                    guard shouldHandleListShortcuts() else { return .ignored }
+                    moveSelection(by: -1)
+                    return .handled
                 }
                 .onKeyPress(characters: CharacterSet(charactersIn: "12345")) { keyPress in
+                    guard shouldHandleListShortcuts() else { return .ignored }
                     switch keyPress.characters {
                     case "1": contentTypeFilter = .all
                     case "2": contentTypeFilter = .text
@@ -430,7 +459,11 @@ struct ClipboardHistoryView: View {
                     }
                     return .handled
                 }
-                .onKeyPress(.return) { pasteSelectedItem(); return .handled }
+                .onKeyPress(.return) {
+                    guard shouldHandleListShortcuts() else { return .ignored }
+                    pasteSelectedItem()
+                    return .handled
+                }
             }
 
             // Free-tier limit banner — shown when history is at cap

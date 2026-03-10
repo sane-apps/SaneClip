@@ -80,3 +80,63 @@ struct WidgetDataContainer: Codable {
 enum WidgetDataError: Error {
     case noSharedContainer
 }
+
+/// Full-fidelity iOS clipboard persistence for the app + share extension.
+/// Kept separate from widget-data.json so widgets don't pay to decode raw clip payloads.
+struct IOSHistoryDataContainer: Codable {
+    let recentItems: [StoredClipboardItem]
+    let pinnedItems: [StoredClipboardItem]
+    let lastUpdated: Date
+
+    static let fileName = "ios-history.json"
+
+    static var sharedContainerURL: URL? {
+        WidgetDataContainer.sharedContainerURL
+    }
+
+    static var fileURL: URL? {
+        sharedContainerURL?.appendingPathComponent(fileName)
+    }
+
+    static func load() -> IOSHistoryDataContainer? {
+        guard let url = fileURL,
+              FileManager.default.fileExists(atPath: url.path) else {
+            return nil
+        }
+        do {
+            let data = try Data(contentsOf: url)
+            return try JSONDecoder().decode(IOSHistoryDataContainer.self, from: data)
+        } catch {
+            return nil
+        }
+    }
+
+    func save() throws {
+        guard let url = IOSHistoryDataContainer.fileURL else {
+            throw WidgetDataError.noSharedContainer
+        }
+        let data = try JSONEncoder().encode(self)
+        try data.write(to: url)
+    }
+}
+
+struct StoredClipboardItem: Codable, Identifiable {
+    enum ContentKind: String, Codable {
+        case text
+        case image
+    }
+
+    let id: UUID
+    let contentKind: ContentKind
+    let text: String?
+    let imageData: Data?
+    let imageWidth: Int?
+    let imageHeight: Int?
+    let timestamp: Date
+    let sourceAppBundleID: String?
+    let sourceAppName: String?
+    let pasteCount: Int
+    let note: String?
+    let deviceId: String
+    let deviceName: String
+}

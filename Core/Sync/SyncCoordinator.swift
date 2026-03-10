@@ -14,8 +14,10 @@
     /// Main sync orchestrator. Implements CKSyncEngineDelegate to handle
     /// bidirectional sync between local clipboard history and iCloud.
     ///
-    /// Only active in App Store builds (#if ENABLE_SYNC).
-    /// Developer ID builds degrade gracefully — sync is simply unavailable.
+    /// Active in any build that compiles with ENABLE_SYNC.
+    /// For SaneClip today that includes direct-download Release builds and
+    /// App Store builds, so CloudKit production schema must be ready before
+    /// shipping either channel.
     @MainActor
     @Observable
     class SyncCoordinator: NSObject, CKSyncEngineDelegate {
@@ -64,6 +66,7 @@
                 UserDefaults.standard.set(isInitialLocalSeedPending, forKey: Self.initialLocalSeedPendingKey)
             }
         }
+        private var awaitingInitialZoneBootstrap = false
         #if os(iOS)
             private var pendingIOSItemsByID: [UUID: SharedClipboardItem] = [:]
         #endif
@@ -164,10 +167,13 @@
             } else {
                 pendingRecordIDs.removeAll()
             }
+            awaitingInitialZoneBootstrap = Self.shouldQueueInitialLocalSeedAfterZoneBootstrap(
+                previousStateExists: previousState != nil,
+                savedZoneCount: 1
+            )
             if isInitialLocalSeedPending, pendingRecordIDs.isEmpty, previousState != nil {
                 isInitialLocalSeedPending = false
             }
-            seedExistingMacHistoryIfNeeded(previousState: previousState)
 
             logger.info("Sync engine started")
         }
@@ -227,6 +233,13 @@
             historyIDs.map(\.uuidString).filter { !pendingRecordNames.contains($0) }
         }
 
+        nonisolated static func initialLocalSeedItems(
+            items: [SharedClipboardItem],
+            pendingRecordNames: Set<String>
+        ) -> [SharedClipboardItem] {
+            items.filter { !pendingRecordNames.contains($0.id.uuidString) }
+        }
+
         nonisolated static func pendingSaveRecordIDs(
             from changes: [CKSyncEngine.PendingRecordZoneChange]
         ) -> Set<CKRecord.ID> {
@@ -243,31 +256,71 @@
             !isInitialLocalSeedPending || pendingRecordCount == 0
         }
 
-        private func seedExistingMacHistoryIfNeeded(previousState: CKSyncEngine.State.Serialization?) {
+        nonisolated static func shouldResetSyncState(forDeletedZoneIDs zoneIDs: [CKRecordZone.ID]) -> Bool {
+            zoneIDs.contains(SyncDataModel.zoneID)
+        }
+
+        nonisolated static func shouldQueueInitialLocalSeedAfterZoneBootstrap(
+            previousStateExists: Bool,
+            savedZoneCount: Int
+        ) -> Bool {
+            !previousStateExists && savedZoneCount > 0
+        }
+
+        nonisolated static func postBootstrapSeedFollowUp(seededRecordCount: Int) -> PostBootstrapSeedFollowUp {
+            seededRecordCount > 0 ? .waitForAutomaticSend : .none
+        }
+
+        @discardableResult
+        private func queueInitialLocalSeedIfNeeded() -> Int {
+            guard awaitingInitialZoneBootstrap,
+                  let syncEngine else { return 0 }
+
+            let pendingRecordNames = Set(
+                Self.pendingSaveRecordIDs(from: syncEngine.state.pendingRecordZoneChanges).map(\.recordName)
+            )
+            let itemsToSeed = Self.initialLocalSeedItems(
+                items: localSeedItems(),
+                pendingRecordNames: pendingRecordNames
+            )
+            awaitingInitialZoneBootstrap = false
+            guard !itemsToSeed.isEmpty else { return 0 }
+
+            let recordIDs = Set(itemsToSeed.map { item in
+                CKRecord.ID(recordName: item.id.uuidString, zoneID: SyncDataModel.zoneID)
+            })
+            let changes = recordIDs.map(CKSyncEngine.PendingRecordZoneChange.saveRecord)
+            syncEngine.state.add(pendingRecordZoneChanges: changes)
+            pendingRecordIDs.formUnion(recordIDs)
+            #if os(iOS)
+                for item in itemsToSeed {
+                    pendingIOSItemsByID[item.id] = item
+                }
+            #endif
+            isInitialLocalSeedPending = true
+            logger.info("Queued \(itemsToSeed.count) existing history items for initial sync")
+            return itemsToSeed.count
+        }
+
+        private func localSeedItems() -> [SharedClipboardItem] {
             #if os(macOS)
-                guard previousState == nil,
-                      let syncEngine,
-                      let manager = ClipboardManager.shared
-                else { return }
-
-                let pendingRecordNames = Set(
-                    Self.pendingSaveRecordIDs(from: syncEngine.state.pendingRecordZoneChanges).map(\.recordName)
-                )
-
-                let recordNames = Self.initialRecordNamesToSeed(
-                    historyIDs: manager.history.map(\.id),
-                    pendingRecordNames: pendingRecordNames
-                )
-                guard !recordNames.isEmpty else { return }
-
-                let recordIDs = Set(recordNames.map { recordName in
-                    CKRecord.ID(recordName: recordName, zoneID: SyncDataModel.zoneID)
-                })
-                let changes = recordIDs.map(CKSyncEngine.PendingRecordZoneChange.saveRecord)
-                syncEngine.state.add(pendingRecordZoneChanges: changes)
-                pendingRecordIDs.formUnion(recordIDs)
-                isInitialLocalSeedPending = true
-                logger.info("Queued \(recordNames.count) existing history items for initial sync")
+                guard let manager = ClipboardManager.shared else { return [] }
+                return manager.history.map { item in
+                    SharedClipboardItem(
+                        id: item.id,
+                        content: item.sharedContent,
+                        timestamp: item.timestamp,
+                        sourceAppBundleID: item.sourceAppBundleID,
+                        sourceAppName: item.sourceAppName,
+                        pasteCount: item.pasteCount,
+                        note: item.note,
+                        deviceId: deviceId,
+                        deviceName: deviceName
+                    )
+                }
+            #else
+                guard let container = IOSHistoryDataContainer.load() else { return [] }
+                return container.recentItems.compactMap(SharedClipboardItem.init(storedItem:))
             #endif
         }
 
@@ -275,10 +328,12 @@
             guard isSyncEnabled, let syncEngine else { return }
 
             syncStatus = .syncing
+            logger.info("Manual sync requested: pendingRecords=\(self.pendingRecordIDs.count)")
 
             do {
                 try await syncEngine.sendChanges()
                 try await syncEngine.fetchChanges()
+                logger.info("Manual sync cycle completed")
             } catch let error as CKError {
                 applySyncFailure(for: error, message: "Manual sync failed")
             } catch {
@@ -330,8 +385,8 @@
 
         // MARK: - CKSyncEngineDelegate
 
-        nonisolated func handleEvent(_ event: CKSyncEngine.Event, syncEngine: CKSyncEngine) {
-            Task { @MainActor in
+        nonisolated func handleEvent(_ event: CKSyncEngine.Event, syncEngine: CKSyncEngine) async {
+            await MainActor.run {
                 self.processEvent(event, syncEngine: syncEngine)
             }
         }
@@ -341,21 +396,31 @@
             syncEngine: CKSyncEngine
         ) async -> CKSyncEngine.RecordZoneChangeBatch? {
             // Collect records on MainActor first, then build batch outside
-            let (pending, recordsByID) = await MainActor.run {
+            let (pending, recordsByID, missingRecordIDs) = await MainActor.run {
                 let scope = context.options.scope
                 let filtered = syncEngine.state.pendingRecordZoneChanges.filter { scope.contains($0) }
                 var records: [CKRecord.ID: CKRecord] = [:]
+                var missingRecordIDs: [CKRecord.ID] = []
                 for change in filtered {
                     if case let .saveRecord(recordID) = change {
                         if let record = try? self.buildRecordForID(recordID) {
                             records[recordID] = record
+                        } else {
+                            missingRecordIDs.append(recordID)
                         }
                     }
                 }
-                return (filtered, records)
+                return (filtered, records, missingRecordIDs)
             }
 
             guard !pending.isEmpty else { return nil }
+            logger.info(
+                "Preparing record batch: pendingChanges=\(pending.count) saveRecords=\(recordsByID.count) missingRecords=\(missingRecordIDs.count)"
+            )
+            if !missingRecordIDs.isEmpty {
+                let names = missingRecordIDs.map(\.recordName).joined(separator: ",")
+                logger.error("Missing local records for sync batch: \(names, privacy: .public)")
+            }
 
             return await CKSyncEngine.RecordZoneChangeBatch(pendingChanges: pending) { recordID in
                 recordsByID[recordID]
@@ -387,8 +452,11 @@
             case let .didFetchRecordZoneChanges(fetchResult):
                 handleDidFetchRecordZoneChanges(fetchResult)
 
+            case .didSendChanges:
+                break
+
             case .willFetchChanges, .willFetchRecordZoneChanges,
-                 .willSendChanges, .didSendChanges,
+                 .willSendChanges,
                  .didFetchChanges:
                 break // Progress events we don't need to act on
 
@@ -439,6 +507,9 @@
         // MARK: - Handle Sent Changes
 
         private func handleSentChanges(_ sentChanges: CKSyncEngine.Event.SentRecordZoneChanges) {
+            logger.info(
+                "Sent record changes: saved=\(sentChanges.savedRecords.count) failedSaves=\(sentChanges.failedRecordSaves.count) failedDeletes=\(sentChanges.failedRecordDeletes.count)"
+            )
             // Remove successful saves from pending
             for saved in sentChanges.savedRecords {
                 pendingRecordIDs.remove(saved.recordID)
@@ -528,6 +599,18 @@
         // MARK: - Handle Database Changes
 
         private func handleFetchedDatabaseChanges(_ changes: CKSyncEngine.Event.FetchedDatabaseChanges) {
+            let deletedZoneIDs = changes.deletions.map(\.zoneID)
+            if Self.shouldResetSyncState(forDeletedZoneIDs: deletedZoneIDs) {
+                logger.warning("Primary sync zone deleted on server — resetting local sync state and re-seeding history")
+                try? FileManager.default.removeItem(at: stateFileURL)
+                connectedDevices.removeAll()
+                pendingRecordIDs.removeAll()
+                isInitialLocalSeedPending = false
+                stopSync()
+                startSync()
+                return
+            }
+
             for deletion in changes.deletions {
                 logger.info("Zone deleted from server: \(deletion.zoneID.zoneName)")
             }
@@ -549,6 +632,12 @@
                 if syncStatus == .syncing {
                     syncStatus = .error
                 }
+                return
+            }
+            let seededRecordCount = queueInitialLocalSeedIfNeeded()
+            if Self.postBootstrapSeedFollowUp(seededRecordCount: seededRecordCount) == .waitForAutomaticSend {
+                syncStatus = .syncing
+                logger.info("Queued initial local seed and waiting for CKSyncEngine to send pending records automatically")
                 return
             }
             if !changes.savedZones.isEmpty || !changes.deletedZoneIDs.isEmpty {
@@ -598,9 +687,24 @@
             }
         }
 
+        nonisolated static func failureDiagnostic(message: String, error: CKError) -> String {
+            let nsError = error as NSError
+            var diagnostic = "\(message): domain=\(nsError.domain) code=\(error.code.rawValue) status=\(status(for: error.code).rawValue)"
+            if !nsError.userInfo.isEmpty {
+                let details = nsError.userInfo
+                    .map { key, value in
+                        "\(key)=\(String(describing: value))"
+                    }
+                    .sorted()
+                    .joined(separator: "; ")
+                diagnostic += " userInfo={\(details)}"
+            }
+            return diagnostic
+        }
+
         private func applySyncFailure(for error: CKError, message: String) {
             syncStatus = Self.status(for: error.code)
-            logger.error("\(message): \(error.localizedDescription)")
+            logger.error("\(Self.failureDiagnostic(message: message, error: error), privacy: .public)")
         }
 
         // MARK: - Notifications to Local Data Layer
@@ -635,6 +739,11 @@
             #else
                 syncedItems.removeAll { $0.id == itemID }
             #endif
+        }
+
+        enum PostBootstrapSeedFollowUp {
+            case none
+            case waitForAutomaticSend
         }
     }
 

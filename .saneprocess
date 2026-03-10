@@ -28,6 +28,13 @@ release:
       - "com.saneclip.app:SaneClip Developer ID"
       - "com.saneclip.app.widgets:SaneClip Widgets Developer ID"
 
+cloudkit:
+  enabled: true
+  container_id: iCloud.com.saneclip.app
+  team_id: M78L6FXD48
+  required_record_types:
+    - ClipboardItem
+
 commands:
   verify: ./scripts/SaneMaster.rb verify
   test_mode: ./scripts/SaneMaster.rb tm
@@ -70,7 +77,7 @@ appstore:
         Keep important clips close, find old copies instantly, and build a cleaner repeatable workflow without handing your data to a third party.
         Pro adds Touch ID history lock, AES-256 encryption at rest, paste stack, transforms, clipboard rules, and unlimited history with a one-time unlock.
       keywords: "clipboard,copy paste,history,snippets,touch id,security,productivity,mac utility"
-      whats_new: "Improved sync and search performance, stronger reliability for history operations, and stability updates."
+      whats_new: "Fixes iCloud sync rollout and production schema issues, improves update reliability, and fixes edit-field keyboard shortcut handling."
       marketing_url: "https://saneclip.com"
     ios:
       subtitle: "Clipboard History + Widgets"
@@ -80,7 +87,7 @@ appstore:
         Browse your recent clips, copy them again in one tap, save new text and links from the Share Sheet, and keep important items pinned across devices.
         Pro adds encryption and more advanced workflows while keeping your data on your own devices instead of a third-party server.
       keywords: "clipboard,copy paste,history,widgets,icloud,snippets,productivity,notes"
-      whats_new: "Faster history refresh, better sync stability, and reliability improvements across clipboard actions."
+      whats_new: "Fixes iCloud sync startup, preserves local history more reliably, and improves clipboard action stability."
       marketing_url: "https://saneclip.com"
   review_notes: "SaneClip App Store build does not request Accessibility access and does not simulate keyboard events. Selecting a clipboard item copies it to the clipboard and shows a local notification asking the user to press Cmd+V manually in the frontmost app. To test: open history with Cmd+Shift+V, select any item, then paste with Cmd+V. Basic is free. Pro is a one-time in-app purchase. No external checkout links or license keys are used in the App Store build."
   review_notes_by_platform:

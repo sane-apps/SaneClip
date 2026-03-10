@@ -73,6 +73,7 @@ class ClipboardHistoryViewModel: ObservableObject {
             if !newItems.isEmpty {
                 history.append(contentsOf: newItems)
                 history.sort { $0.timestamp > $1.timestamp }
+                saveToWidgetContainer()
             }
 
             if let syncDate = coordinator.lastSyncDate {
@@ -86,9 +87,17 @@ class ClipboardHistoryViewModel: ObservableObject {
 
     /// Load clipboard data from App Group shared container
     func loadFromSharedContainer() {
+        if let fullContainer = IOSHistoryDataContainer.load(),
+           !fullContainer.recentItems.isEmpty {
+            isShowingDemoData = false
+            history = fullContainer.recentItems.compactMap(SharedClipboardItem.init(storedItem:))
+            pinnedItems = fullContainer.pinnedItems.compactMap(SharedClipboardItem.init(storedItem:))
+            lastSyncTime = fullContainer.lastUpdated
+            return
+        }
+
         guard let container = WidgetDataContainer.load(),
-              !container.recentItems.isEmpty
-        else {
+              !container.recentItems.isEmpty else {
             // No synced data yet — load demo data so reviewers can see the app working
             loadDemoDataIfNeeded()
             return
@@ -338,7 +347,14 @@ class ClipboardHistoryViewModel: ObservableObject {
             lastUpdated: Date()
         )
 
+        let fullContainer = IOSHistoryDataContainer(
+            recentItems: Array(history.prefix(50)).map(\.storedItem),
+            pinnedItems: pinnedItems.map(\.storedItem),
+            lastUpdated: container.lastUpdated
+        )
+
         try? container.save()
+        try? fullContainer.save()
         WidgetCenter.shared.reloadAllTimelines()
     }
 

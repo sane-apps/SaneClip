@@ -170,3 +170,72 @@ struct SharedClipboardItem: Identifiable, Codable, Sendable {
         return parts.joined(separator: ", ")
     }
 }
+
+extension SharedClipboardItem {
+    init?(storedItem: StoredClipboardItem) {
+        let content: SharedClipboardContent
+        switch storedItem.contentKind {
+        case .text:
+            guard let text = storedItem.text else { return nil }
+            content = .text(text)
+        case .image:
+            guard let imageData = storedItem.imageData,
+                  let width = storedItem.imageWidth,
+                  let height = storedItem.imageHeight else {
+                return nil
+            }
+            content = .imageData(imageData, width: width, height: height)
+        }
+
+        self.init(
+            id: storedItem.id,
+            content: content,
+            timestamp: storedItem.timestamp,
+            sourceAppBundleID: storedItem.sourceAppBundleID,
+            sourceAppName: storedItem.sourceAppName,
+            pasteCount: storedItem.pasteCount,
+            note: storedItem.note,
+            deviceId: storedItem.deviceId,
+            deviceName: storedItem.deviceName
+        )
+    }
+
+    var storedItem: StoredClipboardItem {
+        let kind: StoredClipboardItem.ContentKind
+        let text: String?
+        let imageData: Data?
+        let imageWidth: Int?
+        let imageHeight: Int?
+
+        switch content {
+        case let .text(string):
+            kind = .text
+            text = string
+            imageData = nil
+            imageWidth = nil
+            imageHeight = nil
+        case let .imageData(data, width, height):
+            kind = .image
+            text = nil
+            imageData = data
+            imageWidth = width
+            imageHeight = height
+        }
+
+        return StoredClipboardItem(
+            id: id,
+            contentKind: kind,
+            text: text,
+            imageData: imageData,
+            imageWidth: imageWidth,
+            imageHeight: imageHeight,
+            timestamp: timestamp,
+            sourceAppBundleID: sourceAppBundleID,
+            sourceAppName: sourceAppName,
+            pasteCount: pasteCount,
+            note: note,
+            deviceId: deviceId,
+            deviceName: deviceName
+        )
+    }
+}

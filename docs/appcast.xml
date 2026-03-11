@@ -6,7 +6,26 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                            <item>
+                                                    <item>
+            <title>2.2.8</title>
+            <pubDate>Tue, 10 Mar 2026 21:20:23 -0400</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:criticalUpdate sparkle:version="2208"/>            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Fix broken direct-download auto-updates for sandboxed builds.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.2.8.zip"
+                       sparkle:version="2208"
+                       sparkle:shortVersionString="2.2.8"
+                       length="3134554"
+                       type="application/octet-stream"
+                       sparkle:edSignature="Bn17A3NnqZDhNxZCH9MFqHYbRUinMRXo5hZwZbYwOKZFDCUwhoTQbTfYzxtzdyxHZeqKmFCobACWlIY9VtX8AA=="/>
+        </item>
+<item>
             <title>2.2.7</title>
             <pubDate>Tue, 10 Mar 2026 13:36:08 -0400</pubDate>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>

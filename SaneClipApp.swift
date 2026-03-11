@@ -102,10 +102,26 @@ private let appLogger = Logger(subsystem: "com.saneclip.app", category: "App")
         static let shared = UpdateService()
 
         nonisolated static let manualDownloadURL = "https://saneclip.com/download"
+        nonisolated static let testFeedOverrideKey = "SANECLIP_TEST_FEED_URL"
+        nonisolated static let autoCheckOnLaunchKey = "SANECLIP_AUTO_CHECK_FOR_UPDATES"
 
         nonisolated static func shouldInitialize(environment: [String: String] = ProcessInfo.processInfo.environment) -> Bool {
             environment["XCTestConfigurationFilePath"] == nil &&
                 environment["XCTestSessionIdentifier"] == nil
+        }
+
+        nonisolated static func testFeedOverride(environment: [String: String] = ProcessInfo.processInfo.environment) -> String? {
+            guard let value = environment[testFeedOverrideKey]?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  !value.isEmpty
+            else {
+                return nil
+            }
+
+            return value
+        }
+
+        nonisolated static func shouldAutoCheckOnLaunch(environment: [String: String] = ProcessInfo.processInfo.environment) -> Bool {
+            environment[autoCheckOnLaunchKey] == "1"
         }
 
         private var updaterController: SPUStandardUpdaterController?
@@ -317,11 +333,22 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         #endif
 
         #if !APP_STORE
+            if let testFeedOverride = UpdateService.testFeedOverride() {
+                UserDefaults.standard.set(testFeedOverride, forKey: "SUFeedURL")
+                appLogger.info("Using test Sparkle feed override: \(testFeedOverride, privacy: .public)")
+            }
+
             // Initialize update service (Sparkle)
             if UpdateService.shouldInitialize() {
                 updateService = UpdateService.shared
             } else {
                 appLogger.info("Skipping Sparkle updater during XCTest host run")
+            }
+
+            if UpdateService.shouldAutoCheckOnLaunch() {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                    self?.updateService?.checkForUpdates()
+                }
             }
         #endif
 
@@ -333,6 +360,9 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         // Fire launch event (capture isPro on main actor before detaching)
         let launchIsPro = licenseService.isPro
         let isFirstLaunch = !hasSeenWelcome
+        if SaneBackgroundAppDefaults.launchAtLogin {
+            _ = SaneLoginItemPolicy.enableByDefaultIfNeeded(isFirstLaunch: isFirstLaunch)
+        }
         Task.detached {
             await EventTracker.log(launchIsPro ? "app_launch_pro" : "app_launch_free", app: "saneclip")
             if isFirstLaunch, !launchIsPro {

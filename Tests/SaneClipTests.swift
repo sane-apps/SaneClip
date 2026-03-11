@@ -211,6 +211,25 @@ struct SaneClipTests {
         #expect(!UpdateService.shouldInitialize(environment: ["XCTestSessionIdentifier": "session-id"]))
     }
 
+    @Test("Sparkle test feed override only accepts non-empty values")
+    func sparkleTestFeedOverride() {
+        #expect(UpdateService.testFeedOverride(environment: [:]) == nil)
+        #expect(UpdateService.testFeedOverride(environment: [UpdateService.testFeedOverrideKey: ""]) == nil)
+        #expect(UpdateService.testFeedOverride(environment: [UpdateService.testFeedOverrideKey: "  "]) == nil)
+        #expect(
+            UpdateService.testFeedOverride(
+                environment: [UpdateService.testFeedOverrideKey: " http://127.0.0.1:38890/appcast.xml "]
+            ) == "http://127.0.0.1:38890/appcast.xml"
+        )
+    }
+
+    @Test("Sparkle auto-check-on-launch test hook is opt-in")
+    func sparkleAutoCheckOnLaunchFlag() {
+        #expect(!UpdateService.shouldAutoCheckOnLaunch(environment: [:]))
+        #expect(UpdateService.shouldAutoCheckOnLaunch(environment: [UpdateService.autoCheckOnLaunchKey: "1"]))
+        #expect(!UpdateService.shouldAutoCheckOnLaunch(environment: [UpdateService.autoCheckOnLaunchKey: "0"]))
+    }
+
     @Test("Sparkle cache maintenance targets the per-user Sparkle cache folders")
     func sparkleCacheMaintenancePaths() {
         let homeURL = URL(fileURLWithPath: "/tmp/saneclip-home", isDirectory: true)
@@ -250,6 +269,38 @@ struct SaneClipTests {
 
         #expect(Set(removed) == Set(["Launcher", "Installation", "PersistentDownloads"]))
         #expect(staleFolders.allSatisfy { !fileManager.fileExists(atPath: $0.path) })
+    }
+
+    @Test("Sandboxed direct build enables Sparkle installer launcher service")
+    func sparkleInstallerLauncherServiceEnabledInInfoPlist() throws {
+        let repoRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let plistURL = repoRoot.appendingPathComponent("SaneClip/Info.plist")
+        let plistData = try Data(contentsOf: plistURL)
+        let plist = try #require(
+            PropertyListSerialization.propertyList(from: plistData, format: nil) as? [String: Any]
+        )
+
+        #expect(plist["SUEnableInstallerLauncherService"] as? Bool == true)
+    }
+
+    @Test("Sandboxed direct build grants Sparkle installer mach lookup exceptions")
+    func sparkleInstallerMachLookupExceptionsPresent() throws {
+        let repoRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let entitlementsURL = repoRoot.appendingPathComponent("SaneClip/SaneClip.entitlements")
+        let entitlementsData = try Data(contentsOf: entitlementsURL)
+        let entitlements = try #require(
+            PropertyListSerialization.propertyList(from: entitlementsData, format: nil) as? [String: Any]
+        )
+        let machLookupNames = Set(
+            (entitlements["com.apple.security.temporary-exception.mach-lookup.global-name"] as? [String]) ?? []
+        )
+
+        #expect(machLookupNames.contains("$(PRODUCT_BUNDLE_IDENTIFIER)-spki"))
+        #expect(machLookupNames.contains("$(PRODUCT_BUNDLE_IDENTIFIER)-spks"))
     }
 
     @Test("ClipboardManager free tier history limit is capped at 50")
@@ -325,6 +376,11 @@ struct SaneClipTests {
         try settings.importSettings(from: exported)
 
         #expect(settings.openHistoryAtCursor == true)
+    }
+
+    @Test("SettingsModel keeps Dock hidden by default")
+    func settingsModelDockDefaultIsHidden() {
+        #expect(SettingsModel.defaultShowInDock == false)
     }
 
     @Test("SettingsModel normalizes unsupported capture size values")

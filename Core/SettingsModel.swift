@@ -1,4 +1,5 @@
 import Combine
+import SaneUI
 import SwiftUI
 
 /// Sound to play when pasting from clipboard history
@@ -38,6 +39,7 @@ enum PasteMode: String, CaseIterable {
 @Observable
 class SettingsModel {
     static let shared = SettingsModel()
+    nonisolated static let defaultShowInDock = SaneBackgroundAppDefaults.showDockIcon
 
     nonisolated static let allowedMaxCaptureTextBytes: Set<Int> = [
         0,
@@ -214,7 +216,7 @@ class SettingsModel {
     init() {
         maxHistorySize = UserDefaults.standard.object(forKey: "maxHistorySize") as? Int ?? 50
         openHistoryAtCursor = UserDefaults.standard.object(forKey: "openHistoryAtCursor") as? Bool ?? false
-        showInDock = UserDefaults.standard.object(forKey: "showInDock") as? Bool ?? false
+        showInDock = UserDefaults.standard.object(forKey: "showInDock") as? Bool ?? Self.defaultShowInDock
         protectPasswords = UserDefaults.standard.object(forKey: "protectPasswords") as? Bool ?? true
         requireTouchID = UserDefaults.standard.object(forKey: "requireTouchID") as? Bool ?? false
         excludedApps = UserDefaults.standard.object(forKey: "excludedApps") as? [String] ?? []

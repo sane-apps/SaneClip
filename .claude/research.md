@@ -52,3 +52,19 @@ Graduate verified findings to ARCHITECTURE.md or DEVELOPMENT.md.
 - Paste treats cross-device clipboard sync as a premium headline feature.
 - Raycast keeps clipboard history local-only and does not promise device-to-device sync.
 - SaneClip should keep the local-first story primary and describe iCloud sync as optional between the user's own devices.
+
+## Sparkle Installer Launcher Requirements
+**Updated:** 2026-03-10 | **Status:** verified | **TTL:** 30d
+**Source:** Sparkle docs + Sparkle source + Apple docs + competitor code + local entitlements/build inspection
+- For sandboxed direct-distribution Sparkle apps, `SUEnableInstallerLauncherService` must be enabled in Info.plist.
+- Sandboxed Sparkle apps also need mach lookup exceptions for `$(PRODUCT_BUNDLE_IDENTIFIER)-spki` and `$(PRODUCT_BUNDLE_IDENTIFIER)-spks`.
+- SaneClip's shipped direct build was sandboxed but missing those Sparkle installer-launcher requirements, which matches the exact customer error `An error occurred while launching the installer.` and Sparkle log `Failed to submit installer job`.
+- Dev/ProdDebug updater testing was a blind spot because those builds use non-sandbox debug entitlements, so they do not exercise the same installer-launch path as the signed Release build.
+- Sparkle's official sandboxing guide says the Installer XPC service is required for sandboxed apps and must be enabled with `SUEnableInstallerLauncherService = YES`.
+- Sparkle's official sandboxing guide also requires `com.apple.security.temporary-exception.mach-lookup.global-name` entries for `$(PRODUCT_BUNDLE_IDENTIFIER)-spki` and `$(PRODUCT_BUNDLE_IDENTIFIER)-spks`.
+- Sparkle's official sandboxing guide also warns that the standard archive/export workflow is the trusted way to re-sign Sparkle and its XPC services for sandboxed apps.
+- Local `test_mode` Release builds are not enough proof for this updater lane; SaneClip hit `Failed to make auth right set`, `Failed copying system domain rights: -60005`, and `Failed to submit installer job` there even after adding the launcher service keys.
+- The trusted end-to-end updater proof for sandboxed SaneClip must use an archived/exported release artifact as both the installed host and the offered update.
+- Sparkle source confirms the exact user-facing failure mapping: installer launcher failures log `Failed to submit installer job`, while signature validation failures surface `The update is improperly signed and could not be validated`.
+- Apple's Mach/XPC security docs reinforce that sandboxed IPC should use the intended XPC path and explicit entitlement allowances instead of ad-hoc Mach access.
+- Competitor check: Maccy, another clipboard manager using Sparkle, ships both `SUEnableInstallerLauncherService` and the same `spki` / `spks` mach-lookup exceptions.

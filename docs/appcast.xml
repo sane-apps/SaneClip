@@ -6,7 +6,26 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                                    <item>
+                                                            <item>
+            <title>2.2.9</title>
+            <pubDate>Wed, 11 Mar 2026 18:23:47 -0400</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Fixes the Excluded Apps Add App picker in sandboxed builds, restores import/export and PDF file panels, and improves keyboard navigation in history and settings.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.2.9.zip"
+                       sparkle:version="2209"
+                       sparkle:shortVersionString="2.2.9"
+                       length="3159106"
+                       type="application/octet-stream"
+                       sparkle:edSignature="HFhlUWQtXljw6o1LqbREt/oze0jxNCicRA7kt47LeYZJogoMlFflFGX+Ca0yMj5OrDQgaqhL44VXjp0oNlklBg=="/>
+        </item>
+<item>
             <title>2.2.8</title>
             <pubDate>Tue, 10 Mar 2026 21:20:23 -0400</pubDate>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>

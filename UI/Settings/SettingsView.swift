@@ -3,18 +3,25 @@ import KeyboardShortcuts
 import LocalAuthentication
 import SaneUI
 import SwiftUI
+import os.log
+
+private let settingsLogger = Logger(subsystem: "com.saneclip.app", category: "Settings")
 
 // MARK: - Notifications
 
 extension Notification.Name {
     static let menuBarIconChanged = Notification.Name("menuBarIconChanged")
+    static let historySearchShortcutRequested = Notification.Name("historySearchShortcutRequested")
+    static let settingsTabShortcutRequested = Notification.Name("settingsTabShortcutRequested")
+    static let settingsAddExcludedAppRequested = Notification.Name("settingsAddExcludedAppRequested")
 }
 
 // MARK: - Settings View
 
 struct SettingsView: View {
     var licenseService: LicenseService?
-    @State private var selectedTab: SettingsTab? = .general
+    @State private var selectedTab: SettingsTab?
+    @FocusState private var focusedPane: SettingsPane?
 
     enum SettingsTab: String, CaseIterable, Identifiable {
         case general = "General"
@@ -30,7 +37,16 @@ struct SettingsView: View {
         var id: String { rawValue }
     }
 
+    enum SettingsPane: Hashable {
+        case sidebar
+    }
+
     @Environment(\.colorScheme) private var colorScheme
+
+    init(licenseService: LicenseService?, initialTab: SettingsTab? = .general) {
+        self.licenseService = licenseService
+        _selectedTab = State(initialValue: initialTab)
+    }
 
     var body: some View {
         NavigationSplitView {
@@ -46,6 +62,8 @@ struct SettingsView: View {
             }
             .listStyle(.sidebar)
             .navigationSplitViewColumnWidth(min: 150, ideal: 170)
+            .focusable()
+            .focused($focusedPane, equals: .sidebar)
         } detail: {
             ZStack {
                 // Gradient background for both modes
@@ -83,6 +101,21 @@ struct SettingsView: View {
         }
         .groupBoxStyle(GlassGroupBoxStyle())
         .frame(minWidth: 700, minHeight: 450)
+        .background(settingsKeyboardShortcuts)
+        .onAppear {
+            if selectedTab == nil {
+                selectedTab = .general
+            }
+            focusedPane = .sidebar
+        }
+        .onExitCommand {
+            SettingsWindowController.close()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .settingsTabShortcutRequested)) { notification in
+            guard let tab = notification.object as? SettingsTab else { return }
+            selectedTab = tab
+            focusedPane = .sidebar
+        }
     }
 
     private func icon(for tab: SettingsTab) -> String {
@@ -112,25 +145,91 @@ struct SettingsView: View {
         case .about: .brandSilver
         }
     }
+
+    nonisolated static func tab(forShortcutIndex index: Int) -> SettingsTab? {
+        guard SettingsTab.allCases.indices.contains(index) else { return nil }
+        return SettingsTab.allCases[index]
+    }
+
+    @ViewBuilder
+    private var settingsKeyboardShortcuts: some View {
+        ZStack {
+            ForEach(Array(SettingsTab.allCases.enumerated()), id: \.element.id) { index, tab in
+                Button("") {
+                    selectedTab = tab
+                    focusedPane = .sidebar
+                }
+                .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")), modifiers: .command)
+                .frame(width: 0, height: 0)
+                .opacity(0.001)
+                .accessibilityHidden(true)
+            }
+        }
+    }
+}
+
+@MainActor
+private func preferredPanelHostWindow(explicitWindow: NSWindow? = nil) -> NSWindow? {
+    if let explicitWindow, explicitWindow.isVisible {
+        return explicitWindow
+    }
+
+    if let settingsWindow = SettingsWindowController.presentedWindow {
+        return settingsWindow
+    }
+
+    if let keyWindow = NSApp.keyWindow, keyWindow.isVisible {
+        return keyWindow
+    }
+
+    if let mainWindow = NSApp.mainWindow, mainWindow.isVisible {
+        return mainWindow
+    }
+
+    return NSApp.windows.first(where: \.isVisible)
 }
 
 @MainActor
 private func presentOpenPanel(_ panel: NSOpenPanel, onSelection: @escaping (URL) -> Void) {
-    if let window = NSApp.keyWindow ?? NSApp.mainWindow {
+    if NSApp.activationPolicy() == .accessory {
+        settingsLogger.info("Presenting open panel modally for accessory app flow")
+        NSApp.activate(ignoringOtherApps: true)
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        settingsLogger.info("Accessory open panel completed with selection \(url.path, privacy: .public)")
+        onSelection(url)
+        return
+    }
+
+    if let window = preferredPanelHostWindow() {
+        settingsLogger.info(
+            "Presenting open panel as sheet on window title=\(window.title, privacy: .public) class=\(String(describing: type(of: window)), privacy: .public)"
+        )
         panel.beginSheetModal(for: window) { response in
             guard response == .OK, let url = panel.url else { return }
+            settingsLogger.info("Open panel completed with selection \(url.path, privacy: .public)")
             onSelection(url)
         }
         return
     }
 
+    settingsLogger.info("Presenting open panel modally without host window")
     guard panel.runModal() == .OK, let url = panel.url else { return }
+    settingsLogger.info("Modal open panel completed with selection \(url.path, privacy: .public)")
     onSelection(url)
 }
 
 @MainActor
 private func presentSavePanel(_ panel: NSSavePanel, onSelection: @escaping (URL) -> Void) {
-    if let window = NSApp.keyWindow ?? NSApp.mainWindow {
+    if NSApp.activationPolicy() == .accessory {
+        settingsLogger.info("Presenting save panel modally for accessory app flow")
+        NSApp.activate(ignoringOtherApps: true)
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        settingsLogger.info("Accessory save panel completed with selection \(url.path, privacy: .public)")
+        onSelection(url)
+        return
+    }
+
+    if let window = preferredPanelHostWindow() {
         panel.beginSheetModal(for: window) { response in
             guard response == .OK, let url = panel.url else { return }
             onSelection(url)
@@ -750,6 +849,27 @@ struct ExcludedAppsInline: View {
     @Binding var excludedApps: [String]
     var requireAuthForRemoval: Bool = false
     var authenticate: ((String, @escaping () -> Void) -> Void)?
+    @State private var selectedExcludedAppBundleID: String?
+    @FocusState private var focusedKeyboardTarget: KeyboardTarget?
+
+    private struct AppPreset: Identifiable {
+        let label: String
+        let bundleID: String
+        var id: String { bundleID }
+    }
+
+    enum KeyboardTarget: Hashable {
+        case addButton
+        case preset(String)
+        case row(String)
+    }
+
+    private static let presets = [
+        AppPreset(label: "Alfred", bundleID: "com.runningwithcrayons.Alfred"),
+        AppPreset(label: "Raycast", bundleID: "com.raycast.macos"),
+        AppPreset(label: "1Password", bundleID: "com.1password.1password"),
+        AppPreset(label: "Bitwarden", bundleID: "com.bitwarden.desktop")
+    ]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -758,19 +878,21 @@ struct ExcludedAppsInline: View {
                 Text("Excluded Apps")
                 Spacer()
                 Button("Add App...") {
+                    focusedKeyboardTarget = .addButton
                     browseForApp()
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
+                .keyboardShortcut("n", modifiers: .command)
+                .focused($focusedKeyboardTarget, equals: .addButton)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
 
             HStack(spacing: 8) {
-                presetButton(label: "Alfred", bundleID: "com.runningwithcrayons.Alfred")
-                presetButton(label: "Raycast", bundleID: "com.raycast.macos")
-                presetButton(label: "1Password", bundleID: "com.1password.1password")
-                presetButton(label: "Bitwarden", bundleID: "com.bitwarden.desktop")
+                ForEach(Self.presets) { preset in
+                    presetButton(label: preset.label, bundleID: preset.bundleID)
+                }
                 Spacer()
             }
             .padding(.horizontal, 12)
@@ -799,11 +921,37 @@ struct ExcludedAppsInline: View {
                 // App rows
                 ForEach(excludedApps, id: \.self) { bundleID in
                     CompactDivider()
-                    ExcludedAppRow(bundleID: bundleID) {
-                        removeApp(bundleID)
-                    }
+                    ExcludedAppRow(
+                        bundleID: bundleID,
+                        isSelected: selectedExcludedAppBundleID == bundleID,
+                        onSelect: {
+                            selectedExcludedAppBundleID = bundleID
+                            focusedKeyboardTarget = .row(bundleID)
+                        },
+                        onRemove: {
+                            removeApp(bundleID)
+                        }
+                    )
                 }
             }
+        }
+        .focusable()
+        .onAppear {
+            syncExcludedAppSelection()
+            handleDeferredExcludedAppRequest()
+        }
+        .onChange(of: excludedApps) { _, _ in
+            syncExcludedAppSelection()
+        }
+        .onMoveCommand { direction in
+            handleMove(direction)
+        }
+        .onDeleteCommand {
+            guard case let .row(bundleID) = focusedKeyboardTarget else { return }
+            removeApp(bundleID)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .settingsAddExcludedAppRequested)) { _ in
+            handleDeferredExcludedAppRequest()
         }
     }
 
@@ -812,6 +960,7 @@ struct ExcludedAppsInline: View {
         let exists = excludedApps.contains(bundleID)
         Button {
             guard !exists else { return }
+            focusedKeyboardTarget = .preset(bundleID)
             withAnimation(.easeInOut(duration: 0.2)) {
                 excludedApps.append(bundleID)
             }
@@ -829,6 +978,7 @@ struct ExcludedAppsInline: View {
             .clipShape(Capsule())
         }
         .buttonStyle(.plain)
+        .focused($focusedKeyboardTarget, equals: .preset(bundleID))
     }
 
     private func removeApp(_ bundleID: String) {
@@ -859,6 +1009,18 @@ struct ExcludedAppsInline: View {
         return excludedApps + [bundleID]
     }
 
+    nonisolated static func nextExcludedAppSelection(current: String?, excludedApps: [String], direction: Int) -> String? {
+        guard !excludedApps.isEmpty else { return nil }
+        guard direction != 0 else { return current ?? excludedApps.first }
+
+        guard let current, let currentIndex = excludedApps.firstIndex(of: current) else {
+            return direction > 0 ? excludedApps.first : excludedApps.last
+        }
+
+        let nextIndex = max(0, min(excludedApps.count - 1, currentIndex + direction))
+        return excludedApps[nextIndex]
+    }
+
     @MainActor
     private func addSelectedApp(from url: URL) {
         guard let bundleID = Self.selectedBundleID(fromSelectedAppURL: url) else {
@@ -873,9 +1035,12 @@ struct ExcludedAppsInline: View {
         withAnimation(.easeInOut(duration: 0.2)) {
             excludedApps = updated
         }
+        selectedExcludedAppBundleID = bundleID
+        focusedKeyboardTarget = .row(bundleID)
     }
 
     private func browseForApp() {
+        settingsLogger.info("Excluded Apps Add App invoked")
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.application]
         panel.canChooseFiles = true
@@ -888,12 +1053,85 @@ struct ExcludedAppsInline: View {
             addSelectedApp(from: url)
         }
     }
+
+    private func syncExcludedAppSelection() {
+        guard !excludedApps.isEmpty else {
+            selectedExcludedAppBundleID = nil
+            if case .some(.row) = focusedKeyboardTarget {
+                focusedKeyboardTarget = .addButton
+            }
+            return
+        }
+
+        if let selectedExcludedAppBundleID, excludedApps.contains(selectedExcludedAppBundleID) {
+            return
+        }
+
+        selectedExcludedAppBundleID = excludedApps.first
+    }
+
+    private func handleMove(_ direction: MoveCommandDirection) {
+        switch direction {
+        case .up:
+            guard let next = Self.nextExcludedAppSelection(
+                current: selectedExcludedAppBundleID,
+                excludedApps: excludedApps,
+                direction: -1
+            ) else { return }
+            selectedExcludedAppBundleID = next
+            focusedKeyboardTarget = .row(next)
+        case .down:
+            guard let next = Self.nextExcludedAppSelection(
+                current: selectedExcludedAppBundleID,
+                excludedApps: excludedApps,
+                direction: 1
+            ) else { return }
+            selectedExcludedAppBundleID = next
+            focusedKeyboardTarget = .row(next)
+        case .left:
+            moveHeaderFocus(step: -1)
+        case .right:
+            moveHeaderFocus(step: 1)
+        default:
+            break
+        }
+    }
+
+    private func moveHeaderFocus(step: Int) {
+        let headerTargets: [KeyboardTarget] = [.addButton] + Self.presets.map { .preset($0.bundleID) }
+
+        let currentTarget: KeyboardTarget
+        switch focusedKeyboardTarget {
+        case .some(.addButton):
+            currentTarget = .addButton
+        case let .some(.preset(bundleID)):
+            currentTarget = .preset(bundleID)
+        default:
+            currentTarget = .addButton
+        }
+
+        guard let currentIndex = headerTargets.firstIndex(of: currentTarget) else {
+            focusedKeyboardTarget = .addButton
+            return
+        }
+
+        let nextIndex = max(0, min(headerTargets.count - 1, currentIndex + step))
+        focusedKeyboardTarget = headerTargets[nextIndex]
+    }
+
+    private func handleDeferredExcludedAppRequest() {
+        guard SettingsWindowController.consumePendingAction(.excludedAppPicker) else { return }
+        focusedKeyboardTarget = .addButton
+        browseForApp()
+    }
 }
 
 // MARK: - Excluded App Row
 
 struct ExcludedAppRow: View {
     let bundleID: String
+    let isSelected: Bool
+    let onSelect: () -> Void
     let onRemove: () -> Void
     @State private var isHovering = false
 
@@ -915,6 +1153,7 @@ struct ExcludedAppRow: View {
     var body: some View {
         HStack {
             Text(appName)
+                .foregroundStyle(.white)
 
             Spacer()
 
@@ -928,7 +1167,18 @@ struct ExcludedAppRow: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(isSelected ? Color.clipBlue.opacity(0.16) : .clear)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(isSelected ? Color.clipBlue.opacity(0.55) : .clear, lineWidth: 1)
+        )
         .contentShape(Rectangle())
+        .onTapGesture {
+            onSelect()
+        }
         .onHover { isHovering = $0 }
     }
 }
@@ -1547,21 +1797,29 @@ struct GlassGroupBoxStyle: GroupBoxStyle {
 
 @MainActor
 enum SettingsWindowController {
-    private static var window: NSWindow?
-    static var licenseService: LicenseService?
+    enum PendingAction: Equatable {
+        case excludedAppPicker
+    }
 
-    static func open() {
+    private static var window: NSWindow?
+    private static var pendingAction: PendingAction?
+    static var licenseService: LicenseService?
+    static var presentedWindow: NSWindow? {
+        guard let window, window.isVisible else { return nil }
+        return window
+    }
+
+    static func open(tab: SettingsView.SettingsTab? = nil) {
         if let existingWindow = window, existingWindow.isVisible {
+            if let tab {
+                existingWindow.contentViewController = makeHostingController(initialTab: tab)
+            }
             existingWindow.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
             return
         }
 
-        let settingsView = SettingsView(licenseService: licenseService)
-            .preferredColorScheme(.dark)
-        let hostingController = NSHostingController(rootView: settingsView)
-
-        let newWindow = NSWindow(contentViewController: hostingController)
+        let newWindow = NSWindow(contentViewController: makeHostingController(initialTab: tab))
         newWindow.title = "SaneClip Settings"
         newWindow.appearance = NSAppearance(named: .darkAqua)
         newWindow.styleMask = [.titled, .closable, .resizable]
@@ -1575,6 +1833,28 @@ enum SettingsWindowController {
         window = newWindow
         newWindow.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    static func close() {
+        window?.performClose(nil)
+    }
+
+    static func schedulePendingAction(_ action: PendingAction) {
+        pendingAction = action
+    }
+
+    static func consumePendingAction(_ action: PendingAction) -> Bool {
+        guard pendingAction == action else { return false }
+        pendingAction = nil
+        return true
+    }
+
+    private static func makeHostingController(initialTab: SettingsView.SettingsTab?) -> NSHostingController<AnyView> {
+        let settingsView = AnyView(
+            SettingsView(licenseService: licenseService, initialTab: initialTab)
+                .preferredColorScheme(.dark)
+        )
+        return NSHostingController(rootView: settingsView)
     }
 }
 

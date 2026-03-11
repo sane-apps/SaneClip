@@ -192,6 +192,14 @@ struct SaneClipTests {
         #expect(HistoryShortcutGate.shouldHandleListShortcuts(hasAttachedSheet: false, firstResponder: nil))
     }
 
+    @Test("Slash only redirects focus to search when text input is inactive")
+    @MainActor
+    func historyShortcutSearchFocusGate() {
+        #expect(HistoryShortcutGate.shouldFocusSearch(firstResponder: nil))
+        #expect(!HistoryShortcutGate.shouldFocusSearch(firstResponder: NSTextView()))
+        #expect(!HistoryShortcutGate.shouldFocusSearch(firstResponder: NSTextField()))
+    }
+
     @Test("Manual update fallback only triggers for actionable Sparkle failures")
     func manualUpdateFallbackGate() {
         let installError = NSError(domain: SUSparkleErrorDomain, code: Int(SparkleErrorCode.installation.rawValue))
@@ -301,6 +309,23 @@ struct SaneClipTests {
 
         #expect(machLookupNames.contains("$(PRODUCT_BUNDLE_IDENTIFIER)-spki"))
         #expect(machLookupNames.contains("$(PRODUCT_BUNDLE_IDENTIFIER)-spks"))
+    }
+
+    @Test("Sandboxed builds allow user-selected file access for open and save panels")
+    func sandboxedBuildsGrantUserSelectedFileAccess() throws {
+        let repoRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+
+        for relativePath in ["SaneClip/SaneClip.entitlements", "SaneClip/SaneClipAppStore.entitlements"] {
+            let entitlementsURL = repoRoot.appendingPathComponent(relativePath)
+            let entitlementsData = try Data(contentsOf: entitlementsURL)
+            let entitlements = try #require(
+                PropertyListSerialization.propertyList(from: entitlementsData, format: nil) as? [String: Any]
+            )
+
+            #expect(entitlements["com.apple.security.files.user-selected.read-write"] as? Bool == true)
+        }
     }
 
     @Test("ClipboardManager free tier history limit is capped at 50")
@@ -892,6 +917,27 @@ struct SaneClipTests {
         )
 
         #expect(updated == ["com.example.fake"])
+    }
+
+    @Test("ExcludedAppsInline keyboard selection moves predictably through excluded app rows")
+    func excludedAppsInlineKeyboardSelectionMovement() {
+        let apps = ["com.example.one", "com.example.two", "com.example.three"]
+
+        #expect(ExcludedAppsInline.nextExcludedAppSelection(current: nil, excludedApps: apps, direction: 1) == "com.example.one")
+        #expect(ExcludedAppsInline.nextExcludedAppSelection(current: "com.example.one", excludedApps: apps, direction: 1) == "com.example.two")
+        #expect(ExcludedAppsInline.nextExcludedAppSelection(current: "com.example.three", excludedApps: apps, direction: 1) == "com.example.three")
+        #expect(ExcludedAppsInline.nextExcludedAppSelection(current: "com.example.two", excludedApps: apps, direction: -1) == "com.example.one")
+        #expect(ExcludedAppsInline.nextExcludedAppSelection(current: "com.example.one", excludedApps: apps, direction: -1) == "com.example.one")
+    }
+
+    @Test("SettingsView command-digit mapping follows sidebar order")
+    func settingsViewCommandDigitMapping() {
+        for (index, tab) in SettingsView.SettingsTab.allCases.enumerated() {
+            #expect(SettingsView.tab(forShortcutIndex: index) == tab)
+        }
+
+        #expect(SettingsView.tab(forShortcutIndex: -1) == nil)
+        #expect(SettingsView.tab(forShortcutIndex: SettingsView.SettingsTab.allCases.count) == nil)
     }
 
     @Test("SettingsModel round-trips excluded apps through fresh initialization")

@@ -36,6 +36,10 @@ enum HistoryShortcutGate {
         guard !(firstResponder is NSTextView), !(firstResponder is NSTextField) else { return false }
         return true
     }
+
+    static func shouldFocusSearch(firstResponder: NSResponder?) -> Bool {
+        !(firstResponder is NSTextView) && !(firstResponder is NSTextField)
+    }
 }
 
 struct HistoryFilterPreset: Codable, Identifiable, Hashable {
@@ -66,11 +70,18 @@ struct HistoryFilterPreset: Codable, Identifiable, Hashable {
 // MARK: - Clipboard History View
 
 struct ClipboardHistoryView: View {
+    enum FocusTarget: Hashable {
+        case search
+        case list
+        case settingsButton
+        case clearAllButton
+    }
+
     var clipboardManager: ClipboardManager
     var licenseService: LicenseService?
     @State private var searchText = ""
     @State private var selectedIndex: Int = 0
-    @FocusState private var isListFocused: Bool
+    @FocusState private var focusedTarget: FocusTarget?
 
     // Filter state
     @State private var dateFilter: DateFilter = .all
@@ -226,6 +237,7 @@ struct ClipboardHistoryView: View {
                     .accessibilityHidden(true)
                 TextField("Search clipboard history...", text: $searchText)
                     .textFieldStyle(.plain)
+                    .focused($focusedTarget, equals: .search)
                     .accessibilityLabel("Search")
                     .accessibilityHint("Filter clipboard items by text content")
                 if !searchText.isEmpty {
@@ -426,7 +438,7 @@ struct ClipboardHistoryView: View {
                     }
                 }
                 .listStyle(.plain)
-                .focused($isListFocused)
+                .focused($focusedTarget, equals: .list)
                 .onKeyPress(.downArrow) {
                     guard shouldHandleListShortcuts() else { return .ignored }
                     moveSelection(by: 1)
@@ -463,6 +475,18 @@ struct ClipboardHistoryView: View {
                     guard shouldHandleListShortcuts() else { return .ignored }
                     pasteSelectedItem()
                     return .handled
+                }
+                .onKeyPress(characters: CharacterSet(charactersIn: "/")) { _ in
+                    let keyWindow = NSApp.keyWindow
+                    guard HistoryShortcutGate.shouldFocusSearch(firstResponder: keyWindow?.firstResponder) else {
+                        return .ignored
+                    }
+                    focusedTarget = .search
+                    return .handled
+                }
+                .onDeleteCommand {
+                    guard shouldHandleListShortcuts() else { return }
+                    deleteSelectedItem()
                 }
             }
 
@@ -754,6 +778,9 @@ struct ClipboardHistoryView: View {
                     label: { Image(systemName: "gear") }
                 )
                 .buttonStyle(.plain)
+                .keyboardShortcut(",", modifiers: .command)
+                .focusable()
+                .focused($focusedTarget, equals: .settingsButton)
                 .help("Settings")
                 .accessibilityLabel("Open settings")
 
@@ -761,6 +788,8 @@ struct ClipboardHistoryView: View {
                     clipboardManager.clearHistory()
                 }
                 .buttonStyle(.plain)
+                .focusable()
+                .focused($focusedTarget, equals: .clearAllButton)
                 .font(.subheadline)
                 .foregroundStyle(.primary.opacity(0.85))
                 .accessibilityLabel("Clear all clipboard history")
@@ -768,10 +797,14 @@ struct ClipboardHistoryView: View {
             }
             .padding(8)
         }
+        .background(historyKeyboardShortcuts)
         .onAppear {
             selectedIndex = 0
-            isListFocused = true
+            focusedTarget = .list
             loadSavedPresets()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .historySearchShortcutRequested)) { _ in
+            focusedTarget = .search
         }
         .onChange(of: allCollections) { _, newCollections in
             if !newCollections.contains(selectedCollection) {
@@ -817,6 +850,14 @@ struct ClipboardHistoryView: View {
         guard selectedIndex >= 0, selectedIndex < allItems.count else { return }
         let item = allItems[selectedIndex]
         clipboardManager.paste(item: item)
+    }
+
+    private func deleteSelectedItem() {
+        guard selectedIndex >= 0, selectedIndex < allItems.count else { return }
+        let item = allItems[selectedIndex]
+        clipboardManager.delete(item: item)
+        let nextCount = max(0, allItems.count - 1)
+        selectedIndex = min(selectedIndex, max(0, nextCount - 1))
     }
 
     private func toggleMergeQueue(id: UUID) {
@@ -870,6 +911,17 @@ struct ClipboardHistoryView: View {
         contentTypeFilter = preset.contentTypeFilter
         selectedCollection = allCollections.contains(preset.collectionFilter) ? preset.collectionFilter : "All Collections"
         selectedTag = allTags.contains(preset.tagFilter) ? preset.tagFilter : "All Tags"
+    }
+
+    @ViewBuilder
+    private var historyKeyboardShortcuts: some View {
+        Button("") {
+            focusedTarget = .search
+        }
+        .keyboardShortcut("f", modifiers: .command)
+        .frame(width: 0, height: 0)
+        .opacity(0.001)
+        .accessibilityHidden(true)
     }
 }
 // swiftlint:enable file_length

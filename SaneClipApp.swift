@@ -514,6 +514,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
                 .preferredColorScheme(.dark)
         )
 
+        installMainMenu()
+
         // Set up keyboard shortcuts
         setupKeyboardShortcuts()
 
@@ -642,6 +644,52 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         SettingsWindowController.open()
     }
 
+    @objc private func openGeneralSettings() {
+        SettingsWindowController.open(tab: .general)
+    }
+
+    @objc private func openShortcutsSettings() {
+        SettingsWindowController.open(tab: .shortcuts)
+    }
+
+    @objc private func openSnippetsSettings() {
+        SettingsWindowController.open(tab: .snippets)
+    }
+
+    #if ENABLE_SYNC
+        @objc private func openSyncSettings() {
+            SettingsWindowController.open(tab: .sync)
+        }
+    #endif
+
+    @objc private func openStorageSettings() {
+        SettingsWindowController.open(tab: .storage)
+    }
+
+    @objc private func openLicenseSettings() {
+        SettingsWindowController.open(tab: .license)
+    }
+
+    @objc private func openAboutSettings() {
+        SettingsWindowController.open(tab: .about)
+    }
+
+    @objc private func requestExcludedAppPicker() {
+        appLogger.info("Settings command requested excluded app picker")
+        SettingsWindowController.schedulePendingAction(.excludedAppPicker)
+        SettingsWindowController.open(tab: .general)
+        NotificationCenter.default.post(name: .settingsAddExcludedAppRequested, object: nil)
+    }
+
+    @objc private func focusHistorySearch() {
+        if !popover.isShown {
+            showHistoryPopover()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            NotificationCenter.default.post(name: .historySearchShortcutRequested, object: nil)
+        }
+    }
+
     // MARK: - Biometric Authentication
 
     private func authenticateWithBiometrics(completion: @escaping @Sendable (Bool) -> Void) {
@@ -752,6 +800,79 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
         popoverWindow.setFrameOrigin(origin)
         popoverWindow.makeKey()
+    }
+
+    private func installMainMenu() {
+        let mainMenu = NSMenu()
+
+        let appMenuItem = NSMenuItem()
+        mainMenu.addItem(appMenuItem)
+
+        let appMenu = NSMenu(title: "SaneClip")
+        let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ",")
+        settingsItem.keyEquivalentModifierMask = [.command]
+        settingsItem.target = self
+        appMenu.addItem(settingsItem)
+        appMenu.addItem(NSMenuItem.separator())
+
+        let quitItem = NSMenuItem(title: "Quit SaneClip", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        quitItem.keyEquivalentModifierMask = [.command]
+        appMenu.addItem(quitItem)
+        appMenuItem.submenu = appMenu
+
+        let editMenuItem = NSMenuItem()
+        mainMenu.addItem(editMenuItem)
+
+        let editMenu = NSMenu(title: "Edit")
+        let searchHistoryItem = NSMenuItem(title: "Search History", action: #selector(focusHistorySearch), keyEquivalent: "f")
+        searchHistoryItem.keyEquivalentModifierMask = [.command]
+        searchHistoryItem.target = self
+        editMenu.addItem(searchHistoryItem)
+
+        let addExcludedAppItem = NSMenuItem(title: "Add Excluded App...", action: #selector(requestExcludedAppPicker), keyEquivalent: "n")
+        addExcludedAppItem.keyEquivalentModifierMask = [.command]
+        addExcludedAppItem.target = self
+        editMenu.addItem(addExcludedAppItem)
+        editMenuItem.submenu = editMenu
+
+        let settingsMenuItem = NSMenuItem()
+        mainMenu.addItem(settingsMenuItem)
+
+        let settingsMenu = NSMenu(title: "Settings")
+        for item in settingsMenuItems() {
+            settingsMenu.addItem(item)
+        }
+        settingsMenuItem.submenu = settingsMenu
+
+        NSApp.mainMenu = mainMenu
+    }
+
+    private func settingsMenuItems() -> [NSMenuItem] {
+        var items: [NSMenuItem] = [
+            settingsMenuItem(title: "General", action: #selector(openGeneralSettings), key: "1"),
+            settingsMenuItem(title: "Shortcuts", action: #selector(openShortcutsSettings), key: "2"),
+            settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "3")
+        ]
+
+        #if ENABLE_SYNC
+            items.append(settingsMenuItem(title: "Sync", action: #selector(openSyncSettings), key: "4"))
+            items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "5"))
+            items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "6"))
+            items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "7"))
+        #else
+            items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "4"))
+            items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "5"))
+            items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "6"))
+        #endif
+
+        return items
+    }
+
+    private func settingsMenuItem(title: String, action: Selector, key: String) -> NSMenuItem {
+        let item = NSMenuItem(title: title, action: action, keyEquivalent: key)
+        item.keyEquivalentModifierMask = [.command]
+        item.target = self
+        return item
     }
 
     private func showHistoryPopover() {

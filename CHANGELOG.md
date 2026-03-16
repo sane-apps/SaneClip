@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.2.10] - 2026-03-16
+
+Adds diagnostics-backed bug reporting on iPhone and iPad, and refreshes the latest sync and support improvements across the release line.
+
+---
+
 ## [2.2.9] - 2026-03-11
 
 Fixes the Excluded Apps Add App picker in sandboxed builds, restores import/export and PDF file panels, and improves keyboard navigation in history and settings.

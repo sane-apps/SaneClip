@@ -1,9 +1,11 @@
+import SaneUI
 import SwiftUI
 
 /// Settings tab for iOS app with brand styling
 struct SettingsTab: View {
     @EnvironmentObject var viewModel: ClipboardHistoryViewModel
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @State private var showFeedback = false
 
     private var isIPad: Bool { sizeClass == .regular }
 
@@ -34,6 +36,9 @@ struct SettingsTab: View {
             .listStyle(.grouped)
             .navigationTitle("Settings")
             .toolbarBackground(.visible, for: .navigationBar)
+            .sheet(isPresented: $showFeedback) {
+                SaneFeedbackView(diagnosticsService: .shared)
+            }
         }
     }
 
@@ -130,6 +135,12 @@ struct SettingsTab: View {
                 settingsRow(icon: "envelope", label: "Contact Support")
             }
 
+            Button {
+                showFeedback = true
+            } label: {
+                settingsRow(icon: "ladybug", label: "Report a Bug")
+            }
+
             Link(destination: URL(string: "https://saneclip.com/privacy")!) {
                 settingsRow(icon: "hand.raised", label: "Privacy Policy")
             }
@@ -204,4 +215,33 @@ struct SettingsTab: View {
 #Preview {
     SettingsTab()
         .environmentObject(ClipboardHistoryViewModel())
+}
+
+extension SaneDiagnosticsService {
+    static let shared = SaneDiagnosticsService(
+        appName: "SaneClip",
+        subsystem: "com.saneclip.app",
+        githubRepo: "sane-apps/SaneClip",
+        settingsCollector: collectSaneClipIOSSettings
+    )
+
+    private static func collectSaneClipIOSSettings() async -> String {
+        let defaults = UserDefaults.standard
+        var lines = [
+            "hasCompletedOnboardingIOS: \(defaults.bool(forKey: "hasCompletedOnboardingIOS"))"
+        ]
+
+        #if ENABLE_SYNC
+            let coordinator = SyncCoordinator.shared
+            lines.append("syncEnabled: \(coordinator.isSyncEnabled)")
+            lines.append("syncStatus: \(coordinator.syncStatus.rawValue)")
+            lines.append("connectedDeviceCount: \(coordinator.connectedDevices.count)")
+            lines.append("lastSyncDate: \(coordinator.lastSyncDate?.description ?? "nil")")
+        #else
+            lines.append("syncEnabled: false")
+            lines.append("syncStatus: unavailable")
+        #endif
+
+        return lines.joined(separator: "\n")
+    }
 }

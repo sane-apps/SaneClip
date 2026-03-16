@@ -331,6 +331,7 @@ targets:
       - path: Core/Security/KeychainHelper.swift
       - path: Core/Security/HistoryEncryption.swift
     dependencies:
+      - package: SaneUI
       - target: SaneClipIOSWidgets
         embed: true
         codeSign: true

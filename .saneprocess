@@ -71,11 +71,13 @@ appstore:
   metadata:
     macos:
       subtitle: "Private Clipboard Manager"
-      promotional_text: "Fast private clipboard history for Mac with search, pinning, snippets, and one-time Pro unlock."
+      promotional_text: "Free download includes core clipboard history, search, pinning, excluded apps, and iCloud sync. Optional one-time Pro unlock adds advanced features."
       description: >-
-        SaneClip gives you fast clipboard history on Mac with search, pinning, snippets, widgets, and privacy-first defaults.
-        Keep important clips close, find old copies instantly, and build a cleaner repeatable workflow without handing your data to a third party.
-        Pro adds Touch ID history lock, AES-256 encryption at rest, paste stack, transforms, clipboard rules, and unlimited history with a one-time unlock.
+        SaneClip is a free Mac clipboard manager with a core included feature set and an optional one-time Pro unlock.
+        The free download includes clipboard history for up to 50 items, standard paste, search, pinning, excluded apps,
+        widgets, auto-delete, iCloud sync, and privacy-first defaults.
+        The optional Pro unlock adds unlimited history, Touch ID history lock, AES-256 encryption at rest, paste as plain text,
+        smart paste, text transforms, paste stack, snippets, item notes, clipboard rules, and export/import.
       keywords: "clipboard,copy paste,history,snippets,touch id,security,productivity,mac utility"
       whats_new: "Fixes iCloud sync rollout and production schema issues, improves update reliability, and fixes edit-field keyboard shortcut handling."
       marketing_url: "https://saneclip.com"
@@ -89,10 +91,14 @@ appstore:
       keywords: "clipboard,copy paste,history,widgets,icloud,snippets,productivity,notes"
       whats_new: "Fixes iCloud sync startup, preserves local history more reliably, and improves clipboard action stability."
       marketing_url: "https://saneclip.com"
-  review_notes: "SaneClip App Store build does not request Accessibility access and does not simulate keyboard events. Selecting a clipboard item copies it to the clipboard and shows a local notification asking the user to press Cmd+V manually in the frontmost app. To test: open history with Cmd+Shift+V, select any item, then paste with Cmd+V. Basic is free. Pro is a one-time in-app purchase. No external checkout links or license keys are used in the App Store build."
+  review_notes: "SaneClip is a freemium App Store app. Basic is free in the App Store build. SaneClip Pro Unlock is an optional one-time non-consumable StoreKit in-app purchase. No external checkout links or license keys are used in the App Store build."
+  iap:
+    display_name: "SaneClip Pro Unlock"
+    description: "Unlock unlimited history and advanced tools."
+    review_note: "SaneClip Pro Unlock is a one-time non-consumable StoreKit purchase. It adds unlimited history plus advanced clipboard tools like Touch ID lock, encryption, snippets, paste as plain text, smart paste, text transforms, paste stack, notes, rules, and export/import. No external checkout links or license keys are used."
   review_notes_by_platform:
-    macos: "SaneClip for macOS App Store does not request Accessibility access and does not simulate keyboard events. Selecting a clipboard item copies it to the clipboard and shows a local notification asking the user to paste manually. To test: copy any text in TextEdit or Safari, open history with Cmd+Shift+V, select the copied item, then paste in another app with Cmd+V. If the history is empty on first launch, copy one line of text first and reopen the history window. Basic is free. Pro is a one-time in-app purchase. No external checkout links or license keys are used in the App Store build."
-    ios: "SaneClip for iPhone and iPad does not request Accessibility, Apple Events, camera, microphone, or location permissions. The app displays clipboard history synced through the user's private iCloud account, supports search and pinning, and can save shared text or URLs through the iOS Share Sheet. If there is no synced history yet, the app shows built-in sample or demo history automatically so App Review can inspect the interface immediately. Basic is free. Pro is a one-time in-app purchase. No external checkout links or license keys are used in the App Store build."
+    macos: "SaneClip for macOS is a freemium Mac App Store app. Basic is free in the App Store build. The free download includes clipboard history for up to 50 items, standard paste, search, pinning, excluded apps, widgets, auto-delete, iCloud sync, and privacy-first defaults. The optional non-consumable in-app purchase SaneClip Pro Unlock ($6.99 once) adds unlimited history, Touch ID history lock, AES-256 encryption at rest, paste as plain text, smart paste, text transforms, paste stack, snippets, item notes, clipboard rules, and export/import. The App Store build does not request Accessibility access and does not simulate keyboard events. Selecting a clipboard item copies it to the clipboard and shows a local notification asking the user to paste manually. To test: copy any text in TextEdit or Safari, open history with Cmd+Shift+V, select the copied item, then paste in another app with Cmd+V. If history is empty on first launch, copy one line of text first and reopen the history window. No external checkout links or license keys are used in this build."
+    ios: "SaneClip for iPhone and iPad is a freemium App Store app. Basic is free in the App Store build. The free download includes synced clipboard history, search, pinning, widgets, and Share Sheet saving. The optional one-time in-app purchase unlocks Pro features. The app does not request Accessibility, Apple Events, camera, microphone, or location permissions. If there is no synced history yet, the app shows built-in sample or demo history automatically so App Review can inspect the interface immediately. No external checkout links or license keys are used in the App Store build."
   accessibility_declarations:
     publish: true
     mac:

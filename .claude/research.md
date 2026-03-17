@@ -79,3 +79,4 @@ Graduate verified findings to ARCHITECTURE.md or DEVELOPMENT.md.
 - Setapp requires a separate `-setapp` bundle ID and a real `setappPublicKey.pem` resource before final runtime verification is possible.
 - SaneClip is mechanically easier than SaneBar for Setapp because it is not a menu bar manager, but it has more bundle surfaces (widgets/extensions), so bundle-family drift must be checked deliberately.
 - For the Setapp lane, launch-at-login should remain explicit user opt-in instead of being quietly treated as a channel-side default.
+- SaneClip currently stores app data in `Application Support/SaneClip` but keys credentials off the bundle ID, so a direct build and a Setapp build would likely share settings/history data while keeping separate license state.

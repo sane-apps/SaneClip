@@ -68,3 +68,14 @@ Graduate verified findings to ARCHITECTURE.md or DEVELOPMENT.md.
 - Sparkle source confirms the exact user-facing failure mapping: installer launcher failures log `Failed to submit installer job`, while signature validation failures surface `The update is improperly signed and could not be validated`.
 - Apple's Mach/XPC security docs reinforce that sandboxed IPC should use the intended XPC path and explicit entitlement allowances instead of ad-hoc Mach access.
 - Competitor check: Maccy, another clipboard manager using Sparkle, ships both `SUEnableInstallerLauncherService` and the same `spki` / `spks` mach-lookup exceptions.
+
+## Setapp Single-App Distribution Lane
+**Updated:** 2026-03-17 | **Status:** verified | **TTL:** 30d
+**Source:** Setapp email thread `#370`, official Setapp docs, local SaneClip/SaneUI audit, public Setapp framework interface
+- Setapp is an additional macOS channel for SaneClip, not a reason to replace the direct Lemon Squeezy business.
+- SaneClip should use the same explicit three-lane model as SaneBar: `direct`, `appStore`, and `setapp`.
+- The Setapp build should remove Sparkle, direct licensing UI, and donate/sponsorship UI while keeping the rest of the app visually consistent.
+- Current macOS project settings are `arm64` only, so Setapp universal-readiness is an explicit blocker.
+- Setapp requires a separate `-setapp` bundle ID and a real `setappPublicKey.pem` resource before final runtime verification is possible.
+- SaneClip is mechanically easier than SaneBar for Setapp because it is not a menu bar manager, but it has more bundle surfaces (widgets/extensions), so bundle-family drift must be checked deliberately.
+- For the Setapp lane, launch-at-login should remain explicit user opt-in instead of being quietly treated as a channel-side default.

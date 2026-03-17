@@ -137,14 +137,36 @@ stateDiagram-v2
 - **Single source of truth**: `.saneprocess` in the project root.
 - **Build/test**: `./scripts/SaneMaster.rb verify` (no raw xcodebuild).
 - **Release**: `./scripts/SaneMaster.rb release` (delegates to SaneProcess `release.sh`).
-- **DMGs**: uploaded to Cloudflare R2 (not committed to GitHub).
-- **Appcast**: Sparkle feed configured in `SaneClip/Info.plist`.
+- **Direct channel**:
+  - DMGs uploaded to Cloudflare R2 (not committed to GitHub)
+  - Sparkle feed configured in `SaneClip/Info.plist`
+  - Lemon Squeezy handles direct licensing
+- **App Store channel**:
+  - StoreKit + App Store updates
+  - no external licensing path in the App Store build
+- **Planned Setapp channel**:
+  - separate `-setapp` bundle ID
+  - Setapp entitlement/update path
+  - no Sparkle
+  - no Lemon Squeezy activation UI
+  - no donate/sponsorship UI in the Setapp build
+  - launch-at-login should remain explicit user choice in the Setapp lane instead of being silently treated as channel-default behavior
+- **Channel rule**:
+  - direct Lemon Squeezy business stays in place
+  - Setapp using Stripe does not replace the website/direct flow
+- **Known Setapp gotchas**:
+  - current macOS build settings are `arm64` only, so universal readiness must be verified
+  - if the macOS Setapp lane ships widgets or extensions, the extension bundle-ID family must be audited with the Setapp lane instead of assumed to inherit safely
 
 ## Testing Strategy
 
 - Unit tests in `Tests/`.
 - Use `./scripts/SaneMaster.rb verify` for build + tests.
 - Manual checks: clipboard capture, Touch ID prompt, widgets.
+- Channel checks:
+  - direct = Sparkle + Lemon Squeezy path
+  - App Store = StoreKit + App Store-safe UI
+  - Setapp = Setapp entitlement/update path with no Sparkle/direct-pay drift
 
 ## Risks and Tradeoffs
 

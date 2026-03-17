@@ -1,5 +1,16 @@
 # Session Handoff - 2026-02-17
 
+## Addendum - 2026-03-17 (Setapp Planning)
+
+- Setapp single-app distribution is now documented as a planned third macOS channel for SaneClip.
+- Direct Lemon Squeezy + Sparkle remains the website/direct business path.
+- App Store stays its own StoreKit/App Store-updates lane.
+- Setapp-specific blockers/gotchas are now captured in `ARCHITECTURE.md` and `.claude/research.md`:
+  - separate `-setapp` bundle ID
+  - no Sparkle / no direct licensing UI / no donate UI in the Setapp build
+  - universal-binary readiness still needs proof
+  - widget/extension bundle-family drift needs explicit review if they ship in the Setapp lane
+
 ## Addendum - 2026-03-04 (Planned Next Session)
 
 ### New Customer Feature Request

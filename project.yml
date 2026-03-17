@@ -9,8 +9,10 @@ options:
 configs:
   Debug: debug
   ProdDebug: debug
+  ProdDebug-Setapp: debug
   Release: release
   Release-AppStore: release
+  Release-Setapp: release
 
 packages:
   KeyboardShortcuts:
@@ -73,6 +75,22 @@ schemes:
       config: Debug
     archive:
       config: Release
+
+  SaneClipSetapp:
+    build:
+      targets:
+        SaneClip: all
+        SaneClipTests: [test]
+        SaneClipWidgets: all
+    test:
+      targets:
+        - SaneClipTests
+    profile:
+      config: Release-Setapp
+    run:
+      config: ProdDebug-Setapp
+    archive:
+      config: Release-Setapp
 
   SaneClipIOS:
     build:
@@ -178,6 +196,12 @@ targets:
           CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipDebug.entitlements
           OTHER_SWIFT_FLAGS: "-D ENABLE_SYNC"
+        ProdDebug-Setapp:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app-setapp
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClip.entitlements
+          OTHER_SWIFT_FLAGS: "-D ENABLE_SYNC -D SETAPP"
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
           DEVELOPMENT_TEAM: M78L6FXD48
@@ -193,6 +217,12 @@ targets:
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipAppStore.entitlements
           INFOPLIST_KEY_AppStoreProductID: com.saneclip.app.pro.unlock
           OTHER_SWIFT_FLAGS: "-D APP_STORE -D ENABLE_SYNC"
+        Release-Setapp:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app-setapp
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Developer ID Application"
+          CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClip.entitlements
+          OTHER_SWIFT_FLAGS: "-D ENABLE_SYNC -D SETAPP"
     postCompileScripts:
       - script: |
           if which swiftlint >/dev/null; then
@@ -219,14 +249,26 @@ targets:
             /usr/libexec/PlistBuddy -c "Delete :NSAppleEventsUsageDescription" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             /usr/libexec/PlistBuddy -c "Delete :NSAccessibilityUsageDescription" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             # Sparkle can still be strongly linked by SPM; weaken it to prevent launch crashes when framework is stripped.
-            APP_BIN="${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}"
             WEAKEN_SCRIPT="${SRCROOT}/../../infra/SaneProcess/scripts/weaken_sparkle.rb"
-            if [ -f "${APP_BIN}" ] && [ -f "${WEAKEN_SCRIPT}" ]; then
-              if otool -L "${APP_BIN}" 2>/dev/null | grep -q "Sparkle.framework"; then
-                ruby "${WEAKEN_SCRIPT}" "${APP_BIN}" || exit 1
-              fi
+            if [ -f "${WEAKEN_SCRIPT}" ]; then
+              find "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}" -type f -path "*/Contents/MacOS/*" -print0 | \
+                xargs -0 -I{} ruby "${WEAKEN_SCRIPT}" "{}" || exit 1
             fi
             echo "App Store build: Sparkle, NSServices, and automation-related keys removed"
+          elif [ "$CONFIGURATION" == "ProdDebug-Setapp" ] || [ "$CONFIGURATION" == "Release-Setapp" ]; then
+            echo "Setapp build: stripping Sparkle framework and direct-store keys..."
+            rm -rf "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework"
+            /usr/libexec/PlistBuddy -c "Delete :SUFeedURL" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Delete :SUPublicEDKey" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Delete :SUEnableAutomaticChecks" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Delete :SUEnableSystemProfiling" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Delete :AppStoreProductID" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+            WEAKEN_SCRIPT="${SRCROOT}/../../infra/SaneProcess/scripts/weaken_sparkle.rb"
+            if [ -f "${WEAKEN_SCRIPT}" ]; then
+              find "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}" -type f -path "*/Contents/MacOS/*" -print0 | \
+                xargs -0 -I{} ruby "${WEAKEN_SCRIPT}" "{}" || exit 1
+            fi
+            echo "Setapp build: Sparkle and direct-store keys removed"
           fi
         name: Strip Sparkle for App Store
         basedOnDependencyAnalysis: false
@@ -252,7 +294,13 @@ targets:
         ProdDebug:
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Development"
+        ProdDebug-Setapp:
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Apple Development"
         Release:
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Apple Development"
+        Release-Setapp:
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Development"
 
@@ -296,6 +344,11 @@ targets:
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgetsDebug.entitlements
+        ProdDebug-Setapp:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app-setapp.widgets
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
           DEVELOPMENT_TEAM: M78L6FXD48
@@ -307,6 +360,11 @@ targets:
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_STYLE: Automatic
           CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
+        Release-Setapp:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app-setapp.widgets
+          DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_IDENTITY: "Developer ID Application"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
 
   # iOS App

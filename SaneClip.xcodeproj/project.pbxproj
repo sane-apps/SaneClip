@@ -741,7 +741,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"$CONFIGURATION\" == \"Release-AppStore\" ]; then\n  echo \"App Store build: stripping Sparkle framework and keys...\"\n  # Remove Sparkle framework from app bundle\n  rm -rf \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework\"\n  # Strip Sparkle keys from built Info.plist\n  /usr/libexec/PlistBuddy -c \"Delete :SUFeedURL\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUPublicEDKey\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUEnableAutomaticChecks\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUEnableSystemProfiling\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Strip NSServices (not applicable in sandbox)\n  /usr/libexec/PlistBuddy -c \"Delete :NSServices\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Strip automation-related usage descriptions (not used in App Store build)\n  /usr/libexec/PlistBuddy -c \"Delete :NSAppleEventsUsageDescription\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :NSAccessibilityUsageDescription\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Sparkle can still be strongly linked by SPM; weaken it to prevent launch crashes when framework is stripped.\n  APP_BIN=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\n  WEAKEN_SCRIPT=\"${SRCROOT}/../../infra/SaneProcess/scripts/weaken_sparkle.rb\"\n  if [ -f \"${APP_BIN}\" ] && [ -f \"${WEAKEN_SCRIPT}\" ]; then\n    if otool -L \"${APP_BIN}\" 2>/dev/null | grep -q \"Sparkle.framework\"; then\n      ruby \"${WEAKEN_SCRIPT}\" \"${APP_BIN}\" || exit 1\n    fi\n  fi\n  echo \"App Store build: Sparkle, NSServices, and automation-related keys removed\"\nfi\n";
+			shellScript = "if [ \"$CONFIGURATION\" == \"Release-AppStore\" ]; then\n  echo \"App Store build: stripping Sparkle framework and keys...\"\n  # Remove Sparkle framework from app bundle\n  rm -rf \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework\"\n  # Strip Sparkle keys from built Info.plist\n  /usr/libexec/PlistBuddy -c \"Delete :SUFeedURL\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUPublicEDKey\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUEnableAutomaticChecks\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUEnableSystemProfiling\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Strip NSServices (not applicable in sandbox)\n  /usr/libexec/PlistBuddy -c \"Delete :NSServices\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Strip automation-related usage descriptions (not used in App Store build)\n  /usr/libexec/PlistBuddy -c \"Delete :NSAppleEventsUsageDescription\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :NSAccessibilityUsageDescription\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Sparkle can still be strongly linked by SPM; weaken it to prevent launch crashes when framework is stripped.\n  WEAKEN_SCRIPT=\"${SRCROOT}/../../infra/SaneProcess/scripts/weaken_sparkle.rb\"\n  if [ -f \"${WEAKEN_SCRIPT}\" ]; then\n    find \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}\" -type f -path \"*/Contents/MacOS/*\" -print0 | \\\n      xargs -0 -I{} ruby \"${WEAKEN_SCRIPT}\" \"{}\" || exit 1\n  fi\n  echo \"App Store build: Sparkle, NSServices, and automation-related keys removed\"\nelif [ \"$CONFIGURATION\" == \"ProdDebug-Setapp\" ] || [ \"$CONFIGURATION\" == \"Release-Setapp\" ]; then\n  echo \"Setapp build: stripping Sparkle framework and direct-store keys...\"\n  rm -rf \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework\"\n  /usr/libexec/PlistBuddy -c \"Delete :SUFeedURL\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUPublicEDKey\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUEnableAutomaticChecks\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUEnableSystemProfiling\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :AppStoreProductID\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  WEAKEN_SCRIPT=\"${SRCROOT}/../../infra/SaneProcess/scripts/weaken_sparkle.rb\"\n  if [ -f \"${WEAKEN_SCRIPT}\" ]; then\n    find \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}\" -type f -path \"*/Contents/MacOS/*\" -print0 | \\\n      xargs -0 -I{} ruby \"${WEAKEN_SCRIPT}\" \"{}\" || exit 1\n  fi\n  echo \"Setapp build: Sparkle and direct-store keys removed\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -879,6 +879,26 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		06D7DDA55DC5CF3F1C522ED0 /* ProdDebug-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Widgets/SaneClipWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2210;
+				DEVELOPMENT_TEAM = M78L6FXD48;
+				INFOPLIST_FILE = Widgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MARKETING_VERSION = 2.2.10;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp.widgets";
+				PRODUCT_NAME = SaneClipWidgets;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = "ProdDebug-Setapp";
+		};
 		081EE4EB28193092E569875A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1002,6 +1022,47 @@
 			};
 			name = ProdDebug;
 		};
+		0C334CDE6BB7452ACD3740F5 /* ProdDebug-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2210;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.2.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
+				PRODUCT_NAME = SaneClip;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "ProdDebug-Setapp";
+		};
+		0F706A046C5AADF2CAD3805E /* ProdDebug-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2210;
+				INFOPLIST_FILE = iOSShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MARKETING_VERSION = 2.2.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
+				PRODUCT_NAME = SaneClipIOSShare;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "ProdDebug-Setapp";
+		};
 		104EE135498F3FF61433880C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1112,6 +1173,36 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = ProdDebug;
+		};
+		22439D563573DC35553FF8B4 /* Release-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SaneClip/SaneClip.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2210;
+				DEVELOPMENT_TEAM = M78L6FXD48;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SaneClip/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 2.2.10;
+				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC -D SETAPP";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp";
+				PRODUCT_NAME = SaneClip;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				VALID_ARCHS = arm64;
+			};
+			name = "Release-Setapp";
 		};
 		23C1965966ED0B7E8D0AED00 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -1285,6 +1376,43 @@
 			};
 			name = Release;
 		};
+		4807DD9D2B7675090D22AD2C /* Release-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2210;
+				INFOPLIST_FILE = iOSShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MARKETING_VERSION = 2.2.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
+				PRODUCT_NAME = SaneClipIOSShare;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Release-Setapp";
+		};
+		4846BC74833DD630381332C6 /* Release-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = M78L6FXD48;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.SaneClipTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SaneClip.app/Contents/MacOS/SaneClip";
+			};
+			name = "Release-Setapp";
+		};
 		4857A56DA796F207F2BAF17F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1347,6 +1475,26 @@
 			};
 			name = Release;
 		};
+		5A24897713659C7BEA27433F /* Release-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Widgets/SaneClipWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2210;
+				DEVELOPMENT_TEAM = M78L6FXD48;
+				INFOPLIST_FILE = Widgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MARKETING_VERSION = 2.2.10;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp.widgets";
+				PRODUCT_NAME = SaneClipWidgets;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = "Release-Setapp";
+		};
 		610D165215A8638A63D449DC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1371,6 +1519,36 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
+		};
+		6EA5D48FFF82860DC50EC6CE /* ProdDebug-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SaneClip/SaneClip.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2210;
+				DEVELOPMENT_TEAM = M78L6FXD48;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SaneClip/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 2.2.10;
+				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC -D SETAPP";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp";
+				PRODUCT_NAME = SaneClip;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				VALID_ARCHS = arm64;
+			};
+			name = "ProdDebug-Setapp";
 		};
 		7DB276C762F0B10F39DE682F /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -1488,6 +1666,25 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
+		};
+		A045FA40024086E1BAE76586 /* ProdDebug-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = M78L6FXD48;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.SaneClipTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SaneClip.app/Contents/MacOS/SaneClip";
+			};
+			name = "ProdDebug-Setapp";
 		};
 		A19EE346BD03DF2744B639B5 /* ProdDebug */ = {
 			isa = XCBuildConfiguration;
@@ -1610,6 +1807,97 @@
 			};
 			name = "Release-AppStore";
 		};
+		BFBB5AA8F12BE62FD4935B5F /* ProdDebug-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 5.0;
+			};
+			name = "ProdDebug-Setapp";
+		};
+		C071725803E045F2ADB2AC6B /* ProdDebug-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2210;
+				INFOPLIST_FILE = iOSWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.2.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
+				PRODUCT_NAME = SaneClipIOSWidgets;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "ProdDebug-Setapp";
+		};
 		CA0EBC0F552F4BE83CC9DDD3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1628,6 +1916,51 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SaneClip.app/Contents/MacOS/SaneClip";
 			};
 			name = Release;
+		};
+		D8679FED7EB5239C370B22A9 /* Release-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2210;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.2.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
+				PRODUCT_NAME = SaneClip;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Release-Setapp";
+		};
+		E839E3A43E40349E740DA011 /* Release-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2210;
+				INFOPLIST_FILE = iOSWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.2.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
+				PRODUCT_NAME = SaneClipIOSWidgets;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Release-Setapp";
 		};
 		E9B63989393D377DBE624400 /* Release-AppStore */ = {
 			isa = XCBuildConfiguration;
@@ -1648,6 +1981,68 @@
 				SWIFT_VERSION = 6.0;
 			};
 			name = "Release-AppStore";
+		};
+		F6B1FE3A60A89B00E3F73BA7 /* Release-Setapp */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 5.0;
+			};
+			name = "Release-Setapp";
 		};
 		F99AF4BA34BC6CBEF9C7DEB7 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1702,8 +2097,10 @@
 			buildConfigurations = (
 				1897803D5ED9870A35226242 /* Debug */,
 				42C31971AEA4B908C118298D /* ProdDebug */,
+				BFBB5AA8F12BE62FD4935B5F /* ProdDebug-Setapp */,
 				4857A56DA796F207F2BAF17F /* Release */,
 				09ED956E5C9E6C403024AEAD /* Release-AppStore */,
+				F6B1FE3A60A89B00E3F73BA7 /* Release-Setapp */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -1713,8 +2110,10 @@
 			buildConfigurations = (
 				610D165215A8638A63D449DC /* Debug */,
 				18DC877C62D218761A1404D1 /* ProdDebug */,
+				0C334CDE6BB7452ACD3740F5 /* ProdDebug-Setapp */,
 				B973BC3DE9F520F2C1ECBB1A /* Release */,
 				B155B31A55BBFC71CB535545 /* Release-AppStore */,
+				D8679FED7EB5239C370B22A9 /* Release-Setapp */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -1724,8 +2123,10 @@
 			buildConfigurations = (
 				081EE4EB28193092E569875A /* Debug */,
 				42A1062E83E80311FC85F8C4 /* ProdDebug */,
+				0F706A046C5AADF2CAD3805E /* ProdDebug-Setapp */,
 				23C1965966ED0B7E8D0AED00 /* Release */,
 				08C9CEB31BC5576075CEA2D2 /* Release-AppStore */,
+				4807DD9D2B7675090D22AD2C /* Release-Setapp */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -1735,8 +2136,10 @@
 			buildConfigurations = (
 				F99AF4BA34BC6CBEF9C7DEB7 /* Debug */,
 				A19EE346BD03DF2744B639B5 /* ProdDebug */,
+				C071725803E045F2ADB2AC6B /* ProdDebug-Setapp */,
 				9F4600E445B4C83B27734E99 /* Release */,
 				3D602DF12317036A95BE8E2B /* Release-AppStore */,
+				E839E3A43E40349E740DA011 /* Release-Setapp */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -1746,8 +2149,10 @@
 			buildConfigurations = (
 				8BBC3246D221BD28E92945B7 /* Debug */,
 				A305F693ABF3AA17F345A81A /* ProdDebug */,
+				6EA5D48FFF82860DC50EC6CE /* ProdDebug-Setapp */,
 				7DB276C762F0B10F39DE682F /* Release */,
 				980353CD513BAEA7BEC43D24 /* Release-AppStore */,
+				22439D563573DC35553FF8B4 /* Release-Setapp */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -1757,8 +2162,10 @@
 			buildConfigurations = (
 				FE742B4FF5DDA825AFC41555 /* Debug */,
 				0B7A1241471986E88DDC842C /* ProdDebug */,
+				06D7DDA55DC5CF3F1C522ED0 /* ProdDebug-Setapp */,
 				442EBCA238F905A91322AC9C /* Release */,
 				E9B63989393D377DBE624400 /* Release-AppStore */,
+				5A24897713659C7BEA27433F /* Release-Setapp */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -1768,8 +2175,10 @@
 			buildConfigurations = (
 				104EE135498F3FF61433880C /* Debug */,
 				24210D38A21305A0E1AD6E8F /* ProdDebug */,
+				A045FA40024086E1BAE76586 /* ProdDebug-Setapp */,
 				CA0EBC0F552F4BE83CC9DDD3 /* Release */,
 				BD2901D4BEDF0F5C11AA7631 /* Release-AppStore */,
+				4846BC74833DD630381332C6 /* Release-Setapp */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

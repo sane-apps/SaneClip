@@ -80,3 +80,15 @@ Graduate verified findings to ARCHITECTURE.md or DEVELOPMENT.md.
 - SaneClip is mechanically easier than SaneBar for Setapp because it is not a menu bar manager, but it has more bundle surfaces (widgets/extensions), so bundle-family drift must be checked deliberately.
 - For the Setapp lane, launch-at-login should remain explicit user opt-in instead of being quietly treated as a channel-side default.
 - SaneClip currently stores app data in `Application Support/SaneClip` but keys credentials off the bundle ID, so a direct build and a Setapp build would likely share settings/history data while keeping separate license state.
+- Local Setapp skeleton is now verified farther than planning:
+  - `SaneClipSetapp` scheme builds locally
+  - widget bundle id is `com.saneclip.app-setapp.widgets`
+  - raw build output can still re-embed `Sparkle.framework` and restore `SU*` keys after target shell phases
+  - authoritative cleanup now uses `/Users/sj/SaneApps/infra/SaneProcess/scripts/sanitize_distribution_bundle.rb --channel setapp <app>`
+  - after sanitation and ad hoc re-sign, the Setapp bundle launches locally and stays running
+- Direct SaneClip still passes local `./scripts/SaneMaster.rb verify --quiet` with `108` tests after the Setapp scaffolding changes.
+- Remaining real blockers before a true Setapp-ready claim:
+  - `setappPublicKey.pem`
+  - Setapp-specific release/update resources
+  - explicit final signing flow after sanitation
+  - mini-side verification once `ssh mini` is back

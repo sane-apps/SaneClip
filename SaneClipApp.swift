@@ -5,7 +5,7 @@ import SwiftUI
 #if !APP_STORE
     @preconcurrency import ApplicationServices
 #endif
-#if !APP_STORE
+#if !APP_STORE && !SETAPP
     import Sparkle
 #endif
 import LocalAuthentication
@@ -13,7 +13,7 @@ import os.log
 
 private let appLogger = Logger(subsystem: "com.saneclip.app", category: "App")
 
-#if !APP_STORE
+#if !APP_STORE && !SETAPP
 
     // MARK: - Update Service
 
@@ -290,7 +290,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
     private var clipboardManager: ClipboardManager!
-    #if !APP_STORE
+    #if !APP_STORE && !SETAPP
         private var updateService: UpdateService!
     #endif
     /// Track when user last authenticated with Touch ID (grace period)
@@ -303,6 +303,11 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         let licenseService = LicenseService(
             appName: "SaneClip",
             purchaseBackend: .appStore(productID: "com.saneclip.app.pro.unlock")
+        )
+    #elseif SETAPP
+        let licenseService = LicenseService(
+            appName: "SaneClip",
+            purchaseBackend: .setapp
         )
     #else
         let licenseService = LicenseService(
@@ -328,11 +333,11 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         appLogger.info("SaneClip starting...")
         NSApp.appearance = NSAppearance(named: .darkAqua)
 
-        #if !DEBUG && !APP_STORE
+        #if !DEBUG && !APP_STORE && !SETAPP
             if SaneAppMover.moveToApplicationsFolderIfNeeded() { return }
         #endif
 
-        #if !APP_STORE
+        #if !APP_STORE && !SETAPP
             if let testFeedOverride = UpdateService.testFeedOverride() {
                 UserDefaults.standard.set(testFeedOverride, forKey: "SUFeedURL")
                 appLogger.info("Using test Sparkle feed override: \(testFeedOverride, privacy: .public)")
@@ -907,7 +912,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         settingsItem.target = self
         menu.addItem(settingsItem)
 
-        #if !APP_STORE
+        #if !APP_STORE && !SETAPP
             let updatesItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
             updatesItem.target = self
             menu.addItem(updatesItem)
@@ -1090,7 +1095,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        #if !APP_STORE
+        #if !APP_STORE && !SETAPP
             // Check for Updates
             let updatesItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
             updatesItem.target = self
@@ -1105,7 +1110,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         return menu
     }
 
-    #if !APP_STORE
+    #if !APP_STORE && !SETAPP
         @objc private func checkForUpdates() {
             updateService.checkForUpdates()
         }

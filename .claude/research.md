@@ -92,3 +92,19 @@ Graduate verified findings to ARCHITECTURE.md or DEVELOPMENT.md.
   - Setapp-specific release/update resources
   - explicit final signing flow after sanitation
   - mini-side verification once `ssh mini` is back
+
+## Setapp Mini Verification
+**Updated:** 2026-03-18 00:18 ET | **Status:** mini bundle verification good; signed Setapp release still blocked | **TTL:** 14d
+**Source:** clean mini worktree builds, mini bundle inspection, mini launch checks, mini signed-build log, official Setapp docs
+- Clean mini worktree for SaneClip was updated to commit `715b8cd`.
+- `SaneClipSetapp` now builds on the mini with:
+  - bundle id `com.saneclip.app-setapp`
+  - widget bundle id `com.saneclip.app-setapp.widgets`
+  - no embedded `Sparkle.framework`
+  - `NSUpdateSecurityPolicy` for `com.setapp.DesktopClient.SetappAgent`
+  - `MPSupportedArchitectures = [arm64]`
+- The Setapp build script now expects the real Setapp key at `Setapp/setappPublicKey.pem` and warns if it is missing.
+- `SaneClipSetapp.entitlements` now adds `com.setapp.ProvisioningService` for the sandboxed Setapp lane.
+- After sanitize + plain ad hoc re-sign, the mini-launched Setapp bundle runs and `lsappinfo` reports `CFBundleIdentifier = com.saneclip.app-setapp`.
+- A real signed mini build still fails before launch because Xcode requires a provisioning profile with the iCloud capability for `SaneClip` and a provisioning profile for `SaneClipWidgets`.
+- So the current blocker is no longer “Setapp lane not scaffolded”; it is “real Setapp credentials/provisioning and final signing are still missing.”

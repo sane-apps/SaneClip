@@ -18,6 +18,9 @@ packages:
   KeyboardShortcuts:
     url: https://github.com/sindresorhus/KeyboardShortcuts
     from: 2.0.0
+  Setapp:
+    url: https://github.com/MacPaw/Setapp-framework.git
+    from: 5.0.1
   Sparkle:
     url: https://github.com/sparkle-project/Sparkle
     from: 2.6.0
@@ -116,6 +119,7 @@ targets:
       - main.swift
       - SaneClipApp.swift
       - ProFeature.swift
+      - DirectDistributionSupport.swift
       - path: Core
         excludes:
           - "**/CLAUDE.md"
@@ -128,6 +132,7 @@ targets:
       - Resources
     dependencies:
       - package: KeyboardShortcuts
+      - package: Setapp
       - package: Sparkle
       - package: SaneUI
       - target: SaneClipWidgets

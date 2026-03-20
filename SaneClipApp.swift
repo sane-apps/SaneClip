@@ -334,7 +334,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         NSApp.appearance = NSAppearance(named: .darkAqua)
 
         #if !DEBUG && !APP_STORE && !SETAPP
-            if SaneAppMover.moveToApplicationsFolderIfNeeded() { return }
+            if SaneAppMover.moveToApplicationsFolderIfNeeded(prompt: .init(
+                messageText: "Move to Applications?",
+                informativeText: "{appName} works best from your Applications folder. Move it there now? You may be asked for your password.",
+                moveButtonTitle: "Move to Applications",
+                cancelButtonTitle: "Not Now"
+            )) { return }
         #endif
 
         #if !APP_STORE && !SETAPP
@@ -361,6 +366,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         licenseService.checkCachedLicense()
         setupApp()
         initializeSyncOnLaunch()
+        SetappIntegration.logPurchaseType()
+        if hasSeenWelcome {
+            SetappIntegration.showReleaseNotesIfNeeded()
+        }
 
         // Fire launch event (capture isPro on main actor before detaching)
         let launchIsPro = licenseService.isPro
@@ -421,6 +430,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             licenseService: licenseService,
             onDismiss: { [weak self] in
                 self?.hasSeenWelcome = true
+                SetappIntegration.showReleaseNotesIfNeeded(delay: 0.2)
             }
         )
     }
@@ -649,6 +659,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         SettingsWindowController.open()
     }
 
+    @objc private func showReleaseNotes() {
+        SetappIntegration.showReleaseNotes()
+    }
+
     @objc private func openGeneralSettings() {
         SettingsWindowController.open(tab: .general)
     }
@@ -719,6 +733,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     @objc private func togglePopover() {
         guard statusItem.button != nil else { return }
+        SetappIntegration.reportMenuBarInteraction()
 
         // Check if right-click
         if let event = NSApp.currentEvent, event.type == .rightMouseUp {
@@ -818,6 +833,13 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         settingsItem.keyEquivalentModifierMask = [.command]
         settingsItem.target = self
         appMenu.addItem(settingsItem)
+
+        #if SETAPP
+            let whatsNewItem = NSMenuItem(title: "What's New...", action: #selector(showReleaseNotes), keyEquivalent: "")
+            whatsNewItem.target = self
+            appMenu.addItem(whatsNewItem)
+        #endif
+
         appMenu.addItem(NSMenuItem.separator())
 
         let quitItem = NSMenuItem(title: "Quit SaneClip", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
@@ -911,6 +933,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
+
+        #if SETAPP
+            let whatsNewItem = NSMenuItem(title: "What's New...", action: #selector(showReleaseNotes), keyEquivalent: "")
+            whatsNewItem.target = self
+            menu.addItem(whatsNewItem)
+        #endif
 
         #if !APP_STORE && !SETAPP
             let updatesItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")

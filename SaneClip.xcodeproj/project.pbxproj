@@ -41,17 +41,18 @@
 		7A565742375608A744388912 /* SaneClipIOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ECEE64E98BCC2FC7D58874A /* SaneClipIOSApp.swift */; };
 		7C2DB9FDEE7F3D537CF02CA1 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 0668E59A15F0F31C5BE746B0 /* KeyboardShortcuts */; };
 		7E6E29E295A478AD08C4DB0E /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73D02F6E4DBB9312E67A0AD /* ClipboardManager.swift */; };
-		800E2DBFDB6B69586D884BBF /* SaneUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3C8A1AC0AAF3923420FEA7FF /* SaneUI */; };
+		800E2DBFDB6B69586D884BBF /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C104FF18269706174A84ADDF /* Sparkle */; };
 		802474EB5319EC0BE29B5D80 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 197F40B4EAA11C09CD1A5801 /* PrivacyInfo.xcprivacy */; };
 		88429CF77152B054F581B567 /* WebhookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9381D3ACF3CE661318DF305D /* WebhookService.swift */; };
 		8941A3DAF4AF4FC8A5F19C3F /* BrandColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5449565520B6E5CF68C78D6B /* BrandColors.swift */; };
-		8B41EC7476C54EDF1695272D /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C104FF18269706174A84ADDF /* Sparkle */; };
+		8B41EC7476C54EDF1695272D /* Setapp in Frameworks */ = {isa = PBXBuildFile; productRef = 5E88037D71BF21DCA450C871 /* Setapp */; };
 		8B91331218ABFBC1D64F05B7 /* SavedClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576DAA4FC86516A7F31F8B5F /* SavedClipboardItem.swift */; };
 		8D5889EE4B31459E191B26C8 /* URLSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32272353D437FBA78581647 /* URLSchemeHandler.swift */; };
 		95711D419E5C0F66ED022198 /* SaneClipIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305BB1EB756CA0FC1DAAFFAD /* SaneClipIntents.swift */; };
 		959A8C26A75136D338B643F4 /* PinnedClipsIOSWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CAE73B92B88E86164C13BE4 /* PinnedClipsIOSWidget.swift */; };
 		97C7F0E599822C25790FE644 /* SyncConflictResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098AA40BC8DC5C2501EECC1C /* SyncConflictResolver.swift */; };
 		9ABA34BEB2F16A4A3646750C /* StorageStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE7465DE4D6ABC7FA43FECC8 /* StorageStatsView.swift */; };
+		A19EE790490B7CC63CBBD941 /* SetappIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64578021E526032605A2A68D /* SetappIntegration.swift */; };
 		A1E34C40B6B4693E554DB614 /* SharedClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB6B85899467ECE68DDCE6E /* SharedClipboardItem.swift */; };
 		A2DA6F029DD4A6EEEA2396AF /* RecentClipsIOSWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19827830127FF21617618069 /* RecentClipsIOSWidget.swift */; };
 		A7C25C4197EB4F9E316E7BE7 /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
@@ -63,9 +64,11 @@
 		C78345E2DAD8B460E1C99FC2 /* SyncDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D786C9674AE3DE8113632A /* SyncDataModel.swift */; };
 		C856E4EE52C74475EE8D8CB3 /* SaneClipWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817694FD0F55D259B3F10FDA /* SaneClipWidgets.swift */; };
 		C93168837296DA390F655FC5 /* ClipboardDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7092A10CF0857FEB75EE7222 /* ClipboardDetailView.swift */; };
+		CA18CED23EE5D2D8854E6C8E /* SaneUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3C8A1AC0AAF3923420FEA7FF /* SaneUI */; };
 		CB3014779A5B0642D1441ADD /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
 		CBB9469D4E19146B9AE85BEB /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
 		CEBF533F549AFC2E4D6AE9CE /* HistoryEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82FA89438430FB80B145A7C5 /* HistoryEncryption.swift */; };
+		CEE1670CAECAAE56000EBBF1 /* DirectDistributionSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DBD4FED60D446DFDA669D6A /* DirectDistributionSupport.swift */; };
 		D0121F4D70D88480A053611D /* SensitiveDataDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6448822D405CC78AFFF787 /* SensitiveDataDetector.swift */; };
 		D43CFBAE93357055AB6E3423 /* SaneClipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B639CB4375AE4479924B74 /* SaneClipTests.swift */; };
 		D9E962C435414799E3C255BD /* ClipboardRulesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B94CC9C6F7E02316FEE7E6C4 /* ClipboardRulesManager.swift */; };
@@ -173,6 +176,7 @@
 		5ECEE64E98BCC2FC7D58874A /* SaneClipIOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipIOSApp.swift; sourceTree = "<group>"; };
 		61392CF56C24077C8FD681EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		62E89830225CCA642CD2D752 /* SaneClipIOSWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SaneClipIOSWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		64578021E526032605A2A68D /* SetappIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetappIntegration.swift; sourceTree = "<group>"; };
 		6785DC91231845BA4B10499F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		6CAE73B92B88E86164C13BE4 /* PinnedClipsIOSWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedClipsIOSWidget.swift; sourceTree = "<group>"; };
 		6E0713E5848E1A9394B7528D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -195,6 +199,7 @@
 		9371FC1CADBC7CB49A105A80 /* SnippetsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetsSettingsView.swift; sourceTree = "<group>"; };
 		9381D3ACF3CE661318DF305D /* WebhookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookService.swift; sourceTree = "<group>"; };
 		96D8AACBEE2BC4471F934DC2 /* SaneClipIOSDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipIOSDebug.entitlements; sourceTree = "<group>"; };
+		9DBD4FED60D446DFDA669D6A /* DirectDistributionSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectDistributionSupport.swift; sourceTree = "<group>"; };
 		9E776995068A491A32269B2E /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		A06A5E6F4A48C14D539ABD91 /* PinnedClipsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedClipsWidget.swift; sourceTree = "<group>"; };
 		A0EAEDB65797C08836E1259B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -229,8 +234,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C2DB9FDEE7F3D537CF02CA1 /* KeyboardShortcuts in Frameworks */,
-				8B41EC7476C54EDF1695272D /* Sparkle in Frameworks */,
-				800E2DBFDB6B69586D884BBF /* SaneUI in Frameworks */,
+				8B41EC7476C54EDF1695272D /* Setapp in Frameworks */,
+				800E2DBFDB6B69586D884BBF /* Sparkle in Frameworks */,
+				CA18CED23EE5D2D8854E6C8E /* SaneUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,6 +266,7 @@
 			isa = PBXGroup;
 			children = (
 				29612677A8240D0E5F68DAAF /* DiagnosticsService.swift */,
+				64578021E526032605A2A68D /* SetappIntegration.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -320,6 +327,7 @@
 		421E2940F20104B95C6C67C8 = {
 			isa = PBXGroup;
 			children = (
+				9DBD4FED60D446DFDA669D6A /* DirectDistributionSupport.swift */,
 				B74750429D17786620EF008E /* main.swift */,
 				8607149CD7305298C711068F /* ProFeature.swift */,
 				8FFF4DCFB95C5B26D00A640F /* SaneClipApp.swift */,
@@ -586,6 +594,7 @@
 			name = SaneClip;
 			packageProductDependencies = (
 				0668E59A15F0F31C5BE746B0 /* KeyboardShortcuts */,
+				5E88037D71BF21DCA450C871 /* Setapp */,
 				C104FF18269706174A84ADDF /* Sparkle */,
 				3C8A1AC0AAF3923420FEA7FF /* SaneUI */,
 			);
@@ -665,6 +674,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				FF4FB157E962C62A4042BD35 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				1568EDD9484197C6D8775AA1 /* XCRemoteSwiftPackageReference "Setapp-framework" */,
 				9B9B0D09FDAE079B73A7A0CB /* XCRemoteSwiftPackageReference "Sparkle" */,
 				738AFF53E0709A7286E155CD /* XCLocalSwiftPackageReference "../../infra/SaneUI" */,
 			);
@@ -816,6 +826,7 @@
 				7E6E29E295A478AD08C4DB0E /* ClipboardManager.swift in Sources */,
 				D9E962C435414799E3C255BD /* ClipboardRulesManager.swift in Sources */,
 				F6C0F161CBEAFA2C67714A57 /* DiagnosticsService.swift in Sources */,
+				CEE1670CAECAAE56000EBBF1 /* DirectDistributionSupport.swift in Sources */,
 				DFC8A7437D713D82B5224D1E /* HistoryEncryption.swift in Sources */,
 				281630B49BCFA5B27C0C93B4 /* KeychainHelper.swift in Sources */,
 				3EF2F8F390E9B433A6DA76B7 /* ProFeature.swift in Sources */,
@@ -823,6 +834,7 @@
 				95711D419E5C0F66ED022198 /* SaneClipIntents.swift in Sources */,
 				8B91331218ABFBC1D64F05B7 /* SavedClipboardItem.swift in Sources */,
 				D0121F4D70D88480A053611D /* SensitiveDataDetector.swift in Sources */,
+				A19EE790490B7CC63CBBD941 /* SetappIntegration.swift in Sources */,
 				33E5382D17E0E77A658BF322 /* SettingsModel.swift in Sources */,
 				60E0917C7EE6C533E0E339D6 /* SettingsView.swift in Sources */,
 				A1E34C40B6B4693E554DB614 /* SharedClipboardItem.swift in Sources */,
@@ -2193,6 +2205,14 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		1568EDD9484197C6D8775AA1 /* XCRemoteSwiftPackageReference "Setapp-framework" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MacPaw/Setapp-framework.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.1;
+			};
+		};
 		9B9B0D09FDAE079B73A7A0CB /* XCRemoteSwiftPackageReference "Sparkle" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sparkle-project/Sparkle";
@@ -2224,6 +2244,11 @@
 		3C8A1AC0AAF3923420FEA7FF /* SaneUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SaneUI;
+		};
+		5E88037D71BF21DCA450C871 /* Setapp */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1568EDD9484197C6D8775AA1 /* XCRemoteSwiftPackageReference "Setapp-framework" */;
+			productName = Setapp;
 		};
 		C104FF18269706174A84ADDF /* Sparkle */ = {
 			isa = XCSwiftPackageProductDependency;

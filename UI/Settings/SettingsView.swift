@@ -515,6 +515,16 @@ struct GeneralSettingsView: View {
                                     UpdateService.shared.updateCheckFrequency = newValue
                                 }
                             ),
+                            labels: .init(
+                                automaticCheckLabel: "Check for updates automatically",
+                                automaticCheckHelp: "Periodically check for new versions",
+                                checkFrequencyLabel: "Check frequency",
+                                checkFrequencyHelp: "Choose how often automatic update checks run",
+                                actionsLabel: "Actions",
+                                checkingLabel: "Checking…",
+                                checkNowLabel: "Check Now",
+                                checkNowHelp: "Check for updates right now"
+                            ),
                             onCheckNow: { UpdateService.shared.checkForUpdates() }
                         )
                     }

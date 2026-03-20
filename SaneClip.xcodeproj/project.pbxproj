@@ -183,7 +183,6 @@
 		6E5B3959F17D55FF5C7F90E6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7092A10CF0857FEB75EE7222 /* ClipboardDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardDetailView.swift; sourceTree = "<group>"; };
 		71B639CB4375AE4479924B74 /* SaneClipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipTests.swift; sourceTree = "<group>"; };
-		765436A3694232650B05C233 /* SaneUI */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SaneUI; path = ../../infra/SaneUI; sourceTree = SOURCE_ROOT; };
 		7B181DC2ABBFC0F6C29A7CB9 /* AutoPurgeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoPurgeService.swift; sourceTree = "<group>"; };
 		7B6E13A4E249D85E296D3A5C /* SaneClipIOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SaneClipIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BEA795AFED8797FFAE0DD3E /* TextTransformService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTransformService.swift; sourceTree = "<group>"; };
@@ -335,7 +334,6 @@
 				E2FA8B6080FA528017F8B223 /* iOS */,
 				D04310DD70513FD880B08F56 /* iOSShareExtension */,
 				AC18BD20DF756C306CF4FC65 /* iOSWidgets */,
-				493F4E3FD878CCDE2141E89E /* Packages */,
 				317C3B96EA035EB98F83B6DF /* Resources */,
 				1B130F3074655C63B056F11C /* Shared */,
 				A1F5CB5A388610A825BF634E /* Tests */,
@@ -356,14 +354,6 @@
 				09C2D5E2943BC51ED6D88512 /* SaneClipWidgets.appex */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		493F4E3FD878CCDE2141E89E /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				765436A3694232650B05C233 /* SaneUI */,
-			);
-			name = Packages;
 			sourceTree = "<group>";
 		};
 		69BCB2544EE5E14D64C7050A /* History */ = {
@@ -674,9 +664,9 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				FF4FB157E962C62A4042BD35 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				97F51D438BBECD2FA140CC95 /* XCRemoteSwiftPackageReference "SaneUI" */,
 				1568EDD9484197C6D8775AA1 /* XCRemoteSwiftPackageReference "Setapp-framework" */,
 				9B9B0D09FDAE079B73A7A0CB /* XCRemoteSwiftPackageReference "Sparkle" */,
-				738AFF53E0709A7286E155CD /* XCLocalSwiftPackageReference "../../infra/SaneUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
@@ -2197,13 +2187,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		738AFF53E0709A7286E155CD /* XCLocalSwiftPackageReference "../../infra/SaneUI" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../infra/SaneUI;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		1568EDD9484197C6D8775AA1 /* XCRemoteSwiftPackageReference "Setapp-framework" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -2211,6 +2194,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.0.1;
+			};
+		};
+		97F51D438BBECD2FA140CC95 /* XCRemoteSwiftPackageReference "SaneUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sane-apps/SaneUI.git";
+			requirement = {
+				branch = main;
+				kind = branch;
 			};
 		};
 		9B9B0D09FDAE079B73A7A0CB /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -2239,10 +2230,12 @@
 		};
 		2AE9B42AED97B159C47F60C9 /* SaneUI */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 97F51D438BBECD2FA140CC95 /* XCRemoteSwiftPackageReference "SaneUI" */;
 			productName = SaneUI;
 		};
 		3C8A1AC0AAF3923420FEA7FF /* SaneUI */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 97F51D438BBECD2FA140CC95 /* XCRemoteSwiftPackageReference "SaneUI" */;
 			productName = SaneUI;
 		};
 		5E88037D71BF21DCA450C871 /* Setapp */ = {

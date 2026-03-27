@@ -1,93 +1,76 @@
 # Privacy Policy
 
-**Effective Date:** January 2026
-**Last Updated:** January 2026
+> [README](README.md) · [ARCHITECTURE](ARCHITECTURE.md) · [DEVELOPMENT](DEVELOPMENT.md) · [PRIVACY](PRIVACY.md) · [SECURITY](SECURITY.md)
+
+**Effective Date:** March 26, 2026
+**Last Updated:** March 26, 2026
+
+SaneClip is built to keep your clipboard history on your device. This page explains what stays local, when the app uses the network, and why.
 
 ## The Short Version
 
-SaneClip is **privacy-first by design**:
+- Your clipboard history stays on your Mac by default
+- Optional iCloud sync works only between your own devices if you turn it on
+- Optional webhooks send data only if you set them up
+- The app may send a few simple anonymous counts, such as whether it opened in Basic or Pro
+- No account is required
 
-- ✅ All data stays on your Mac — 100% local
-- ✅ No cloud sync, no network calls
-- ✅ No analytics or telemetry
-- ✅ No account required
-- ✅ 100% Transparent Code — verify yourself
+## What Stays Local
 
----
+SaneClip stores the following locally on your device:
 
-## What Data SaneClip Collects
+- Clipboard history
+- App settings
+- Touch ID and security preferences
+- Excluded apps and rules
 
-### Clipboard History
-- **What**: Text and images you copy
-- **Where**: Stored locally in `~/Library/Application Support/SaneClip/`
-- **Retention**: Configurable (default: 100 items)
-- **Encryption**: Not encrypted at rest (protected by macOS file permissions)
+Your clipboard contents are not uploaded to SaneApps servers.
 
-### User Preferences
-- **What**: Settings like history size, Touch ID preference, keyboard shortcuts
-- **Where**: macOS UserDefaults (local only)
-- **Shared**: Never
+## When SaneClip Uses The Network
 
-### Crash Reports
-- **What**: If the app crashes, macOS may collect crash logs
-- **Where**: Stored locally by macOS
-- **Shared**: Only if you manually submit to Apple
+SaneClip uses the network only when:
 
----
+- You enable iCloud sync between your own Apple devices
+- You configure a webhook
+- It checks for app updates
+- It sends a few simple anonymous counts, such as Basic vs Pro launches
 
-## What SaneClip Does NOT Collect
+Those app counts do not include your clipboard contents.
 
-- ❌ Personal information (name, email, etc.)
-- ❌ Usage analytics
-- ❌ Keystroke logging
-- ❌ Screenshots
-- ❌ Any data sent to remote servers
+## What SaneClip Does Not Collect
 
----
+- Your clipboard contents on SaneApps servers
+- Personal files from your Mac
+- Screenshots
+- Keystrokes outside the clipboard items you choose to keep
 
 ## Third-Party Services
 
-### Sparkle (Auto-Updates) — Direct Download Version Only
-- The version of SaneClip downloaded from [saneclip.com](https://saneclip.com) uses [Sparkle](https://sparkle-project.org/) for automatic updates
-- Sparkle checks our update feed for new versions
-- No personal data is transmitted — only the app version
-- The Mac App Store version does not include Sparkle; updates are handled entirely by the App Store
+SaneClip uses:
 
----
+- **Sparkle** for update checks on the direct-download version
+- **CloudKit / iCloud** if you turn on sync
+- **SaneApps distribution service** for simple anonymous app counts
+- **Cloudflare Web Analytics** on public website pages
 
-## Password Manager Protection
+These website services apply to `saneclip.com` pages, not to your clipboard history inside the app.
 
-SaneClip includes optional protection for password managers:
+## Password Protection
 
-- Detects "quick-clear" patterns (copy then clear within 3 seconds)
-- Automatically removes these entries from history
-- Designed to prevent accidental storage of passwords
+SaneClip includes optional protection for sensitive clipboard data:
 
-**Important**: This is a best-effort feature, not a security guarantee. For sensitive credentials, use a dedicated password manager.
+- Touch ID or password lock for history access
+- Sensitive-data detection to avoid saving likely passwords or payment details
+- Cleanup rules for copied content you do not want to keep
 
----
+## Your Control
 
-## Your Rights
+You can:
 
-Since all data is stored locally, you have full control:
-
-- **Access**: View all data in `~/Library/Application Support/SaneClip/`
-- **Delete**: Clear history anytime via the app, or delete the folder
-- **Export**: Coming in a future version
-
----
-
-## Children's Privacy
-
-SaneClip does not knowingly collect data from children under 13. The app does not require any account or personal information.
-
----
-
-## Changes to This Policy
-
-We may update this policy occasionally. Changes will be noted with a new "Last Updated" date. For significant changes, we'll include a notice in the app's release notes.
-
----
+- Clear your history at any time
+- Turn off optional sync
+- Remove webhooks
+- Delete local app data
 
 ## Contact
 
@@ -95,15 +78,3 @@ Questions about privacy?
 
 - GitHub: [github.com/sane-apps/SaneClip](https://github.com/sane-apps/SaneClip)
 - Email: [privacy@saneapps.com](mailto:privacy@saneapps.com)
-
----
-
-## Code Transparency
-
-SaneClip is 100% Transparent Code. You can verify our privacy claims by reviewing the code:
-
-```bash
-git clone https://github.com/sane-apps/SaneClip.git
-# Search for network calls — you won't find any (except Sparkle updates)
-grep -r "URLSession\|URLRequest\|Network" SaneClip/
-```

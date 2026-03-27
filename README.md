@@ -4,7 +4,7 @@
 
 ### The Only Clipboard Manager That Takes Privacy Seriously
 
-**AES-256 encryption · Touch ID protection · On-device by default · Zero analytics**
+**AES-256 encryption · Touch ID protection · On-device by default · No personal-content upload**
 
 [![GitHub stars](https://img.shields.io/github/stars/sane-apps/SaneClip?style=flat-square)](https://github.com/sane-apps/SaneClip/stargazers)
 [![License: PolyForm Shield](https://img.shields.io/badge/License-PolyForm%20Shield-blue.svg?style=flat-square)](LICENSE)
@@ -53,7 +53,7 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 | **📵 App Exclusions** | Block 1Password, banking apps, or any sensitive app from clipboard capture entirely. |
 | **🕵️ Sensitive Data Detection** | Automatically flags credit cards, SSNs, API keys, passwords, private keys. |
 
-**On-device by default. Optional iCloud sync between your devices. Zero analytics. Zero telemetry.**
+**On-device by default. Optional iCloud sync between your devices. No clipboard-content upload to SaneApps. A few simple anonymous app counts help us improve the app.**
 
 ---
 
@@ -218,9 +218,9 @@ Send HTTP notifications when clipboard events occur with HMAC-SHA256 signatures 
 
 SaneClip is **privacy-first**:
 
-- ✅ **100% On-Device** — All processing stays on your Mac
-- ✅ **iCloud Sync Only** — Syncs between your devices via iCloud, no third-party servers
-- ✅ **Zero Analytics** — No tracking, no telemetry, no data collection
+- ✅ **100% On-Device by Default** — Your clipboard history stays on your Mac
+- ✅ **Optional iCloud Sync** — Syncs only between your own devices if you turn it on
+- ✅ **No Personal-Content Upload** — Clipboard contents are not sent to SaneApps servers
 - ✅ **100% Transparent Code** — Verify yourself at [github.com/sane-apps/SaneClip](https://github.com/sane-apps/SaneClip)
 - ✅ **PolyForm Shield License** — Community-auditable, source-available
 
@@ -308,10 +308,13 @@ Before opening a PR:
 
 | Document | Purpose |
 |----------|---------|
+| [README.md](README.md) | Product overview and doc map |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | System design and major data flows |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
 | [DEVELOPMENT.md](DEVELOPMENT.md) | Development setup and guidelines |
 | [SECURITY.md](SECURITY.md) | Security policy |
 | [PRIVACY.md](PRIVACY.md) | Privacy practices |
+| [`docs/`](docs/) | Public website and guide pages |
 
 ---
 
@@ -337,7 +340,7 @@ Before opening a PR:
 |--------------------------|----------|
 | ❌ Plaintext storage | ✅ AES-256-GCM encryption |
 | ❌ Third-party cloud sync | ✅ Optional private iCloud sync between your devices only |
-| ❌ Analytics and telemetry | ✅ Zero tracking, zero telemetry |
+| ❌ Personal-content upload | ✅ Your clipboard contents stay on your Mac |
 | ❌ Closed source | ✅ 100% Transparent Code (PolyForm Shield) |
 | ❌ Subscription pricing | ✅ $6.99 one-time, free updates |
 | ❌ No Touch ID protection | ✅ Biometric locks with grace period |

@@ -21,10 +21,10 @@ struct SnippetsSettingsView: View {
             if !isPro {
                 HStack(spacing: 8) {
                     Image(systemName: "lock.fill")
-                        .font(.system(size: 11))
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(.teal)
                     Text("Snippets require SaneClip Pro")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(.white)
                     Spacer()
                     Button("Upgrade") {
@@ -32,9 +32,8 @@ struct SnippetsSettingsView: View {
                             ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
                         }
                     }
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.teal)
-                    .buttonStyle(.plain)
+                    .buttonStyle(ClipActionButtonStyle())
+                    .controlSize(.small)
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
@@ -46,13 +45,13 @@ struct SnippetsSettingsView: View {
             // Search bar
             HStack {
                 Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(clipReadableSecondary)
                 TextField("Search snippets...", text: $searchText)
                     .textFieldStyle(.plain)
                 if !searchText.isEmpty {
                     Button(action: { searchText = "" }, label: {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(clipReadableSecondary)
                     })
                     .buttonStyle(.plain)
                 }
@@ -108,8 +107,8 @@ struct SnippetsSettingsView: View {
             // Footer with add button
             HStack {
                 Text("\(snippetManager.snippets.count) snippets")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.callout.weight(.medium))
+                    .foregroundStyle(clipReadableSecondary)
 
                 Spacer()
 
@@ -122,7 +121,8 @@ struct SnippetsSettingsView: View {
                 }, label: {
                     Label(isPro ? "Add Snippet" : "Add Snippet \u{1F512}", systemImage: "plus")
                 })
-                .buttonStyle(.plain)
+                .buttonStyle(ClipActionButtonStyle())
+                .controlSize(.small)
             }
             .padding(8)
         }
@@ -174,7 +174,7 @@ struct SnippetRow: View {
 
                 if let category = snippet.category {
                     Text(category)
-                        .font(.caption2)
+                        .font(.system(size: 13, weight: .semibold))
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
                         .background(Color.blue.opacity(0.2))
@@ -185,14 +185,14 @@ struct SnippetRow: View {
 
                 if snippet.useCount > 0 {
                     Text("\(snippet.useCount)x")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(clipReadableSecondary)
                 }
             }
 
             Text(snippet.template)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 13))
+                .foregroundStyle(clipReadableSecondary)
                 .lineLimit(2)
         }
         .padding(.vertical, 4)
@@ -244,8 +244,8 @@ struct SnippetEditorSheet: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Template")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(.white)
 
                     TextEditor(text: $template)
                         .font(.system(.body, design: .monospaced))
@@ -256,8 +256,8 @@ struct SnippetEditorSheet: View {
                 // Placeholder help
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Placeholders")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(.white)
 
                     HStack(spacing: 12) {
                         PlaceholderChip(text: "{{date}}", description: "Current date")
@@ -265,20 +265,19 @@ struct SnippetEditorSheet: View {
                         PlaceholderChip(text: "{{clipboard}}", description: "Clipboard")
                         PlaceholderChip(text: "{{name}}", description: "User prompt")
                     }
-                    .font(.caption2)
                 }
 
                 // Live preview
                 if !template.isEmpty {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Preview")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(.white)
 
                         Text(SnippetManager.shared.expand(
                             snippet: Snippet(name: "", template: template)
                         ))
-                        .font(.system(.caption, design: .monospaced))
+                        .font(.system(size: 13, design: .monospaced))
                         .padding(8)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color.secondary.opacity(0.1))
@@ -290,13 +289,13 @@ struct SnippetEditorSheet: View {
                 if !placeholders.isEmpty {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Detected Placeholders")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(.white)
 
                         HStack {
                             ForEach(placeholders, id: \.self) { placeholder in
                                 Text("{{\(placeholder)}}")
-                                    .font(.caption2.monospaced())
+                                    .font(.system(size: 13, design: .monospaced))
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
                                     .background(Color.orange.opacity(0.2))
@@ -359,15 +358,15 @@ struct PlaceholderChip: View {
     var body: some View {
         VStack(spacing: 2) {
             Text(text)
-                .font(.caption2.monospaced())
+                .font(.system(size: 13, weight: .semibold, design: .monospaced))
                 .padding(.horizontal, 6)
                 .padding(.vertical, 2)
                 .background(Color.blue.opacity(0.2))
                 .cornerRadius(4)
 
             Text(description)
-                .font(.system(size: 9))
-                .foregroundStyle(.tertiary)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(clipReadableSecondary)
         }
     }
 }

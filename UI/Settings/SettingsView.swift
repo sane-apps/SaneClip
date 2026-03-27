@@ -6,6 +6,13 @@ import SwiftUI
 import os.log
 
 private let settingsLogger = Logger(subsystem: "com.saneclip.app", category: "Settings")
+let clipReadableSecondary = Color.white.opacity(0.88)
+let clipReadableMuted = Color.white.opacity(0.78)
+let clipReadableMonospace = Color.white.opacity(0.92)
+
+typealias SaneClipChrome = SaneUI.SanePanelChrome
+typealias ClipGlassRoundedBackground = SaneUI.SaneGlassRoundedBackground
+typealias ClipActionButtonStyle = SaneUI.SaneActionButtonStyle
 
 // MARK: - Notifications
 
@@ -21,9 +28,8 @@ extension Notification.Name {
 struct SettingsView: View {
     var licenseService: LicenseService?
     @State private var selectedTab: SettingsTab?
-    @FocusState private var focusedPane: SettingsPane?
 
-    enum SettingsTab: String, CaseIterable, Identifiable {
+    enum SettingsTab: String, SaneSettingsTab {
         case general = "General"
         case shortcuts = "Shortcuts"
         case snippets = "Snippets"
@@ -35,13 +41,35 @@ struct SettingsView: View {
         case about = "About"
 
         var id: String { rawValue }
-    }
 
-    enum SettingsPane: Hashable {
-        case sidebar
-    }
+        var icon: String {
+            switch self {
+            case .general: "gear"
+            case .shortcuts: "keyboard"
+            case .snippets: "text.quote"
+            #if ENABLE_SYNC
+                case .sync: "arrow.triangle.2.circlepath.icloud"
+            #endif
+            case .storage: "chart.pie"
+            case .license: "key"
+            case .about: "info.circle"
+            }
+        }
 
-    @Environment(\.colorScheme) private var colorScheme
+        var iconColor: Color {
+            switch self {
+            case .general: .textStone
+            case .shortcuts: .clipBlue
+            case .snippets: .green
+            #if ENABLE_SYNC
+                case .sync: .cyan
+            #endif
+            case .storage: .pinnedOrange
+            case .license: .teal
+            case .about: .brandSilver
+            }
+        }
+    }
 
     init(licenseService: LicenseService?, initialTab: SettingsTab? = .general) {
         self.licenseService = licenseService
@@ -49,100 +77,41 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        NavigationSplitView {
-            List(SettingsTab.allCases, selection: $selectedTab) { tab in
-                NavigationLink(value: tab) {
-                    Label {
-                        Text(tab.rawValue)
-                    } icon: {
-                        Image(systemName: icon(for: tab))
-                            .foregroundStyle(iconColor(for: tab))
+        SaneSettingsContainer(defaultTab: .general, selection: $selectedTab) { tab in
+            switch tab {
+            case .general:
+                GeneralSettingsView(licenseService: licenseService)
+            case .shortcuts:
+                ShortcutsSettingsView(licenseService: licenseService)
+            case .snippets:
+                SnippetsSettingsView(licenseService: licenseService)
+                    .padding(20)
+            #if ENABLE_SYNC
+                case .sync:
+                    SyncSettingsView()
+            #endif
+            case .storage:
+                StorageStatsView()
+                    .padding(20)
+            case .license:
+                if let licenseService {
+                    Form {
+                        LicenseSettingsView(licenseService: licenseService)
                     }
+                    .formStyle(.grouped)
+                    .padding(20)
                 }
-            }
-            .listStyle(.sidebar)
-            .navigationSplitViewColumnWidth(min: 150, ideal: 170)
-            .focusable()
-            .focused($focusedPane, equals: .sidebar)
-        } detail: {
-            ZStack {
-                // Gradient background for both modes
-                SettingsGradientBackground()
-
-                switch selectedTab {
-                case .general:
-                    GeneralSettingsView(licenseService: licenseService)
-                case .shortcuts:
-                    ShortcutsSettingsView(licenseService: licenseService)
-                case .snippets:
-                    SnippetsSettingsView(licenseService: licenseService)
-                        .padding(20)
-                #if ENABLE_SYNC
-                    case .sync:
-                        SyncSettingsView()
-                #endif
-                case .storage:
-                    StorageStatsView()
-                        .padding(20)
-                case .license:
-                    if let licenseService {
-                        Form {
-                            LicenseSettingsView(licenseService: licenseService)
-                        }
-                        .formStyle(.grouped)
-                        .padding(20)
-                    }
-                case .about:
-                    AboutSettingsView(licenseService: licenseService)
-                case .none:
-                    GeneralSettingsView(licenseService: licenseService)
-                }
+            case .about:
+                AboutSettingsView(licenseService: licenseService)
             }
         }
-        .groupBoxStyle(GlassGroupBoxStyle())
-        .frame(minWidth: 700, minHeight: 450)
         .background(settingsKeyboardShortcuts)
-        .onAppear {
-            if selectedTab == nil {
-                selectedTab = .general
-            }
-            focusedPane = .sidebar
-        }
         .onExitCommand {
             SettingsWindowController.close()
         }
         .onReceive(NotificationCenter.default.publisher(for: .settingsTabShortcutRequested)) { notification in
             guard let tab = notification.object as? SettingsTab else { return }
             selectedTab = tab
-            focusedPane = .sidebar
-        }
-    }
-
-    private func icon(for tab: SettingsTab) -> String {
-        switch tab {
-        case .general: "gear"
-        case .shortcuts: "keyboard"
-        case .snippets: "text.quote"
-        #if ENABLE_SYNC
-            case .sync: "arrow.triangle.2.circlepath.icloud"
-        #endif
-        case .storage: "chart.pie"
-        case .license: "key"
-        case .about: "info.circle"
-        }
-    }
-
-    private func iconColor(for tab: SettingsTab) -> Color {
-        switch tab {
-        case .general: .textStone
-        case .shortcuts: .clipBlue
-        case .snippets: .green
-        #if ENABLE_SYNC
-            case .sync: .cyan
-        #endif
-        case .storage: .pinnedOrange
-        case .license: .teal
-        case .about: .brandSilver
         }
     }
 
@@ -157,7 +126,6 @@ struct SettingsView: View {
             ForEach(Array(SettingsTab.allCases.enumerated()), id: \.element.id) { index, tab in
                 Button("") {
                     selectedTab = tab
-                    focusedPane = .sidebar
                 }
                 .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")), modifiers: .command)
                 .frame(width: 0, height: 0)
@@ -309,9 +277,9 @@ struct GeneralSettingsView: View {
                                 settings.pasteSound.play()
                             } label: {
                                 Image(systemName: "speaker.wave.2")
-                                    .font(.caption)
+                                    .font(.system(size: 12, weight: .semibold))
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(ClipActionButtonStyle())
                             .controlSize(.small)
                             .disabled(settings.pasteSound == .off)
                             .help("Preview sound")
@@ -379,29 +347,29 @@ struct GeneralSettingsView: View {
                                         settings.setPasteMode(appPresetMode, for: key)
                                         appPresetBundleID = ""
                                     }
-                                    .buttonStyle(.bordered)
+                                    .buttonStyle(ClipActionButtonStyle())
                                     .controlSize(.small)
                                 }
 
                                 if settings.perAppPasteModes.isEmpty {
                                     Text("No overrides configured")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundStyle(clipReadableSecondary)
                                 } else {
                                     ForEach(settings.perAppPasteModes.keys.sorted(), id: \.self) { bundleID in
                                         HStack(spacing: 8) {
                                             Text(bundleID)
-                                                .font(.system(size: 11, design: .monospaced))
+                                                .font(.system(size: 13, design: .monospaced))
                                                 .lineLimit(1)
                                             Spacer(minLength: 8)
                                             Text(settings.perAppPasteModes[bundleID] ?? "")
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundStyle(clipReadableSecondary)
                                             Button("Remove") {
                                                 settings.setPasteMode(nil, for: bundleID)
                                             }
-                                            .buttonStyle(.plain)
-                                            .font(.caption)
+                                            .buttonStyle(ClipActionButtonStyle())
+                                            .controlSize(.small)
                                         }
                                     }
                                 }
@@ -556,11 +524,12 @@ struct GeneralSettingsView: View {
                                         .foregroundStyle(.white.opacity(0.7))
                                     Text("100 / 200")
                                     Image(systemName: "lock.fill")
-                                        .font(.system(size: 10))
+                                        .font(.system(size: 12, weight: .semibold))
                                 }
                                 .foregroundStyle(.teal)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(ClipActionButtonStyle())
+                            .controlSize(.small)
                         }
                     }
                     CompactDivider()
@@ -582,8 +551,8 @@ struct GeneralSettingsView: View {
                     CompactDivider()
                     CompactRow("Storage") {
                         Text("~/Library/Application Support/SaneClip/")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 13, design: .monospaced))
+                            .foregroundStyle(clipReadableSecondary)
                     }
                     CompactDivider()
                     CompactRow("Data") {
@@ -592,13 +561,13 @@ struct GeneralSettingsView: View {
                                 Button("Export...") {
                                     exportHistory()
                                 }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(ClipActionButtonStyle())
                                 .controlSize(.small)
 
                                 Button("Import...") {
                                     importHistory()
                                 }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(ClipActionButtonStyle())
                                 .controlSize(.small)
                             }
                         } else {
@@ -609,13 +578,14 @@ struct GeneralSettingsView: View {
                             } label: {
                                 HStack(spacing: 4) {
                                     Image(systemName: "lock.fill")
-                                        .font(.system(size: 10))
-                                    Text("Export / Import")
                                         .font(.system(size: 12, weight: .semibold))
+                                    Text("Export / Import")
+                                        .font(.system(size: 13, weight: .semibold))
                                 }
                                 .foregroundStyle(.teal)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(ClipActionButtonStyle())
+                            .controlSize(.small)
                         }
                     }
                 }
@@ -625,23 +595,23 @@ struct GeneralSettingsView: View {
                         Button("Ignore Once") {
                             ClipboardManager.shared?.ignoreNextCopy()
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(ClipActionButtonStyle())
                         .controlSize(.small)
                     }
                     CompactDivider()
                     CompactRow("Pause Capture") {
                         HStack(spacing: 6) {
                             Button("5m") { ClipboardManager.shared?.pauseCapture(minutes: 5) }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(ClipActionButtonStyle())
                                 .controlSize(.small)
                             Button("15m") { ClipboardManager.shared?.pauseCapture(minutes: 15) }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(ClipActionButtonStyle())
                                 .controlSize(.small)
                             Button("60m") { ClipboardManager.shared?.pauseCapture(minutes: 60) }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(ClipActionButtonStyle())
                                 .controlSize(.small)
                             Button("Resume") { ClipboardManager.shared?.resumeCapture() }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(ClipActionButtonStyle())
                                 .controlSize(.small)
                         }
                     }
@@ -685,13 +655,13 @@ struct GeneralSettingsView: View {
                             Button("Export...") {
                                 exportSettings()
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(ClipActionButtonStyle())
                             .controlSize(.small)
 
                             Button("Import...") {
                                 importSettings()
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(ClipActionButtonStyle())
                             .controlSize(.small)
                         }
                     }
@@ -891,7 +861,7 @@ struct ExcludedAppsInline: View {
                     focusedKeyboardTarget = .addButton
                     browseForApp()
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(ClipActionButtonStyle())
                 .controlSize(.small)
                 .keyboardShortcut("n", modifiers: .command)
                 .focused($focusedKeyboardTarget, equals: .addButton)
@@ -913,7 +883,7 @@ struct ExcludedAppsInline: View {
                 HStack {
                     Text("Click \"Add App\" to exclude from clipboard history")
                         .font(.callout)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(clipReadableSecondary)
                     Spacer()
                 }
                 .padding(.horizontal, 12)
@@ -922,7 +892,7 @@ struct ExcludedAppsInline: View {
                 HStack {
                     Text("Clips from these apps won't be saved:")
                         .font(.callout)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(clipReadableSecondary)
                     Spacer()
                 }
                 .padding(.horizontal, 12)
@@ -977,14 +947,14 @@ struct ExcludedAppsInline: View {
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: exists ? "checkmark.circle.fill" : "plus.circle")
-                    .font(.system(size: 10))
+                    .font(.system(size: 12, weight: .semibold))
                 Text(label)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.system(size: 13, weight: .semibold))
             }
             .foregroundStyle(exists ? .green : .white)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(Color.white.opacity(0.08))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(Color.white.opacity(0.10))
             .clipShape(Capsule())
         }
         .buttonStyle(.plain)
@@ -1171,7 +1141,7 @@ struct ExcludedAppRow: View {
                 onRemove()
             } label: {
                 Image(systemName: "xmark.circle.fill")
-                    .foregroundStyle(isHovering ? .primary : .secondary)
+                    .foregroundStyle(isHovering ? .white : clipReadableMuted)
             }
             .buttonStyle(.plain)
         }
@@ -1320,9 +1290,9 @@ struct AboutSettingsView: View {
                 Text("Made with ❤️ in 🇺🇸")
                     .fontWeight(.medium)
                 Text(" · ")
-                Text("100% On-Device")
+                Text("On-Device by Default")
                 Text(" · ")
-                Text("No Analytics")
+                Text("No Personal Data")
             }
             .font(.callout)
             .foregroundStyle(.white.opacity(0.92))
@@ -1349,7 +1319,7 @@ struct AboutSettingsView: View {
                                 Text("Support")
                             } icon: {
                                 Image(systemName: "heart.fill")
-                                    .foregroundStyle(.red)
+                                    .foregroundStyle(.pink)
                             }
                         }
                     }
@@ -1371,7 +1341,7 @@ struct AboutSettingsView: View {
                     }
                 }
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(ClipActionButtonStyle())
             .controlSize(.regular)
             .padding(.top, 12)
 
@@ -1382,7 +1352,7 @@ struct AboutSettingsView: View {
                 } label: {
                     Label("Check for Updates", systemImage: "arrow.triangle.2.circlepath")
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(ClipActionButtonStyle(prominent: true))
                 .controlSize(.regular)
             }
 
@@ -1418,6 +1388,7 @@ struct AboutSettingsView: View {
                 Button("Done") {
                     showLicenses = false
                 }
+                .buttonStyle(ClipActionButtonStyle(prominent: true))
                 .keyboardShortcut(.defaultAction)
             }
             .padding()
@@ -1455,8 +1426,8 @@ struct AboutSettingsView: View {
                             OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE \
                             SOFTWARE.
                             """)
-                            .font(.system(.footnote, design: .monospaced))
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 13, design: .monospaced))
+                            .foregroundStyle(clipReadableMonospace)
                             .textSelection(.enabled)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -1495,8 +1466,8 @@ struct AboutSettingsView: View {
                                 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
                                 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                                 """)
-                                .font(.system(.footnote, design: .monospaced))
-                                .foregroundStyle(.secondary)
+                                .font(.system(size: 13, design: .monospaced))
+                                .foregroundStyle(clipReadableMonospace)
                                 .textSelection(.enabled)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -1520,6 +1491,7 @@ struct AboutSettingsView: View {
                 Button("Done") {
                     showSupport = false
                 }
+                .buttonStyle(ClipActionButtonStyle(prominent: true))
                 .keyboardShortcut(.defaultAction)
             }
             .padding()
@@ -1534,8 +1506,8 @@ struct AboutSettingsView: View {
                             .font(.system(size: 14, weight: .medium, design: .serif))
                             .italic()
                         Text("— 1 Timothy 5:18")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 13))
+                            .foregroundStyle(.white.opacity(0.92))
                     }
                     .padding(.top, 8)
 
@@ -1544,7 +1516,7 @@ struct AboutSettingsView: View {
                     I need your help to keep SaneClip alive. \
                     Your support — whether one-time or monthly — makes this possible. Thank you.
                     """)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.92))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
 
@@ -1565,23 +1537,29 @@ struct AboutSettingsView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
-                        .background(.pink.opacity(0.1))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(ClipActionButtonStyle(prominent: true))
 
                     // Crypto addresses
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Or send crypto:")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(.tertiary)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.9))
                         CryptoAddressRow(label: "BTC", address: "3Go9nJu3dj2qaa4EAYXrTsTf5AnhcrPQke")
                         CryptoAddressRow(label: "SOL", address: "FBvU83GUmwEYk3HMwZh3GBorGvrVVWSPb8VLCKeLiWZZ")
                         CryptoAddressRow(label: "ZEC", address: "t1PaQ7LSoRDVvXLaQTWmy5tKUAiKxuE9hBN")
                     }
                     .padding()
-                    .background(.fill.quaternary)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .background(
+                        ClipGlassRoundedBackground(
+                            cornerRadius: 10,
+                            tint: SaneClipChrome.panelTint,
+                            tintStrength: 0.12,
+                            shadowOpacity: 0.10,
+                            shadowRadius: 6,
+                            shadowY: 2
+                        )
+                    )
                 }
                 .padding()
             }
@@ -1606,7 +1584,7 @@ private struct CryptoAddressRow: View {
 
             Text(address)
                 .font(.system(size: 13, design: .monospaced))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(clipReadableSecondary)
                 .lineLimit(1)
                 .truncationMode(.middle)
 
@@ -1624,187 +1602,8 @@ private struct CryptoAddressRow: View {
                     .font(.system(size: 13))
             }
             .buttonStyle(.borderless)
-            .foregroundStyle(copied ? .green : .secondary)
+            .foregroundStyle(copied ? .green : clipReadableSecondary)
         }
-    }
-}
-
-// MARK: - Settings Gradient Background
-
-struct SettingsGradientBackground: View {
-    @Environment(\.colorScheme) private var colorScheme
-
-    var body: some View {
-        ZStack {
-            if colorScheme == .dark {
-                // Dark mode: beautiful glass effect
-                VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow)
-
-                // Subtle navy-teal tint
-                LinearGradient(
-                    colors: [
-                        Color.clipBlue.opacity(0.08),
-                        Color.teal.opacity(0.05),
-                        Color.clipBlue.opacity(0.03)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            } else {
-                // Light mode: soft, warm gradient - not stark white
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.95, green: 0.97, blue: 1.0),
-                        Color(red: 0.92, green: 0.95, blue: 0.99),
-                        Color(red: 0.94, green: 0.96, blue: 1.0)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            }
-        }
-        .ignoresSafeArea()
-    }
-}
-
-// MARK: - Visual Effect Blur (NSVisualEffectView wrapper)
-
-struct VisualEffectBlur: NSViewRepresentable {
-    let material: NSVisualEffectView.Material
-    let blendingMode: NSVisualEffectView.BlendingMode
-
-    func makeNSView(context _: Context) -> NSVisualEffectView {
-        let view = NSVisualEffectView()
-        view.material = material
-        view.blendingMode = blendingMode
-        view.state = .active
-        return view
-    }
-
-    func updateNSView(_ nsView: NSVisualEffectView, context _: Context) {
-        nsView.material = material
-        nsView.blendingMode = blendingMode
-    }
-}
-
-// MARK: - Compact Components
-
-struct CompactSection<Content: View>: View {
-    @Environment(\.colorScheme) private var colorScheme
-    let title: String
-    let content: Content
-
-    init(_ title: String, @ViewBuilder content: () -> Content) {
-        self.title = title
-        self.content = content()
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.headline)
-                .foregroundStyle(.primary)
-                .padding(.leading, 4)
-
-            VStack(spacing: 0) {
-                content
-            }
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(colorScheme == .dark
-                        ? Color.white.opacity(0.08)
-                        : Color.white)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
-                    )
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(colorScheme == .dark
-                        ? Color.white.opacity(0.12)
-                        : Color.clipBlue.opacity(0.15), lineWidth: 1)
-            )
-            .shadow(
-                color: colorScheme == .dark ? .black.opacity(0.15) : .clipBlue.opacity(0.08),
-                radius: colorScheme == .dark ? 8 : 6, x: 0, y: 3
-            )
-            .padding(.horizontal, 2)
-        }
-    }
-}
-
-struct CompactRow<Content: View>: View {
-    let label: String
-    let content: Content
-
-    init(_ label: String, @ViewBuilder content: () -> Content) {
-        self.label = label
-        self.content = content()
-    }
-
-    var body: some View {
-        HStack {
-            Text(label)
-            Spacer()
-            content
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .contentShape(Rectangle())
-    }
-}
-
-struct CompactToggle: View {
-    let label: String
-    @Binding var isOn: Bool
-
-    var body: some View {
-        HStack {
-            Text(label)
-            Spacer()
-            Toggle("", isOn: $isOn)
-                .labelsHidden()
-                .toggleStyle(.switch)
-                .controlSize(.small)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .contentShape(Rectangle())
-    }
-}
-
-struct CompactDivider: View {
-    var body: some View {
-        Divider()
-            .padding(.leading, 12)
-    }
-}
-
-// MARK: - Glass Group Box Style
-
-struct GlassGroupBoxStyle: GroupBoxStyle {
-    @Environment(\.colorScheme) private var colorScheme
-
-    func makeBody(configuration: Configuration) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            configuration.label
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.primary)
-
-            configuration.content
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(colorScheme == .dark ? .thickMaterial : .regularMaterial)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.08), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(colorScheme == .dark ? 0.2 : 0.06), radius: 4, y: 2)
     }
 }
 
@@ -1967,13 +1766,14 @@ private struct ProLockedRow: View {
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "lock.fill")
-                        .font(.system(size: 10))
+                        .font(.system(size: 12, weight: .semibold))
                     Text("Pro")
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: 13, weight: .semibold))
                 }
                 .foregroundStyle(.teal)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ClipActionButtonStyle())
+            .controlSize(.small)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
@@ -1994,20 +1794,21 @@ private struct ProLockedSectionBanner: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "lock.fill")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.teal)
                 Text("These settings require SaneClip Pro")
-                    .font(.system(size: 12))
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.white.opacity(0.92))
                 Spacer()
                 Text("Upgrade")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.teal)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 9)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ClipActionButtonStyle())
+        .controlSize(.small)
     }
 }
 // swiftlint:enable file_length

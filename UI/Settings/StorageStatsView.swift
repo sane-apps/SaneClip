@@ -21,17 +21,17 @@ struct StorageStatsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Items by Type")
                         .font(.headline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.white)
 
                     ForEach(itemsByType, id: \.0) { type, count in
                         HStack {
                             Image(systemName: iconForType(type))
                                 .frame(width: 20)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(clipReadableSecondary)
                             Text(type)
                             Spacer()
                             Text("\(count)")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(clipReadableSecondary)
                                 .monospacedDigit()
                         }
                         .padding(.vertical, 4)
@@ -129,8 +129,8 @@ private struct StatCard: View {
                 .monospacedDigit()
 
             Text(title)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(.callout.weight(.medium))
+                .foregroundStyle(clipReadableSecondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)

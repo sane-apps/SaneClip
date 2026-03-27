@@ -13,6 +13,13 @@ import os.log
 
 private let appLogger = Logger(subsystem: "com.saneclip.app", category: "App")
 
+@MainActor
+private func menuBarTemplateImage(named systemName: String) -> NSImage? {
+    let image = NSImage(systemSymbolName: systemName, accessibilityDescription: "SaneClip")
+    image?.isTemplate = true
+    return image
+}
+
 #if !APP_STORE && !SETAPP
 
     // MARK: - Update Service
@@ -485,7 +492,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         if let button = statusItem.button {
             // Use SF Symbol from settings
             let iconName = SettingsModel.shared.menuBarIcon
-            button.image = NSImage(systemSymbolName: iconName, accessibilityDescription: "SaneClip")
+            button.image = menuBarTemplateImage(named: iconName)
             button.action = #selector(togglePopover)
             button.target = self
             // Right-click menu
@@ -1072,7 +1079,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     @objc private func handleMenuBarIconChanged(_ notification: Notification) {
         guard let iconName = notification.object as? String,
               let button = statusItem.button else { return }
-        button.image = NSImage(systemSymbolName: iconName, accessibilityDescription: "SaneClip")
+        button.image = menuBarTemplateImage(named: iconName)
     }
 
     @objc private func handleDismissForPaste() {

@@ -1,5 +1,7 @@
 # SaneClip Development Guide (SOP)
 
+> [README](README.md) · [ARCHITECTURE](ARCHITECTURE.md) · [DEVELOPMENT](DEVELOPMENT.md) · [PRIVACY](PRIVACY.md) · [SECURITY](SECURITY.md)
+
 **Version 1.1** | Last updated: 2026-01-24
 
 > **SINGLE SOURCE OF TRUTH** for all Developers and AI Agents.

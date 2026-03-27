@@ -16,8 +16,8 @@
                                     Text("iCloud Sync")
                                         .font(.headline)
                                     Text("Sync clipboard history across your Apple devices")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .font(.callout.weight(.medium))
+                                        .foregroundStyle(clipReadableSecondary)
                                 }
                             }
                             .toggleStyle(.switch)
@@ -34,7 +34,7 @@
                                     }
                                     Spacer()
                                     Text(coordinator.syncStatus.rawValue)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(clipReadableSecondary)
                                 }
 
                                 // Last sync
@@ -43,7 +43,7 @@
                                         Label("Last Sync", systemImage: "clock")
                                         Spacer()
                                         Text(lastSync, style: .relative)
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(clipReadableSecondary)
                                     }
                                 }
                             }
@@ -83,7 +83,7 @@
                                 Image(systemName: "lock.shield")
                                     .foregroundStyle(.green)
                             }
-                            .font(.caption)
+                            .font(.callout)
 
                             Label {
                                 Text("Uses your private iCloud storage — no third-party servers")
@@ -91,15 +91,15 @@
                                 Image(systemName: "icloud")
                                     .foregroundStyle(Color.clipBlue)
                             }
-                            .font(.caption)
+                            .font(.callout)
 
                             Label {
                                 Text("Images are synced as compressed PNG data")
                             } icon: {
                                 Image(systemName: "photo")
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(clipReadableSecondary)
                             }
-                            .font(.caption)
+                            .font(.callout)
                         }
                         .padding(4)
                     }
@@ -122,7 +122,7 @@
                     .foregroundStyle(.red)
             case .disabled:
                 Image(systemName: "pause.circle.fill")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(clipReadableSecondary)
             case .noAccount:
                 Image(systemName: "person.crop.circle.badge.exclamationmark")
                     .foregroundStyle(.orange)

@@ -108,3 +108,26 @@ Graduate verified findings to ARCHITECTURE.md or DEVELOPMENT.md.
 - After sanitize + plain ad hoc re-sign, the mini-launched Setapp bundle runs and `lsappinfo` reports `CFBundleIdentifier = com.saneclip.app-setapp`.
 - A real signed mini build still fails before launch because Xcode requires a provisioning profile with the iCloud capability for `SaneClip` and a provisioning profile for `SaneClipWidgets`.
 - So the current blocker is no longer “Setapp lane not scaffolded”; it is “real Setapp credentials/provisioning and final signing are still missing.”
+
+## Settings Contrast + Menu Bar Icon Research
+**Updated:** 2026-03-23 | **Status:** verified | **TTL:** 21d
+**Source:** local code + SaneBar reference + Apple docs + GitHub/Web
+- Local root cause: `UI/Settings/SettingsView.swift` had many small `.caption` labels, weak `.secondary` text, and plain `.bordered` buttons in the settings/about flow. That made SaneClip read materially weaker than the current SaneBar SaneUI standard.
+- Local root cause: `SaneClipApp.swift` was assigning `NSImage(systemSymbolName:)` directly to the status item button without marking the image as a template, so the system never got to render the symbol in the normal menu-bar color.
+- Local reference standard: SaneBar already uses `SaneUI.SaneActionButtonStyle`, stronger white copy, and template-rendered menu bar icons. That is the correct in-house baseline for SaneClip too.
+- Apple docs: on current macOS, single-window screenshots should use `ScreenCaptureKit` (`SCScreenshotManager.captureImage`, `SCContentFilter(desktopIndependentWindow:)`) instead of deprecated `CGWindowListCreateImage`.
+- Apple docs + platform behavior: menu bar/status item glyphs should use template rendering so macOS can choose the correct light/dark menu bar color automatically.
+- GitHub/Web competitor pattern: mature menu bar apps and our own SaneBar code mark menu bar symbols/images as template images and avoid hard-coded menu bar icon colors.
+
+## App Store Advertising Readiness
+**Updated:** 2026-03-27 | **Status:** verified | **TTL:** 7d
+**Source:** live public App Store page + GitHub issue audit + inbox audit + Mini verification
+- The live public App Store page for `id6758898132` currently presents SaneClip as `Free · In-App Purchases` with iPhone/iPad-focused copy about synced clipboard history, widgets, Share Sheet saving, pinning, and private iCloud sync.
+- That public copy does not currently contain the older false Mac/App Review messaging about external checkout, demo-only free mode, or nonexistent settings paths.
+- The public iOS App Store description is materially accurate against the shipped code: search, pinning, widgets, Share Sheet saving, iCloud sync, and Pro-only encryption/advanced workflows are all real features.
+- Pinning is still Pro-gated on macOS, but it is free on iPhone/iPad in the live code, so the current public iOS-facing App Store copy is not lying when it mentions pinning in the included experience.
+- Current live customer pressure is low: the inbox has no open SaneClip email threads, GitHub has one open issue (`#3`), and `check-inbox.sh issue-review SaneClip 3` classifies it as waiting for reporter confirmation rather than a newly reproducing live regression.
+- The remaining open GitHub issue is specifically the stale iPhone sync thread from before iOS `2.2.6` went live; there has been no reporter follow-up since 2026-03-11 after the maintainer said the iPhone fix was pending App Review.
+- Mini verification on 2026-03-27 passed for the current repo state: `./scripts/SaneMaster.rb verify` passed with 112 tests, `./scripts/SaneMaster.rb test_mode --release --no-logs` launched the fresh signed release app successfully, and the iOS Release target built cleanly with `xcodebuild ... -scheme SaneClipIOS -configuration Release -destination generic/platform=iOS build CODE_SIGNING_ALLOWED=NO`.
+- Current go/no-go interpretation: SaneClip looks safe enough to advertise this week, but the stale open GitHub sync thread should be followed up for a fresh retest rather than ignored indefinitely.
+- Practical rule going forward: if a settings/about surface uses SaneUI chrome elsewhere, do not regress to `.caption`, `.secondary`, and default bordered buttons for primary actions or explanatory copy.

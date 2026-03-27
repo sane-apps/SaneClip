@@ -3,10 +3,21 @@ import CloudKit
 #if !APP_STORE
     import Sparkle
 #endif
+import SaneUI
+import SwiftUI
 import Testing
 @testable import SaneClip
 
 struct SaneClipTests {
+    private let screenshotOutputHintFile = URL(fileURLWithPath: "/tmp/saneclip_screenshot_dir.txt")
+    private let renderBackdrop = Color(red: 0.06, green: 0.10, blue: 0.18)
+
+    private func projectRootURL() -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
+
     @Test("ClipboardItem preview truncates long text")
     func clipboardItemPreviewTruncation() {
         let longText = String(repeating: "a", count: 200)
@@ -940,6 +951,187 @@ struct SaneClipTests {
         #expect(SettingsView.tab(forShortcutIndex: SettingsView.SettingsTab.allCases.count) == nil)
     }
 
+    @Test("SettingsView uses shared SaneUI settings chrome")
+    func settingsViewUsesSharedSaneUIChrome() throws {
+        let settingsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
+            encoding: .utf8
+        )
+
+        #expect(settingsSource.contains("SaneSettingsContainer(defaultTab: .general, selection: $selectedTab)"))
+        #expect(!settingsSource.contains("struct SettingsGradientBackground"))
+        #expect(!settingsSource.contains("struct VisualEffectBlur"))
+        #expect(!settingsSource.contains("struct CompactSection<"))
+        #expect(!settingsSource.contains("struct CompactRow<"))
+        #expect(!settingsSource.contains("struct CompactToggle"))
+        #expect(!settingsSource.contains("struct CompactDivider"))
+        #expect(!settingsSource.contains("struct GlassGroupBoxStyle"))
+        #expect(settingsSource.contains("typealias ClipActionButtonStyle = SaneUI.SaneActionButtonStyle"))
+        #expect(settingsSource.contains(".buttonStyle(ClipActionButtonStyle())"))
+        #expect(settingsSource.contains("On-Device by Default"))
+        #expect(settingsSource.contains("No Personal Data"))
+    }
+
+    @Test("Settings screens keep readable typography and contrast tokens")
+    func settingsScreensUseReadableTypography() throws {
+        let settingsFiles = [
+            "UI/Settings/SettingsView.swift",
+            "UI/Settings/SnippetsSettingsView.swift",
+            "UI/Settings/StorageStatsView.swift",
+            "Core/Sync/SyncSettingsView.swift"
+        ]
+        let disallowedSubstrings = [
+            ".font(.caption)",
+            ".font(.caption2)",
+            ".foregroundStyle(.secondary)",
+            ".foregroundStyle(.tertiary)",
+            ".font(.system(size: 9)",
+            ".font(.system(size: 10)",
+            ".font(.system(size: 11)"
+        ]
+
+        for relativePath in settingsFiles {
+            let source = try String(
+                contentsOf: projectRootURL().appendingPathComponent(relativePath),
+                encoding: .utf8
+            )
+
+            for forbidden in disallowedSubstrings {
+                #expect(
+                    !source.contains(forbidden),
+                    Comment("\(relativePath) still contains disallowed settings styling: \(forbidden)")
+                )
+            }
+        }
+    }
+
+    @Test("Menu bar symbol images are template-rendered for system contrast")
+    func menuBarTemplateImageUsesTemplateRendering() throws {
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+
+        #expect(appSource.contains("image?.isTemplate = true"))
+        #expect(appSource.contains("button.image = menuBarTemplateImage(named: iconName)"))
+    }
+
+    @Test("Render settings screenshots when requested")
+    @MainActor
+    func renderSettingsScreenshots() throws {
+        guard let rawOutputDir = screenshotOutputDirectory()
+        else {
+            return
+        }
+
+        let outputDir = URL(
+            fileURLWithPath: NSString(string: rawOutputDir).expandingTildeInPath,
+            isDirectory: true
+        )
+        try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
+
+        try renderPNG(
+            ZStack {
+                renderBackdrop.opacity(0.3)
+                    .ignoresSafeArea()
+                GeneralSettingsView(licenseService: nil)
+            }
+                .preferredColorScheme(.dark)
+                .frame(width: 1000, height: 760),
+            size: CGSize(width: 1000, height: 760),
+            to: outputDir.appendingPathComponent("settings-general-render.png")
+        )
+
+        try renderPNG(
+            ZStack {
+                renderBackdrop.opacity(0.3)
+                    .ignoresSafeArea()
+                ShortcutsSettingsView(licenseService: nil)
+            }
+                .preferredColorScheme(.dark)
+                .frame(width: 1000, height: 760),
+            size: CGSize(width: 1000, height: 760),
+            to: outputDir.appendingPathComponent("settings-shortcuts-render.png")
+        )
+
+        try renderPNG(
+            ZStack {
+                renderBackdrop.opacity(0.3)
+                    .ignoresSafeArea()
+                SnippetsSettingsView(licenseService: nil)
+            }
+                .preferredColorScheme(.dark)
+                .frame(width: 1000, height: 760),
+            size: CGSize(width: 1000, height: 760),
+            to: outputDir.appendingPathComponent("settings-snippets-render.png")
+        )
+
+        try renderPNG(
+            ZStack {
+                renderBackdrop.opacity(0.3)
+                    .ignoresSafeArea()
+                SyncSettingsView()
+            }
+                .preferredColorScheme(.dark)
+                .frame(width: 1000, height: 760),
+            size: CGSize(width: 1000, height: 760),
+            to: outputDir.appendingPathComponent("settings-sync-render.png")
+        )
+
+        try renderPNG(
+            ZStack {
+                renderBackdrop.opacity(0.3)
+                    .ignoresSafeArea()
+                StorageStatsView()
+                    .padding(20)
+            }
+                .preferredColorScheme(.dark)
+                .frame(width: 1000, height: 760),
+            size: CGSize(width: 1000, height: 760),
+            to: outputDir.appendingPathComponent("settings-storage-render.png")
+        )
+
+        let previewLicenseService = LicenseService(
+            appName: "SaneClip",
+            purchaseBackend: .appStore(productID: "com.saneclip.app.pro.unlock")
+        )
+        try renderPNG(
+            ZStack {
+                renderBackdrop.opacity(0.3)
+                    .ignoresSafeArea()
+                Form {
+                    LicenseSettingsView(licenseService: previewLicenseService)
+                }
+                .formStyle(.grouped)
+                .padding(20)
+            }
+                .preferredColorScheme(.dark)
+                .frame(width: 1000, height: 760),
+            size: CGSize(width: 1000, height: 760),
+            to: outputDir.appendingPathComponent("settings-license-render.png")
+        )
+
+        try renderPNG(
+            ZStack {
+                renderBackdrop.opacity(0.3)
+                    .ignoresSafeArea()
+                AboutSettingsView(licenseService: nil)
+            }
+                .preferredColorScheme(.dark)
+                .frame(width: 1000, height: 760),
+            size: CGSize(width: 1000, height: 760),
+            to: outputDir.appendingPathComponent("settings-about-render.png")
+        )
+
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-general-render.png").path))
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-shortcuts-render.png").path))
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-snippets-render.png").path))
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-sync-render.png").path))
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-storage-render.png").path))
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-license-render.png").path))
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-about-render.png").path))
+    }
+
     @Test("SettingsModel round-trips excluded apps through fresh initialization")
     @MainActor
     func settingsModelExcludedAppsRoundTrip() {
@@ -953,4 +1145,54 @@ struct SaneClipTests {
         #expect(reloaded.excludedApps == ["com.test.one", "com.test.two"])
     }
 
+    @MainActor
+    private func renderPNG<Content: View>(_ view: Content, size: CGSize, to url: URL) throws {
+        let controller = NSHostingController(rootView: view.frame(width: size.width, height: size.height))
+        let window = NSWindow(
+            contentRect: NSRect(origin: .zero, size: size),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        window.isReleasedWhenClosed = false
+        window.contentViewController = controller
+        window.backgroundColor = .windowBackgroundColor
+        window.makeKeyAndOrderFront(nil)
+        window.displayIfNeeded()
+        controller.view.layoutSubtreeIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.35))
+
+        let renderView = controller.view
+        guard let bitmap = renderView.bitmapImageRepForCachingDisplay(in: renderView.bounds) else {
+            Issue.record("Failed to render screenshot for \(url.lastPathComponent)")
+            return
+        }
+
+        renderView.cacheDisplay(in: renderView.bounds, to: bitmap)
+        guard let png = bitmap.representation(using: .png, properties: [:]) else {
+            Issue.record("Failed to encode screenshot for \(url.lastPathComponent)")
+            return
+        }
+
+        try png.write(to: url, options: .atomic)
+        window.orderOut(nil)
+    }
+
+    private func screenshotOutputDirectory() -> String? {
+        if let rawOutputDir = ProcessInfo.processInfo.environment["SANECLIP_SCREENSHOT_DIR"]?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+           !rawOutputDir.isEmpty
+        {
+            return rawOutputDir
+        }
+
+        if let hintedOutputDir = try? String(contentsOf: screenshotOutputHintFile, encoding: .utf8)
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+            !hintedOutputDir.isEmpty
+        {
+            return hintedOutputDir
+        }
+
+        return nil
+    }
 }

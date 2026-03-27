@@ -1,5 +1,7 @@
 # Security Policy
 
+> [README](README.md) · [ARCHITECTURE](ARCHITECTURE.md) · [DEVELOPMENT](DEVELOPMENT.md) · [PRIVACY](PRIVACY.md) · [SECURITY](SECURITY.md)
+
 ## Supported Versions
 
 | Version | Supported          |
@@ -25,8 +27,8 @@ SaneClip includes several security features:
 
 ### Local-Only Storage
 - All clipboard data stored locally in `~/Library/Application Support/SaneClip/`
-- 100% on-device — no cloud sync, no network calls
-- No analytics or telemetry
+- On-device by default, with optional iCloud sync between your own devices
+- Limited network use for updates and a few simple anonymous app counts
 
 ### Hardened Runtime
 - App is signed with hardened runtime

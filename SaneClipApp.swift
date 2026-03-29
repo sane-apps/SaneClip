@@ -476,7 +476,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     private func setupApp() {
         // Make license service available to settings
-        SettingsWindowController.licenseService = licenseService
+        SettingsWindowController.licenseService = self.licenseService
+        appLogger.info("Settings license service seeded with isPro=\(self.licenseService.isPro)")
 
         // Apply dock visibility setting (must happen early)
         _ = SettingsModel.shared

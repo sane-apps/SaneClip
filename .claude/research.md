@@ -131,3 +131,14 @@ Graduate verified findings to ARCHITECTURE.md or DEVELOPMENT.md.
 - Mini verification on 2026-03-27 passed for the current repo state: `./scripts/SaneMaster.rb verify` passed with 112 tests, `./scripts/SaneMaster.rb test_mode --release --no-logs` launched the fresh signed release app successfully, and the iOS Release target built cleanly with `xcodebuild ... -scheme SaneClipIOS -configuration Release -destination generic/platform=iOS build CODE_SIGNING_ALLOWED=NO`.
 - Current go/no-go interpretation: SaneClip looks safe enough to advertise this week, but the stale open GitHub sync thread should be followed up for a fresh retest rather than ignored indefinitely.
 - Practical rule going forward: if a settings/about surface uses SaneUI chrome elsewhere, do not regress to `.caption`, `.secondary`, and default bordered buttons for primary actions or explanatory copy.
+
+## Sync Status Gate Refresh
+**Updated:** 2026-03-28 | **Status:** verified | **TTL:** 7d
+**Source:** Apple CloudKit docs + web competitor docs + GitHub issue #3 + local code/tests
+- Apple CloudKit docs still confirm the core production rule: App Store builds can only use the production environment, and record types/fields must be deployed from development to production before shipping. That matches SaneClip's earlier real production-schema failure.
+- Apple CloudKit docs still support the current app architecture: development can be reset independently, but production schema changes are additive, which fits SaneClip's custom-zone `CKSyncEngine` model instead of a destructive migration story.
+- Current public competitor positioning still supports SaneClip's local-first sync framing. Paste explicitly says clipboard data stays on-device and in the user's private iCloud, while Raycast's public Cloud Sync docs still treat clipboard history as sensitive. The right product claim remains optional private iCloud sync, not server-based sync.
+- GitHub issue `#3` is still the only active public sync thread. The latest reporter update says macOS looks better, but iPhone sync still under-syncs (`151` items on Mac, only `19` on iPhone after restarts). That means the issue is not cleanly closed yet even though the earlier Mac-side bootstrap failure narrowed.
+- Local code still shows the intended protections are present in `Core/Sync/SyncCoordinator.swift`: persisted `CKSyncEngine.State.Serialization`, explicit custom zone creation, initial local seed tracking via `syncInitialLocalSeedPending`, and remote-deletion blocking while the seed is pending.
+- Local tests still cover the current sync safety story: bootstrap seeding, pending-record filtering, remote-deletion blocking while the initial seed is pending, and failure diagnostics are all present in `Tests/SaneClipTests.swift`.
+- Practical rule for this pass: settings/About standardization work should not alter sync behavior, claims, or troubleshooting copy unless the code and public thread both support it.

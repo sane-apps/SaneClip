@@ -10,8 +10,6 @@ let clipReadableSecondary = Color.white.opacity(0.88)
 let clipReadableMuted = Color.white.opacity(0.78)
 let clipReadableMonospace = Color.white.opacity(0.92)
 
-typealias SaneClipChrome = SaneUI.SanePanelChrome
-typealias ClipGlassRoundedBackground = SaneUI.SaneGlassRoundedBackground
 typealias ClipActionButtonStyle = SaneUI.SaneActionButtonStyle
 
 // MARK: - Notifications
@@ -58,15 +56,15 @@ struct SettingsView: View {
 
         var iconColor: Color {
             switch self {
-            case .general: .textStone
-            case .shortcuts: .clipBlue
-            case .snippets: .green
+            case .general: SaneSettingsIconSemantic.general.color
+            case .shortcuts: SaneSettingsIconSemantic.shortcuts.color
+            case .snippets: SaneSettingsIconSemantic.content.color
             #if ENABLE_SYNC
-                case .sync: .cyan
+                case .sync: SaneSettingsIconSemantic.sync.color
             #endif
-            case .storage: .pinnedOrange
-            case .license: .teal
-            case .about: .brandSilver
+            case .storage: SaneSettingsIconSemantic.storage.color
+            case .license: SaneSettingsIconSemantic.license.color
+            case .about: SaneSettingsIconSemantic.about.color
             }
         }
     }
@@ -95,14 +93,24 @@ struct SettingsView: View {
                     .padding(20)
             case .license:
                 if let licenseService {
-                    Form {
-                        LicenseSettingsView(licenseService: licenseService)
+                    ScrollView(.vertical, showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            LicenseSettingsView(licenseService: licenseService, style: .panel)
+                                .frame(maxWidth: 420, alignment: .leading)
+                            Spacer(minLength: 0)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                        .padding(20)
                     }
-                    .formStyle(.grouped)
-                    .padding(20)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 }
             case .about:
-                AboutSettingsView(licenseService: licenseService)
+                SaneAboutView(
+                    appName: "SaneClip",
+                    githubRepo: "SaneClip",
+                    diagnosticsService: .shared,
+                    licenses: saneClipAboutLicenses(licenseService: licenseService)
+                )
             }
         }
         .background(settingsKeyboardShortcuts)
@@ -134,6 +142,77 @@ struct SettingsView: View {
             }
         }
     }
+}
+
+@MainActor
+private func saneClipAboutLicenses(licenseService: LicenseService?) -> [SaneAboutView.LicenseEntry] {
+    var entries = [
+        SaneAboutView.LicenseEntry(
+            name: "KeyboardShortcuts",
+            url: "https://github.com/sindresorhus/KeyboardShortcuts",
+            text: """
+            MIT License (third-party dependency)
+
+            Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+
+            Permission is hereby granted, free of charge, to any person obtaining a copy \
+            of this software and associated documentation files (the "Software"), to deal \
+            in the Software without restriction, including without limitation the rights \
+            to use, copy, modify, merge, publish, distribute, sublicense, and/or sell \
+            copies of the Software, and to permit persons to whom the Software is \
+            furnished to do so, subject to the following conditions:
+
+            The above copyright notice and this permission notice shall be included in all \
+            copies or substantial portions of the Software.
+
+            THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR \
+            IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, \
+            FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE \
+            AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER \
+            LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, \
+            OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE \
+            SOFTWARE.
+            """
+        )
+    ]
+
+    if licenseService?.distributionChannel.supportsInAppUpdates == true {
+        entries.append(
+            SaneAboutView.LicenseEntry(
+                name: "Sparkle",
+                url: "https://sparkle-project.org",
+                text: """
+                Copyright (c) 2006-2013 Andy Matuschak.
+                Copyright (c) 2009-2013 Elgato Systems GmbH.
+                Copyright (c) 2011-2014 Kornel Lesiński.
+                Copyright (c) 2015-2017 Mayur Pawashe.
+                Copyright (c) 2014 C.W. Betts.
+                Copyright (c) 2014 Petroules Corporation.
+                Copyright (c) 2014 Big Nerd Ranch.
+                All rights reserved.
+
+                Permission is hereby granted, free of charge, to any person obtaining a copy of
+                this software and associated documentation files (the "Software"), to deal in
+                the Software without restriction, including without limitation the rights to
+                use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+                of the Software, and to permit persons to whom the Software is furnished to do
+                so, subject to the following conditions:
+
+                The above copyright notice and this permission notice shall be included in all
+                copies or substantial portions of the Software.
+
+                THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+                IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+                FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+                COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+                IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+                CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+                """
+            )
+        )
+    }
+
+    return entries
 }
 
 @MainActor
@@ -249,15 +328,21 @@ struct GeneralSettingsView: View {
 
                 CompactSection("Appearance") {
                     CompactRow("Menu Bar Icon") {
-                        Picker("", selection: Binding(
-                            get: { settings.menuBarIcon },
-                            set: { settings.menuBarIcon = $0 }
-                        )) {
-                            Label("List", systemImage: "list.clipboard.fill").tag("list.clipboard.fill")
-                            Label("Minimal", systemImage: "doc.plaintext").tag("doc.plaintext")
+                        HStack(spacing: 8) {
+                            Image(nsImage: popupSymbolImage(settings.menuBarIcon))
+
+                            Picker("", selection: Binding(
+                                get: { settings.menuBarIcon },
+                                set: { settings.menuBarIcon = $0 }
+                            )) {
+                                Text("List")
+                                    .tag("list.clipboard.fill")
+                                Text("Minimal")
+                                    .tag("doc.plaintext")
+                            }
+                            .pickerStyle(.menu)
+                            .frame(width: 104)
                         }
-                        .pickerStyle(.menu)
-                        .frame(width: 140)
                     }
                     CompactDivider()
                     CompactRow("Paste sound") {
@@ -701,6 +786,21 @@ struct GeneralSettingsView: View {
         return success
     }
 
+    private func popupSymbolImage(_ systemImage: String) -> NSImage {
+        let weightConfig = NSImage.SymbolConfiguration(pointSize: 12, weight: .semibold)
+        let colorConfig = NSImage.SymbolConfiguration(hierarchicalColor: .white)
+        let resolvedConfig = weightConfig.applying(colorConfig)
+
+        guard let symbol = NSImage(systemSymbolName: systemImage, accessibilityDescription: nil)?
+            .withSymbolConfiguration(resolvedConfig)
+        else {
+            return NSImage()
+        }
+
+        symbol.isTemplate = false
+        return symbol
+    }
+
     private func exportHistory() {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.json]
@@ -869,19 +969,23 @@ struct ExcludedAppsInline: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
 
-            HStack(spacing: 8) {
+            LazyVGrid(
+                columns: [
+                    GridItem(.flexible(minimum: 0, maximum: .infinity), spacing: 8),
+                    GridItem(.flexible(minimum: 0, maximum: .infinity), spacing: 8)
+                ],
+                spacing: 8
+            ) {
                 ForEach(Self.presets) { preset in
                     presetButton(label: preset.label, bundleID: preset.bundleID)
                 }
-                Spacer()
             }
             .padding(.horizontal, 12)
             .padding(.bottom, 8)
 
-            // Subtitle
             if excludedApps.isEmpty {
                 HStack {
-                    Text("Click \"Add App\" to exclude from clipboard history")
+                    Text("Add password managers, launchers, or any app you never want saved to history.")
                         .font(.callout)
                         .foregroundStyle(clipReadableSecondary)
                     Spacer()
@@ -890,7 +994,7 @@ struct ExcludedAppsInline: View {
                 .padding(.bottom, 10)
             } else {
                 HStack {
-                    Text("Clips from these apps won't be saved:")
+                    Text("Clips from these apps are never saved to history.")
                         .font(.callout)
                         .foregroundStyle(clipReadableSecondary)
                     Spacer()
@@ -945,20 +1049,41 @@ struct ExcludedAppsInline: View {
                 excludedApps.append(bundleID)
             }
         } label: {
-            HStack(spacing: 4) {
-                Image(systemName: exists ? "checkmark.circle.fill" : "plus.circle")
-                    .font(.system(size: 12, weight: .semibold))
+            HStack(spacing: 8) {
+                Image(nsImage: appIcon(for: bundleID))
+                    .resizable()
+                    .frame(width: 16, height: 16)
+
                 Text(label)
                     .font(.system(size: 13, weight: .semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.9)
+
+                Spacer(minLength: 6)
+
+                Image(systemName: exists ? "checkmark.circle.fill" : "plus.circle")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(exists ? .green : .white)
             }
-            .foregroundStyle(exists ? .green : .white)
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(Color.white.opacity(0.10))
-            .clipShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ClipActionButtonStyle(prominent: exists, compact: true))
         .focused($focusedKeyboardTarget, equals: .preset(bundleID))
+    }
+
+    private func appIcon(for bundleID: String) -> NSImage {
+        guard let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) else {
+            let fallback = NSImage(systemSymbolName: "app.dashed", accessibilityDescription: nil) ?? NSImage()
+            fallback.size = NSSize(width: 16, height: 16)
+            return fallback
+        }
+
+        let icon = NSWorkspace.shared.icon(forFile: appURL.path)
+        icon.size = NSSize(width: 16, height: 16)
+        return icon
     }
 
     private func removeApp(_ bundleID: String) {
@@ -1130,30 +1255,52 @@ struct ExcludedAppRow: View {
         return appURL.deletingPathExtension().lastPathComponent
     }
 
+    private var appIcon: NSImage {
+        guard let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) else {
+            let fallback = NSImage(systemSymbolName: "app.dashed", accessibilityDescription: nil) ?? NSImage()
+            fallback.size = NSSize(width: 18, height: 18)
+            return fallback
+        }
+
+        let icon = NSWorkspace.shared.icon(forFile: appURL.path)
+        icon.size = NSSize(width: 18, height: 18)
+        return icon
+    }
+
     var body: some View {
-        HStack {
-            Text(appName)
-                .foregroundStyle(.white)
+        HStack(spacing: 10) {
+            Image(nsImage: appIcon)
+                .resizable()
+                .frame(width: 18, height: 18)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(appName)
+                    .foregroundStyle(.white)
+                    .font(.system(size: 13, weight: .semibold))
+
+                Text(bundleID)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(clipReadableMuted)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+            }
 
             Spacer()
 
-            Button {
+            Button("Remove") {
                 onRemove()
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .foregroundStyle(isHovering ? .white : clipReadableMuted)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ClipActionButtonStyle(destructive: isHovering, compact: true))
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 8)
+        .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(isSelected ? Color.clipBlue.opacity(0.16) : .clear)
+                .fill(isSelected ? Color.clipBlue.opacity(0.16) : Color.white.opacity(0.04))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(isSelected ? Color.clipBlue.opacity(0.55) : .clear, lineWidth: 1)
+                .stroke(isSelected ? Color.clipBlue.opacity(0.55) : Color.white.opacity(0.08), lineWidth: 1)
         )
         .contentShape(Rectangle())
         .onTapGesture {
@@ -1254,359 +1401,6 @@ struct ShortcutsSettingsView: View {
     }
 }
 
-// MARK: - About Settings
-
-struct AboutSettingsView: View {
-    let licenseService: LicenseService?
-    @State private var showLicenses = false
-    @State private var showSupport = false
-    @State private var showFeedback = false
-
-    var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
-
-            // App identity
-            Image(nsImage: NSApp.applicationIconImage)
-                .resizable()
-                .frame(width: 96, height: 96)
-                .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 4)
-
-            VStack(spacing: 8) {
-                Text("SaneClip")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.white)
-
-                if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-                    Text("Version \(version)")
-                        .font(.body)
-                        .foregroundStyle(.white.opacity(0.92))
-                }
-            }
-
-            // Trust info
-            HStack(spacing: 0) {
-                Text("Made with ❤️ in 🇺🇸")
-                    .fontWeight(.medium)
-                Text(" · ")
-                Text("On-Device by Default")
-                Text(" · ")
-                Text("No Personal Data")
-            }
-            .font(.callout)
-            .foregroundStyle(.white.opacity(0.92))
-            .padding(.top, 4)
-
-            // Action grid (two clean rows)
-            VStack(spacing: 10) {
-                HStack(spacing: 12) {
-                    Link(destination: URL(string: "https://github.com/sane-apps/SaneClip")!) {
-                        Label("GitHub", systemImage: "link")
-                    }
-
-                    Button {
-                        showLicenses = true
-                    } label: {
-                        Label("Licenses", systemImage: "doc.text")
-                    }
-
-                    if licenseService?.distributionChannel.showsSupportSection == true {
-                        Button {
-                            showSupport = true
-                        } label: {
-                            Label {
-                                Text("Support")
-                            } icon: {
-                                Image(systemName: "heart.fill")
-                                    .foregroundStyle(.pink)
-                            }
-                        }
-                    }
-                }
-
-                HStack(spacing: 12) {
-                    Button {
-                        showFeedback = true
-                    } label: {
-                        Label("Report Issue", systemImage: "ladybug")
-                    }
-
-                    Link(destination: URL(string: "https://github.com/sane-apps/SaneClip/issues/new?template=bug_report.md")!) {
-                        Label("View Issues", systemImage: "arrow.up.right.square")
-                    }
-
-                    Link(destination: URL(string: "mailto:hi@saneapps.com")!) {
-                        Label("Questions", systemImage: "envelope")
-                    }
-                }
-            }
-            .buttonStyle(ClipActionButtonStyle())
-            .controlSize(.regular)
-            .padding(.top, 12)
-
-            if licenseService?.distributionChannel.supportsInAppUpdates == true {
-                // Check for Updates
-                Button {
-                    checkForUpdates()
-                } label: {
-                    Label("Check for Updates", systemImage: "arrow.triangle.2.circlepath")
-                }
-                .buttonStyle(ClipActionButtonStyle(prominent: true))
-                .controlSize(.regular)
-            }
-
-            Spacer()
-        }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .sheet(isPresented: $showLicenses) {
-            licensesSheet
-        }
-        .sheet(isPresented: $showSupport) {
-            supportSheet
-        }
-        .sheet(isPresented: $showFeedback) {
-            SaneFeedbackView(diagnosticsService: .shared)
-        }
-    }
-
-    private func checkForUpdates() {
-        #if !APP_STORE && !SETAPP
-            UpdateService.shared.checkForUpdates()
-        #endif
-    }
-
-    // MARK: - Licenses Sheet
-
-    private var licensesSheet: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text("Third-Party Licenses")
-                    .font(.headline)
-                Spacer()
-                Button("Done") {
-                    showLicenses = false
-                }
-                .buttonStyle(ClipActionButtonStyle(prominent: true))
-                .keyboardShortcut(.defaultAction)
-            }
-            .padding()
-
-            Divider()
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    GroupBox {
-                        VStack(alignment: .leading, spacing: 8) {
-                            let url = URL(string: "https://github.com/sindresorhus/KeyboardShortcuts")!
-                            Link("KeyboardShortcuts", destination: url)
-                                .font(.headline)
-
-                            Text("""
-                            MIT License (third-party dependency)
-
-                            Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
-
-                            Permission is hereby granted, free of charge, to any person obtaining a copy \
-                            of this software and associated documentation files (the "Software"), to deal \
-                            in the Software without restriction, including without limitation the rights \
-                            to use, copy, modify, merge, publish, distribute, sublicense, and/or sell \
-                            copies of the Software, and to permit persons to whom the Software is \
-                            furnished to do so, subject to the following conditions:
-
-                            The above copyright notice and this permission notice shall be included in all \
-                            copies or substantial portions of the Software.
-
-                            THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR \
-                            IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, \
-                            FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE \
-                            AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER \
-                            LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, \
-                            OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE \
-                            SOFTWARE.
-                            """)
-                            .font(.system(size: 13, design: .monospaced))
-                            .foregroundStyle(clipReadableMonospace)
-                            .textSelection(.enabled)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-
-                    if licenseService?.distributionChannel.supportsInAppUpdates == true {
-                        GroupBox {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Link("Sparkle", destination: URL(string: "https://sparkle-project.org")!)
-                                    .font(.headline)
-
-                                Text("""
-                                Copyright (c) 2006-2013 Andy Matuschak.
-                                Copyright (c) 2009-2013 Elgato Systems GmbH.
-                                Copyright (c) 2011-2014 Kornel Lesiński.
-                                Copyright (c) 2015-2017 Mayur Pawashe.
-                                Copyright (c) 2014 C.W. Betts.
-                                Copyright (c) 2014 Petroules Corporation.
-                                Copyright (c) 2014 Big Nerd Ranch.
-                                All rights reserved.
-
-                                Permission is hereby granted, free of charge, to any person obtaining a copy of
-                                this software and associated documentation files (the "Software"), to deal in
-                                the Software without restriction, including without limitation the rights to
-                                use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-                                of the Software, and to permit persons to whom the Software is furnished to do
-                                so, subject to the following conditions:
-
-                                The above copyright notice and this permission notice shall be included in all
-                                copies or substantial portions of the Software.
-
-                                THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-                                IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-                                FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-                                COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-                                IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-                                CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-                                """)
-                                .font(.system(size: 13, design: .monospaced))
-                                .foregroundStyle(clipReadableMonospace)
-                                .textSelection(.enabled)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                }
-                .padding()
-            }
-        }
-        .frame(width: 500, height: 400)
-    }
-
-    // MARK: - Support Sheet
-
-    private var supportSheet: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text("Support SaneClip")
-                    .font(.headline)
-                Spacer()
-                Button("Done") {
-                    showSupport = false
-                }
-                .buttonStyle(ClipActionButtonStyle(prominent: true))
-                .keyboardShortcut(.defaultAction)
-            }
-            .padding()
-
-            Divider()
-
-            ScrollView {
-                VStack(spacing: 16) {
-                    // Quote
-                    VStack(spacing: 4) {
-                        Text("\"The worker is worthy of his wages.\"")
-                            .font(.system(size: 14, weight: .medium, design: .serif))
-                            .italic()
-                        Text("— 1 Timothy 5:18")
-                            .font(.system(size: 13))
-                            .foregroundStyle(.white.opacity(0.92))
-                    }
-                    .padding(.top, 8)
-
-                    // Personal message
-                    Text("""
-                    I need your help to keep SaneClip alive. \
-                    Your support — whether one-time or monthly — makes this possible. Thank you.
-                    """)
-                    .foregroundStyle(.white.opacity(0.92))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-
-                    Text("— Mr. Sane")
-                        .font(.system(size: 13, weight: .medium))
-                        .multilineTextAlignment(.center)
-
-                    Divider()
-                        .padding(.horizontal, 40)
-
-                    // GitHub Sponsors
-                    Link(destination: URL(string: "https://github.com/sponsors/sane-apps")!) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "heart.fill")
-                                .foregroundStyle(.pink)
-                            Text("Sponsor on GitHub")
-                                .fontWeight(.medium)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                    }
-                    .buttonStyle(ClipActionButtonStyle(prominent: true))
-
-                    // Crypto addresses
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Or send crypto:")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.9))
-                        CryptoAddressRow(label: "BTC", address: "3Go9nJu3dj2qaa4EAYXrTsTf5AnhcrPQke")
-                        CryptoAddressRow(label: "SOL", address: "FBvU83GUmwEYk3HMwZh3GBorGvrVVWSPb8VLCKeLiWZZ")
-                        CryptoAddressRow(label: "ZEC", address: "t1PaQ7LSoRDVvXLaQTWmy5tKUAiKxuE9hBN")
-                    }
-                    .padding()
-                    .background(
-                        ClipGlassRoundedBackground(
-                            cornerRadius: 10,
-                            tint: SaneClipChrome.panelTint,
-                            tintStrength: 0.12,
-                            shadowOpacity: 0.10,
-                            shadowRadius: 6,
-                            shadowY: 2
-                        )
-                    )
-                }
-                .padding()
-            }
-        }
-        .frame(width: 420, height: 360)
-    }
-}
-
-// MARK: - Crypto Address Row
-
-private struct CryptoAddressRow: View {
-    let label: String
-    let address: String
-    @State private var copied = false
-
-    var body: some View {
-        HStack(spacing: 8) {
-            Text(label)
-                .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                .foregroundStyle(.blue)
-                .frame(width: 36, alignment: .leading)
-
-            Text(address)
-                .font(.system(size: 13, design: .monospaced))
-                .foregroundStyle(clipReadableSecondary)
-                .lineLimit(1)
-                .truncationMode(.middle)
-
-            Spacer()
-
-            Button {
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(address, forType: .string)
-                copied = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    copied = false
-                }
-            } label: {
-                Image(systemName: copied ? "checkmark" : "doc.on.doc")
-                    .font(.system(size: 13))
-            }
-            .buttonStyle(.borderless)
-            .foregroundStyle(copied ? .green : clipReadableSecondary)
-        }
-    }
-}
-
 // MARK: - Settings Window Controller
 
 @MainActor
@@ -1624,6 +1418,7 @@ enum SettingsWindowController {
     }
 
     static func open(tab: SettingsView.SettingsTab? = nil) {
+        settingsLogger.info("Opening settings window with license service present=\(licenseService != nil) isPro=\(licenseService?.isPro == true)")
         if let existingWindow = window, existingWindow.isVisible {
             if let tab {
                 existingWindow.contentViewController = makeHostingController(initialTab: tab)

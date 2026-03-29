@@ -120,7 +120,9 @@ struct KeychainHelper: Sendable {
     }
 
     private static var fallbackDefaults: UserDefaults {
-        UserDefaults(suiteName: "com.saneclip.no-keychain") ?? .standard
+        // Keep no-keychain fallback data in SaneClip's standard defaults domain.
+        // Sandboxed macOS builds do not reliably persist arbitrary suite names here.
+        .standard
     }
 
     private static func fallbackKey(_ account: String) -> String {

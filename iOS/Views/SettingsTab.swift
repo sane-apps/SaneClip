@@ -131,8 +131,8 @@ struct SettingsTab: View {
                 value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
             )
 
-            Link(destination: URL(string: "mailto:hi@saneapps.com")!) {
-                settingsRow(icon: "envelope", label: "Contact Support")
+            Link(destination: URL(string: "https://github.com/sane-apps/SaneClip/issues")!) {
+                settingsRow(icon: "arrow.up.right.square", label: "View Issues")
             }
 
             Button {

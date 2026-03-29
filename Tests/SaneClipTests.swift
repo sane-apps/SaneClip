@@ -957,8 +957,22 @@ struct SaneClipTests {
             contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
             encoding: .utf8
         )
+        let directSupportSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("DirectDistributionSupport.swift"),
+            encoding: .utf8
+        )
+        let iosSettingsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("iOS/Views/SettingsTab.swift"),
+            encoding: .utf8
+        )
 
         #expect(settingsSource.contains("SaneSettingsContainer(defaultTab: .general, selection: $selectedTab)"))
+        #expect(settingsSource.contains("SaneSettingsIconSemantic.general.color"))
+        #expect(settingsSource.contains("SaneSettingsIconSemantic.shortcuts.color"))
+        #expect(settingsSource.contains("SaneSettingsIconSemantic.content.color"))
+        #expect(settingsSource.contains("SaneSettingsIconSemantic.storage.color"))
+        #expect(settingsSource.contains("SaneSettingsIconSemantic.license.color"))
+        #expect(settingsSource.contains("SaneSettingsIconSemantic.about.color"))
         #expect(!settingsSource.contains("struct SettingsGradientBackground"))
         #expect(!settingsSource.contains("struct VisualEffectBlur"))
         #expect(!settingsSource.contains("struct CompactSection<"))
@@ -968,8 +982,18 @@ struct SaneClipTests {
         #expect(!settingsSource.contains("struct GlassGroupBoxStyle"))
         #expect(settingsSource.contains("typealias ClipActionButtonStyle = SaneUI.SaneActionButtonStyle"))
         #expect(settingsSource.contains(".buttonStyle(ClipActionButtonStyle())"))
-        #expect(settingsSource.contains("On-Device by Default"))
-        #expect(settingsSource.contains("No Personal Data"))
+        #expect(settingsSource.contains("ClipActionButtonStyle(prominent: exists, compact: true)"))
+        #expect(settingsSource.contains("Button(\"Remove\")"))
+        #expect(settingsSource.contains("Image(nsImage: popupSymbolImage(settings.menuBarIcon))"))
+        #expect(settingsSource.contains("Text(\"List\")"))
+        #expect(settingsSource.contains("hierarchicalColor: .white"))
+        #expect(settingsSource.contains("symbol.isTemplate = false"))
+        #expect(settingsSource.contains("LicenseSettingsView(licenseService: licenseService, style: .panel)"))
+        #expect(settingsSource.contains("SaneAboutView("))
+        #expect(!settingsSource.contains("mailto:hi@saneapps.com"))
+        #expect(!directSupportSource.contains("struct SaneSparkleRow"))
+        #expect(!iosSettingsSource.contains("mailto:hi@saneapps.com"))
+        #expect(iosSettingsSource.contains("https://github.com/sane-apps/SaneClip/issues"))
     }
 
     @Test("Settings screens keep readable typography and contrast tokens")
@@ -1014,6 +1038,17 @@ struct SaneClipTests {
 
         #expect(appSource.contains("image?.isTemplate = true"))
         #expect(appSource.contains("button.image = menuBarTemplateImage(named: iconName)"))
+    }
+
+    @Test("No-keychain fallback stays in SaneClip standard defaults")
+    func noKeychainFallbackUsesStandardDefaults() throws {
+        let keychainSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/Security/KeychainHelper.swift"),
+            encoding: .utf8
+        )
+
+        #expect(keychainSource.contains(".standard"))
+        #expect(!keychainSource.contains("UserDefaults(suiteName: \"com.saneclip.no-keychain\")"))
     }
 
     @Test("Render settings screenshots when requested")
@@ -1095,14 +1130,22 @@ struct SaneClipTests {
             appName: "SaneClip",
             purchaseBackend: .appStore(productID: "com.saneclip.app.pro.unlock")
         )
+        let previewAboutLicenses = [
+            SaneAboutView.LicenseEntry(
+                name: "KeyboardShortcuts",
+                url: "https://github.com/sindresorhus/KeyboardShortcuts",
+                text: "MIT License"
+            )
+        ]
         try renderPNG(
             ZStack {
                 renderBackdrop.opacity(0.3)
                     .ignoresSafeArea()
-                Form {
-                    LicenseSettingsView(licenseService: previewLicenseService)
+                VStack(alignment: .leading, spacing: 0) {
+                    LicenseSettingsView(licenseService: previewLicenseService, style: .panel)
+                        .frame(maxWidth: 420, alignment: .leading)
+                    Spacer(minLength: 0)
                 }
-                .formStyle(.grouped)
                 .padding(20)
             }
                 .preferredColorScheme(.dark)
@@ -1115,7 +1158,12 @@ struct SaneClipTests {
             ZStack {
                 renderBackdrop.opacity(0.3)
                     .ignoresSafeArea()
-                AboutSettingsView(licenseService: nil)
+                SaneAboutView(
+                    appName: "SaneClip",
+                    githubRepo: "SaneClip",
+                    diagnosticsService: .shared,
+                    licenses: previewAboutLicenses
+                )
             }
                 .preferredColorScheme(.dark)
                 .frame(width: 1000, height: 760),

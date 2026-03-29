@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.2.11] - 2026-03-29
+
+Settings now use the shared SaneUI shell, the menu bar icon preview stays readable, and no-keychain builds keep the correct unlock state.
+
+---
+
 ## [2.2.10] - 2026-03-16
 
 Adds diagnostics-backed bug reporting on iPhone and iPad, and refreshes the latest sync and support improvements across the release line.

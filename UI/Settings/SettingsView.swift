@@ -40,6 +40,20 @@ struct SettingsView: View {
 
         var id: String { rawValue }
 
+        var title: String {
+            switch self {
+            case .general: SaneSettingsStrings.generalTabTitle
+            case .shortcuts: SaneSettingsStrings.shortcutsTabTitle
+            case .snippets: SaneSettingsStrings.snippetsTabTitle
+            #if ENABLE_SYNC
+                case .sync: SaneSettingsStrings.syncTabTitle
+            #endif
+            case .storage: SaneSettingsStrings.storageTabTitle
+            case .license: SaneSettingsStrings.licenseTabTitle
+            case .about: SaneSettingsStrings.aboutTabTitle
+            }
+        }
+
         var icon: String {
             switch self {
             case .general: "gear"
@@ -317,7 +331,7 @@ struct GeneralSettingsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                CompactSection("Startup") {
+                CompactSection(SaneClipSettingsCopy.startupSectionTitle) {
                     SaneLoginItemToggle()
                     CompactDivider()
                     SaneDockIconToggle(showDockIcon: Binding(
@@ -326,8 +340,10 @@ struct GeneralSettingsView: View {
                     ))
                 }
 
-                CompactSection("Appearance") {
-                    CompactRow("Menu Bar Icon") {
+                SaneLanguageSettingsRow()
+
+                CompactSection(SaneClipSettingsCopy.appearanceSectionTitle) {
+                    CompactRow(SaneClipSettingsCopy.menuBarIconLabel) {
                         HStack(spacing: 8) {
                             Image(nsImage: popupSymbolImage(settings.menuBarIcon))
 
@@ -335,9 +351,9 @@ struct GeneralSettingsView: View {
                                 get: { settings.menuBarIcon },
                                 set: { settings.menuBarIcon = $0 }
                             )) {
-                                Text("List")
+                                Text(SaneClipSettingsCopy.menuBarIconListTitle)
                                     .tag("list.clipboard.fill")
-                                Text("Minimal")
+                                Text(SaneClipSettingsCopy.menuBarIconMinimalTitle)
                                     .tag("doc.plaintext")
                             }
                             .pickerStyle(.menu)
@@ -345,14 +361,14 @@ struct GeneralSettingsView: View {
                         }
                     }
                     CompactDivider()
-                    CompactRow("Paste sound") {
+                    CompactRow(SaneClipSettingsCopy.pasteSoundLabel) {
                         HStack(spacing: 8) {
                             Picker("", selection: Binding(
                                 get: { settings.pasteSound },
                                 set: { settings.pasteSound = $0 }
                             )) {
                                 ForEach(PasteSound.allCases, id: \.self) { sound in
-                                    Text(sound.rawValue).tag(sound)
+                                    Text(SaneClipSettingsCopy.pasteSoundDisplayName(sound)).tag(sound)
                                 }
                             }
                             .pickerStyle(.menu)
@@ -367,38 +383,38 @@ struct GeneralSettingsView: View {
                             .buttonStyle(ClipActionButtonStyle())
                             .controlSize(.small)
                             .disabled(settings.pasteSound == .off)
-                            .help("Preview sound")
+                            .help(SaneClipSettingsCopy.pasteSoundPreviewHelp)
                         }
                     }
                     CompactDivider()
                     if isPro {
-                        CompactToggle(label: "Paste stack: newest first", isOn: Binding(
+                        CompactToggle(label: SaneClipSettingsCopy.pasteStackNewestFirstLabel, isOn: Binding(
                             get: { settings.pasteStackReversed },
                             set: { settings.pasteStackReversed = $0 }
                         ))
                         CompactDivider()
-                        CompactToggle(label: "Keep stack panel open while pasting", isOn: Binding(
+                        CompactToggle(label: SaneClipSettingsCopy.keepStackPanelOpenLabel, isOn: Binding(
                             get: { settings.keepPasteStackOpenBetweenPastes },
                             set: { settings.keepPasteStackOpenBetweenPastes = $0 }
                         ))
                         CompactDivider()
-                        CompactToggle(label: "Auto-close panel when stack is empty", isOn: Binding(
+                        CompactToggle(label: SaneClipSettingsCopy.autoCloseStackPanelLabel, isOn: Binding(
                             get: { settings.autoClosePasteStackWhenEmpty },
                             set: { settings.autoClosePasteStackWhenEmpty = $0 }
                         ))
                         CompactDivider()
-                        CompactToggle(label: "Collapse duplicate stack items", isOn: Binding(
+                        CompactToggle(label: SaneClipSettingsCopy.collapseDuplicateStackItemsLabel, isOn: Binding(
                             get: { settings.collapseDuplicatePasteStackItems },
                             set: { settings.collapseDuplicatePasteStackItems = $0 }
                         ))
                         CompactDivider()
-                        CompactRow("Default paste mode") {
+                        CompactRow(SaneClipSettingsCopy.defaultPasteModeLabel) {
                             Picker("", selection: Binding(
                                 get: { SettingsModel.shared.defaultPasteMode },
                                 set: { SettingsModel.shared.defaultPasteMode = $0 }
                             )) {
                                 ForEach(PasteMode.allCases, id: \.self) { mode in
-                                    Text(mode.rawValue).tag(mode)
+                                    Text(SaneClipSettingsCopy.pasteModeDisplayName(mode)).tag(mode)
                                 }
                             }
                             .pickerStyle(.segmented)
@@ -406,27 +422,27 @@ struct GeneralSettingsView: View {
                         }
                         HStack {
                             Spacer()
-                            Text(SettingsModel.shared.defaultPasteMode.description)
+                            Text(SaneClipSettingsCopy.pasteModeDescription(SettingsModel.shared.defaultPasteMode))
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(.white)
                         }
                         .padding(.horizontal, 12)
                         .padding(.bottom, 4)
 
-                        CompactRow("Per-app paste mode") {
+                        CompactRow(SaneClipSettingsCopy.perAppPasteModeLabel) {
                             VStack(alignment: .leading, spacing: 6) {
                                 HStack(spacing: 6) {
-                                    TextField("com.apple.TextEdit", text: $appPresetBundleID)
+                                    TextField(SaneClipSettingsCopy.appPresetPlaceholder, text: $appPresetBundleID)
                                         .textFieldStyle(.roundedBorder)
                                         .frame(width: 190)
                                     Picker("", selection: $appPresetMode) {
                                         ForEach(PasteMode.allCases, id: \.self) { mode in
-                                            Text(mode.rawValue).tag(mode)
+                                            Text(SaneClipSettingsCopy.pasteModeDisplayName(mode)).tag(mode)
                                         }
                                     }
                                     .pickerStyle(.menu)
                                     .frame(width: 110)
-                                    Button("Save") {
+                                    Button(SaneClipSettingsCopy.saveButtonTitle) {
                                         let key = appPresetBundleID.trimmingCharacters(in: .whitespacesAndNewlines)
                                         guard !key.isEmpty else { return }
                                         settings.setPasteMode(appPresetMode, for: key)
@@ -437,7 +453,7 @@ struct GeneralSettingsView: View {
                                 }
 
                                 if settings.perAppPasteModes.isEmpty {
-                                    Text("No overrides configured")
+                                    Text(SaneClipSettingsCopy.noOverridesConfigured)
                                         .font(.system(size: 13, weight: .medium))
                                         .foregroundStyle(clipReadableSecondary)
                                 } else {
@@ -447,10 +463,10 @@ struct GeneralSettingsView: View {
                                                 .font(.system(size: 13, design: .monospaced))
                                                 .lineLimit(1)
                                             Spacer(minLength: 8)
-                                            Text(settings.perAppPasteModes[bundleID] ?? "")
+                                            Text(SaneClipSettingsCopy.pasteModeDisplayName(settings.pasteMode(for: bundleID) ?? .standard))
                                                 .font(.system(size: 13, weight: .medium))
                                                 .foregroundStyle(clipReadableSecondary)
-                                            Button("Remove") {
+                                            Button(SaneClipSettingsCopy.removeButtonTitle) {
                                                 settings.setPasteMode(nil, for: bundleID)
                                             }
                                             .buttonStyle(ClipActionButtonStyle())
@@ -463,14 +479,14 @@ struct GeneralSettingsView: View {
                         .padding(.horizontal, 12)
                         .padding(.bottom, 8)
                     } else {
-                        ProLockedRow(label: "Paste stack order (FIFO / LIFO)", feature: .pasteStack, licenseService: licenseService)
+                        ProLockedRow(label: SaneClipSettingsCopy.pasteStackOrderLockedLabel, feature: .pasteStack, licenseService: licenseService)
                         CompactDivider()
-                        ProLockedRow(label: "Default paste mode (Plain / Smart)", feature: .smartPaste, licenseService: licenseService)
+                        ProLockedRow(label: SaneClipSettingsCopy.defaultPasteModeLockedLabel, feature: .smartPaste, licenseService: licenseService)
                     }
                 }
 
-                CompactSection("Security") {
-                    CompactToggle(label: "Detect & skip passwords", isOn: Binding(
+                CompactSection(SaneClipSettingsCopy.securitySectionTitle) {
+                    CompactToggle(label: SaneClipSettingsCopy.detectPasswordsLabel, isOn: Binding(
                         get: { settings.protectPasswords },
                         set: { newValue in
                             if newValue {
@@ -478,7 +494,7 @@ struct GeneralSettingsView: View {
                                 settings.protectPasswords = true
                             } else {
                                 // Turning OFF - always requires auth
-                                let reason = "Authenticate to allow password manager copies in history"
+                                let reason = SaneClipSettingsCopy.authenticatePasswordManagerMessage
                                 Task { @MainActor in
                                     if await authenticateForSecurityChange(reason: reason) {
                                         settings.protectPasswords = false
@@ -490,7 +506,7 @@ struct GeneralSettingsView: View {
                     .disabled(isAuthenticating)
                     CompactDivider()
                     if isPro {
-                        CompactToggle(label: "Require Touch ID to view history", isOn: Binding(
+                        CompactToggle(label: SaneClipSettingsCopy.touchIDLabel, isOn: Binding(
                             get: { settings.requireTouchID },
                             set: { newValue in
                                 if newValue {
@@ -499,7 +515,7 @@ struct GeneralSettingsView: View {
                                 } else {
                                     // Turning OFF - always requires auth
                                     Task { @MainActor in
-                                        if await authenticateForSecurityChange(reason: "Authenticate to disable Touch ID protection") {
+                                        if await authenticateForSecurityChange(reason: String(localized: "saneclip.settings.security.authenticate_disable_touch_id", defaultValue: "Authenticate to disable Touch ID protection")) {
                                             settings.requireTouchID = false
                                         }
                                     }
@@ -508,11 +524,11 @@ struct GeneralSettingsView: View {
                         ))
                         .disabled(isAuthenticating)
                     } else {
-                        ProLockedRow(label: "Require Touch ID to view history", feature: .historyLock, licenseService: licenseService)
+                        ProLockedRow(label: SaneClipSettingsCopy.touchIDLabel, feature: .historyLock, licenseService: licenseService)
                     }
                     CompactDivider()
                     if isPro {
-                        CompactToggle(label: "Encrypt history at rest", isOn: Binding(
+                        CompactToggle(label: SaneClipSettingsCopy.encryptHistoryLabel, isOn: Binding(
                             get: { settings.encryptHistory },
                             set: { newValue in
                                 if newValue {
@@ -521,7 +537,7 @@ struct GeneralSettingsView: View {
                                 } else {
                                     // Turning OFF encryption - requires auth
                                     Task { @MainActor in
-                                        if await authenticateForSecurityChange(reason: "Authenticate to disable history encryption") {
+                                        if await authenticateForSecurityChange(reason: String(localized: "saneclip.settings.security.authenticate_disable_history_encryption", defaultValue: "Authenticate to disable history encryption")) {
                                             settings.encryptHistory = false
                                         }
                                     }
@@ -529,10 +545,10 @@ struct GeneralSettingsView: View {
                             }
                         ))
                         .disabled(isAuthenticating)
-                        .help("Encrypts clipboard history on disk using AES-256-GCM")
+                        .help(SaneClipSettingsCopy.encryptHistoryHelp)
                     } else {
-                        ProLockedRow(label: "Encrypt history at rest", feature: .encryption, licenseService: licenseService)
-                            .help("Encrypts clipboard history on disk using AES-256-GCM — requires Pro")
+                        ProLockedRow(label: SaneClipSettingsCopy.encryptHistoryLabel, feature: .encryption, licenseService: licenseService)
+                            .help(String(localized: "saneclip.settings.security.encrypt_history_pro_help", defaultValue: "Encrypts clipboard history on disk using AES-256-GCM — requires Pro"))
                     }
                     CompactDivider()
                     ExcludedAppsInline(
@@ -552,7 +568,7 @@ struct GeneralSettingsView: View {
                 }
 
                 #if !APP_STORE && !SETAPP
-                    CompactSection("Software Updates") {
+                    CompactSection(SaneClipSettingsCopy.softwareUpdatesSectionTitle) {
                         SaneSparkleRow(
                             automaticallyChecks: Binding(
                                 get: { autoCheckUpdates },
@@ -569,22 +585,24 @@ struct GeneralSettingsView: View {
                                 }
                             ),
                             labels: .init(
-                                automaticCheckLabel: "Check for updates automatically",
-                                automaticCheckHelp: "Periodically check for new versions",
-                                checkFrequencyLabel: "Check frequency",
-                                checkFrequencyHelp: "Choose how often automatic update checks run",
-                                actionsLabel: "Actions",
-                                checkingLabel: "Checking…",
-                                checkNowLabel: "Check Now",
-                                checkNowHelp: "Check for updates right now"
+                                automaticCheckLabel: SaneClipSettingsCopy.updateAutomaticallyLabel,
+                                automaticCheckHelp: SaneClipSettingsCopy.updateAutomaticallyHelp,
+                                checkFrequencyLabel: SaneClipSettingsCopy.updateFrequencyLabel,
+                                checkFrequencyHelp: SaneClipSettingsCopy.updateFrequencyHelp,
+                                actionsLabel: SaneClipSettingsCopy.updatesActionsLabel,
+                                checkingLabel: SaneClipSettingsCopy.checkingButtonTitle,
+                                checkNowLabel: SaneClipSettingsCopy.checkNowButtonTitle,
+                                checkNowHelp: SaneClipSettingsCopy.checkNowHelp,
+                                dailyTitle: String(localized: "saneclip.settings.updates.daily", defaultValue: "Daily"),
+                                weeklyTitle: String(localized: "saneclip.settings.updates.weekly", defaultValue: "Weekly")
                             ),
                             onCheckNow: { UpdateService.shared.checkForUpdates() }
                         )
                     }
                 #endif
 
-                CompactSection("History") {
-                    CompactRow("Maximum Items") {
+                CompactSection(SaneClipSettingsCopy.historySectionTitle) {
+                    CompactRow(SaneClipSettingsCopy.maximumItemsLabel) {
                         if isPro {
                             Picker("", selection: Binding(
                                 get: { settings.maxHistorySize },
@@ -618,38 +636,38 @@ struct GeneralSettingsView: View {
                         }
                     }
                     CompactDivider()
-                    CompactRow("Auto-delete After") {
+                    CompactRow(SaneClipSettingsCopy.autoDeleteAfterLabel) {
                         Picker("", selection: Binding(
                             get: { settings.autoExpireHours },
                             set: { settings.autoExpireHours = $0 }
                         )) {
-                            Text("Never").tag(0)
-                            Text("1 hour").tag(1)
-                            Text("24 hours").tag(24)
-                            Text("7 days").tag(168)
-                            Text("30 days").tag(720)
+                            Text(String(localized: "saneclip.settings.history.never", defaultValue: "Never")).tag(0)
+                            Text(String(localized: "saneclip.settings.history.1_hour", defaultValue: "1 hour")).tag(1)
+                            Text(String(localized: "saneclip.settings.history.24_hours", defaultValue: "24 hours")).tag(24)
+                            Text(String(localized: "saneclip.settings.history.7_days", defaultValue: "7 days")).tag(168)
+                            Text(String(localized: "saneclip.settings.history.30_days", defaultValue: "30 days")).tag(720)
                         }
                         .pickerStyle(.menu)
                         .frame(width: 100)
-                        .help("Pinned items are never deleted")
+                        .help(SaneClipSettingsCopy.pinnedItemsHelp)
                     }
                     CompactDivider()
-                    CompactRow("Storage") {
+                    CompactRow(SaneClipSettingsCopy.storageLabel) {
                         Text("~/Library/Application Support/SaneClip/")
                             .font(.system(size: 13, design: .monospaced))
                             .foregroundStyle(clipReadableSecondary)
                     }
                     CompactDivider()
-                    CompactRow("Data") {
+                    CompactRow(SaneClipSettingsCopy.dataLabel) {
                         if isPro {
                             HStack(spacing: 8) {
-                                Button("Export...") {
+                                Button(SaneClipSettingsCopy.exportButtonTitle) {
                                     exportHistory()
                                 }
                                 .buttonStyle(ClipActionButtonStyle())
                                 .controlSize(.small)
 
-                                Button("Import...") {
+                                Button(SaneClipSettingsCopy.importButtonTitle) {
                                     importHistory()
                                 }
                                 .buttonStyle(ClipActionButtonStyle())
@@ -664,7 +682,7 @@ struct GeneralSettingsView: View {
                                 HStack(spacing: 4) {
                                     Image(systemName: "lock.fill")
                                         .font(.system(size: 12, weight: .semibold))
-                                    Text("Export / Import")
+                                    Text(SaneClipSettingsCopy.exportImportLabel)
                                         .font(.system(size: 13, weight: .semibold))
                                 }
                                 .foregroundStyle(.teal)
@@ -675,57 +693,57 @@ struct GeneralSettingsView: View {
                     }
                 }
 
-                CompactSection("Capture Controls") {
-                    CompactRow("Ignore Next Copy") {
-                        Button("Ignore Once") {
+                CompactSection(SaneClipSettingsCopy.captureControlsSectionTitle) {
+                    CompactRow(SaneClipSettingsCopy.ignoreNextCopyLabel) {
+                        Button(SaneClipSettingsCopy.ignoreOnceButtonTitle) {
                             ClipboardManager.shared?.ignoreNextCopy()
                         }
                         .buttonStyle(ClipActionButtonStyle())
                         .controlSize(.small)
                     }
                     CompactDivider()
-                    CompactRow("Pause Capture") {
+                    CompactRow(SaneClipSettingsCopy.pauseCaptureLabel) {
                         HStack(spacing: 6) {
-                            Button("5m") { ClipboardManager.shared?.pauseCapture(minutes: 5) }
+                            Button(SaneClipSettingsCopy.pause5mTitle) { ClipboardManager.shared?.pauseCapture(minutes: 5) }
                                 .buttonStyle(ClipActionButtonStyle())
                                 .controlSize(.small)
-                            Button("15m") { ClipboardManager.shared?.pauseCapture(minutes: 15) }
+                            Button(SaneClipSettingsCopy.pause15mTitle) { ClipboardManager.shared?.pauseCapture(minutes: 15) }
                                 .buttonStyle(ClipActionButtonStyle())
                                 .controlSize(.small)
-                            Button("60m") { ClipboardManager.shared?.pauseCapture(minutes: 60) }
+                            Button(SaneClipSettingsCopy.pause60mTitle) { ClipboardManager.shared?.pauseCapture(minutes: 60) }
                                 .buttonStyle(ClipActionButtonStyle())
                                 .controlSize(.small)
-                            Button("Resume") { ClipboardManager.shared?.resumeCapture() }
+                            Button(SaneClipSettingsCopy.resumeTitle) { ClipboardManager.shared?.resumeCapture() }
                                 .buttonStyle(ClipActionButtonStyle())
                                 .controlSize(.small)
                         }
                     }
                     CompactDivider()
-                    CompactRow("Max Text Size") {
+                    CompactRow(SaneClipSettingsCopy.textSizeLabel) {
                         Picker("", selection: Binding(
                             get: { settings.maxCaptureTextBytes },
                             set: { settings.maxCaptureTextBytes = $0 }
                         )) {
-                            Text("64 KB").tag(64 * 1024)
-                            Text("256 KB").tag(256 * 1024)
-                            Text("512 KB").tag(512 * 1024)
-                            Text("1 MB").tag(1024 * 1024)
-                            Text("Unlimited").tag(0)
+                            Text(String(localized: "saneclip.settings.history.text_64_kb", defaultValue: "64 KB")).tag(64 * 1024)
+                            Text(String(localized: "saneclip.settings.history.text_256_kb", defaultValue: "256 KB")).tag(256 * 1024)
+                            Text(String(localized: "saneclip.settings.history.text_512_kb", defaultValue: "512 KB")).tag(512 * 1024)
+                            Text(String(localized: "saneclip.settings.history.text_1_mb", defaultValue: "1 MB")).tag(1024 * 1024)
+                            Text(String(localized: "saneclip.settings.history.text_unlimited", defaultValue: "Unlimited")).tag(0)
                         }
                         .pickerStyle(.menu)
                         .frame(width: 110)
                     }
                     CompactDivider()
-                    CompactRow("Max Image Size") {
+                    CompactRow(SaneClipSettingsCopy.imageSizeLabel) {
                         Picker("", selection: Binding(
                             get: { settings.maxCaptureImageBytes },
                             set: { settings.maxCaptureImageBytes = $0 }
                         )) {
-                            Text("2 MB").tag(2 * 1024 * 1024)
-                            Text("5 MB").tag(5 * 1024 * 1024)
-                            Text("10 MB").tag(10 * 1024 * 1024)
-                            Text("25 MB").tag(25 * 1024 * 1024)
-                            Text("Unlimited").tag(0)
+                            Text(String(localized: "saneclip.settings.history.image_2_mb", defaultValue: "2 MB")).tag(2 * 1024 * 1024)
+                            Text(String(localized: "saneclip.settings.history.image_5_mb", defaultValue: "5 MB")).tag(5 * 1024 * 1024)
+                            Text(String(localized: "saneclip.settings.history.image_10_mb", defaultValue: "10 MB")).tag(10 * 1024 * 1024)
+                            Text(String(localized: "saneclip.settings.history.image_25_mb", defaultValue: "25 MB")).tag(25 * 1024 * 1024)
+                            Text(String(localized: "saneclip.settings.history.text_unlimited", defaultValue: "Unlimited")).tag(0)
                         }
                         .pickerStyle(.menu)
                         .frame(width: 110)
@@ -734,16 +752,16 @@ struct GeneralSettingsView: View {
 
                 ClipboardRulesSection(licenseService: licenseService)
 
-                CompactSection("Backup & Restore") {
-                    CompactRow("Settings") {
+                CompactSection(SaneClipSettingsCopy.backupRestoreSectionTitle) {
+                    CompactRow(SaneClipSettingsCopy.settingsLabel) {
                         HStack(spacing: 8) {
-                            Button("Export...") {
+                            Button(SaneClipSettingsCopy.exportButtonTitle) {
                                 exportSettings()
                             }
                             .buttonStyle(ClipActionButtonStyle())
                             .controlSize(.small)
 
-                            Button("Import...") {
+                            Button(SaneClipSettingsCopy.importButtonTitle) {
                                 importSettings()
                             }
                             .buttonStyle(ClipActionButtonStyle())

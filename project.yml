@@ -25,8 +25,7 @@ packages:
     url: https://github.com/sparkle-project/Sparkle
     from: 2.6.0
   SaneUI:
-    url: https://github.com/sane-apps/SaneUI.git
-    branch: main
+    path: ../../infra/SaneUI
 
 settings:
   DEAD_CODE_STRIPPING: YES
@@ -79,6 +78,18 @@ schemes:
       config: Debug
     archive:
       config: Release
+
+  SaneClip-AppStore:
+    build:
+      targets:
+        SaneClipAppStore: all
+        SaneClipWidgets: all
+    profile:
+      config: Release-AppStore
+    run:
+      config: Debug
+    archive:
+      config: Release-AppStore
 
   SaneClipSetapp:
     build:
@@ -218,8 +229,9 @@ targets:
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
           DEVELOPMENT_TEAM: M78L6FXD48
-          CODE_SIGN_STYLE: Automatic
-          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "SaneClip Mac App Store"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipAppStore.entitlements
           INFOPLIST_KEY_AppStoreProductID: com.saneclip.app.pro.unlock
           OTHER_SWIFT_FLAGS: "-D APP_STORE -D ENABLE_SYNC"
@@ -293,6 +305,78 @@ targets:
           fi
         name: Strip Sparkle for App Store
         basedOnDependencyAnalysis: false
+
+  SaneClipAppStore:
+    type: application
+    platform: macOS
+    bundleId: com.saneclip.app
+    deploymentTarget:
+      macOS: 15.0
+    sources:
+      - main.swift
+      - SaneClipApp.swift
+      - ProFeature.swift
+      - DirectDistributionSupport.swift
+      - path: Core
+        excludes:
+          - "**/CLAUDE.md"
+      - path: UI
+        excludes:
+          - "**/CLAUDE.md"
+      - path: Shared
+        excludes:
+          - "**/CLAUDE.md"
+      - Resources
+    dependencies:
+      - package: KeyboardShortcuts
+      - package: SaneUI
+      - target: SaneClipWidgets
+        embed: true
+        codeSign: true
+    info:
+      path: SaneClip/Info.plist
+      properties:
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        AppStoreProductID: com.saneclip.app.pro.unlock
+        LSUIElement: true
+        ITSAppUsesNonExemptEncryption: false
+        LSApplicationCategoryType: "public.app-category.productivity"
+        CFBundleURLTypes:
+          - CFBundleURLName: "SaneClip URL Scheme"
+            CFBundleURLSchemes:
+              - saneclip
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: NO
+        PRODUCT_NAME: SaneClip
+        PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
+        MARKETING_VERSION: "2.2.11"
+        CURRENT_PROJECT_VERSION: "2211"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+        SWIFT_VERSION: 6.0
+        MACOSX_DEPLOYMENT_TARGET: 15.0
+        ARCHS: arm64
+        VALID_ARCHS: arm64
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_INJECT_BASE_ENTITLEMENTS: YES
+        DEVELOPMENT_TEAM: M78L6FXD48
+        OTHER_SWIFT_FLAGS: "$(inherited) -D APP_STORE -D ENABLE_SYNC"
+      configs:
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
+          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipAppStore.entitlements
+        Release:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
+          CODE_SIGN_IDENTITY: "Developer ID Application"
+          CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipAppStore.entitlements
+        Release-AppStore:
+          PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "SaneClip Mac App Store"
+          CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipAppStore.entitlements
 
   SaneClipTests:
     type: bundle.unit-test
@@ -379,8 +463,9 @@ targets:
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
           DEVELOPMENT_TEAM: M78L6FXD48
-          CODE_SIGN_STYLE: Automatic
-          CODE_SIGN_IDENTITY: "Apple Development"
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "SaneClip Widgets Mac App Store"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
         Release-Setapp:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app-setapp.widgets
@@ -466,7 +551,9 @@ targets:
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
           DEVELOPMENT_TEAM: M78L6FXD48
-          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "SaneClip iOS App Store"
           CODE_SIGN_ENTITLEMENTS: iOS/SaneClipIOS.entitlements
           INFOPLIST_KEY_AppStoreProductID: com.saneclip.app.pro.unlock
           OTHER_SWIFT_FLAGS: "-D APP_STORE -D ENABLE_SYNC"
@@ -516,7 +603,9 @@ targets:
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ioswidgets
           DEVELOPMENT_TEAM: M78L6FXD48
-          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "SaneClip iOS Widgets App Store"
           CODE_SIGN_ENTITLEMENTS: iOSWidgets/SaneClipIOSWidgets.entitlements
 
   # iOS Share Extension
@@ -571,5 +660,7 @@ targets:
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.share
           DEVELOPMENT_TEAM: M78L6FXD48
-          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "SaneClip iOS Share App Store"
           CODE_SIGN_ENTITLEMENTS: iOSShareExtension/SaneClipShare.entitlements

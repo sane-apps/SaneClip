@@ -2,6 +2,8 @@
 
     import SwiftUI
 
+    private let syncReadableSecondary = Color.white.opacity(0.88)
+
     struct SyncSettingsView: View {
         @State private var coordinator = SyncCoordinator.shared
 
@@ -17,7 +19,7 @@
                                         .font(.headline)
                                     Text("Sync clipboard history across your Apple devices")
                                         .font(.callout.weight(.medium))
-                                        .foregroundStyle(clipReadableSecondary)
+                                        .foregroundStyle(syncReadableSecondary)
                                 }
                             }
                             .toggleStyle(.switch)
@@ -34,7 +36,7 @@
                                     }
                                     Spacer()
                                     Text(coordinator.syncStatus.rawValue)
-                                        .foregroundStyle(clipReadableSecondary)
+                                        .foregroundStyle(syncReadableSecondary)
                                 }
 
                                 // Last sync
@@ -43,7 +45,7 @@
                                         Label("Last Sync", systemImage: "clock")
                                         Spacer()
                                         Text(lastSync, style: .relative)
-                                            .foregroundStyle(clipReadableSecondary)
+                                            .foregroundStyle(syncReadableSecondary)
                                     }
                                 }
                             }
@@ -97,7 +99,7 @@
                                 Text("Images are synced as compressed PNG data")
                             } icon: {
                                 Image(systemName: "photo")
-                                    .foregroundStyle(clipReadableSecondary)
+                                    .foregroundStyle(syncReadableSecondary)
                             }
                             .font(.callout)
                         }
@@ -122,7 +124,7 @@
                     .foregroundStyle(.red)
             case .disabled:
                 Image(systemName: "pause.circle.fill")
-                    .foregroundStyle(clipReadableSecondary)
+                    .foregroundStyle(syncReadableSecondary)
             case .noAccount:
                 Image(systemName: "person.crop.circle.badge.exclamationmark")
                     .foregroundStyle(.orange)

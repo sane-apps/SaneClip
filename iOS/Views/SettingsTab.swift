@@ -232,11 +232,16 @@ extension SaneDiagnosticsService {
         ]
 
         #if ENABLE_SYNC
-            let coordinator = SyncCoordinator.shared
-            lines.append("syncEnabled: \(coordinator.isSyncEnabled)")
-            lines.append("syncStatus: \(coordinator.syncStatus.rawValue)")
-            lines.append("connectedDeviceCount: \(coordinator.connectedDevices.count)")
-            lines.append("lastSyncDate: \(coordinator.lastSyncDate?.description ?? "nil")")
+            let syncDiagnostics = await MainActor.run { () -> [String] in
+                let coordinator = SyncCoordinator.shared
+                return [
+                    "syncEnabled: \(coordinator.isSyncEnabled)",
+                    "syncStatus: \(coordinator.syncStatus.rawValue)",
+                    "connectedDeviceCount: \(coordinator.connectedDevices.count)",
+                    "lastSyncDate: \(coordinator.lastSyncDate?.description ?? "nil")"
+                ]
+            }
+            lines.append(contentsOf: syncDiagnostics)
         #else
             lines.append("syncEnabled: false")
             lines.append("syncStatus: unavailable")

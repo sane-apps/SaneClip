@@ -1,0 +1,34 @@
+[
+  {
+    "slug": "saneclip-sync",
+    "reason": "Repeated iCloud/sync/history-loss reports. Fresh CloudKit docs, competitor sync behavior, GitHub, and local research required before more changes.",
+    "created_at": "2026-04-01T19:53:06Z",
+    "source_updated_at": "2026-04-01T19:53:06Z",
+    "source": "issue-cluster-sync",
+    "app": "SaneClip",
+    "threshold": 3,
+    "match_count": 3,
+    "matches": [
+      {
+        "kind": "email",
+        "id": 210,
+        "subject": "saneclip ios",
+        "created_at": "2026-03-05 02:59:42"
+      },
+      {
+        "kind": "github",
+        "id": 5,
+        "title": "[Feature] Pinned item on Mac version",
+        "state": "CLOSED",
+        "updated_at": "2026-04-01T19:53:06Z"
+      },
+      {
+        "kind": "github",
+        "id": 3,
+        "title": "The iCloud sync on Iphone app is not working.",
+        "state": "OPEN",
+        "updated_at": "2026-04-01T19:53:05Z"
+      }
+    ]
+  }
+]

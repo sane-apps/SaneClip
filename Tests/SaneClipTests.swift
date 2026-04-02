@@ -11,6 +11,7 @@ import Testing
 struct SaneClipTests {
     private let screenshotOutputHintFile = URL(fileURLWithPath: "/tmp/saneclip_screenshot_dir.txt")
     private let renderBackdrop = Color(red: 0.06, green: 0.10, blue: 0.18)
+    private let appStoreCanvasSize = CGSize(width: 1440, height: 900)
 
     private func projectRootURL() -> URL {
         URL(fileURLWithPath: #filePath)
@@ -1055,6 +1056,11 @@ struct SaneClipTests {
     @Test("Render settings screenshots when requested")
     @MainActor
     func renderSettingsScreenshots() throws {
+        guard ProcessInfo.processInfo.environment["SANECLIP_RENDER_SETTINGS_SHOTS"] == "1"
+        else {
+            return
+        }
+
         guard let rawOutputDir = screenshotOutputDirectory()
         else {
             return
@@ -1181,6 +1187,100 @@ struct SaneClipTests {
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-about-render.png").path))
     }
 
+    @Test("Render App Store macOS screenshots when requested")
+    @MainActor
+    func renderAppStoreMacScreenshots() throws {
+        guard let rawOutputDir = screenshotOutputDirectory()
+        else {
+            return
+        }
+
+        let outputDir = URL(
+            fileURLWithPath: NSString(string: rawOutputDir).expandingTildeInPath,
+            isDirectory: true
+        )
+        try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
+
+        let licenseService = LicenseService(
+            appName: "SaneClip",
+            purchaseBackend: .appStore(productID: "com.saneclip.app.pro.unlock")
+        )
+        let clipboardManager = seedAppStoreScreenshotState()
+        let originalSharedClipboardManager = ClipboardManager.shared
+        let snippetManager = SnippetManager.shared
+        let originalSnippets = snippetManager.snippets
+        defer {
+            ClipboardManager.shared = originalSharedClipboardManager
+            snippetManager.snippets = originalSnippets
+        }
+
+        ClipboardManager.shared = clipboardManager
+        snippetManager.snippets = [
+            Snippet(
+                name: "Follow-up Email",
+                template: "Thanks again for the time today. I attached the recap and next steps below.",
+                category: "Work",
+                lastUsedAt: Date().addingTimeInterval(-1_800),
+                useCount: 14
+            ),
+            Snippet(
+                name: "Shipping Update",
+                template: "Your order is packed and leaves the warehouse this afternoon.",
+                category: "Support",
+                lastUsedAt: Date().addingTimeInterval(-3_600),
+                useCount: 8
+            ),
+            Snippet(
+                name: "Date Stamp",
+                template: "{{date}}",
+                category: "Utility",
+                lastUsedAt: Date().addingTimeInterval(-7_200),
+                useCount: 20
+            )
+        ]
+
+        try renderPNG(
+            appStoreHistoryShowcase(clipboardManager: clipboardManager, licenseService: licenseService)
+                .frame(width: appStoreCanvasSize.width, height: appStoreCanvasSize.height),
+            size: appStoreCanvasSize,
+            to: outputDir.appendingPathComponent("appstore-macos-history.png")
+        )
+
+        try renderPNG(
+            appStoreSettingsShowcase(licenseService: licenseService, tab: .general)
+                .frame(width: appStoreCanvasSize.width, height: appStoreCanvasSize.height),
+            size: appStoreCanvasSize,
+            to: outputDir.appendingPathComponent("appstore-macos-general.png")
+        )
+
+        try renderPNG(
+            appStoreSettingsShowcase(licenseService: licenseService, tab: .shortcuts)
+                .frame(width: appStoreCanvasSize.width, height: appStoreCanvasSize.height),
+            size: appStoreCanvasSize,
+            to: outputDir.appendingPathComponent("appstore-macos-shortcuts.png")
+        )
+
+        try renderPNG(
+            appStoreSettingsShowcase(licenseService: licenseService, tab: .snippets)
+                .frame(width: appStoreCanvasSize.width, height: appStoreCanvasSize.height),
+            size: appStoreCanvasSize,
+            to: outputDir.appendingPathComponent("appstore-macos-snippets.png")
+        )
+
+        try renderPNG(
+            appStoreSettingsShowcase(licenseService: licenseService, tab: .license)
+                .frame(width: appStoreCanvasSize.width, height: appStoreCanvasSize.height),
+            size: appStoreCanvasSize,
+            to: outputDir.appendingPathComponent("appstore-macos-license.png")
+        )
+
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("appstore-macos-history.png").path))
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("appstore-macos-general.png").path))
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("appstore-macos-shortcuts.png").path))
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("appstore-macos-snippets.png").path))
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("appstore-macos-license.png").path))
+    }
+
     @Test("SettingsModel round-trips excluded apps through fresh initialization")
     @MainActor
     func settingsModelExcludedAppsRoundTrip() {
@@ -1196,35 +1296,455 @@ struct SaneClipTests {
 
     @MainActor
     private func renderPNG<Content: View>(_ view: Content, size: CGSize, to url: URL) throws {
-        let controller = NSHostingController(rootView: view.frame(width: size.width, height: size.height))
-        let window = NSWindow(
-            contentRect: NSRect(origin: .zero, size: size),
-            styleMask: [.titled, .closable],
-            backing: .buffered,
-            defer: false
-        )
-        window.isReleasedWhenClosed = false
-        window.contentViewController = controller
-        window.backgroundColor = .windowBackgroundColor
-        window.makeKeyAndOrderFront(nil)
-        window.displayIfNeeded()
-        controller.view.layoutSubtreeIfNeeded()
-        RunLoop.main.run(until: Date().addingTimeInterval(0.35))
+        let content = view.frame(width: size.width, height: size.height)
+        let hostingView = NSHostingView(rootView: content)
+        hostingView.frame = CGRect(origin: .zero, size: size)
+        hostingView.setFrameSize(size)
+        hostingView.layoutSubtreeIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.1))
 
-        let renderView = controller.view
-        guard let bitmap = renderView.bitmapImageRepForCachingDisplay(in: renderView.bounds) else {
+        guard let fallbackBitmap = hostingView.bitmapImageRepForCachingDisplay(in: hostingView.bounds) else {
             Issue.record("Failed to render screenshot for \(url.lastPathComponent)")
             return
         }
 
-        renderView.cacheDisplay(in: renderView.bounds, to: bitmap)
-        guard let png = bitmap.representation(using: .png, properties: [:]) else {
+        hostingView.cacheDisplay(in: hostingView.bounds, to: fallbackBitmap)
+        guard let fallbackPNG = fallbackBitmap.representation(using: .png, properties: [:]) else {
             Issue.record("Failed to encode screenshot for \(url.lastPathComponent)")
             return
         }
 
-        try png.write(to: url, options: .atomic)
-        window.orderOut(nil)
+        try fallbackPNG.write(to: url, options: .atomic)
+    }
+
+    @MainActor
+    private func seedAppStoreScreenshotState() -> ClipboardManager {
+        let now = Date()
+        let clipboardManager = ClipboardManager()
+        clipboardManager.licenseService = LicenseService(
+            appName: "SaneClip",
+            purchaseBackend: .appStore(productID: "com.saneclip.app.pro.unlock")
+        )
+        clipboardManager.pinnedItems = [
+            ClipboardItem(
+                content: .text("https://saneapps.com/saneclip"),
+                timestamp: now.addingTimeInterval(-1_200),
+                sourceAppBundleID: "com.apple.Safari",
+                sourceAppName: "Safari",
+                pasteCount: 3,
+                title: "SaneClip for Mac",
+                collection: "Links"
+            )
+        ]
+        clipboardManager.history = [
+            ClipboardItem(
+                content: .text("Meeting recap: ship the clipboard search update on Friday and keep the macOS build aligned with iPhone."),
+                timestamp: now.addingTimeInterval(-2_400),
+                sourceAppBundleID: "com.apple.Notes",
+                sourceAppName: "Notes",
+                pasteCount: 2,
+                collection: "Work"
+            ),
+            ClipboardItem(
+                content: .text("func presentShareSheet() { print(\"Ready to share the latest build\") }"),
+                timestamp: now.addingTimeInterval(-4_800),
+                sourceAppBundleID: "com.apple.dt.Xcode",
+                sourceAppName: "Xcode",
+                pasteCount: 1,
+                title: "Share Sheet Helper",
+                collection: "Code"
+            ),
+            ClipboardItem(
+                content: .text("Shipping update: your replacement cable is out for delivery and should arrive before 8 PM."),
+                timestamp: now.addingTimeInterval(-7_200),
+                sourceAppBundleID: "com.apple.Mail",
+                sourceAppName: "Mail",
+                pasteCount: 4,
+                collection: "Support"
+            ),
+            ClipboardItem(
+                content: .text("https://developer.apple.com/app-store/review/guidelines/"),
+                timestamp: now.addingTimeInterval(-9_600),
+                sourceAppBundleID: "com.apple.Safari",
+                sourceAppName: "Safari",
+                pasteCount: 1,
+                collection: "Links"
+            )
+        ]
+        return clipboardManager
+    }
+
+    @MainActor
+    private func appStoreHistoryShowcase(
+        clipboardManager: ClipboardManager,
+        licenseService: LicenseService
+    ) -> some View {
+        ZStack {
+            LinearGradient(
+                colors: [
+                    renderBackdrop.opacity(0.96),
+                    Color(red: 0.09, green: 0.13, blue: 0.22)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                HStack(spacing: 10) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(.white.opacity(0.7))
+                    Text("Search clipboard history...")
+                        .foregroundStyle(.white.opacity(0.7))
+                    Spacer()
+                    Image(systemName: "line.3.horizontal.decrease.circle")
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+                .background(Color.white.opacity(0.06))
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 14) {
+                        if let pinned = clipboardManager.pinnedItems.first {
+                            Text("Pinned")
+                                .font(.headline)
+                                .foregroundStyle(.white.opacity(0.92))
+                            ClipboardItemRow(
+                                item: pinned,
+                                isPinned: true,
+                                clipboardManager: clipboardManager,
+                                licenseService: licenseService
+                            )
+                        }
+
+                        Text("Recent")
+                            .font(.headline)
+                            .foregroundStyle(.white.opacity(0.92))
+
+                        ForEach(clipboardManager.history.prefix(4)) { item in
+                            ClipboardItemRow(
+                                item: item,
+                                isPinned: false,
+                                clipboardManager: clipboardManager,
+                                licenseService: licenseService
+                            )
+                        }
+                    }
+                    .padding(16)
+                }
+
+                HStack {
+                    Text("50 items")
+                        .font(.headline)
+                        .foregroundStyle(.white.opacity(0.9))
+                    Spacer()
+                    Label("Clear All", systemImage: "trash")
+                        .font(.headline)
+                        .foregroundStyle(.white.opacity(0.9))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+                .background(Color.white.opacity(0.06))
+            }
+            .frame(width: 540, height: 820)
+            .preferredColorScheme(.dark)
+                .background(
+                    RoundedRectangle(cornerRadius: 26, style: .continuous)
+                        .fill(Color.black.opacity(0.24))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 26, style: .continuous)
+                        .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(0.35), radius: 30, x: 0, y: 20)
+        }
+    }
+
+    @MainActor
+    private func appStoreSettingsShowcase(
+        licenseService: LicenseService,
+        tab: SettingsView.SettingsTab
+    ) -> some View {
+        ZStack {
+            renderBackdrop
+                .ignoresSafeArea()
+
+            HStack(spacing: 0) {
+                screenshotSidebar(selectedTab: tab)
+                    .frame(width: 260)
+                    .padding(18)
+
+                Rectangle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: 1)
+
+                screenshotSettingsContent(for: tab, licenseService: licenseService)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .padding(28)
+            }
+            .frame(width: 1180, height: 780)
+            .background(Color(red: 0.10, green: 0.12, blue: 0.18))
+            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .stroke(Color.white.opacity(0.08), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.32), radius: 24, x: 0, y: 18)
+        }
+    }
+
+    @ViewBuilder
+    private func screenshotSettingsContent(
+        for tab: SettingsView.SettingsTab,
+        licenseService: LicenseService
+    ) -> some View {
+        switch tab {
+        case .general:
+            VStack(alignment: .leading, spacing: 18) {
+                screenshotSection("Startup") {
+                    screenshotToggleRow("Start automatically at login", isOn: false)
+                    screenshotToggleRow("Show app in Dock", isOn: true)
+                }
+                screenshotSection("Appearance") {
+                    screenshotValueRow("Menu Bar Icon", value: "List")
+                    screenshotToggleRow("Play sound when copying", isOn: false)
+                }
+                screenshotSection("Security") {
+                    screenshotToggleRow("Detect & skip passwords", isOn: true)
+                    screenshotToggleRow("Require Touch ID to view history", isOn: false)
+                    screenshotButtonRow("Excluded Apps", buttonTitle: "Add App...")
+                }
+            }
+        case .shortcuts:
+            VStack(alignment: .leading, spacing: 18) {
+                screenshotSection("History") {
+                    screenshotShortcutRow("Show clipboard history", shortcut: "⌘⇧V")
+                    screenshotShortcutRow("Paste as plain text", shortcut: "⌘⌥V")
+                    screenshotShortcutRow("Open at cursor", shortcut: "⌃⌥V")
+                }
+                screenshotSection("Quick Paste") {
+                    screenshotShortcutRow("Paste first item", shortcut: "⌃1")
+                    screenshotShortcutRow("Paste second item", shortcut: "⌃2")
+                    screenshotShortcutRow("Paste third item", shortcut: "⌃3")
+                }
+            }
+        case .snippets:
+            VStack(alignment: .leading, spacing: 18) {
+                screenshotSection("Snippets") {
+                    screenshotSnippetRow(name: "Follow-up Email", detail: "Thanks again for the time today. I attached the recap and next steps below.", tag: "Work")
+                    screenshotSnippetRow(name: "Shipping Update", detail: "Your order is packed and leaves the warehouse this afternoon.", tag: "Support")
+                    screenshotSnippetRow(name: "Date Stamp", detail: "{{date}}", tag: "Utility")
+                }
+                HStack {
+                    Text("3 snippets")
+                        .font(.headline)
+                        .foregroundStyle(.white.opacity(0.86))
+                    Spacer()
+                    screenshotPrimaryButton("Add Snippet")
+                }
+            }
+        case .sync:
+            screenshotSection("iCloud Sync") {
+                screenshotToggleRow("Sync clipboard history across your Apple devices", isOn: true)
+                screenshotValueRow("Status", value: "Idle")
+                screenshotValueRow("Connected Devices", value: "MacBook Pro, iPhone 16 Pro")
+            }
+        case .storage:
+            screenshotSection("Storage") {
+                screenshotValueRow("Total Items", value: "50")
+                screenshotValueRow("Pinned", value: "4")
+                screenshotValueRow("Storage", value: "184 KB")
+            }
+        case .license:
+            VStack(alignment: .leading, spacing: 18) {
+                screenshotSection("Unlock Pro") {
+                    screenshotValueRow("One-time unlock", value: "$6.99")
+                    screenshotValueRow("Includes", value: "Unlimited history, snippets, paste tools, Touch ID lock")
+                }
+                HStack(spacing: 12) {
+                    screenshotPrimaryButton("Unlock Pro")
+                    screenshotSecondaryButton("Restore Purchases")
+                }
+                Text("The App Store build uses StoreKit only.")
+                    .font(.headline)
+                    .foregroundStyle(.white.opacity(0.82))
+            }
+        case .about:
+            screenshotSection("About") {
+                screenshotValueRow("Version", value: "2.2.11")
+                screenshotValueRow("Privacy", value: "Private clipboard history with iCloud sync")
+            }
+        }
+    }
+
+    private func screenshotSidebar(selectedTab: SettingsView.SettingsTab) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("SaneClip Settings")
+                .font(.system(size: 22, weight: .bold))
+                .foregroundStyle(.white)
+                .padding(.bottom, 10)
+
+            ForEach(Array(SettingsView.SettingsTab.allCases), id: \.id) { item in
+                HStack(spacing: 12) {
+                    Image(systemName: item.icon)
+                        .frame(width: 18)
+                    Text(item.title)
+                        .font(.headline)
+                }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(item == selectedTab ? Color.blue.opacity(0.78) : Color.clear)
+                )
+            }
+
+            Spacer()
+        }
+    }
+
+    private func screenshotSection<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.system(size: 26, weight: .bold))
+                .foregroundStyle(.white)
+            VStack(spacing: 0) {
+                content()
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(Color.white.opacity(0.08))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(Color.white.opacity(0.08), lineWidth: 1)
+            )
+        }
+    }
+
+    private func screenshotToggleRow(_ title: String, isOn: Bool) -> some View {
+        HStack {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(.white)
+            Spacer()
+            screenshotToggle(isOn: isOn)
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+    }
+
+    private func screenshotValueRow(_ title: String, value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(.white)
+            Spacer()
+            Text(value)
+                .font(.headline)
+                .foregroundStyle(.white.opacity(0.86))
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+    }
+
+    private func screenshotButtonRow(_ title: String, buttonTitle: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(.white)
+            Spacer()
+            screenshotSecondaryButton(buttonTitle)
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+    }
+
+    private func screenshotShortcutRow(_ title: String, shortcut: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(.white)
+            Spacer()
+            Text(shortcut)
+                .font(.system(size: 18, weight: .semibold, design: .monospaced))
+                .foregroundStyle(.white.opacity(0.9))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(Color.black.opacity(0.2))
+                )
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+    }
+
+    private func screenshotSnippetRow(name: String, detail: String, tag: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(name)
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                Spacer()
+                Text(tag)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.86))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.blue.opacity(0.28))
+                    .clipShape(Capsule())
+            }
+            Text(detail)
+                .font(.system(size: 17, weight: .medium))
+                .foregroundStyle(.white.opacity(0.82))
+                .lineLimit(2)
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+    }
+
+    private func screenshotToggle(isOn: Bool) -> some View {
+        ZStack(alignment: isOn ? .trailing : .leading) {
+            Capsule()
+                .fill(isOn ? Color.blue : Color.white.opacity(0.18))
+                .frame(width: 56, height: 32)
+            Circle()
+                .fill(.white)
+                .frame(width: 26, height: 26)
+                .padding(3)
+        }
+    }
+
+    private func screenshotPrimaryButton(_ title: String) -> some View {
+        Text(title)
+            .font(.headline)
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color.blue)
+            )
+    }
+
+    private func screenshotSecondaryButton(_ title: String) -> some View {
+        Text(title)
+            .font(.headline)
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color.white.opacity(0.10))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color.white.opacity(0.08), lineWidth: 1)
+            )
     }
 
     private func screenshotOutputDirectory() -> String? {

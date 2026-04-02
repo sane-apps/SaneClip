@@ -109,7 +109,7 @@ appstore:
     ipad:
       supports_dark_interface: true
   screenshots:
-    macos: docs/images/screenshot-[!i]*.png
+    macos: docs/images/appstore-macos-*.png
     ios: docs/images/screenshot-ios-*-dark.png
     ipad: docs/images/screenshot-ipad-*-dark.png
   strip_frameworks:

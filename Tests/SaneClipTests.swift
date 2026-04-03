@@ -772,6 +772,52 @@ struct SaneClipTests {
         )
     }
 
+    @Test("SyncCoordinator resets stale iPhone sync state when upgrading from pre-2.2.6")
+    func syncCoordinatorResetsStaleIOSBootstrapStateOnUpgrade() {
+        #expect(
+            SyncCoordinator.shouldResetStaleIOSBootstrapState(
+                previousStateExists: true,
+                lastRunAppVersion: "2.1",
+                currentAppVersion: "2.2.6"
+            )
+        )
+        #expect(
+            SyncCoordinator.shouldResetStaleIOSBootstrapState(
+                previousStateExists: true,
+                lastRunAppVersion: nil,
+                currentAppVersion: "2.2.8"
+            )
+        )
+        #expect(
+            !SyncCoordinator.shouldResetStaleIOSBootstrapState(
+                previousStateExists: false,
+                lastRunAppVersion: "2.1",
+                currentAppVersion: "2.2.6"
+            )
+        )
+        #expect(
+            !SyncCoordinator.shouldResetStaleIOSBootstrapState(
+                previousStateExists: true,
+                lastRunAppVersion: "2.2.6",
+                currentAppVersion: "2.2.6"
+            )
+        )
+        #expect(
+            !SyncCoordinator.shouldResetStaleIOSBootstrapState(
+                previousStateExists: true,
+                lastRunAppVersion: "2.2.8",
+                currentAppVersion: "2.2.8"
+            )
+        )
+        #expect(
+            !SyncCoordinator.shouldResetStaleIOSBootstrapState(
+                previousStateExists: true,
+                lastRunAppVersion: "2.1",
+                currentAppVersion: "2.2.5"
+            )
+        )
+    }
+
     @Test("SyncCoordinator relies on CKSyncEngine automatic send after bootstrap seeding")
     func syncCoordinatorUsesAutomaticSendAfterBootstrapSeed() {
         #expect(

@@ -70,8 +70,10 @@
         #if os(iOS)
             private var pendingIOSItemsByID: [UUID: SharedClipboardItem] = [:]
         #endif
-        private static let containerIdentifier = "iCloud.com.saneclip.app"
-        private static let initialLocalSeedPendingKey = "syncInitialLocalSeedPending"
+        nonisolated private static let containerIdentifier = "iCloud.com.saneclip.app"
+        nonisolated private static let initialLocalSeedPendingKey = "syncInitialLocalSeedPending"
+        nonisolated private static let lastRunAppVersionKey = "syncLastRunAppVersion"
+        nonisolated private static let staleIOSBootstrapResetVersion = "2.2.6"
 
         private let deviceId: String = {
             #if os(macOS)
@@ -112,6 +114,10 @@
             }
         }
 
+        private static var currentAppVersion: String {
+            Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
+        }
+
         // MARK: - Lifecycle
 
         override init() {
@@ -147,7 +153,25 @@
                 return
             }
 
-            let previousState = loadStateSerialization()
+            var previousState = loadStateSerialization()
+            #if os(iOS)
+                let lastRunAppVersion = UserDefaults.standard.string(forKey: Self.lastRunAppVersionKey)
+                if Self.shouldResetStaleIOSBootstrapState(
+                    previousStateExists: previousState != nil,
+                    lastRunAppVersion: lastRunAppVersion,
+                    currentAppVersion: Self.currentAppVersion
+                ) {
+                    try? FileManager.default.removeItem(at: stateFileURL)
+                    previousState = nil
+                    isInitialLocalSeedPending = false
+                    pendingRecordIDs.removeAll()
+                    pendingIOSItemsByID.removeAll()
+                    logger.info(
+                        "Reset stale iPhone sync state after upgrading from pre-\(Self.staleIOSBootstrapResetVersion, privacy: .public) bootstrap path"
+                    )
+                }
+                UserDefaults.standard.set(Self.currentAppVersion, forKey: Self.lastRunAppVersionKey)
+            #endif
             let configuration = CKSyncEngine.Configuration(
                 database: container.privateCloudDatabase,
                 stateSerialization: previousState,
@@ -265,6 +289,25 @@
             savedZoneCount: Int
         ) -> Bool {
             !previousStateExists && savedZoneCount > 0
+        }
+
+        nonisolated static func shouldResetStaleIOSBootstrapState(
+            previousStateExists: Bool,
+            lastRunAppVersion: String?,
+            currentAppVersion: String
+        ) -> Bool {
+            guard previousStateExists else { return false }
+            guard isVersion(currentAppVersion, atLeast: staleIOSBootstrapResetVersion) else { return false }
+
+            guard let lastRunAppVersion else {
+                return true
+            }
+
+            return !isVersion(lastRunAppVersion, atLeast: staleIOSBootstrapResetVersion)
+        }
+
+        private nonisolated static func isVersion(_ version: String, atLeast minimumVersion: String) -> Bool {
+            version.compare(minimumVersion, options: .numeric) != .orderedAscending
         }
 
         nonisolated static func postBootstrapSeedFollowUp(seededRecordCount: Int) -> PostBootstrapSeedFollowUp {

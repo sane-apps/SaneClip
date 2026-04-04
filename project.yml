@@ -334,7 +334,7 @@ targets:
         embed: true
         codeSign: true
     info:
-      path: SaneClip/Info.plist
+      path: SaneClip/Info-AppStore.plist
       properties:
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"

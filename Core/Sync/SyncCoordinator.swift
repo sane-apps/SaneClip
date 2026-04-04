@@ -55,6 +55,27 @@
             case unavailable = "Unavailable in This Build"
         }
 
+        var localItemCount: Int {
+            localSeedItems().count
+        }
+
+        var remoteItemCount: Int? {
+            #if os(iOS)
+                syncedItems.count
+            #else
+                nil
+            #endif
+        }
+
+        var canResetSyncState: Bool {
+            Self.shouldOfferManualReset(
+                isSyncEnabled: isSyncEnabled,
+                lastSyncDate: lastSyncDate,
+                connectedDeviceCount: connectedDevices.count,
+                hasPersistedState: FileManager.default.fileExists(atPath: stateFileURL.path)
+            )
+        }
+
         // MARK: - Private State
 
         private var syncEngine: CKSyncEngine?
@@ -306,6 +327,19 @@
             return !isVersion(lastRunAppVersion, atLeast: staleIOSBootstrapResetVersion)
         }
 
+        nonisolated static func shouldOfferManualReset(
+            isSyncEnabled: Bool,
+            lastSyncDate: Date?,
+            connectedDeviceCount: Int,
+            hasPersistedState: Bool
+        ) -> Bool {
+            isSyncEnabled || lastSyncDate != nil || connectedDeviceCount > 0 || hasPersistedState
+        }
+
+        nonisolated static func shouldRestartSyncAfterManualReset(isSyncEnabled: Bool) -> Bool {
+            isSyncEnabled
+        }
+
         private nonisolated static func isVersion(_ version: String, atLeast minimumVersion: String) -> Bool {
             version.compare(minimumVersion, options: .numeric) != .orderedAscending
         }
@@ -382,6 +416,28 @@
             } catch {
                 syncStatus = .error
                 logger.error("Manual sync failed: \(error.localizedDescription)")
+            }
+        }
+
+        func resetSyncStatePreservingLocalHistory() {
+            logger.info("Manual iCloud sync reset requested")
+
+            try? FileManager.default.removeItem(at: stateFileURL)
+            connectedDevices.removeAll()
+            pendingRecordIDs.removeAll()
+            awaitingInitialZoneBootstrap = false
+            isInitialLocalSeedPending = false
+            lastSyncDate = nil
+
+            #if os(iOS)
+                pendingIOSItemsByID.removeAll()
+                syncedItems.removeAll()
+            #endif
+
+            let shouldRestart = Self.shouldRestartSyncAfterManualReset(isSyncEnabled: isSyncEnabled)
+            stopSync(setStatusToDisabled: !shouldRestart)
+            if shouldRestart {
+                startSync()
             }
         }
 

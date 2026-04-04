@@ -1,137 +1,201 @@
 #if ENABLE_SYNC
 
+    import SaneUI
     import SwiftUI
 
     private let syncReadableSecondary = Color.white.opacity(0.88)
 
     struct SyncSettingsView: View {
         @State private var coordinator = SyncCoordinator.shared
+        @State private var showResetConfirmation = false
+
+        init(coordinator: SyncCoordinator = .shared) {
+            _coordinator = State(initialValue: coordinator)
+        }
 
         var body: some View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // Enable/disable toggle
-                    GroupBox {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Toggle(isOn: $coordinator.isSyncEnabled) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("iCloud Sync")
-                                        .font(.headline)
-                                    Text("Sync clipboard history across your Apple devices")
-                                        .font(.callout.weight(.medium))
-                                        .foregroundStyle(syncReadableSecondary)
-                                }
-                            }
-                            .toggleStyle(.switch)
+                    CompactSection("Sync", icon: "arrow.triangle.2.circlepath.icloud", iconColor: SaneSettingsIconSemantic.sync.color) {
+                        CompactToggle(
+                            label: "iCloud Sync",
+                            icon: "arrow.triangle.2.circlepath.icloud",
+                            iconColor: SaneSettingsIconSemantic.sync.color,
+                            isOn: $coordinator.isSyncEnabled
+                        )
 
-                            if coordinator.isSyncEnabled {
-                                Divider()
+                        Text("Share clipboard history across your Apple devices")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(syncReadableSecondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.92)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 12)
+                            .padding(.bottom, 12)
 
-                                // Status row
-                                HStack {
-                                    Label {
-                                        Text("Status")
-                                    } icon: {
-                                        statusIcon
-                                    }
-                                    Spacer()
-                                    Text(coordinator.syncStatus.rawValue)
-                                        .foregroundStyle(syncReadableSecondary)
-                                }
-
-                                // Last sync
-                                if let lastSync = coordinator.lastSyncDate {
-                                    HStack {
-                                        Label("Last Sync", systemImage: "clock")
-                                        Spacer()
-                                        Text(lastSync, style: .relative)
-                                            .foregroundStyle(syncReadableSecondary)
-                                    }
-                                }
+                        if coordinator.isSyncEnabled {
+                            CompactDivider()
+                            CompactRow("Status") {
+                                StatusBadge(
+                                    coordinator.syncStatus.rawValue,
+                                    color: statusColor,
+                                    icon: statusSymbol
+                                )
                             }
                         }
-                        .padding(4)
                     }
 
-                    // Connected devices
+                    CompactSection("Status", icon: "chart.pie", iconColor: SaneSettingsIconSemantic.storage.color) {
+                        diagnosticsRow("Local Items", value: "\(coordinator.localItemCount)", icon: "doc.on.clipboard")
+
+                        if let remoteItemCount = coordinator.remoteItemCount {
+                            CompactDivider()
+                            diagnosticsRow("Synced Items", value: "\(remoteItemCount)", icon: "arrow.triangle.2.circlepath")
+                        }
+
+                        CompactDivider()
+                        diagnosticsRow("Connected Devices", value: "\(coordinator.connectedDevices.count)", icon: "desktopcomputer")
+
+                        CompactDivider()
+                        diagnosticsRow(
+                            "Last Sync",
+                            value: coordinator.lastSyncDate.map {
+                                RelativeDateTimeFormatter().localizedString(for: $0, relativeTo: Date())
+                            } ?? "Never",
+                            icon: "clock"
+                        )
+                    }
+
                     if coordinator.isSyncEnabled, !coordinator.connectedDevices.isEmpty {
-                        GroupBox {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Connected Devices")
-                                    .font(.headline)
-
-                                ForEach(coordinator.connectedDevices, id: \.self) { device in
-                                    HStack {
-                                        Image(systemName: deviceIcon(for: device))
-                                            .foregroundStyle(Color.clipBlue)
-                                        Text(device)
-                                        Spacer()
-                                    }
+                        CompactSection("Connected Devices", icon: "desktopcomputer", iconColor: Color.clipBlue) {
+                            ForEach(Array(coordinator.connectedDevices.enumerated()), id: \.offset) { index, device in
+                                if index > 0 {
+                                    CompactDivider()
                                 }
+
+                                HStack(spacing: 10) {
+                                    Image(systemName: deviceIcon(for: device))
+                                        .foregroundStyle(Color.clipBlue)
+                                        .frame(width: 16)
+                                    Text(device)
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundStyle(.white)
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 10)
                             }
-                            .padding(4)
                         }
                     }
 
-                    // Info section
-                    GroupBox {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("About Sync")
-                                .font(.headline)
-
-                            Label {
-                                Text("End-to-end encrypted when history encryption is enabled")
-                            } icon: {
-                                Image(systemName: "lock.shield")
-                                    .foregroundStyle(.green)
+                    if coordinator.canResetSyncState {
+                        CompactSection("Actions", icon: "gearshape.2", iconColor: .white) {
+                            HStack(spacing: 12) {
+                                Text("Reset iCloud Sync")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(.white)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.9)
+                                Spacer(minLength: 12)
+                                Button("Reset Sync") {
+                                    showResetConfirmation = true
+                                }
+                                .buttonStyle(SaneActionButtonStyle(destructive: true, compact: true))
                             }
-                            .font(.callout)
+                            .padding(.horizontal, 12)
+                            .padding(.top, 10)
+                            .padding(.bottom, 6)
 
-                            Label {
-                                Text("Uses your private iCloud storage — no third-party servers")
-                            } icon: {
-                                Image(systemName: "icloud")
-                                    .foregroundStyle(Color.clipBlue)
-                            }
-                            .font(.callout)
-
-                            Label {
-                                Text("Images are synced as compressed PNG data")
-                            } icon: {
-                                Image(systemName: "photo")
-                                    .foregroundStyle(syncReadableSecondary)
-                            }
-                            .font(.callout)
+                            Text("Clears saved sync state on this device and reconnects to iCloud. Your local clipboard history stays on this device.")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(syncReadableSecondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 12)
+                                .padding(.bottom, 12)
                         }
-                        .padding(4)
+                    }
+
+                    CompactSection("About Sync", icon: "icloud", iconColor: Color.clipBlue) {
+                        infoRow("End-to-end encrypted when history encryption is enabled", icon: "lock.shield", color: .green)
+                        CompactDivider()
+                        infoRow("Uses your private iCloud storage — no third-party servers", icon: "icloud", color: Color.clipBlue)
+                        CompactDivider()
+                        infoRow("Images are synced as compressed PNG data", icon: "photo", color: syncReadableSecondary)
                     }
                 }
                 .padding(20)
             }
+            .alert("Reset iCloud Sync?", isPresented: $showResetConfirmation) {
+                Button("Cancel", role: .cancel) {}
+                Button("Reset Sync", role: .destructive) {
+                    coordinator.resetSyncStatePreservingLocalHistory()
+                }
+            } message: {
+                Text("This clears saved sync state on this device and reconnects to iCloud sync. Your local clipboard history stays on this device.")
+            }
         }
 
-        @ViewBuilder
-        private var statusIcon: some View {
+        private var statusSymbol: String {
             switch coordinator.syncStatus {
             case .idle:
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                "checkmark.circle.fill"
             case .syncing:
-                Image(systemName: "arrow.triangle.2.circlepath")
-                    .foregroundStyle(Color.clipBlue)
+                "arrow.triangle.2.circlepath"
             case .error:
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.red)
+                "exclamationmark.triangle.fill"
             case .disabled:
-                Image(systemName: "pause.circle.fill")
-                    .foregroundStyle(syncReadableSecondary)
+                "pause.circle.fill"
             case .noAccount:
-                Image(systemName: "person.crop.circle.badge.exclamationmark")
-                    .foregroundStyle(.orange)
+                "person.crop.circle.badge.exclamationmark"
             case .unavailable:
-                Image(systemName: "icloud.slash")
-                    .foregroundStyle(.orange)
+                "icloud.slash"
             }
+        }
+
+        private var statusColor: Color {
+            switch coordinator.syncStatus {
+            case .idle:
+                .green
+            case .syncing:
+                Color.clipBlue
+            case .error:
+                .red
+            case .disabled:
+                Color.white.opacity(0.35)
+            case .noAccount, .unavailable:
+                .orange
+            }
+        }
+
+        private func diagnosticsRow(_ label: String, value: String, icon: String) -> some View {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .foregroundStyle(Color.clipBlue)
+                    .frame(width: 16)
+                Text(label)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white)
+                Spacer()
+                Text(value)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(syncReadableSecondary)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+        }
+
+        private func infoRow(_ text: String, icon: String, color: Color) -> some View {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .foregroundStyle(color)
+                    .frame(width: 16)
+                Text(text)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.white)
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
         }
 
         private func deviceIcon(for device: String) -> String {

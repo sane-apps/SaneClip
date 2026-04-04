@@ -142,3 +142,23 @@ Graduate verified findings to ARCHITECTURE.md or DEVELOPMENT.md.
 - Local code still shows the intended protections are present in `Core/Sync/SyncCoordinator.swift`: persisted `CKSyncEngine.State.Serialization`, explicit custom zone creation, initial local seed tracking via `syncInitialLocalSeedPending`, and remote-deletion blocking while the seed is pending.
 - Local tests still cover the current sync safety story: bootstrap seeding, pending-record filtering, remote-deletion blocking while the initial seed is pending, and failure diagnostics are all present in `Tests/SaneClipTests.swift`.
 - Practical rule for this pass: settings/About standardization work should not alter sync behavior, claims, or troubleshooting copy unless the code and public thread both support it.
+
+## SaneClip Sync Recovery Refresh
+**Updated:** 2026-04-03 | **Status:** verified | **TTL:** 14d
+**Source:** Apple docs + Apple sample + GitHub example + Raycast manual + local code/tests
+- Apple `CKSyncEngine` docs still require apps to persist and restore the engine's opaque state across launches; resetting that state is an application-owned recovery lever when the stored state is stale or no longer trustworthy.
+- Apple's `sample-cloudkit-sync-engine` README still says real `CKSyncEngine` validation requires actual devices or Macs because simulators do not receive remote push notifications reliably enough for proper sync behavior.
+- GitHub examples still align with our architecture: Apple's sample and OpenPaste both persist `CKSyncEngine.State.Serialization` and restore it at engine startup rather than trying to rebuild sync state from scratch every launch.
+- Raycast's current Cloud Sync docs still explicitly exclude clipboard history because it may contain sensitive data. That leaves SaneClip's optional private iCloud clipboard sync as a differentiated feature, but it also means sync bugs are higher trust-risk than ordinary UI bugs.
+- GitHub issue `#3` still points to an iPhone-side stale-state problem, not a new Mac bootstrap issue: after earlier fixes, the reporter said macOS looked good while iPhone remained partially synced (`151` items on Mac, `19` on iPhone).
+- Local code now adds an iOS-only stale-state migration in `Core/Sync/SyncCoordinator.swift`: if `sync_state.data` exists and the last recorded app version is missing or older than `2.2.6`, startup deletes the saved sync state, clears the initial-seed flag, clears pending record tracking, and lets the engine rebootstrap cleanly.
+- Local tests in `Tests/SaneClipTests.swift` now explicitly cover that migration logic, and Mini verification on 2026-04-03 passed `114` tests with the new upgrade-reset test green.
+
+## Mini Visual Verification Refresh
+**Updated:** 2026-04-03 | **Status:** verified | **TTL:** 7d
+**Source:** local SaneProcess screenshot helper audit + Mini GUI capture path + local/mini SaneClip renders
+- Plain `ssh ... screencapture` is not the canonical Mini screenshot path for live app windows. The reliable path is the controlling-machine wrapper `/Users/sj/SaneApps/infra/SaneProcess/scripts/mini/capture-mini-screenshot.sh`, which syncs the screenshot helper to the Mini and runs it through `mini-gui-run.sh` inside the Mini GUI session.
+- First-use Screen Recording permission is required for Terminal on the Mini, but once granted the wrapper can enumerate and capture real Mini windows. Verified on 2026-04-03 by listing and capturing the live `SaneClip Settings` window.
+- Deterministic SwiftUI render PNGs remain the fallback when live capture is flaky or when a stable artifact is preferable. For SaneClip, the settings render test now emits both `settings-sync-render.png` and `settings-sync-enabled-render.png`.
+- The Mini verify failure after the sync-settings spacing change was not a product regression; it was an Xcode build database lock caused by concurrent `verify` runs against the same DerivedData directory.
+- Current visual conclusion for the sync reset UI: the old centered destructive button block was inconsistent with the rest of the settings chrome. The intended standard is a settings row with the action label left and a compact destructive button right, with explanatory copy underneath.

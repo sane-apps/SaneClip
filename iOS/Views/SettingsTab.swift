@@ -6,6 +6,7 @@ struct SettingsTab: View {
     @EnvironmentObject var viewModel: ClipboardHistoryViewModel
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var showFeedback = false
+    @State private var showResetSyncConfirmation = false
 
     private var isIPad: Bool { sizeClass == .regular }
 
@@ -39,6 +40,16 @@ struct SettingsTab: View {
             .sheet(isPresented: $showFeedback) {
                 SaneFeedbackView(diagnosticsService: .shared)
             }
+            #if ENABLE_SYNC
+                .alert("Reset iCloud Sync?", isPresented: $showResetSyncConfirmation) {
+                    Button("Cancel", role: .cancel) {}
+                    Button("Reset Sync", role: .destructive) {
+                        coordinator.resetSyncStatePreservingLocalHistory()
+                    }
+                } message: {
+                    Text("This clears saved sync state on this device and reconnects to iCloud sync. Your local clipboard history stays on this device.")
+                }
+            #endif
         }
     }
 
@@ -66,10 +77,53 @@ struct SettingsTab: View {
                         value: coordinator.lastSyncDate.map { RelativeDateTimeFormatter().localizedString(for: $0, relativeTo: Date()) } ?? "Never"
                     )
 
+                    settingsRow(
+                        icon: "doc.on.clipboard",
+                        label: "Local Items",
+                        value: "\(coordinator.localItemCount)"
+                    )
+
+                    if let remoteItemCount = coordinator.remoteItemCount {
+                        settingsRow(
+                            icon: "tray.full",
+                            label: "Synced Items",
+                            value: "\(remoteItemCount)"
+                        )
+                    }
+
                     if !coordinator.connectedDevices.isEmpty {
+                        settingsRow(
+                            icon: "desktopcomputer",
+                            label: "Connected Devices",
+                            value: "\(coordinator.connectedDevices.count)"
+                        )
                         ForEach(coordinator.connectedDevices, id: \.self) { device in
                             settingsRow(icon: "desktopcomputer", label: device)
                         }
+                    }
+
+                    if coordinator.canResetSyncState {
+                        VStack(alignment: .leading, spacing: isIPad ? 12 : 8) {
+                            HStack(spacing: rowSpacing) {
+                                Text("Reset iCloud Sync")
+                                    .font(rowText.weight(.semibold))
+                                    .foregroundStyle(.white)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.9)
+                                Spacer(minLength: isIPad ? 20 : 12)
+                                Button("Reset Sync") {
+                                    showResetSyncConfirmation = true
+                                }
+                                .buttonStyle(SaneActionButtonStyle(destructive: true, compact: true))
+                            }
+
+                            Text("Clears saved sync state on this device and reconnects to iCloud. Your local clipboard history stays on this device.")
+                                .font(infoBody)
+                                .foregroundStyle(.white.opacity(0.88))
+                                .frame(maxWidth: isIPad ? 720 : 340, alignment: .leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(.vertical, isIPad ? 10 : 6)
                     }
                 }
             #else

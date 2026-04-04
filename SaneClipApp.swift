@@ -885,16 +885,17 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     private func settingsMenuItems() -> [NSMenuItem] {
         var items: [NSMenuItem] = [
             settingsMenuItem(title: "General", action: #selector(openGeneralSettings), key: "1"),
-            settingsMenuItem(title: "Shortcuts", action: #selector(openShortcutsSettings), key: "2"),
-            settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "3")
+            settingsMenuItem(title: "Shortcuts", action: #selector(openShortcutsSettings), key: "2")
         ]
 
         #if ENABLE_SYNC
-            items.append(settingsMenuItem(title: "Sync", action: #selector(openSyncSettings), key: "4"))
+            items.append(settingsMenuItem(title: "Sync", action: #selector(openSyncSettings), key: "3"))
+            items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "4"))
             items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "5"))
             items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "6"))
             items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "7"))
         #else
+            items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "3"))
             items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "4"))
             items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "5"))
             items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "6"))

@@ -15,6 +15,24 @@ log() {
   printf '[capture] %s\n' "$1"
 }
 
+run_with_timeout() {
+  local seconds="$1"
+  shift
+  python3 - "$seconds" "$@" <<'PY'
+import subprocess
+import sys
+
+timeout = int(sys.argv[1])
+cmd = sys.argv[2:]
+
+try:
+    completed = subprocess.run(cmd, timeout=timeout)
+    raise SystemExit(completed.returncode)
+except subprocess.TimeoutExpired:
+    raise SystemExit(124)
+PY
+}
+
 device_udid() {
   local preferred="$1"
   local fallback_pattern="$2"
@@ -40,6 +58,18 @@ boot_and_style() {
     --batteryLevel 100 >/dev/null 2>&1 || true
 }
 
+install_app() {
+  local udid="$1"
+  local app_path="$2"
+  if xcrun simctl install "${udid}" "${app_path}" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  log "Install retried after re-booting simulator ${udid}"
+  boot_and_style "${udid}"
+  xcrun simctl install "${udid}" "${app_path}" >/dev/null
+}
+
 capture_tab() {
   local udid="$1"
   local bundle_id="$2"
@@ -48,10 +78,16 @@ capture_tab() {
   local launch_log="/tmp/saneclip_capture_${tab}_$(basename "${output}").log"
 
   xcrun simctl terminate "${udid}" "${bundle_id}" >/dev/null 2>&1 || true
-  if ! xcrun simctl launch "${udid}" "${bundle_id}" -- --skip-onboarding --screenshot-tab "${tab}" >"${launch_log}" 2>&1; then
+  log "Launching ${tab} on ${udid}"
+  if ! run_with_timeout 20 xcrun simctl launch "${udid}" "${bundle_id}" -- --skip-onboarding --screenshot-tab "${tab}" >"${launch_log}" 2>&1; then
+    status=$?
+    if [[ "${status}" -eq 124 ]]; then
+      log "Launch timed out for ${tab}; continuing because the app may already be visible"
+    else
     echo "Launch failed for ${bundle_id} (${tab}). See ${launch_log}" >&2
     sed -n '1,120p' "${launch_log}" >&2 || true
     exit 1
+    fi
   fi
   sleep 2
   xcrun simctl io "${udid}" screenshot "${output}" >/dev/null
@@ -93,8 +129,8 @@ boot_and_style "${IPHONE_UDID}"
 boot_and_style "${IPAD_UDID}"
 
 log "Installing app on simulators..."
-xcrun simctl install "${IPHONE_UDID}" "${IOS_APP}" >/dev/null
-xcrun simctl install "${IPAD_UDID}" "${IOS_APP}" >/dev/null
+install_app "${IPHONE_UDID}" "${IOS_APP}"
+install_app "${IPAD_UDID}" "${IOS_APP}"
 
 capture_tab "${IPHONE_UDID}" "${BUNDLE_ID}" history "${OUT_DIR}/screenshot-ios-history-dark.png"
 capture_tab "${IPHONE_UDID}" "${BUNDLE_ID}" pinned "${OUT_DIR}/screenshot-ios-pinned-dark.png"

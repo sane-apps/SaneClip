@@ -8,6 +8,19 @@ import SwiftUI
 import Testing
 @testable import SaneClip
 
+@MainActor
+private final class PreviewSyncCoordinator: SyncCoordinator {
+    override func startSync() {
+        syncStatus = .idle
+    }
+
+    override func stopSync(setStatusToDisabled: Bool = true) {
+        if setStatusToDisabled {
+            syncStatus = .disabled
+        }
+    }
+}
+
 struct SaneClipTests {
     private let screenshotOutputHintFile = URL(fileURLWithPath: "/tmp/saneclip_screenshot_dir.txt")
     private let renderBackdrop = Color(red: 0.06, green: 0.10, blue: 0.18)
@@ -818,6 +831,56 @@ struct SaneClipTests {
         )
     }
 
+    @Test("SyncCoordinator offers manual reset when sync state or diagnostics exist")
+    func syncCoordinatorOffersManualReset() {
+        #expect(
+            SyncCoordinator.shouldOfferManualReset(
+                isSyncEnabled: true,
+                lastSyncDate: nil,
+                connectedDeviceCount: 0,
+                hasPersistedState: false
+            )
+        )
+        #expect(
+            SyncCoordinator.shouldOfferManualReset(
+                isSyncEnabled: false,
+                lastSyncDate: Date(timeIntervalSince1970: 1),
+                connectedDeviceCount: 0,
+                hasPersistedState: false
+            )
+        )
+        #expect(
+            SyncCoordinator.shouldOfferManualReset(
+                isSyncEnabled: false,
+                lastSyncDate: nil,
+                connectedDeviceCount: 2,
+                hasPersistedState: false
+            )
+        )
+        #expect(
+            SyncCoordinator.shouldOfferManualReset(
+                isSyncEnabled: false,
+                lastSyncDate: nil,
+                connectedDeviceCount: 0,
+                hasPersistedState: true
+            )
+        )
+        #expect(
+            !SyncCoordinator.shouldOfferManualReset(
+                isSyncEnabled: false,
+                lastSyncDate: nil,
+                connectedDeviceCount: 0,
+                hasPersistedState: false
+            )
+        )
+    }
+
+    @Test("SyncCoordinator restart decision preserves current sync toggle")
+    func syncCoordinatorRestartDecisionAfterManualReset() {
+        #expect(SyncCoordinator.shouldRestartSyncAfterManualReset(isSyncEnabled: true))
+        #expect(!SyncCoordinator.shouldRestartSyncAfterManualReset(isSyncEnabled: false))
+    }
+
     @Test("SyncCoordinator relies on CKSyncEngine automatic send after bootstrap seeding")
     func syncCoordinatorUsesAutomaticSendAfterBootstrapSeed() {
         #expect(
@@ -1012,7 +1075,7 @@ struct SaneClipTests {
             encoding: .utf8
         )
 
-        #expect(settingsSource.contains("SaneSettingsContainer(defaultTab: .general, selection: $selectedTab)"))
+        #expect(settingsSource.contains("SaneSettingsContainer(defaultTab: .general, selection: $selectedTab, windowSizing: .embedded)"))
         #expect(settingsSource.contains("SaneSettingsIconSemantic.general.color"))
         #expect(settingsSource.contains("SaneSettingsIconSemantic.shortcuts.color"))
         #expect(settingsSource.contains("SaneSettingsIconSemantic.content.color"))
@@ -1160,6 +1223,24 @@ struct SaneClipTests {
             to: outputDir.appendingPathComponent("settings-sync-render.png")
         )
 
+        let previewSyncCoordinator = PreviewSyncCoordinator()
+        previewSyncCoordinator.isSyncEnabled = true
+        previewSyncCoordinator.syncStatus = .idle
+        previewSyncCoordinator.lastSyncDate = Date().addingTimeInterval(-120)
+        previewSyncCoordinator.connectedDevices = ["MacBook Pro", "iPhone"]
+
+        try renderPNG(
+            ZStack {
+                renderBackdrop.opacity(0.3)
+                    .ignoresSafeArea()
+                SyncSettingsView(coordinator: previewSyncCoordinator)
+            }
+                .preferredColorScheme(.dark)
+                .frame(width: 1000, height: 860),
+            size: CGSize(width: 1000, height: 860),
+            to: outputDir.appendingPathComponent("settings-sync-enabled-render.png")
+        )
+
         try renderPNG(
             ZStack {
                 renderBackdrop.opacity(0.3)
@@ -1222,6 +1303,7 @@ struct SaneClipTests {
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-shortcuts-render.png").path))
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-snippets-render.png").path))
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-sync-render.png").path))
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-sync-enabled-render.png").path))
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-storage-render.png").path))
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-license-render.png").path))
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-about-render.png").path))

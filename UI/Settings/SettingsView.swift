@@ -30,10 +30,10 @@ struct SettingsView: View {
     enum SettingsTab: String, SaneSettingsTab {
         case general = "General"
         case shortcuts = "Shortcuts"
-        case snippets = "Snippets"
         #if ENABLE_SYNC
             case sync = "Sync"
         #endif
+        case snippets = "Snippets"
         case storage = "Storage"
         case license = "License"
         case about = "About"
@@ -44,10 +44,10 @@ struct SettingsView: View {
             switch self {
             case .general: SaneSettingsStrings.generalTabTitle
             case .shortcuts: SaneSettingsStrings.shortcutsTabTitle
-            case .snippets: SaneSettingsStrings.snippetsTabTitle
             #if ENABLE_SYNC
                 case .sync: SaneSettingsStrings.syncTabTitle
             #endif
+            case .snippets: SaneSettingsStrings.snippetsTabTitle
             case .storage: SaneSettingsStrings.storageTabTitle
             case .license: SaneSettingsStrings.licenseTabTitle
             case .about: SaneSettingsStrings.aboutTabTitle
@@ -58,10 +58,10 @@ struct SettingsView: View {
             switch self {
             case .general: "gear"
             case .shortcuts: "keyboard"
-            case .snippets: "text.quote"
             #if ENABLE_SYNC
                 case .sync: "arrow.triangle.2.circlepath.icloud"
             #endif
+            case .snippets: "text.quote"
             case .storage: "chart.pie"
             case .license: "key"
             case .about: "info.circle"
@@ -72,10 +72,10 @@ struct SettingsView: View {
             switch self {
             case .general: SaneSettingsIconSemantic.general.color
             case .shortcuts: SaneSettingsIconSemantic.shortcuts.color
-            case .snippets: SaneSettingsIconSemantic.content.color
             #if ENABLE_SYNC
                 case .sync: SaneSettingsIconSemantic.sync.color
             #endif
+            case .snippets: SaneSettingsIconSemantic.content.color
             case .storage: SaneSettingsIconSemantic.storage.color
             case .license: SaneSettingsIconSemantic.license.color
             case .about: SaneSettingsIconSemantic.about.color
@@ -89,35 +89,39 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        SaneSettingsContainer(defaultTab: .general, selection: $selectedTab) { tab in
+        SaneSettingsContainer(defaultTab: .general, selection: $selectedTab, windowSizing: .embedded) { tab in
             switch tab {
             case .general:
                 GeneralSettingsView(licenseService: licenseService)
             case .shortcuts:
                 ShortcutsSettingsView(licenseService: licenseService)
+            #if ENABLE_SYNC
+            case .sync:
+                SyncSettingsView()
+            #endif
             case .snippets:
                 SnippetsSettingsView(licenseService: licenseService)
                     .padding(20)
-            #if ENABLE_SYNC
-                case .sync:
-                    SyncSettingsView()
-            #endif
             case .storage:
                 StorageStatsView()
                     .padding(20)
             case .license:
-                if let licenseService {
-                    ScrollView(.vertical, showsIndicators: false) {
-                        VStack(alignment: .leading, spacing: 0) {
-                            LicenseSettingsView(licenseService: licenseService, style: .panel)
-                                .frame(maxWidth: 420, alignment: .leading)
-                            Spacer(minLength: 0)
+                Group {
+                    if let licenseService {
+                        ScrollView(.vertical, showsIndicators: false) {
+                            VStack(alignment: .leading, spacing: 0) {
+                                LicenseSettingsView(licenseService: licenseService, style: .panel)
+                                    .frame(maxWidth: 420, alignment: .leading)
+                                Spacer(minLength: 0)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .topLeading)
+                            .padding(20)
                         }
-                        .frame(maxWidth: .infinity, alignment: .topLeading)
-                        .padding(20)
+                    } else {
+                        EmptyView()
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             case .about:
                 SaneAboutView(
                     appName: "SaneClip",
@@ -127,6 +131,7 @@ struct SettingsView: View {
                 )
             }
         }
+        .frame(minWidth: 760, idealWidth: 760, minHeight: 500, idealHeight: 500)
         .background(settingsKeyboardShortcuts)
         .onExitCommand {
             SettingsWindowController.close()
@@ -1450,7 +1455,8 @@ enum SettingsWindowController {
         newWindow.title = "SaneClip Settings"
         newWindow.appearance = NSAppearance(named: .darkAqua)
         newWindow.styleMask = [.titled, .closable, .resizable]
-        newWindow.setContentSize(NSSize(width: 700, height: 450))
+        newWindow.contentMinSize = NSSize(width: 760, height: 500)
+        newWindow.setContentSize(NSSize(width: 760, height: 500))
         newWindow.center()
         newWindow.isReleasedWhenClosed = false
 

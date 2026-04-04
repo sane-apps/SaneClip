@@ -6,7 +6,26 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                                                            <item>
+                                                                                    <item>
+            <title>2.2.12</title>
+            <pubDate>Fri, 03 Apr 2026 21:26:10 -0400</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Fixes iPhone iCloud sync recovery, adds manual iCloud sync reset and diagnostics, and refreshes the sync settings layout.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.2.12.zip"
+                       sparkle:version="2212"
+                       sparkle:shortVersionString="2.2.12"
+                       length="3541719"
+                       type="application/octet-stream"
+                       sparkle:edSignature="q0HKflKgmRIDXW0qd0a6kBOSQ15XTqDkdN1wrZGLytigEqDfxqbYmV2mMxNvql5UOuNu3udKvMiKJhnakzM/Bw=="/>
+        </item>
+<item>
             <title>2.2.11</title>
             <pubDate>Sun, 29 Mar 2026 16:58:57 -0400</pubDate>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>

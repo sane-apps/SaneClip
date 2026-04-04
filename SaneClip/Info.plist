@@ -35,7 +35,39 @@
 	<false/>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
+	<key>NSAccessibilityUsageDescription</key>
+	<string>SaneClip uses Accessibility to paste clipboard items directly into applications.</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>SaneClip needs to paste clipboard content to other applications.</string>
+	<key>NSServices</key>
+	<array>
+		<dict>
+			<key>NSMenuItem</key>
+			<dict>
+				<key>default</key>
+				<string>Save to SaneClip</string>
+			</dict>
+			<key>NSMessage</key>
+			<string>saveToSaneClip</string>
+			<key>NSPortName</key>
+			<string>SaneClip</string>
+			<key>NSSendTypes</key>
+			<array>
+				<string>public.plain-text</string>
+			</array>
+		</dict>
+	</array>
 	<key>LSUIElement</key>
 	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
+	<key>SUEnableSystemProfiling</key>
+	<false/>
+	<key>SUFeedURL</key>
+	<string>https://saneclip.com/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>7Pl/8cwfb2vm4Dm65AByslkMCScLJ9tbGlwGGx81qYU=</string>
 </dict>
 </plist>

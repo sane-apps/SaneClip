@@ -25,7 +25,8 @@ packages:
     url: https://github.com/sparkle-project/Sparkle
     from: 2.6.0
   SaneUI:
-    path: ../../infra/SaneUI
+    url: https://github.com/sane-apps/SaneUI.git
+    branch: main
 
 settings:
   DEAD_CODE_STRIPPING: YES
@@ -229,9 +230,8 @@ targets:
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
           DEVELOPMENT_TEAM: M78L6FXD48
-          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_STYLE: Automatic
           CODE_SIGN_IDENTITY: "Apple Distribution"
-          PROVISIONING_PROFILE_SPECIFIER: "SaneClip Mac App Store"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipAppStore.entitlements
           INFOPLIST_KEY_AppStoreProductID: com.saneclip.app.pro.unlock
           OTHER_SWIFT_FLAGS: "-D APP_STORE -D ENABLE_SYNC"
@@ -374,8 +374,8 @@ targets:
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipAppStore.entitlements
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
+          CODE_SIGN_STYLE: Automatic
           CODE_SIGN_IDENTITY: "Apple Distribution"
-          PROVISIONING_PROFILE_SPECIFIER: "SaneClip Mac App Store"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipAppStore.entitlements
 
   SaneClipTests:
@@ -463,9 +463,8 @@ targets:
         Release-AppStore:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
           DEVELOPMENT_TEAM: M78L6FXD48
-          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_STYLE: Automatic
           CODE_SIGN_IDENTITY: "Apple Distribution"
-          PROVISIONING_PROFILE_SPECIFIER: "SaneClip Widgets Mac App Store"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
         Release-Setapp:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app-setapp.widgets

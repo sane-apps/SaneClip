@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.2.12] - 2026-04-03
+
+Fixes iPhone iCloud sync recovery, adds manual iCloud sync reset and diagnostics, and refreshes the sync settings layout across Mac, iPhone, and iPad.
+
+---
+
 ## [2.2.11] - 2026-03-29
 
 Settings now use the shared SaneUI shell, the menu bar icon preview stays readable, and no-keychain builds keep the correct unlock state.

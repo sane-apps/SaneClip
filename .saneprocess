@@ -80,7 +80,7 @@ appstore:
         The optional Pro unlock adds unlimited history, Touch ID history lock, AES-256 encryption at rest, paste as plain text,
         smart paste, text transforms, paste stack, snippets, item notes, clipboard rules, and export/import.
       keywords: "clipboard,copy paste,history,snippets,touch id,security,productivity,mac utility"
-      whats_new: "Fixes iCloud sync rollout and production schema issues, improves update reliability, and fixes edit-field keyboard shortcut handling."
+      whats_new: "Restores the color-coded source indicators on iPhone and iPad, aligns the mobile UI with the approved screenshots, and improves older Mac update recovery."
       marketing_url: "https://saneclip.com"
     ios:
       subtitle: "Clipboard History + Widgets"
@@ -90,7 +90,7 @@ appstore:
         Browse your recent clips, copy them again in one tap, save new text and links from the Share Sheet, and keep important items pinned across devices.
         Pro adds encryption and more advanced workflows while keeping your data on your own devices instead of a third-party server.
       keywords: "clipboard,copy paste,history,widgets,icloud,snippets,productivity,notes"
-      whats_new: "Fixes iCloud sync startup, preserves local history more reliably, and improves clipboard action stability."
+      whats_new: "Restores the color-coded source indicators on iPhone and iPad and brings the mobile UI back in line with the approved screenshots."
       marketing_url: "https://saneclip.com"
   review_notes: "SaneClip is a freemium App Store app. Basic is free in the App Store build. SaneClip Pro Unlock is an optional one-time non-consumable StoreKit in-app purchase. No external checkout links or license keys are used in the App Store build."
   iap:

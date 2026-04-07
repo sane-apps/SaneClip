@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.2.13] - 2026-04-07
+
+Restores the color-coded source indicators on iPhone and iPad, brings the mobile settings/history UI back in line with the approved App Store screenshots, and improves recovery for older Mac updater installs.
+
+---
+
 ## [2.2.12] - 2026-04-03
 
 Fixes iPhone iCloud sync recovery, adds manual iCloud sync reset and diagnostics, and refreshes the sync settings layout across Mac, iPhone, and iPad.

@@ -340,10 +340,15 @@ struct SaneClipTests {
         let repoRoot = projectRootURL()
         let appcastURL = repoRoot.appendingPathComponent("docs/appcast.xml")
         let appcast = try String(contentsOf: appcastURL, encoding: .utf8)
+        let latestItemRange = try #require(
+            appcast.range(of: #"<item>\s*<title>2\.2\.12</title>[\s\S]*?</item>"#, options: .regularExpression)
+        )
+        let latestItem = String(appcast[latestItemRange])
 
-        #expect(appcast.contains("<title>2.2.12</title>"))
-        #expect(appcast.contains("<sparkle:informationalUpdate>"))
-        #expect(appcast.contains("<sparkle:belowVersion>2.2.8</sparkle:belowVersion>"))
+        #expect(latestItem.contains("<title>2.2.12</title>"))
+        #expect(latestItem.contains("<link>https://saneclip.com/download</link>"))
+        #expect(latestItem.contains("<sparkle:informationalUpdate>"))
+        #expect(latestItem.contains("<sparkle:belowVersion>2.2.8</sparkle:belowVersion>"))
     }
 
     @Test("iPhone settings restore the App Store screenshot accent lane")

@@ -89,11 +89,13 @@ releases/
 .claude/memory_checked.json
 .claude/recent_actions.json
 .claude/read_history.json
+.claude/research-locks.json
 .claude/user_patterns.json
 .claude/bypass_mode.txt
 .claude/saneloop-archive/
 .claude/research/
 .claude/rule_tracking.jsonl
+.claude/sop-verify-state.json
 .claude/bugs.md
 .claude/hook_*.md
 .claude/SOP*.md

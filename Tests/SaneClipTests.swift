@@ -335,7 +335,7 @@ struct SaneClipTests {
         #expect(machLookupNames.contains("$(PRODUCT_BUNDLE_IDENTIFIER)-spks"))
     }
 
-    @Test("Appcast forces pre-2.2.8 builds onto the manual download path")
+    @Test("Appcast forces pre-2208 builds onto the manual download path")
     func sparkleAppcastProtectsPreInstallerLauncherBuilds() throws {
         let repoRoot = projectRootURL()
         let appcastURL = repoRoot.appendingPathComponent("docs/appcast.xml")
@@ -348,7 +348,7 @@ struct SaneClipTests {
         #expect(latestItem.contains("<title>2.2.12</title>"))
         #expect(latestItem.contains("<link>https://saneclip.com/download</link>"))
         #expect(latestItem.contains("<sparkle:informationalUpdate>"))
-        #expect(latestItem.contains("<sparkle:belowVersion>2.2.8</sparkle:belowVersion>"))
+        #expect(latestItem.contains("<sparkle:belowVersion>2208</sparkle:belowVersion>"))
     }
 
     @Test("iPhone settings restore the App Store screenshot accent lane")

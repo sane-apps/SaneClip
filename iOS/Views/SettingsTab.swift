@@ -5,7 +5,6 @@ import SwiftUI
 struct SettingsTab: View {
     @EnvironmentObject var viewModel: ClipboardHistoryViewModel
     @Environment(\.horizontalSizeClass) private var sizeClass
-    @State private var showFeedback = false
     @State private var showResetSyncConfirmation = false
 
     private var isIPad: Bool { sizeClass == .regular }
@@ -37,9 +36,6 @@ struct SettingsTab: View {
             .listStyle(.grouped)
             .navigationTitle("Settings")
             .toolbarBackground(.visible, for: .navigationBar)
-            .sheet(isPresented: $showFeedback) {
-                SaneFeedbackView(diagnosticsService: .shared)
-            }
             #if ENABLE_SYNC
                 .alert("Reset iCloud Sync?", isPresented: $showResetSyncConfirmation) {
                     Button("Cancel", role: .cancel) {}
@@ -130,11 +126,11 @@ struct SettingsTab: View {
                 HStack(spacing: rowSpacing) {
                     Image(systemName: "arrow.triangle.2.circlepath")
                         .font(.system(size: rowIcon))
-                        .foregroundStyle(.teal)
+                        .foregroundStyle(Color.clipBlue)
                         .frame(width: iconFrame, alignment: .center)
                     Text("Last Synced")
                         .font(rowText)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color.clipBlue)
                     Spacer()
                     if let lastSync = viewModel.lastSyncTime {
                         Text(lastSync, style: .relative)
@@ -155,14 +151,15 @@ struct SettingsTab: View {
                 HStack(spacing: rowSpacing) {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(size: rowIcon))
-                        .foregroundStyle(.teal)
+                        .foregroundStyle(Color.clipBlue)
                         .frame(width: iconFrame, alignment: .center)
                     Text("Sync Now")
                         .font(rowText)
+                        .foregroundStyle(Color.clipBlue)
                     Spacer()
                     if viewModel.isLoading {
                         ProgressView()
-                            .tint(.teal)
+                            .tint(Color.clipBlue)
                     }
                 }
                 .padding(.vertical, rowPadding)
@@ -185,14 +182,8 @@ struct SettingsTab: View {
                 value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
             )
 
-            Link(destination: URL(string: "https://github.com/sane-apps/SaneClip/issues")!) {
-                settingsRow(icon: "arrow.up.right.square", label: "View Issues")
-            }
-
-            Button {
-                showFeedback = true
-            } label: {
-                settingsRow(icon: "ladybug", label: "Report a Bug")
+            Link(destination: URL(string: "https://saneclip.com")!) {
+                settingsRow(icon: "globe", label: "Website")
             }
 
             Link(destination: URL(string: "https://saneclip.com/privacy")!) {
@@ -212,7 +203,7 @@ struct SettingsTab: View {
             VStack(alignment: .leading, spacing: isIPad ? 20 : 8) {
                 Text("SaneClip iOS")
                     .font(infoTitle)
-                Text("Save clipboard items with the + button or Share menu. Tap any item to copy it back. Enable iCloud Sync to share your clipboard between your Mac and iOS devices.")
+                Text("View and copy your clipboard history synced from your Mac. Enable iCloud Sync to keep your clipboard in sync across all your devices.")
                     .font(infoBody)
                     .foregroundStyle(.white.opacity(0.9))
             }
@@ -232,7 +223,8 @@ struct SettingsTab: View {
         icon: String,
         label: String,
         value: String? = nil,
-        iconColor: Color = .teal
+        iconColor: Color = .clipBlue,
+        labelColor: Color = .clipBlue
     ) -> some View {
         HStack(spacing: rowSpacing) {
             Image(systemName: icon)
@@ -241,7 +233,7 @@ struct SettingsTab: View {
                 .frame(width: iconFrame, alignment: .center)
             Text(label)
                 .font(rowText)
-                .foregroundStyle(.white)
+                .foregroundStyle(labelColor)
             Spacer()
             if let value {
                 Text(value)

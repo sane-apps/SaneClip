@@ -9,6 +9,7 @@ struct ClipboardItemCell: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
 
     private var isIPad: Bool { sizeClass == .regular }
+    private let isScreenshotMode = LaunchOptions.isScreenshotMode()
 
     // MARK: - Source-Aware Colors
 
@@ -16,7 +17,7 @@ struct ClipboardItemCell: View {
     /// Dark mode: bright/saturated for readability on dark backgrounds.
     /// Light mode: darkened variants for WCAG AA (4.5:1) on light backgrounds.
     private var sourceColor: Color {
-        guard let source = item.sourceAppName?.lowercased() else { return Color.teal }
+        guard let source = item.sourceAppName?.lowercased() else { return Color.clipBlue }
         if colorScheme == .dark {
             switch source {
             case "messages": return Color(hex: 0x5EC2A0) // Sage green
@@ -32,7 +33,7 @@ struct ClipboardItemCell: View {
             case "xcode": return Color(hex: 0x6B7FE8) // Indigo
             case "finder": return Color(hex: 0x4DD4D4) // Cyan
             case "slack": return Color(hex: 0xD464CC) // Fuchsia
-            default: return Color.teal
+            default: return Color.clipBlue
             }
         } else {
             switch source {
@@ -49,7 +50,7 @@ struct ClipboardItemCell: View {
             case "xcode": return Color(hex: 0x4450A8) // Deep indigo
             case "finder": return Color(hex: 0x2A8FA8) // Deep cyan
             case "slack": return Color(hex: 0xA03898) // Deep fuchsia
-            default: return Color.teal
+            default: return Color.clipBlue
             }
         }
     }
@@ -170,7 +171,7 @@ struct ClipboardItemCell: View {
                                 .foregroundColor(accentColor)
                         }
 
-                        if !item.deviceName.isEmpty {
+                        if !item.deviceName.isEmpty && !isScreenshotMode {
                             Text("·")
                                 .font(isIPad ? .system(size: 18) : .caption)
                                 .foregroundStyle(metadataColor)

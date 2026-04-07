@@ -13,7 +13,7 @@ struct SaneClipIOSApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(viewModel)
-                .tint(.teal)
+                .tint(Color.clipBlue)
                 .preferredColorScheme(.dark)
                 .fullScreenCover(isPresented: Binding(
                     get: {
@@ -83,11 +83,11 @@ struct ContentView: View {
                     .fontWeight(isSelected ? .bold : .regular)
             }
             .font(.system(size: 28))
-            .foregroundStyle(isSelected ? .teal : .white.opacity(0.9))
+            .foregroundStyle(isSelected ? Color.clipBlue : .white.opacity(0.9))
             .padding(.horizontal, 32)
             .padding(.vertical, 14)
             .background(
-                isSelected ? Color.teal.opacity(0.15) : Color.clear,
+                isSelected ? Color.clipBlue.opacity(0.15) : Color.clear,
                 in: RoundedRectangle(cornerRadius: 14)
             )
         }
@@ -118,16 +118,23 @@ struct ContentView: View {
     }
 }
 
-private enum LaunchOptions {
+enum LaunchOptions {
+    static func isScreenshotMode(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        arguments.contains("--screenshot-tab")
+    }
+
     static var initialTabIndex: Int {
-        let args = ProcessInfo.processInfo.arguments
-        guard let markerIndex = args.firstIndex(of: "--screenshot-tab"),
-              markerIndex + 1 < args.count
+        initialTabIndex(arguments: ProcessInfo.processInfo.arguments)
+    }
+
+    static func initialTabIndex(arguments: [String]) -> Int {
+        guard let markerIndex = arguments.firstIndex(of: "--screenshot-tab"),
+              markerIndex + 1 < arguments.count
         else {
             return 0
         }
 
-        switch args[markerIndex + 1].lowercased() {
+        switch arguments[markerIndex + 1].lowercased() {
         case "history":
             return 0
         case "pinned":

@@ -9,6 +9,7 @@ struct HistoryTab: View {
     @State private var selectedItem: SharedClipboardItem?
 
     private var isIPad: Bool { sizeClass == .regular }
+    private let isScreenshotMode = LaunchOptions.isScreenshotMode()
 
     var body: some View {
         NavigationStack {
@@ -21,21 +22,23 @@ struct HistoryTab: View {
                     )
                 } else {
                     VStack(spacing: 0) {
-                        if viewModel.isShowingDemoData {
+                        if viewModel.isShowingDemoData && !isScreenshotMode {
                             demoBanner
                         }
-                        if viewModel.clipboardDetectedText != nil {
+                        if viewModel.clipboardDetectedText != nil && !isScreenshotMode {
                             clipboardDetectedBanner
                         }
                         historyList
                     }
                 }
             }
-            .navigationTitle("SaneClip")
+            .navigationTitle("History")
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    saveClipboardButton
+                if !isScreenshotMode {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        saveClipboardButton
+                    }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     refreshButton
@@ -175,7 +178,7 @@ struct HistoryTab: View {
             } label: {
                 Label("Copy", systemImage: "doc.on.doc")
             }
-            .tint(.teal)
+            .tint(Color.clipBlue)
         }
         .accessibilityLabel(item.accessibilityDescription)
         .accessibilityHint("Tap to copy, long press for options")
@@ -194,11 +197,11 @@ struct HistoryTab: View {
     @ViewBuilder
     private var toastOverlay: some View {
         if viewModel.copiedItemID != nil {
-            ToastView(icon: "checkmark.circle.fill", text: "Copied", color: .teal)
+            ToastView(icon: "checkmark.circle.fill", text: "Copied", color: Color.clipBlue)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .padding(.bottom, 16)
         } else if viewModel.savedItemID != nil {
-            ToastView(icon: "plus.circle.fill", text: "Saved", color: .teal)
+            ToastView(icon: "plus.circle.fill", text: "Saved", color: Color.clipBlue)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .padding(.bottom, 16)
         }

@@ -76,17 +76,24 @@ capture_tab() {
   local tab="$3"
   local output="$4"
   local launch_log="/tmp/saneclip_capture_${tab}_$(basename "${output}").log"
+  local status=0
 
   xcrun simctl terminate "${udid}" "${bundle_id}" >/dev/null 2>&1 || true
   log "Launching ${tab} on ${udid}"
-  if ! run_with_timeout 20 xcrun simctl launch "${udid}" "${bundle_id}" -- --skip-onboarding --screenshot-tab "${tab}" >"${launch_log}" 2>&1; then
-    status=$?
+  run_with_timeout 20 xcrun simctl launch "${udid}" "${bundle_id}" -- --skip-onboarding --screenshot-tab "${tab}" >"${launch_log}" 2>&1 || status=$?
+  if [[ "${status}" -ne 0 ]]; then
     if [[ "${status}" -eq 124 ]]; then
       log "Launch timed out for ${tab}; continuing because the app may already be visible"
     else
-    echo "Launch failed for ${bundle_id} (${tab}). See ${launch_log}" >&2
-    sed -n '1,120p' "${launch_log}" >&2 || true
-    exit 1
+      log "Launch failed for ${tab} with status ${status}; re-booting simulator and retrying once"
+      boot_and_style "${udid}"
+      status=0
+      run_with_timeout 20 xcrun simctl launch "${udid}" "${bundle_id}" -- --skip-onboarding --screenshot-tab "${tab}" >"${launch_log}" 2>&1 || status=$?
+      if [[ "${status}" -ne 0 ]]; then
+        echo "Launch failed for ${bundle_id} (${tab}). See ${launch_log}" >&2
+        sed -n '1,120p' "${launch_log}" >&2 || true
+        exit 1
+      fi
     fi
   fi
   sleep 2

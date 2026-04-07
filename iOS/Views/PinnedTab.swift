@@ -110,7 +110,7 @@ struct PinnedTab: View {
     @ViewBuilder
     private var copiedToastOverlay: some View {
         if viewModel.copiedItemID != nil {
-            ToastView(icon: "checkmark.circle.fill", text: "Copied", color: Color.teal)
+            ToastView(icon: "checkmark.circle.fill", text: "Copied", color: Color.pinnedOrange)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .padding(.bottom, 16)
         }

@@ -335,6 +335,40 @@ struct SaneClipTests {
         #expect(machLookupNames.contains("$(PRODUCT_BUNDLE_IDENTIFIER)-spks"))
     }
 
+    @Test("Appcast forces pre-2.2.8 builds onto the manual download path")
+    func sparkleAppcastProtectsPreInstallerLauncherBuilds() throws {
+        let repoRoot = projectRootURL()
+        let appcastURL = repoRoot.appendingPathComponent("docs/appcast.xml")
+        let appcast = try String(contentsOf: appcastURL, encoding: .utf8)
+
+        #expect(appcast.contains("<title>2.2.12</title>"))
+        #expect(appcast.contains("<sparkle:informationalUpdate>"))
+        #expect(appcast.contains("<sparkle:belowVersion>2.2.8</sparkle:belowVersion>"))
+    }
+
+    @Test("iPhone settings restore the App Store screenshot accent lane")
+    func iPhoneSettingsSourceMatchesScreenshotLane() throws {
+        let repoRoot = projectRootURL()
+        let settingsURL = repoRoot.appendingPathComponent("iOS/Views/SettingsTab.swift")
+        let settingsSource = try String(contentsOf: settingsURL, encoding: .utf8)
+
+        #expect(settingsSource.contains("labelColor: Color = .clipBlue"))
+        #expect(settingsSource.contains("Link(destination: URL(string: \"https://saneclip.com\")!)"))
+        #expect(!settingsSource.contains("View Issues"))
+        #expect(!settingsSource.contains("Report a Bug"))
+    }
+
+    @Test("iPhone screenshot mode keeps history chrome aligned with App Store assets")
+    func screenshotModeHistoryChromeMatchesAssetLane() throws {
+        let repoRoot = projectRootURL()
+        let historyURL = repoRoot.appendingPathComponent("iOS/Views/HistoryTab.swift")
+        let historySource = try String(contentsOf: historyURL, encoding: .utf8)
+
+        #expect(historySource.contains(".navigationTitle(\"History\")"))
+        #expect(historySource.contains("if !isScreenshotMode"))
+        #expect(historySource.contains("viewModel.isShowingDemoData && !isScreenshotMode"))
+    }
+
     @Test("Sandboxed builds allow user-selected file access for open and save panels")
     func sandboxedBuildsGrantUserSelectedFileAccess() throws {
         let repoRoot = URL(fileURLWithPath: #filePath)

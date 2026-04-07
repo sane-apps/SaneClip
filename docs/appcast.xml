@@ -6,10 +6,13 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                                                                    <item>
+        <item>
             <title>2.2.12</title>
             <pubDate>Fri, 03 Apr 2026 21:26:10 -0400</pubDate>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:informationalUpdate>
+                <sparkle:belowVersion>2.2.8</sparkle:belowVersion>
+            </sparkle:informationalUpdate>
             <description>
                 <![CDATA[
                 <h2>What's New</h2>

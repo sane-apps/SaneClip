@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download SaneClip</title>
+    <meta name="description" content="Download the latest SaneClip direct build and replace your old app cleanly without ending up with duplicate copies in Applications.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://saneclip.com/download">
+    <meta name="theme-color" content="#0099ff">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://saneclip.com/download">
+    <meta property="og:title" content="Download SaneClip">
+    <meta property="og:description" content="Download the latest SaneClip direct build and replace your old app cleanly without ending up with duplicate copies in Applications.">
+    <meta property="og:image" content="https://saneclip.com/images/og-image.png">
+    <meta property="og:site_name" content="SaneClip">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Download SaneClip">
+    <meta name="twitter:description" content="Download the latest SaneClip direct build and replace your old app cleanly without ending up with duplicate copies in Applications.">
+    <meta name="twitter:image" content="https://saneclip.com/images/og-image.png">
+    <meta name="twitter:site" content="@saneapps">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --text-primary: #f5f5f7;
+            --text-secondary: #c0c0d0;
+            --text-muted: #8b8b98;
+            --accent: #0099ff;
+            --accent-soft: #0077cc;
+            --accent-subtle: rgba(0, 153, 255, 0.15);
+            --accent-glow: rgba(0, 153, 255, 0.3);
+            --warning: #f59e0b;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+        .gradient-bg {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(0, 153, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(0, 119, 204, 0.1) 0%, transparent 50%),
+                var(--bg-primary);
+            pointer-events: none;
+            z-index: -1;
+        }
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 0;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .logo img { width: 32px; height: 32px; border-radius: 8px; }
+        .nav-links { display: flex; gap: 24px; align-items: center; }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+        .content { padding: 120px 0 80px; }
+        h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(2.3rem, 6vw, 3.4rem);
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+            line-height: 1.08;
+        }
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            margin-bottom: 32px;
+            max-width: 760px;
+        }
+        .card {
+            background: linear-gradient(145deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+        .warning-card {
+            border-color: rgba(245, 158, 11, 0.28);
+            background: linear-gradient(145deg, rgba(245, 158, 11, 0.12) 0%, rgba(18, 18, 26, 1) 100%);
+        }
+        .eyebrow {
+            font-size: 0.82rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--warning);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .card p,
+        li {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        h2 {
+            font-size: 1.45rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+        .cta-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin: 28px 0 20px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 22px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            border: 1px solid transparent;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+            color: #fff;
+            box-shadow: 0 10px 28px var(--accent-glow);
+        }
+        .btn-primary:hover { transform: translateY(-1px); }
+        .btn-secondary {
+            color: var(--text-primary);
+            border-color: var(--border);
+            background: var(--bg-card);
+        }
+        .btn-secondary:hover { border-color: var(--accent); }
+        .steps {
+            display: grid;
+            gap: 14px;
+            margin: 22px 0 0;
+        }
+        .step {
+            display: grid;
+            grid-template-columns: 34px 1fr;
+            gap: 14px;
+            align-items: start;
+        }
+        .step-number {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-subtle);
+            color: var(--accent);
+            font-weight: 700;
+        }
+        .step strong {
+            display: block;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .checklist {
+            margin: 16px 0 0 20px;
+        }
+        .checklist li { margin-bottom: 10px; }
+        code {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--accent);
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+        .muted {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        footer {
+            padding: 40px 0 60px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+        footer a:hover { color: var(--accent); }
+        @media (max-width: 700px) {
+            .nav-links { display: none; }
+            .content { padding: 100px 0 60px; }
+            .cta-row { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">
+                <img src="images/icon.png" alt="SaneClip">
+                SaneClip
+            </a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/support">Support</a>
+                <a href="https://github.com/sane-apps/SaneClip">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="content">
+        <div class="container">
+            <h1>Download SaneClip</h1>
+            <p class="subtitle">Use this page when an older SaneClip build could not update itself. The goal is one clean app in <code>/Applications</code>, not two copies with different names.</p>
+
+            <div class="card warning-card">
+                <div class="eyebrow">Important</div>
+                <p>Do <strong>not</strong> unzip SaneClip directly inside <code>/Applications</code>. That is how macOS can create <code>SaneClip 2.app</code> next to the old one.</p>
+            </div>
+
+            <div class="card">
+                <h2>Manual install</h2>
+                <p>Download the latest direct build, open it from <code>Downloads</code>, then drag <code>SaneClip.app</code> onto <code>Applications</code> and choose <strong>Replace</strong> if Finder asks.</p>
+                <div class="cta-row">
+                    <a id="download-button" href="https://dist.saneclip.com/updates/SaneClip-2.2.12.zip" class="btn btn-primary">Download latest direct build</a>
+                    <a href="/" class="btn btn-secondary">Back to homepage</a>
+                </div>
+                <p class="muted" id="download-note">Current direct download link: loading latest release from the live appcast.</p>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div>
+                            <strong>Download to Downloads</strong>
+                            <p>Keep the ZIP in Downloads first. Do not extract it directly into <code>/Applications</code>.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div>
+                            <strong>Open the ZIP from Downloads</strong>
+                            <p>macOS will unpack a fresh <code>SaneClip.app</code>. Leave the unpacked app in Downloads for the next step.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div>
+                            <strong>Drag SaneClip.app onto Applications</strong>
+                            <p>When Finder asks, choose <strong>Replace</strong>. After that, launch the copy in <code>/Applications</code>.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div>
+                            <strong>Keep one copy</strong>
+                            <p>If you see both <code>SaneClip.app</code> and <code>SaneClip 2.app</code>, delete the extra one and keep only <code>/Applications/SaneClip.app</code>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>If you already ended up with two copies</h2>
+                <ul class="checklist">
+                    <li>Keep the newest <code>/Applications/SaneClip.app</code>.</li>
+                    <li>Delete <code>SaneClip 2.app</code> if Finder created it.</li>
+                    <li>Delete any extra <code>~/Applications/SaneClip.app</code> copy unless you intentionally use a separate dev build.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>Need help?</h2>
+                <p>If the download still does not replace the old app cleanly, email <a href="mailto:hi@saneapps.com">hi@saneapps.com</a> or use the support page.</p>
+                <div class="cta-row">
+                    <a href="/support" class="btn btn-secondary">Open support</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p><a href="/">SaneClip</a> · <a href="/privacy">Privacy</a> · <a href="/support">Support</a></p>
+        </div>
+    </footer>
+
+    <script>
+        (async function syncLatestDownload() {
+            const button = document.getElementById('download-button');
+            const note = document.getElementById('download-note');
+            if (!button || !note) return;
+
+            try {
+                const response = await fetch('/appcast.xml', { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const xmlText = await response.text();
+                const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
+                const latestItem = xml.querySelector('channel > item');
+                const enclosure = latestItem && latestItem.querySelector('enclosure');
+                if (!latestItem || !enclosure) throw new Error('Missing latest appcast item');
+
+                const url = enclosure.getAttribute('url');
+                const version =
+                    enclosure.getAttribute('sparkle:shortVersionString') ||
+                    latestItem.querySelector('title')?.textContent?.trim() ||
+                    'latest';
+
+                if (!url) throw new Error('Missing enclosure URL');
+
+                button.href = url;
+                button.textContent = `Download SaneClip ${version}`;
+                note.textContent = `Latest direct build from the live appcast: SaneClip ${version}.`;
+            } catch (error) {
+                note.textContent = 'Could not read the live appcast. The download button still points at the current fallback direct build.';
+            }
+        })();
+    </script>
+</body>
+</html>

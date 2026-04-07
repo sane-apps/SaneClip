@@ -351,6 +351,30 @@ struct SaneClipTests {
         #expect(latestItem.contains("<sparkle:belowVersion>2208</sparkle:belowVersion>"))
     }
 
+    @Test("Website download CTAs route through the manual install guide")
+    func websiteDownloadCtasUseManualGuide() throws {
+        let repoRoot = projectRootURL()
+        let indexURL = repoRoot.appendingPathComponent("docs/index.html")
+        let indexSource = try String(contentsOf: indexURL, encoding: .utf8)
+
+        #expect(indexSource.contains("href=\"/download\" class=\"mobile-nav-cta\""))
+        #expect(indexSource.contains("href=\"/download\" class=\"pricing-cta pricing-cta-free\""))
+        #expect(indexSource.contains("href=\"/download\" class=\"sustainability-option\""))
+        #expect(!indexSource.contains("https://dist.saneclip.com/updates/SaneClip-2.2.12.zip\" class=\"pricing-cta pricing-cta-free\""))
+    }
+
+    @Test("Download guide warns against duplicate app installs")
+    func manualDownloadGuideWarnsAboutDuplicateApps() throws {
+        let repoRoot = projectRootURL()
+        let downloadURL = repoRoot.appendingPathComponent("docs/download.html")
+        let downloadSource = try String(contentsOf: downloadURL, encoding: .utf8)
+
+        #expect(downloadSource.contains("Do <strong>not</strong> unzip SaneClip directly inside <code>/Applications</code>."))
+        #expect(downloadSource.contains("choose <strong>Replace</strong>"))
+        #expect(downloadSource.contains("delete the extra one and keep only <code>/Applications/SaneClip.app</code>"))
+        #expect(downloadSource.contains("fetch('/appcast.xml'"))
+    }
+
     @Test("iPhone settings restore the App Store screenshot accent lane")
     func iPhoneSettingsSourceMatchesScreenshotLane() throws {
         let repoRoot = projectRootURL()

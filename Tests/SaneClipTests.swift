@@ -8,6 +8,20 @@ import SwiftUI
 import Testing
 @testable import SaneClip
 
+private final class MockKeychainService: KeychainServiceProtocol, @unchecked Sendable {
+    private var bools: [String: Bool] = [:]
+    private var strings: [String: String] = [:]
+
+    func bool(forKey key: String) throws -> Bool? { bools[key] }
+    func set(_ value: Bool, forKey key: String) throws { bools[key] = value }
+    func string(forKey key: String) throws -> String? { strings[key] }
+    func set(_ value: String, forKey key: String) throws { strings[key] = value }
+    func delete(_ key: String) throws {
+        bools.removeValue(forKey: key)
+        strings.removeValue(forKey: key)
+    }
+}
+
 @MainActor
 private final class PreviewSyncCoordinator: SyncCoordinator {
     override func startSync() {
@@ -29,6 +43,12 @@ struct SaneClipTests {
         URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
+    }
+
+    @MainActor
+    private func withClipboardManagerState(_ body: (ClipboardManager) throws -> Void) rethrows {
+        let manager = ClipboardManager(startMonitoring: false, loadPersistedState: false, persistenceEnabled: false)
+        try body(manager)
     }
 
     @Test("ClipboardItem preview truncates long text")
@@ -426,6 +446,88 @@ struct SaneClipTests {
     func clipboardManagerProTierHistoryLimit() {
         #expect(ClipboardManager.historyLimit(maxHistorySize: 500, isPro: true) == 500)
         #expect(ClipboardManager.historyLimit(maxHistorySize: 50, isPro: true) == 50)
+    }
+
+    @Test("ClipboardManager unlimited history sentinel is stable")
+    func clipboardManagerUnlimitedHistoryLimit() {
+        #expect(ClipboardManager.usesUnlimitedHistory(maxHistorySize: 0, isPro: true))
+        #expect(ClipboardManager.historyLimit(maxHistorySize: 0, isPro: true) == .max)
+        #expect(ClipboardManager.historyLimit(maxHistorySize: 0, isPro: false) == 50)
+    }
+
+    @Test("SettingsModel formats unlimited history labels clearly")
+    func settingsModelHistoryLabels() {
+        #expect(SettingsModel.historySizeLabel(0) == "Unlimited")
+        #expect(SettingsModel.historySizeLabel(5000) == "5000")
+    }
+
+    @Test("Smart clear protects curated items")
+    @MainActor
+    func clipboardManagerSmartClearProtectsCuratedItems() {
+        withClipboardManagerState { manager in
+            let disposable = ClipboardItem(content: .text("temporary build number"), sourceAppName: "Xcode")
+            let tagged = ClipboardItem(content: .text("release checklist"), sourceAppName: "Notes", tags: ["release"])
+            let noted = ClipboardItem(content: .text("customer quote"), sourceAppName: "Messages", note: "Use for launch copy")
+            let collected = ClipboardItem(content: .text("support draft"), sourceAppName: "Safari", collection: "Support")
+            let pinned = ClipboardItem(content: .text("Pinned reference"), sourceAppName: "Mail")
+
+            manager.history = [disposable, tagged, noted, collected, pinned]
+            manager.pinnedItems = [pinned]
+            manager.pasteStack = [disposable, pinned]
+
+            let plan = manager.smartClearPlan()
+            #expect(plan.removableCount == 1)
+            #expect(plan.protectedCount == 4)
+
+            _ = manager.clearSmartHistory()
+
+            #expect(Set(manager.history.map(\.id)) == Set([tagged.id, noted.id, collected.id, pinned.id]))
+            #expect(Set(manager.pasteStack.map(\.id)) == Set([pinned.id]))
+            #expect(manager.pinnedItems.map(\.id) == [pinned.id])
+        }
+    }
+
+    @Test("Smart clear only removes disposable items inside the selected scope")
+    @MainActor
+    func clipboardManagerSmartClearRespectsScope() {
+        withClipboardManagerState { manager in
+            let visibleDisposable = ClipboardItem(content: .text("clear me"), sourceAppName: "Xcode")
+            let hiddenDisposable = ClipboardItem(content: .text("leave me"), sourceAppName: "Safari")
+            let visibleProtected = ClipboardItem(
+                content: .text("keep tagged note"),
+                sourceAppName: "Notes",
+                tags: ["keep"]
+            )
+
+            manager.history = [visibleDisposable, hiddenDisposable, visibleProtected]
+
+            let scope = Set([visibleDisposable.id, visibleProtected.id])
+            let plan = manager.clearSmartHistory(matching: scope)
+
+            #expect(plan.matchedCount == 2)
+            #expect(plan.removableCount == 1)
+            #expect(plan.protectedCount == 1)
+            #expect(Set(manager.history.map(\.id)) == Set([hiddenDisposable.id, visibleProtected.id]))
+        }
+    }
+
+    @Test("Clear history preserves pinned items in durable history")
+    @MainActor
+    func clipboardManagerClearHistoryPreservesPinnedItems() {
+        withClipboardManagerState { manager in
+            let regular = ClipboardItem(content: .text("ephemeral"), sourceAppName: "Safari")
+            let pinned = ClipboardItem(content: .text("keep me"), sourceAppName: "Notes")
+
+            manager.history = [regular, pinned]
+            manager.pinnedItems = [pinned]
+            manager.pasteStack = [regular, pinned]
+
+            _ = manager.clearHistory()
+
+            #expect(manager.history.map(\.id) == [pinned.id])
+            #expect(manager.pinnedItems.map(\.id) == [pinned.id])
+            #expect(manager.pasteStack.isEmpty)
+        }
     }
 
     @Test("Snippet intents require Pro")
@@ -1166,7 +1268,7 @@ struct SaneClipTests {
         #expect(!settingsSource.contains("mailto:hi@saneapps.com"))
         #expect(!directSupportSource.contains("struct SaneSparkleRow"))
         #expect(!iosSettingsSource.contains("mailto:hi@saneapps.com"))
-        #expect(iosSettingsSource.contains("https://github.com/sane-apps/SaneClip/issues"))
+        #expect(iosSettingsSource.contains("githubRepo: \"sane-apps/SaneClip\""))
     }
 
     @Test("Settings screens keep readable typography and contrast tokens")
@@ -1224,6 +1326,24 @@ struct SaneClipTests {
         #expect(!keychainSource.contains("UserDefaults(suiteName: \"com.saneclip.no-keychain\")"))
     }
 
+    @Test("History and settings surfaces expose unlimited retention and smart clear")
+    func historyAndSettingsExposeUnlimitedAndSmartClear() throws {
+        let settingsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
+            encoding: .utf8
+        )
+        let historySource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardHistoryView.swift"),
+            encoding: .utf8
+        )
+
+        #expect(settingsSource.contains("SettingsModel.proHistorySizeChoices"))
+        #expect(settingsSource.contains("100 / 500 / Unlimited"))
+        #expect(historySource.contains("Smart Clear"))
+        #expect(historySource.contains("Clear Visible Disposable Items"))
+        #expect(historySource.contains("Keeps pinned, tagged, noted, and non-default collection items."))
+    }
+
     @Test("Render settings screenshots when requested")
     @MainActor
     func renderSettingsScreenshots() throws {
@@ -1248,6 +1368,35 @@ struct SaneClipTests {
                 .frame(width: 1000, height: 760),
             size: CGSize(width: 1000, height: 760),
             to: outputDir.appendingPathComponent("settings-general-render.png")
+        )
+
+        let sharedSettings = SettingsModel.shared
+        let originalMaxHistorySize = sharedSettings.maxHistorySize
+        defer { sharedSettings.maxHistorySize = originalMaxHistorySize }
+
+        let previewHistoryKeychain = MockKeychainService()
+        let recentValidation = ISO8601DateFormatter().string(from: Date().addingTimeInterval(-300))
+        try previewHistoryKeychain.set("test-license-key", forKey: "license_key")
+        try previewHistoryKeychain.set(recentValidation, forKey: "last_validation")
+        try previewHistoryKeychain.set("pro@example.com", forKey: "license_email")
+        let previewHistoryLicenseService = LicenseService(
+            appName: "SaneClip",
+            purchaseBackend: .direct(checkoutURL: URL(string: "https://saneclip.com")!),
+            keychain: previewHistoryKeychain
+        )
+        previewHistoryLicenseService.checkCachedLicense()
+        sharedSettings.maxHistorySize = 0
+
+        try renderPNG(
+            ZStack(alignment: .topLeading) {
+                renderBackdrop.opacity(0.3)
+                    .ignoresSafeArea()
+                GeneralSettingsView(licenseService: previewHistoryLicenseService)
+            }
+            .preferredColorScheme(.dark)
+            .frame(width: 1000, height: 1500),
+            size: CGSize(width: 1000, height: 1500),
+            to: outputDir.appendingPathComponent("settings-general-history-render.png")
         )
 
         try renderPNG(
@@ -1363,6 +1512,7 @@ struct SaneClipTests {
         )
 
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-general-render.png").path))
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-general-history-render.png").path))
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-shortcuts-render.png").path))
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-snippets-render.png").path))
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-sync-render.png").path))
@@ -1370,6 +1520,69 @@ struct SaneClipTests {
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-storage-render.png").path))
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-license-render.png").path))
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("settings-about-render.png").path))
+    }
+
+    @Test("Render history screenshot when requested")
+    @MainActor
+    func renderHistoryScreenshot() throws {
+        guard let rawOutputDir = screenshotOutputDirectory()
+        else {
+            return
+        }
+
+        let outputDir = URL(
+            fileURLWithPath: NSString(string: rawOutputDir).expandingTildeInPath,
+            isDirectory: true
+        )
+        try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
+
+        try withClipboardManagerState { manager in
+            let pinned = ClipboardItem(
+                content: .text("Pinned reference clip for launch day"),
+                sourceAppName: "Notes",
+                tags: ["launch"],
+                collection: "Planning",
+                note: "Keep"
+            )
+            let tagged = ClipboardItem(
+                content: .text("Support template with reusable copy"),
+                sourceAppName: "Safari",
+                tags: ["support"]
+            )
+            let noted = ClipboardItem(
+                content: .text("Customer quote worth saving"),
+                sourceAppName: "Messages",
+                note: "Potential testimonial"
+            )
+            let collected = ClipboardItem(
+                content: .text("Terminal snippet for release cleanup"),
+                sourceAppName: "Terminal",
+                collection: "Ops"
+            )
+            let disposable = ClipboardItem(
+                content: .text("Temporary build number 2214"),
+                sourceAppName: "Xcode"
+            )
+
+            manager.history = [disposable, collected, noted, tagged, pinned]
+            manager.pinnedItems = [pinned]
+            manager.pasteStack = [disposable]
+
+            try renderPNG(
+                ZStack {
+                    renderBackdrop.opacity(0.3)
+                        .ignoresSafeArea()
+                    ClipboardHistoryView(clipboardManager: manager, licenseService: nil)
+                        .padding(18)
+                }
+                .preferredColorScheme(.dark)
+                .frame(width: 980, height: 760),
+                size: CGSize(width: 980, height: 760),
+                to: outputDir.appendingPathComponent("history-smart-clear-render.png")
+            )
+        }
+
+        #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("history-smart-clear-render.png").path))
     }
 
     @Test("SettingsModel round-trips excluded apps through fresh initialization")

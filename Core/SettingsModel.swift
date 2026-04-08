@@ -57,6 +57,17 @@ class SettingsModel {
         25 * 1024 * 1024
     ]
 
+    nonisolated static let unlimitedHistoryValue = 0
+    nonisolated static let proHistorySizeChoices = [
+        50,
+        100,
+        200,
+        500,
+        1000,
+        5000,
+        unlimitedHistoryValue
+    ]
+
     nonisolated static func normalizedCaptureTextBytes(_ value: Int) -> Int {
         allowedMaxCaptureTextBytes.contains(value) ? value : 256 * 1024
     }
@@ -65,9 +76,27 @@ class SettingsModel {
         allowedMaxCaptureImageBytes.contains(value) ? value : 5 * 1024 * 1024
     }
 
+    nonisolated static func normalizedMaxHistorySize(_ value: Int) -> Int {
+        value <= unlimitedHistoryValue ? unlimitedHistoryValue : value
+    }
+
+    nonisolated static func isUnlimitedHistorySize(_ value: Int) -> Bool {
+        normalizedMaxHistorySize(value) == unlimitedHistoryValue
+    }
+
+    nonisolated static func historySizeLabel(_ value: Int) -> String {
+        let normalized = normalizedMaxHistorySize(value)
+        return normalized == unlimitedHistoryValue ? "Unlimited" : "\(normalized)"
+    }
+
     var maxHistorySize: Int {
         didSet {
-            UserDefaults.standard.set(maxHistorySize, forKey: "maxHistorySize")
+            let normalized = Self.normalizedMaxHistorySize(maxHistorySize)
+            if normalized != maxHistorySize {
+                maxHistorySize = normalized
+                return
+            }
+            UserDefaults.standard.set(normalized, forKey: "maxHistorySize")
         }
     }
 
@@ -214,7 +243,9 @@ class SettingsModel {
     }
 
     init() {
-        maxHistorySize = UserDefaults.standard.object(forKey: "maxHistorySize") as? Int ?? 50
+        maxHistorySize = Self.normalizedMaxHistorySize(
+            UserDefaults.standard.object(forKey: "maxHistorySize") as? Int ?? 50
+        )
         openHistoryAtCursor = UserDefaults.standard.object(forKey: "openHistoryAtCursor") as? Bool ?? false
         showInDock = UserDefaults.standard.object(forKey: "showInDock") as? Bool ?? Self.defaultShowInDock
         protectPasswords = UserDefaults.standard.object(forKey: "protectPasswords") as? Bool ?? true
@@ -324,7 +355,7 @@ class SettingsModel {
 
         // Apply each setting if present
         if let value = settings["maxHistorySize"] as? Int {
-            maxHistorySize = value
+            maxHistorySize = Self.normalizedMaxHistorySize(value)
         }
         if let value = settings["openHistoryAtCursor"] as? Bool {
             openHistoryAtCursor = value

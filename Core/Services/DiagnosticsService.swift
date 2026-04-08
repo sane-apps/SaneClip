@@ -43,7 +43,7 @@ private func collectSaneClipSettings() -> String {
     pasteStackCount: \(manager.pasteStack.count)
 
     settings:
-      maxHistorySize: \(settings.maxHistorySize)
+      maxHistorySize: \(SettingsModel.historySizeLabel(settings.maxHistorySize))
       defaultPasteMode: \(settings.defaultPasteMode.rawValue)
       pasteSound: \(settings.pasteSound.rawValue)
       protectPasswords: \(settings.protectPasswords)

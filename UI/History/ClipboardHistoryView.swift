@@ -74,7 +74,7 @@ struct ClipboardHistoryView: View {
         case search
         case list
         case settingsButton
-        case clearAllButton
+        case smartClearButton
     }
 
     var clipboardManager: ClipboardManager
@@ -94,6 +94,7 @@ struct ClipboardHistoryView: View {
     @State private var mergeQueueIDs: Set<UUID> = []
     @State private var showFilters = false
     @State private var showPasteStackPanel = false
+    @State private var showSmartClearConfirmation = false
     @State private var editingStackTitleID: UUID?
     @State private var editingStackNoteID: UUID?
     @State private var stackTitleDraft = ""
@@ -122,6 +123,35 @@ struct ClipboardHistoryView: View {
     /// All navigable items (pinned + history)
     var allItems: [ClipboardItem] {
         filteredPinned + filteredHistory
+    }
+
+    private var hasScopedView: Bool {
+        !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || hasActiveFilters
+    }
+
+    private var visibleItemIDs: Set<UUID> {
+        Set(allItems.map(\.id))
+    }
+
+    private var smartClearPlan: ClipboardManager.HistoryClearPlan {
+        clipboardManager.smartClearPlan()
+    }
+
+    private var visibleSmartClearPlan: ClipboardManager.HistoryClearPlan {
+        clipboardManager.smartClearPlan(matching: visibleItemIDs)
+    }
+
+    private var shouldOfferVisibleSmartClear: Bool {
+        hasScopedView &&
+            visibleSmartClearPlan.removableCount > 0 &&
+            visibleSmartClearPlan.removableCount != smartClearPlan.removableCount
+    }
+
+    private var smartClearMessage: String {
+        if smartClearPlan.protectedCount > 0 {
+            return "Keeps pinned, tagged, noted, and non-default collection items. \(smartClearPlan.protectedCount) protected item\(smartClearPlan.protectedCount == 1 ? "" : "s") stay in history."
+        }
+        return "Keeps pinned, tagged, noted, and non-default collection items."
     }
 
     var filteredHistory: [ClipboardItem] {
@@ -784,16 +814,20 @@ struct ClipboardHistoryView: View {
                 .help("Settings")
                 .accessibilityLabel("Open settings")
 
-                Button("Clear All") {
-                    clipboardManager.clearHistory()
+                Button {
+                    showSmartClearConfirmation = true
+                } label: {
+                    Label("Smart Clear", systemImage: "sparkles")
                 }
                 .buttonStyle(.plain)
                 .focusable()
-                .focused($focusedTarget, equals: .clearAllButton)
+                .focused($focusedTarget, equals: .smartClearButton)
                 .font(.subheadline)
-                .foregroundStyle(.primary.opacity(0.85))
-                .accessibilityLabel("Clear all clipboard history")
-                .accessibilityHint("Removes all items from history. This cannot be undone.")
+                .foregroundStyle(Color.clipBlue.opacity(0.95))
+                .help("Bulk-delete disposable clips while keeping pinned, tagged, noted, and non-default collection items.")
+                .accessibilityLabel("Smart clear clipboard history")
+                .accessibilityHint("Opens safe bulk delete options for disposable items only.")
+                .disabled(smartClearPlan.removableCount == 0)
             }
             .padding(8)
         }
@@ -837,6 +871,23 @@ struct ClipboardHistoryView: View {
             }
             .padding(16)
             .frame(width: 320)
+        }
+        .confirmationDialog("Smart Clear", isPresented: $showSmartClearConfirmation, titleVisibility: .visible) {
+            if shouldOfferVisibleSmartClear {
+                Button("Clear Visible Disposable Items (\(visibleSmartClearPlan.removableCount))", role: .destructive) {
+                    _ = clipboardManager.clearSmartHistory(matching: visibleItemIDs)
+                }
+            }
+
+            if smartClearPlan.removableCount > 0 {
+                Button("Clear Disposable Items (\(smartClearPlan.removableCount))", role: .destructive) {
+                    _ = clipboardManager.clearSmartHistory()
+                }
+            }
+
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(smartClearMessage)
         }
     }
 

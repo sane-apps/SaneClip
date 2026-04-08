@@ -332,6 +332,19 @@ struct GeneralSettingsView: View {
     @State private var isAuthenticating = false
 
     private var isPro: Bool { licenseService?.isPro == true }
+    private var historySizeChoices: [Int] {
+        let currentChoice = SettingsModel.normalizedMaxHistorySize(settings.maxHistorySize)
+        let allChoices = Set(SettingsModel.proHistorySizeChoices + [currentChoice])
+        return allChoices.sorted { lhs, rhs in
+            if SettingsModel.isUnlimitedHistorySize(lhs) {
+                return false
+            }
+            if SettingsModel.isUnlimitedHistorySize(rhs) {
+                return true
+            }
+            return lhs < rhs
+        }
+    }
 
     var body: some View {
         ScrollView {
@@ -606,35 +619,38 @@ struct GeneralSettingsView: View {
                     }
                 #endif
 
-                CompactSection(SaneClipSettingsCopy.historySectionTitle) {
-                    CompactRow(SaneClipSettingsCopy.maximumItemsLabel) {
-                        if isPro {
-                            Picker("", selection: Binding(
-                                get: { settings.maxHistorySize },
-                                set: { settings.maxHistorySize = $0 }
-                            )) {
-                                Text("50").tag(50)
-                                Text("100").tag(100)
-                                Text("200").tag(200)
-                            }
-                            .pickerStyle(.menu)
-                            .frame(width: 80)
-                        } else {
-                            Button {
-                                if let ls = licenseService {
-                                    ProUpsellWindow.show(feature: ProFeature.unlimitedHistory, licenseService: ls)
+                    CompactSection(SaneClipSettingsCopy.historySectionTitle) {
+                        CompactRow(SaneClipSettingsCopy.maximumItemsLabel) {
+                            if isPro {
+                                Picker("", selection: Binding(
+                                    get: { settings.maxHistorySize },
+                                    set: { settings.maxHistorySize = SettingsModel.normalizedMaxHistorySize($0) }
+                                )) {
+                                    ForEach(historySizeChoices, id: \.self) { choice in
+                                        Text(SettingsModel.historySizeLabel(choice)).tag(choice)
+                                    }
                                 }
+                                .pickerStyle(.menu)
+                                .frame(width: 120)
+                                .help("Pro keeps as much history as you configure, including unlimited.")
+                            } else {
+                                Button {
+                                    if let ls = licenseService {
+                                        ProUpsellWindow.show(feature: ProFeature.unlimitedHistory, licenseService: ls)
+                                    }
                             } label: {
                                 HStack(spacing: 6) {
                                     Text("50")
                                         .font(.system(size: 13, weight: .semibold))
+                                        .foregroundStyle(.white)
                                     Text("•")
                                         .foregroundStyle(.white.opacity(0.7))
-                                    Text("100 / 200")
+                                    Text("100 / 500 / Unlimited")
+                                        .foregroundStyle(.white)
                                     Image(systemName: "lock.fill")
                                         .font(.system(size: 12, weight: .semibold))
+                                        .foregroundStyle(Color.clipBlue.opacity(0.95))
                                 }
-                                .foregroundStyle(.teal)
                             }
                             .buttonStyle(ClipActionButtonStyle())
                             .controlSize(.small)

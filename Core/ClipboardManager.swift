@@ -29,11 +29,44 @@ class ClipboardManager {
 
     /// Free tier history cap — Pro users get unlimited.
     nonisolated static let freeHistoryCap = 50
+    struct HistoryClearPlan {
+        let matchedCount: Int
+        let protectedCount: Int
+        let removableIDs: Set<UUID>
+
+        var removableCount: Int { removableIDs.count }
+    }
+
+    nonisolated static func usesUnlimitedHistory(maxHistorySize: Int, isPro: Bool) -> Bool {
+        isPro && SettingsModel.isUnlimitedHistorySize(maxHistorySize)
+    }
+
     nonisolated static func historyLimit(maxHistorySize: Int, isPro: Bool) -> Int {
-        if isPro {
-            return maxHistorySize
+        if usesUnlimitedHistory(maxHistorySize: maxHistorySize, isPro: isPro) {
+            return .max
         }
-        return min(maxHistorySize, freeHistoryCap)
+        let normalized = SettingsModel.normalizedMaxHistorySize(maxHistorySize)
+        if isPro {
+            return max(normalized, 1)
+        }
+        let configured = normalized == SettingsModel.unlimitedHistoryValue ? freeHistoryCap : normalized
+        return min(max(configured, 1), freeHistoryCap)
+    }
+
+    nonisolated static func isProtectedFromSmartClear(item: ClipboardItem, isPinned: Bool) -> Bool {
+        if isPinned {
+            return true
+        }
+        if !item.tags.isEmpty {
+            return true
+        }
+        if item.collection != "Default" {
+            return true
+        }
+        if let note = item.note?.trimmingCharacters(in: .whitespacesAndNewlines), !note.isEmpty {
+            return true
+        }
+        return false
     }
 
     var history: [ClipboardItem] = []
@@ -72,6 +105,7 @@ class ClipboardManager {
     private var ignoreNextCapture = false
     private var capturePausedUntil: Date?
     private var maxHistorySize: Int { SettingsModel.shared.maxHistorySize }
+    private let persistenceEnabled: Bool
     private let logger = Logger(subsystem: "com.saneclip.app", category: "ClipboardManager")
 
     var isCapturePaused: Bool {
@@ -112,11 +146,16 @@ class ClipboardManager {
         "com.wsigenesis.1Password7"
     ]
 
-    init() {
+    init(startMonitoring: Bool = true, loadPersistedState: Bool = true, persistenceEnabled: Bool = true) {
+        self.persistenceEnabled = persistenceEnabled
         lastChangeCount = NSPasteboard.general.changeCount
-        startMonitoring()
-        loadHistory()
-        loadPasteStack()
+        if startMonitoring {
+            self.startMonitoring()
+        }
+        if loadPersistedState {
+            loadHistory()
+            loadPasteStack()
+        }
     }
 
     private func startMonitoring() {
@@ -1148,14 +1187,15 @@ class ClipboardManager {
             history.insert(item, at: 0)
 
             // Trim to max size, cleaning up thumbnails for removed items
-            if history.count > maxHistorySize {
-                let removed = history.suffix(from: maxHistorySize)
+            let syncLimit = effectiveHistoryLimit() ?? (maxHistorySize > 0 ? maxHistorySize : nil)
+            if let syncLimit, history.count > syncLimit {
+                let removed = history.suffix(from: syncLimit)
                 for removedItem in removed {
                     if case .image = removedItem.content {
                         deleteThumbnail(id: removedItem.id)
                     }
                 }
-                history = Array(history.prefix(maxHistorySize))
+                history = Array(history.prefix(syncLimit))
             }
 
             saveHistory()
@@ -1176,18 +1216,79 @@ class ClipboardManager {
         }
     #endif
 
-    func clearHistory() {
-        // Clean up all thumbnail files
-        for item in history {
+    func smartClearPlan(matching ids: Set<UUID>? = nil) -> HistoryClearPlan {
+        let pinnedIDs = Set(pinnedItems.map(\.id))
+        var seen: Set<UUID> = []
+        var protectedCount = 0
+        var removableIDs: Set<UUID> = []
+        var matchedCount = 0
+
+        for item in pinnedItems + history {
+            guard ids?.contains(item.id) ?? true else { continue }
+            guard seen.insert(item.id).inserted else { continue }
+            matchedCount += 1
+            if Self.isProtectedFromSmartClear(item: item, isPinned: pinnedIDs.contains(item.id)) {
+                protectedCount += 1
+            } else {
+                removableIDs.insert(item.id)
+            }
+        }
+
+        return HistoryClearPlan(
+            matchedCount: matchedCount,
+            protectedCount: protectedCount,
+            removableIDs: removableIDs
+        )
+    }
+
+    @discardableResult
+    func clearSmartHistory(matching ids: Set<UUID>? = nil) -> HistoryClearPlan {
+        let plan = smartClearPlan(matching: ids)
+        _ = removeHistoryItems(withIDs: plan.removableIDs)
+        return plan
+    }
+
+    @discardableResult
+    func clearHistory() -> Int {
+        let pinnedIDs = Set(pinnedItems.map(\.id))
+        let removedIDs = Set(history.filter { !pinnedIDs.contains($0.id) }.map(\.id))
+
+        for item in history where removedIDs.contains(item.id) {
             if case .image = item.content {
                 deleteThumbnail(id: item.id)
             }
         }
-        history.removeAll()
+
+        history.removeAll { !pinnedIDs.contains($0.id) }
         pasteStack.removeAll()
         lastPastedFromStack = nil
         saveHistory()
         savePasteStack()
+        return removedIDs.count
+    }
+
+    @discardableResult
+    func removeHistoryItems(withIDs ids: Set<UUID>) -> Int {
+        guard !ids.isEmpty else { return 0 }
+
+        var seen: Set<UUID> = []
+        for item in pinnedItems + history where ids.contains(item.id) {
+            guard seen.insert(item.id).inserted else { continue }
+            if case .image = item.content {
+                deleteThumbnail(id: item.id)
+            }
+        }
+
+        history.removeAll { ids.contains($0.id) }
+        pinnedItems.removeAll { ids.contains($0.id) }
+        pasteStack.removeAll { ids.contains($0.id) }
+        if let lastPastedFromStack, ids.contains(lastPastedFromStack.id) {
+            self.lastPastedFromStack = nil
+        }
+
+        saveHistory()
+        savePasteStack()
+        return ids.count
     }
 
     func pasteItemAt(index: Int) {
@@ -1322,6 +1423,7 @@ class ClipboardManager {
     }
 
     private func savePasteStack() {
+        guard persistenceEnabled else { return }
         let ids = pasteStack.map { $0.id.uuidString }
         UserDefaults.standard.set(ids, forKey: "pasteStackIDs")
     }
@@ -1592,6 +1694,9 @@ class ClipboardManager {
     }
 
     func saveHistory() {
+        guard persistenceEnabled else { return }
+        ensurePinnedItemsPersistedInHistory()
+
         // Save text items directly; save image items as downsized thumbnails on disk
         let savedItems = history.compactMap { item -> SavedClipboardItem? in
             switch item.content {
@@ -1646,6 +1751,14 @@ class ClipboardManager {
         } catch {
             logger.error("Failed to save history: \(error.localizedDescription)")
         }
+    }
+
+    private func ensurePinnedItemsPersistedInHistory() {
+        guard !pinnedItems.isEmpty else { return }
+        let existingIDs = Set(history.map(\.id))
+        let missingPinnedItems = pinnedItems.filter { !existingIDs.contains($0.id) }
+        guard !missingPinnedItems.isEmpty else { return }
+        history = missingPinnedItems + history
     }
 
     // MARK: - Widget Support
@@ -1771,7 +1884,11 @@ class ClipboardManager {
 
     private func effectiveHistoryLimit() -> Int? {
         guard licenseService != nil else { return nil }
-        return Self.historyLimit(maxHistorySize: maxHistorySize, isPro: licenseService?.isPro == true)
+        let isPro = licenseService?.isPro == true
+        if Self.usesUnlimitedHistory(maxHistorySize: maxHistorySize, isPro: isPro) {
+            return nil
+        }
+        return Self.historyLimit(maxHistorySize: maxHistorySize, isPro: isPro)
     }
 
     private func enforceHistoryLimitIfNeeded(saveAfterTrim: Bool = true) {

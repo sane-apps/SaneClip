@@ -162,3 +162,19 @@ Graduate verified findings to ARCHITECTURE.md or DEVELOPMENT.md.
 - Deterministic SwiftUI render PNGs remain the fallback when live capture is flaky or when a stable artifact is preferable. For SaneClip, the settings render test now emits both `settings-sync-render.png` and `settings-sync-enabled-render.png`.
 - The Mini verify failure after the sync-settings spacing change was not a product regression; it was an Xcode build database lock caused by concurrent `verify` runs against the same DerivedData directory.
 - Current visual conclusion for the sync reset UI: the old centered destructive button block was inconsistent with the rest of the settings chrome. The intended standard is a settings row with the action label left and a compact destructive button right, with explanatory copy underneath.
+
+## History Retention + Smart Clear Research
+**Updated:** 2026-04-07 | **Status:** verified | **TTL:** 14d
+**Source:** GitHub issue `#7` + local code/tests + Mini verification plan + official clipboard product docs
+- GitHub issue `#7` is valid product feedback, not just user confusion. The current settings UI only exposed `50 / 100 / 200`, even though `ProFeature.unlimitedHistory` already promises unlimited history and the model layer already allows Pro history values above `200`.
+- The real contradiction was UI-level: `SettingsView` capped the menu choices, while `ClipboardManager.historyLimit(maxHistorySize:isPro:)` already respected the configured Pro value and the tests already covered values like `500`.
+- The old footer bulk-delete flow was too blunt. It preserved pinned clips only and did not treat tagged items, noted items, or non-default collections as curated data worth protecting by default.
+- Best product resolution for this request is: expose real Pro retention choices including `Unlimited`, keep the free cap at `50`, and make the footer action a smart clear that removes only disposable clips while preserving pinned, tagged, noted, and non-default collection items.
+- Durability note: pinned items must remain present in the saved history payload, not just the separate pinned ID list, or a “clear while preserving pinned” action quietly degrades on the next launch. The save path should enforce that invariant.
+- External pattern check lines up with this direction:
+  - Microsoft clipboard history officially documents that `Clear` removes everything except pinned items, and that older non-pinned items roll off automatically when the history cap is reached.
+  - Maccy’s official usage docs separate `Clear all unpinned items` from the stronger `clear all including pinned`, which reinforces the idea that curated/pinned data should survive the default destructive action.
+  - iClip’s official manual treats transient recorder history as disposable and tells users to move clips they want to keep into named clip sets. That supports SaneClip’s “default collection is disposable, named collections are curated” split.
+- Mini verification proof for this pass:
+  - Routed `./scripts/SaneMaster.rb verify --quiet` passed with `128` tests after adding scoped Smart Clear coverage and the dedicated Pro history render.
+  - The deterministic Mini render now captures a dedicated `settings-general-history-render.png`, which shows the real Pro history row with `Unlimited` selected inside the shared settings chrome.

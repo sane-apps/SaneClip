@@ -6,7 +6,27 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-        <item>
+                <item>
+            <title>2.2.13</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Thu, 09 Apr 2026 18:38:39 -0400</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Adds Smart Clear and true Unlimited history for Pro, restores the color-coded source indicators on iPhone and iPad, aligns the mobile UI with the approved screenshots, and improves older Mac update recovery.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.2.13.zip"
+                       sparkle:version="2213"
+                       sparkle:shortVersionString="2.2.13"
+                       length="3633858"
+                       type="application/octet-stream"
+                       sparkle:edSignature="72dqNANIDE8Zb3dvJaNBUr0tfT4XVxQM2miRux5N3DNim7DaYIE+rDopmq+uA+4j22+JTcn7x7TiaX8JvqOLAg=="/>
+        </item>
+<item>
             <title>2.2.12</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Fri, 03 Apr 2026 21:26:10 -0400</pubDate>

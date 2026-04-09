@@ -57,19 +57,16 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ---
 
-## 🆕 What's New in v2.1
+## 🆕 Current macOS Direct Download: v2.2.12
 
-**Security Hardening + iOS Companion App (Feb 2026)**
+**Current direct-download release (Apr 2026)**
 
-- ✅ **History Encryption-at-Rest** — AES-256-GCM encryption available in Pro
-- ✅ **Keychain Integration** — All secrets stored securely in macOS Keychain
-- ✅ **URL Scheme Confirmation** — Destructive commands require user approval
-- ✅ **HTTPS Enforcement** — Webhooks must use HTTPS
-- ✅ **Seamless Migration** — Existing plaintext data auto-migrates to encrypted format
-- ✅ **Paste Stack Order** — FIFO/LIFO modes for paste stack
-- ✅ **Open at Cursor Mode** — Optional setting to open history at your mouse cursor
-- ✅ **iOS Companion App** — Free iPhone/iPad app with iCloud sync (now live on the App Store)
-- ✅ **macOS & iOS Widgets** — Recent and Pinned clips on your desktop and Home Screen
+- ✅ Fixes iPhone iCloud sync recovery
+- ✅ Adds manual iCloud sync reset and diagnostics
+- ✅ Refreshes the sync settings layout across Mac, iPhone, and iPad
+- ✅ Keeps the current macOS direct-download lane aligned with the live appcast
+
+The next mobile follow-up is `2.2.13`, which restores the color-coded source indicators on iPhone and iPad and improves recovery for older Mac updater installs.
 
 ---
 

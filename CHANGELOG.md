@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.2.13] - 2026-04-09
+
+Adds Smart Clear and true Unlimited history for Pro, restores the color-coded source indicators on iPhone and iPad, aligns the mobile UI with the approved screenshots, and improves older Mac update recovery.
+
+---
+
 ## [2.2.13] - 2026-04-07
 
 Restores the color-coded source indicators on iPhone and iPad, brings the mobile settings/history UI back in line with the approved App Store screenshots, and improves recovery for older Mac updater installs.

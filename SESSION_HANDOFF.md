@@ -1,4 +1,15 @@
-# Session Handoff - 2026-02-17
+# Session Handoff — SaneClip
+
+**Last updated:** 2026-04-09
+**Current project version:** `2.2.13` (build `2213`)
+
+## Current State
+
+- The current repo version is `2.2.13`; direct-download recovery work and the iOS screenshot/theme fixes landed after the older notes below.
+- `CHANGELOG.md` is the current release ledger. Use it instead of the stale `v2.0 released / App Store REJECTED` summary below.
+- Treat the older sections in this file as archival notes only.
+
+## Archived Notes
 
 ## Addendum - 2026-03-17 (Setapp Planning)
 

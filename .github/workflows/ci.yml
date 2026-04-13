@@ -17,4 +17,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run verify
+        env:
+          SANEMASTER_HEADLESS: "1"
         run: ./scripts/SaneMaster.rb verify --quiet

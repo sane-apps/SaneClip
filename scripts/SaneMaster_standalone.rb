@@ -6,14 +6,35 @@
 
 require "open3"
 require "fileutils"
+require "shellwords"
 
 PROJECT_ROOT = File.expand_path("..", __dir__)
 XCODEPROJ = File.join(PROJECT_ROOT, "SaneClip.xcodeproj")
 SCHEME = "SaneClip"
 
+def headless_unsigned_build?
+  ENV["SANEMASTER_HEADLESS"] == "1" || ENV["GITHUB_ACTIONS"] == "true" || ENV["CI"] == "true" || ENV["CI"] == "1"
+end
+
+def unsigned_signing_args
+  [
+    "CODE_SIGNING_ALLOWED=NO",
+    "CODE_SIGNING_REQUIRED=NO",
+    "CODE_SIGN_IDENTITY=",
+    "DEVELOPMENT_TEAM=",
+    "PROVISIONING_PROFILE_SPECIFIER=",
+    "PROVISIONING_PROFILE="
+  ]
+end
+
 def run(cmd, label = nil)
-  warn "=> #{label || cmd}"
-  stdout, stderr, status = Open3.capture3(cmd, chdir: PROJECT_ROOT)
+  printable = cmd.is_a?(Array) ? cmd.map { |part| Shellwords.escape(part) }.join(" ") : cmd
+  warn "=> #{label || printable}"
+  stdout, stderr, status = if cmd.is_a?(Array)
+                             Open3.capture3(*cmd, chdir: PROJECT_ROOT)
+                           else
+                             Open3.capture3(cmd, chdir: PROJECT_ROOT)
+                           end
   unless status.success?
     warn stderr unless stderr.empty?
     warn stdout unless stdout.empty?
@@ -24,19 +45,35 @@ def run(cmd, label = nil)
 end
 
 def build(config = "Debug")
-  run(
-    "xcodebuild -project #{XCODEPROJ} -scheme #{SCHEME} " \
-    "-configuration #{config} -arch arm64 build",
-    "Build (#{config})"
-  )
+  cmd = [
+    "xcodebuild",
+    "-project", XCODEPROJ,
+    "-scheme", SCHEME,
+    "-configuration", config,
+    "-destination", "platform=macOS,arch=arm64",
+    "build"
+  ]
+  if headless_unsigned_build?
+    warn "   unsigned headless build mode active"
+    cmd.concat(unsigned_signing_args)
+  end
+  run(cmd, "Build (#{config})")
 end
 
 def test
-  run(
-    "xcodebuild -project #{XCODEPROJ} -scheme #{SCHEME} " \
-    "-configuration Debug -arch arm64 test",
-    "Test"
-  )
+  cmd = [
+    "xcodebuild",
+    "-project", XCODEPROJ,
+    "-scheme", SCHEME,
+    "-configuration", "Debug",
+    "-destination", "platform=macOS,arch=arm64",
+    "test"
+  ]
+  if headless_unsigned_build?
+    warn "   unsigned headless test mode active"
+    cmd.concat(unsigned_signing_args)
+  end
+  run(cmd, "Test")
 end
 
 def verify

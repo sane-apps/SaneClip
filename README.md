@@ -9,10 +9,10 @@
 [![GitHub stars](https://img.shields.io/github/stars/sane-apps/SaneClip?style=flat-square)](https://github.com/sane-apps/SaneClip/stargazers)
 [![License: PolyForm Shield](https://img.shields.io/badge/License-PolyForm%20Shield-blue.svg?style=flat-square)](LICENSE)
 [![macOS](https://img.shields.io/badge/macOS-15.0+-blue?style=flat-square)](https://www.apple.com/macos/)
-[![Price](https://img.shields.io/badge/Price-$6.99_one--time-green?style=flat-square)](https://saneclip.com)
+[![Pricing](https://img.shields.io/badge/Pricing-Free_%2B_%2414.99_Pro-green?style=flat-square)](https://saneclip.com)
 [![Listed on awesome-macos](https://img.shields.io/badge/Listed%20on-open--source--mac--os--apps%20(40k%E2%98%85)-black?style=flat-square)](https://github.com/serhii-londar/open-source-mac-os-apps)
 
-> **⭐ Star this repo if you find it useful!** · **[💰 Buy for $6.99](https://saneclip.com)** · Takes 30 seconds, keeps development alive
+> **⭐ Star this repo if you find it useful!** · **[⬇️ Download Free](https://saneclip.com/download)** · **[💰 Upgrade to Pro for $14.99 once](https://go.saneapps.com/buy/saneclip?ref=github-readme)**
 
 <img src="docs/images/screenshot-popover.png" alt="SaneClip Screenshot" width="600">
 
@@ -240,7 +240,7 @@ See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) for full details.
 
 **Mac Pro is a one-time unlock.** The iPhone/iPad companion remains a separate free App Store download that uses your iCloud account for sync.
 
-Want more? **[Upgrade to Pro ($6.99 once)](https://go.saneapps.com/buy/saneclip?ref=github-readme)** for unlimited history, Touch ID lock, encryption-at-rest, smart paste, snippets, and advanced rules.
+Want more? **[Upgrade to Pro ($14.99 once)](https://go.saneapps.com/buy/saneclip?ref=github-readme)** for unlimited history, Touch ID lock, encryption-at-rest, smart paste, snippets, and advanced rules.
 
 ### Install
 
@@ -253,8 +253,6 @@ brew install --cask --adopt sane-apps/tap/saneclip
 ```
 
 Or **[download directly](https://saneclip.com)** · or [build from source](#-development)
-
-> *I wanted to make it $5, but processing fees and taxes were... insane. — Mr. Sane*
 
 SaneClip updates itself automatically via Sparkle. `brew upgrade` works too if you prefer.
 
@@ -339,7 +337,7 @@ Before opening a PR:
 | ❌ Third-party cloud sync | ✅ Optional private iCloud sync between your devices only |
 | ❌ Personal-content upload | ✅ Your clipboard contents stay on your Mac |
 | ❌ Closed source | ✅ 100% Transparent Code (PolyForm Shield) |
-| ❌ Subscription pricing | ✅ $6.99 one-time, free updates |
+| ❌ Subscription pricing | ✅ $14.99 one-time, free updates |
 | ❌ No Touch ID protection | ✅ Biometric locks with grace period |
 | ❌ No sensitive data detection | ✅ Auto-flags credit cards, API keys, SSNs |
 
@@ -375,7 +373,7 @@ SaneClip is available in two versions with different capabilities:
 
 > **Why the difference?** The Mac App Store version runs in Apple's sandbox, which blocks simulated keyboard events (used for auto-paste). Instead, the App Store version copies items to your clipboard and shows a notification — just press Cmd+V to paste. All other features work identically.
 
-**Direct download:** [$6.99 one-time at saneclip.com](https://saneclip.com) — includes Sparkle auto-updates.
+**Direct download:** [Free Basic at saneclip.com/download](https://saneclip.com/download) · [Upgrade to Pro for $14.99 once](https://go.saneapps.com/buy/saneclip?ref=github-readme) — includes Sparkle auto-updates.
 
 ---
 
@@ -415,7 +413,7 @@ Looking at alternatives? Here's how SaneClip stacks up:
 | iCloud Sync | ✅ | ✅ | ❌ | ✅ | ❌ |
 | 100% Transparent Code | ✅ | ❌ | ✅ | ❌ | ❌ |
 | 100% Private | ✅ | ❌ | ✅ | ✅ | ✅ |
-| **Price** | **$6.99** | $30/yr | Free | $13 | Free |
+| **Price** | **$14.99** | $30/yr | Free | $13 | Free |
 
 **Bottom line:** The first 7 rows are SaneClip-only features. No other clipboard manager offers encryption, Touch ID, sensitive data detection, or webhook automation. If privacy and security matter to you, SaneClip is the only choice.
 

@@ -27,7 +27,7 @@ struct SnippetsSettingsView: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(.white)
                     Spacer()
-                    Button("Upgrade") {
+                    Button("Upgrade — \(licenseService?.displayPriceLabel ?? "$14.99")") {
                         if let ls = licenseService {
                             ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
                         }
@@ -90,7 +90,7 @@ struct SnippetsSettingsView: View {
                                         snippetManager.delete(id: snippet.id)
                                     }
                                 } else {
-                                    Button("Unlock Pro") {
+                                    Button("Unlock Pro — \(licenseService?.displayPriceLabel ?? "$14.99")") {
                                         if let ls = licenseService {
                                             ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
                                         }

@@ -9,6 +9,21 @@
 - `CHANGELOG.md` is the current release ledger. Use it instead of the stale `v2.0 released / App Store REJECTED` summary below.
 - Treat the older sections in this file as archival notes only.
 
+## Addendum - 2026-04-14 (Pricing Rollout)
+
+- SaneClip pricing is now `Basic free + Pro $14.99 once` for both the direct lane and the App Store lane.
+- The business model stays the same: free Basic, one-time Pro unlock, no subscription, and the StoreKit product ID remains `com.saneclip.app.pro.unlock`.
+- The canonical source of truth is `/Users/sj/SaneApps/apps/SaneClip`. The `/Users/sj/SaneApps/release/SaneClip` mirror was updated with the same public-facing price copy so it does not drift back to `$6.99`.
+- Price-copy updates landed in `.saneprocess`, `README.md`, `docs/index.html`, `docs/guides.html`, and the pricing CTAs across the guide pages in both trees.
+- The homepage schema `downloadUrl` now points to `/download` to match the free Basic model instead of a paid checkout URL.
+
+### Post-change Tracking
+
+1. Watch direct conversion from free download to Pro checkout at the new `$14.99` price.
+2. Watch App Store conversion after the matching IAP price is updated in App Store Connect.
+3. Confirm future docs audits do not reintroduce the old `$5` or `$6.99` assumptions.
+4. Re-run a visual spot check on the live homepage, `/download`, `/guides`, and one long-tail guide after deployment.
+
 ## Archived Notes
 
 ## Addendum - 2026-03-17 (Setapp Planning)

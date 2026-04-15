@@ -498,7 +498,7 @@ private struct PlanUpgradePageIOS: View {
 
                 planCard(
                     title: "Pro",
-                    subtitle: "One-time unlock",
+                    subtitle: "$14.99 once",
                     lines: [
                         "Paste Stack + Snippets",
                         "Clipboard Rules + Item Notes",

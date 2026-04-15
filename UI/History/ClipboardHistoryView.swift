@@ -539,7 +539,7 @@ struct ClipboardHistoryView: View {
                         HStack(spacing: 3) {
                             Image(systemName: "lock.fill")
                                 .font(.system(size: 10))
-                            Text("Upgrade to Pro")
+                            Text("Upgrade to Pro — \(licenseService?.displayPriceLabel ?? "$14.99")")
                                 .font(.system(size: 12, weight: .semibold))
                         }
                         .foregroundStyle(.teal)

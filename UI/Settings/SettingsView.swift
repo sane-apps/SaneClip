@@ -1635,7 +1635,7 @@ private struct ProLockedSectionBanner: View {
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.white.opacity(0.92))
                 Spacer()
-                Text("Upgrade")
+                Text("Upgrade — \(licenseService?.displayPriceLabel ?? "$14.99")")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.teal)
             }

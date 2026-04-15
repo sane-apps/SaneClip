@@ -42,7 +42,7 @@ Many perspectives flagged code issues (race conditions, silent failures, crashes
 ## Documented Issues (Prioritized)
 
 ### Website Issues (Needs Human)
-1. **Website pricing** — Website shows $6.99, SaneApps standard is $5
+1. **Website pricing** — Keep the site aligned with the approved Basic free + Pro $14.99 once model
 2. **No trust badges** — Missing "No spying / No subscription / Actively maintained"
 3. **No Sane Apps cross-linking** — No family branding in header/footer
 

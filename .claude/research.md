@@ -178,3 +178,11 @@ Graduate verified findings to ARCHITECTURE.md or DEVELOPMENT.md.
 - Mini verification proof for this pass:
   - Routed `./scripts/SaneMaster.rb verify --quiet` passed with `128` tests after adding scoped Smart Clear coverage and the dedicated Pro history render.
   - The deterministic Mini render now captures a dedicated `settings-general-history-render.png`, which shows the real Pro history row with `Unlimited` selected inside the shared settings chrome.
+
+## Pricing Upgrade Surface Refresh 2026-04-14
+**Updated:** 2026-04-14 | **Status:** verified | **TTL:** 7d
+**Source:** Apple review guidance already captured locally, current web/GitHub spot check for upgrade CTA patterns, local code audit of onboarding/history/settings/menu surfaces
+- The main remaining pricing drift after the earlier sweep was in app-owned surfaces, not shared SaneUI: iOS onboarding still said `One-time unlock` instead of the approved numeric price.
+- Shared SaneUI welcome/settings/upsell surfaces already resolve the correct SaneClip fallback price when live pricing is unavailable, so the app-specific fixes should stay limited to local CTA text and onboarding copy.
+- Context-menu upgrade actions in `ClipboardItemRow.swift` are real upgrade entry points and should carry the same numeric price cue as the larger settings/history banners to avoid submenu drift.
+- The approved local pattern is `... — \(licenseService?.displayPriceLabel ?? "$14.99")` for app-owned SaneClip upgrade labels when the shared service is optional in scope.

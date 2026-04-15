@@ -23,6 +23,10 @@ struct ClipboardItemRow: View {
     @State private var showCollectionSheet = false
     @State private var customCollection = ""
 
+    private var upgradePriceLabel: String {
+        licenseService?.displayPriceLabel ?? "$14.99"
+    }
+
     private var isImageItem: Bool {
         if case .image = item.content { return true }
         return false
@@ -359,7 +363,7 @@ struct ClipboardItemRow: View {
                             }
                         }
                     } else {
-                        Button("Unlock with Pro") {
+                        Button("Unlock with Pro — \(upgradePriceLabel)") {
                             if let ls = licenseService {
                                 ProUpsellWindow.show(feature: ProFeature.textTransforms, licenseService: ls)
                             }
@@ -371,14 +375,14 @@ struct ClipboardItemRow: View {
             Divider()
 
             // Organize — Pin is Pro only, Paste Stack is Pro only
-            Button(isPinned ? "Unpin \u{1F512}" : "Pin \u{1F512}") {
+            Button(isPinned ? "Unpin — \(upgradePriceLabel)" : "Pin — \(upgradePriceLabel)") {
                 if isPro {
                     clipboardManager.togglePin(item: item)
                 } else if let ls = licenseService {
                     ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
                 }
             }
-            Button(isPro ? "Add to Paste Stack" : "Paste Stack \u{1F512}") {
+            Button(isPro ? "Add to Paste Stack" : "Paste Stack — \(upgradePriceLabel)") {
                 clipboardManager.addToPasteStack(item)
             }
 
@@ -438,7 +442,7 @@ struct ClipboardItemRow: View {
                     showEditSheet = true
                 }
             } else {
-                Button("Organize Items \u{1F512}") {
+                Button("Organize Items — \(upgradePriceLabel)") {
                     if let ls = licenseService {
                         ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
                     }
@@ -447,7 +451,7 @@ struct ClipboardItemRow: View {
 
             // Notes — Pro only
             if item.note == nil || item.note?.isEmpty == true {
-                Button(isPro ? "Add Note..." : "Add Note... \u{1F512}") {
+                Button(isPro ? "Add Note..." : "Add Note... — \(upgradePriceLabel)") {
                     if isPro {
                         if case let .text(text) = item.content {
                             editText = text
@@ -464,7 +468,7 @@ struct ClipboardItemRow: View {
                     }
                 }
             } else {
-                Button(isPro ? "Edit Note..." : "Edit Note... \u{1F512}") {
+                Button(isPro ? "Edit Note..." : "Edit Note... — \(upgradePriceLabel)") {
                     if isPro {
                         if case let .text(text) = item.content {
                             editText = text
@@ -485,7 +489,7 @@ struct ClipboardItemRow: View {
                         clipboardManager.updateItemNote(id: item.id, note: nil)
                     }
                 } else {
-                    Button("Remove Note \u{1F512}") {
+                    Button("Remove Note — \(upgradePriceLabel)") {
                         if let ls = licenseService {
                             ProUpsellWindow.show(feature: ProFeature.itemNotes, licenseService: ls)
                         }

@@ -57,16 +57,15 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ---
 
-## 🆕 Current macOS Direct Download: v2.2.12
+## 🆕 Current macOS Direct Download: v2.2.14
 
 **Current direct-download release (Apr 2026)**
 
-- ✅ Fixes iPhone iCloud sync recovery
-- ✅ Adds manual iCloud sync reset and diagnostics
-- ✅ Refreshes the sync settings layout across Mac, iPhone, and iPad
+- ✅ Aligns Basic-to-Pro upgrade pricing across onboarding, history locks, and settings
 - ✅ Keeps the current macOS direct-download lane aligned with the live appcast
+- ✅ Preserves the approved iPhone and iPad visual fixes from the prior 2.2.13 mobile follow-up
 
-The next mobile follow-up is `2.2.13`, which restores the color-coded source indicators on iPhone and iPad and improves recovery for older Mac updater installs.
+The prior `2.2.13` mobile follow-up restored the color-coded source indicators on iPhone and iPad and improved recovery for older Mac updater installs.
 
 ---
 

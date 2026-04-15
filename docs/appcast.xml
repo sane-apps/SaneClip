@@ -6,7 +6,27 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                <item>
+                        <item>
+            <title>2.2.14</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Wed, 15 Apr 2026 00:19:19 -0400</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Updated pricing screens and upgrade messaging clarity.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.2.14.zip"
+                       sparkle:version="2214"
+                       sparkle:shortVersionString="2.2.14"
+                       length="3634707"
+                       type="application/octet-stream"
+                       sparkle:edSignature="fIL8fDkovHUBny+KVAHzTmzUXGdml0Vu6XjZ85bN2lz1Q+PNPY5sIdB0aFWwML1uVcfNIAYXxjYvD+9lKilDCw=="/>
+        </item>
+<item>
             <title>2.2.13</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Thu, 09 Apr 2026 18:38:39 -0400</pubDate>

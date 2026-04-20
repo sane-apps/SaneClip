@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.2.15] - 2026-04-20
+
+Makes pinning free on Mac so Basic matches the App Store promise and the iPhone companion.
+Clarifies Pro upgrade messaging around organization tools while keeping advanced workflows in Pro.
+Keeps the clipboard history popover pinned under the menu bar icon more reliably.
+Improves the upgrade popup so license entry and dismissal behave cleanly.
+
+---
+
 ## [2.2.14] - 2026-04-15
 
 Aligns the Pro pricing copy across onboarding, history locks, snippets settings, and other Basic-to-Pro upgrade prompts so every upgrade surface shows the current $14.99 one-time unlock.

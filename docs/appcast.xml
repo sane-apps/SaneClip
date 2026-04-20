@@ -6,7 +6,30 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                        <item>
+                                <item>
+            <title>2.2.15</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Mon, 20 Apr 2026 17:39:42 -0400</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Makes pinning free on Mac so Basic matches the App Store promise and the iPhone companion.</li>
+                <li>Clarifies Pro upgrade messaging around organization tools while keeping advanced workflows in Pro.</li>
+                <li>Keeps the clipboard history popover pinned under the menu bar icon more reliably.</li>
+                <li>Improves the upgrade popup so license entry and dismissal behave cleanly.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.2.15.zip"
+                       sparkle:version="2215"
+                       sparkle:shortVersionString="2.2.15"
+                       length="3640780"
+                       type="application/octet-stream"
+                       sparkle:edSignature="d74GkV5azSMBcJT+7nMORQy+8Mb6ZKkaRXQppdvPD6FluvvXf+sijy/5/0eOCfei3u4nMSzpGJ34n0Y39CYrDA=="/>
+        </item>
+<item>
             <title>2.2.14</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Wed, 15 Apr 2026 00:19:19 -0400</pubDate>

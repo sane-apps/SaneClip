@@ -27,10 +27,18 @@ struct SnippetsSettingsView: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(.white)
                     Spacer()
-                    Button("Upgrade — \(licenseService?.displayPriceLabel ?? "$14.99")") {
+                    Button {
                         if let ls = licenseService {
                             ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
                         }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 11, weight: .semibold))
+                            Text("Pro")
+                                .font(.system(size: 13, weight: .semibold))
+                        }
+                        .foregroundStyle(.teal)
                     }
                     .buttonStyle(ClipActionButtonStyle())
                     .controlSize(.small)
@@ -90,7 +98,7 @@ struct SnippetsSettingsView: View {
                                         snippetManager.delete(id: snippet.id)
                                     }
                                 } else {
-                                    Button("Unlock Pro — \(licenseService?.displayPriceLabel ?? "$14.99")") {
+                                    Button("Snippets \u{1F512}") {
                                         if let ls = licenseService {
                                             ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
                                         }

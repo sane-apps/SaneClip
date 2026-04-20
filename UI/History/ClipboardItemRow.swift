@@ -23,8 +23,15 @@ struct ClipboardItemRow: View {
     @State private var showCollectionSheet = false
     @State private var customCollection = ""
 
-    private var upgradePriceLabel: String {
-        licenseService?.displayPriceLabel ?? "$14.99"
+    private func lockedMenuTitle(_ title: String) -> String {
+        "\(title) \u{1F512}"
+    }
+
+    private var pinMenuTitle: String {
+        if isPro {
+            return isPinned ? "Unpin" : "Pin"
+        }
+        return lockedMenuTitle(isPinned ? "Unpin" : "Pin")
     }
 
     private var isImageItem: Bool {
@@ -355,18 +362,18 @@ struct ClipboardItemRow: View {
 
             // Text transform options (only for text content) — Pro only
             if case .text = item.content {
-                Menu(isPro ? "Paste As..." : "Paste As... \u{1F512}") {
-                    if isPro {
+                if isPro {
+                    Menu("Paste As...") {
                         ForEach(TextTransform.allCases, id: \.self) { transform in
                             Button(transform.displayName) {
                                 clipboardManager.pasteWithTransform(item: item, transform: transform)
                             }
                         }
-                    } else {
-                        Button("Unlock with Pro — \(upgradePriceLabel)") {
-                            if let ls = licenseService {
-                                ProUpsellWindow.show(feature: ProFeature.textTransforms, licenseService: ls)
-                            }
+                    }
+                } else {
+                    Button(lockedMenuTitle("Paste As...")) {
+                        if let ls = licenseService {
+                            ProUpsellWindow.show(feature: ProFeature.textTransforms, licenseService: ls)
                         }
                     }
                 }
@@ -375,14 +382,10 @@ struct ClipboardItemRow: View {
             Divider()
 
             // Organize — Pin is Pro only, Paste Stack is Pro only
-            Button(isPinned ? "Unpin — \(upgradePriceLabel)" : "Pin — \(upgradePriceLabel)") {
-                if isPro {
-                    clipboardManager.togglePin(item: item)
-                } else if let ls = licenseService {
-                    ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
-                }
+            Button(pinMenuTitle) {
+                clipboardManager.togglePin(item: item)
             }
-            Button(isPro ? "Add to Paste Stack" : "Paste Stack — \(upgradePriceLabel)") {
+            Button(isPro ? "Add to Paste Stack" : lockedMenuTitle("Paste Stack")) {
                 clipboardManager.addToPasteStack(item)
             }
 
@@ -442,7 +445,7 @@ struct ClipboardItemRow: View {
                     showEditSheet = true
                 }
             } else {
-                Button("Organize Items — \(upgradePriceLabel)") {
+                Button(lockedMenuTitle("Organize Items")) {
                     if let ls = licenseService {
                         ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
                     }
@@ -451,7 +454,7 @@ struct ClipboardItemRow: View {
 
             // Notes — Pro only
             if item.note == nil || item.note?.isEmpty == true {
-                Button(isPro ? "Add Note..." : "Add Note... — \(upgradePriceLabel)") {
+                Button(isPro ? "Add Note..." : lockedMenuTitle("Add Note...")) {
                     if isPro {
                         if case let .text(text) = item.content {
                             editText = text
@@ -468,7 +471,7 @@ struct ClipboardItemRow: View {
                     }
                 }
             } else {
-                Button(isPro ? "Edit Note..." : "Edit Note... — \(upgradePriceLabel)") {
+                Button(isPro ? "Edit Note..." : lockedMenuTitle("Edit Note...")) {
                     if isPro {
                         if case let .text(text) = item.content {
                             editText = text
@@ -489,7 +492,7 @@ struct ClipboardItemRow: View {
                         clipboardManager.updateItemNote(id: item.id, note: nil)
                     }
                 } else {
-                    Button("Remove Note — \(upgradePriceLabel)") {
+                    Button(lockedMenuTitle("Remove Note")) {
                         if let ls = licenseService {
                             ProUpsellWindow.show(feature: ProFeature.itemNotes, licenseService: ls)
                         }

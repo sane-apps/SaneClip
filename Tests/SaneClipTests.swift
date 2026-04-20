@@ -1344,6 +1344,47 @@ struct SaneClipTests {
         #expect(historySource.contains("Keeps pinned, tagged, noted, and non-default collection items."))
     }
 
+    @Test("Context menu Pro gates use lock labels instead of price labels")
+    func contextMenuProGatesUseLockLabels() throws {
+        let rowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRow.swift"),
+            encoding: .utf8
+        )
+        let snippetsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SnippetsSettingsView.swift"),
+            encoding: .utf8
+        )
+        let historySource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardHistoryView.swift"),
+            encoding: .utf8
+        )
+        let settingsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
+            encoding: .utf8
+        )
+
+        #expect(rowSource.contains("private func lockedMenuTitle(_ title: String) -> String"))
+        #expect(rowSource.contains("return isPinned ? \"Unpin\" : \"Pin\""))
+        #expect(rowSource.contains("return lockedMenuTitle(isPinned ? \"Unpin\" : \"Pin\")"))
+        #expect(rowSource.contains("Button(lockedMenuTitle(\"Paste As...\"))"))
+        #expect(rowSource.contains("Button(isPro ? \"Add to Paste Stack\" : lockedMenuTitle(\"Paste Stack\"))"))
+        #expect(rowSource.contains("Button(lockedMenuTitle(\"Organize Items\"))"))
+        #expect(rowSource.contains("Button(isPro ? \"Add Note...\" : lockedMenuTitle(\"Add Note...\"))"))
+        #expect(!rowSource.contains("upgradePriceLabel"))
+        #expect(!rowSource.contains("Unlock with Pro"))
+        #expect(!rowSource.contains("Pin — \\(upgradePriceLabel)"))
+        #expect(!rowSource.contains("Paste Stack — \\(upgradePriceLabel)"))
+        #expect(!rowSource.contains("Remove Note — \\(upgradePriceLabel)"))
+        #expect(snippetsSource.contains("Text(\"Pro\")"))
+        #expect(snippetsSource.contains("Button(\"Snippets \\u{1F512}\")"))
+        #expect(!snippetsSource.contains("Upgrade — \\(licenseService?.displayPriceLabel"))
+        #expect(!snippetsSource.contains("Unlock Pro — \\(licenseService?.displayPriceLabel"))
+        #expect(historySource.contains("Text(\"Pro\")"))
+        #expect(!historySource.contains("Upgrade to Pro — \\(licenseService?.displayPriceLabel"))
+        #expect(settingsSource.contains("Text(\"These settings require SaneClip Pro\")"))
+        #expect(!settingsSource.contains("Text(\"Upgrade — \\(licenseService?.displayPriceLabel"))
+    }
+
     @Test("Render settings screenshots when requested")
     @MainActor
     func renderSettingsScreenshots() throws {

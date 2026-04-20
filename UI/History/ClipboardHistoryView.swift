@@ -70,6 +70,9 @@ struct HistoryFilterPreset: Codable, Identifiable, Hashable {
 // MARK: - Clipboard History View
 
 struct ClipboardHistoryView: View {
+    static let popoverWidth: CGFloat = 320
+    static let popoverMinHeight: CGFloat = 500
+
     enum FocusTarget: Hashable {
         case search
         case list
@@ -789,13 +792,15 @@ struct ClipboardHistoryView: View {
                             ProUpsellWindow.show(feature: ProFeature.pasteStack, licenseService: ls)
                         }
                     } label: {
-                        HStack(spacing: 3) {
-                            Image(systemName: "lock.fill")
-                                .font(.system(size: 9))
+                        HStack(spacing: 4) {
                             Text("Stack")
-                                .font(.system(size: 11))
+                                .font(.system(size: 11, weight: .semibold))
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 9, weight: .semibold))
+                            Text("Pro")
+                                .font(.system(size: 11, weight: .semibold))
                         }
-                        .foregroundStyle(.teal.opacity(0.8))
+                        .foregroundStyle(.teal)
                     }
                     .buttonStyle(.plain)
                     .help("Unlock Paste Stack with Pro")
@@ -870,7 +875,7 @@ struct ClipboardHistoryView: View {
                 }
             }
             .padding(16)
-            .frame(width: 320)
+            .frame(width: Self.popoverWidth)
         }
         .confirmationDialog("Smart Clear", isPresented: $showSmartClearConfirmation, titleVisibility: .visible) {
             if shouldOfferVisibleSmartClear {

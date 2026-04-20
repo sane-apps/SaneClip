@@ -9,7 +9,7 @@ enum ProFeature: String, ProFeatureDescribing, CaseIterable {
     case textTransforms = "Text Transforms"
     case pasteStack = "Paste Stack"
     case snippets = "Snippets"
-    case pinning = "Pin Items"
+    case organization = "Organize Items"
     case itemNotes = "Item Notes"
     case clipboardRules = "Clipboard Rules"
     case encryption = "History Encryption"
@@ -33,8 +33,8 @@ enum ProFeature: String, ProFeatureDescribing, CaseIterable {
             "Queue multiple items for sequential pasting — perfect for filling forms or structured workflows."
         case .snippets:
             "Save reusable text templates with dynamic placeholders like {{date}}, {{name}}, and {{clipboard}}."
-        case .pinning:
-            "Pin your most important clips to the top of your history so they're always within reach."
+        case .organization:
+            "Add titles, tags, and collections so important clips stay organized and easy to find."
         case .itemNotes:
             "Attach private notes to any clipboard item for context, tags, or reminders."
         case .clipboardRules:
@@ -62,8 +62,8 @@ enum ProFeature: String, ProFeatureDescribing, CaseIterable {
             "square.stack.3d.up"
         case .snippets:
             "text.quote"
-        case .pinning:
-            "pin.fill"
+        case .organization:
+            "tag.fill"
         case .itemNotes:
             "note.text"
         case .clipboardRules:

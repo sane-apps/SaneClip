@@ -98,7 +98,7 @@ struct SnippetsSettingsView: View {
                                         snippetManager.delete(id: snippet.id)
                                     }
                                 } else {
-                                    Button("Snippets \u{1F512}") {
+                                    Button("Snippets Pro \u{1F512}") {
                                         if let ls = licenseService {
                                             ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
                                         }
@@ -127,7 +127,19 @@ struct SnippetsSettingsView: View {
                         ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
                     }
                 }, label: {
-                    Label(isPro ? "Add Snippet" : "Add Snippet \u{1F512}", systemImage: "plus")
+                    if isPro {
+                        Label("Add Snippet", systemImage: "plus")
+                    } else {
+                        HStack(spacing: 6) {
+                            Image(systemName: "plus")
+                            Text("Add Snippet")
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 11, weight: .semibold))
+                            Text("Pro")
+                                .font(.system(size: 13, weight: .semibold))
+                        }
+                        .foregroundStyle(.teal)
+                    }
                 })
                 .buttonStyle(ClipActionButtonStyle())
                 .controlSize(.small)

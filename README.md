@@ -75,6 +75,8 @@ The prior `2.2.13` mobile follow-up restored the color-coded source indicators o
 - Clipboard history (last 50 items)
 - Standard paste with original formatting
 - Search and source-aware filtering
+- Pin and unpin important clips
+- Excluded apps and auto-delete controls
 - Optional "open at mouse cursor" launch mode
 - iPhone companion app with iCloud sync
 - On-device privacy defaults
@@ -87,7 +89,7 @@ The prior `2.2.13` mobile follow-up restored the color-coded source indicators o
 - Text transforms
 - Paste stack (FIFO/LIFO)
 - Snippets with placeholders
-- Pin items + item notes
+- Titles, tags, collections, and item notes
 - Clipboard rules
 - Export and import
 
@@ -235,7 +237,7 @@ See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) for full details.
 
 ## 📦 Installation
 
-**SaneClip Basic is $0.** Clipboard history, standard paste, search, and the free iPhone/iPad companion app are included.
+**SaneClip Basic is $0.** Clipboard history, search, pinning, excluded apps, and the free iPhone/iPad companion app are included.
 
 **Mac Pro is a one-time unlock.** The iPhone/iPad companion remains a separate free App Store download that uses your iCloud account for sync.
 

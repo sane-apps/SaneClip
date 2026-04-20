@@ -649,7 +649,10 @@ struct GeneralSettingsView: View {
                                         .foregroundStyle(.white)
                                     Image(systemName: "lock.fill")
                                         .font(.system(size: 12, weight: .semibold))
-                                        .foregroundStyle(Color.clipBlue.opacity(0.95))
+                                        .foregroundStyle(.teal)
+                                    Text("Pro")
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundStyle(.teal)
                                 }
                             }
                             .buttonStyle(ClipActionButtonStyle())
@@ -704,6 +707,8 @@ struct GeneralSettingsView: View {
                                     Image(systemName: "lock.fill")
                                         .font(.system(size: 12, weight: .semibold))
                                     Text(SaneClipSettingsCopy.exportImportLabel)
+                                        .font(.system(size: 13, weight: .semibold))
+                                    Text("Pro")
                                         .font(.system(size: 13, weight: .semibold))
                                 }
                                 .foregroundStyle(.teal)

@@ -3,6 +3,16 @@
 Persistent research findings for this project. Limit: 200 lines.
 Graduate verified findings to ARCHITECTURE.md or DEVELOPMENT.md.
 
+## Mac Basic vs Pro Gating Audit
+**Updated:** 2026-04-20 | **Status:** verified | **TTL:** 30d
+**Source:** Mini runtime + local code + App Store metadata + official competitor sites
+- The clearest live mismatch was pinning: macOS App Store metadata said Basic includes pinning, iPhone/iPad already allowed pinning for free, but macOS still gated `togglePin` behind Pro.
+- The correct fix is to make pin/unpin free on macOS and keep organization tools like titles, tags, collections, and notes in Pro.
+- `ProFeature.pinning` was too broad after that change, so the paid upsell bucket should be named `Organize Items` instead of `Pin Items`.
+- Competitor baseline supports a generous free core: Maccy gives free search/pinning/excluded apps, Raycast gives free clipboard history and snippets, and Paste keeps sync/advanced workflow value in paid tiers.
+- SaneClip Basic is already competitive once Mac pinning is free; the strongest paid value remains unlimited history, Touch ID, encryption, paste tools, snippets, notes, rules, and export/import.
+- Mini verification for this fix now has three independent proofs: full `xcodebuild test` pass (`132` tests), live Basic owner-machine run, and successful `SaneClip-AppStore` compile with the Release-AppStore binary containing `Organize Items` and not `Pin Items`.
+
 ## iOS Extension Scope
 **Updated:** 2026-02-07 | **Status:** verified | **TTL:** 30d
 **Source:** Apple docs + GitHub + web
@@ -186,3 +196,22 @@ Graduate verified findings to ARCHITECTURE.md or DEVELOPMENT.md.
 - Shared SaneUI welcome/settings/upsell surfaces already resolve the correct SaneClip fallback price when live pricing is unavailable, so the app-specific fixes should stay limited to local CTA text and onboarding copy.
 - Context-menu upgrade actions in `ClipboardItemRow.swift` are real upgrade entry points and should carry the same numeric price cue as the larger settings/history banners to avoid submenu drift.
 - The approved local pattern is `... — \(licenseService?.displayPriceLabel ?? "$14.99")` for app-owned SaneClip upgrade labels when the shared service is optional in scope.
+
+## Shared Upsell Popup Dismissal Refresh
+**Updated:** 2026-04-20 | **Status:** verified | **TTL:** 14d
+**Source:** Apple event-handling docs + GitHub popup-monitor examples + local SaneUI/SaneClip Mini audit
+- Apple’s AppKit event guide explicitly treats a popup window that behaves like a menu as a valid use case for a local `NSEvent.addLocalMonitorForEvents` handler that swallows `Escape` and closes the popup; relying on responder-chain routing alone is not required for this UI shape.
+- Apple’s key-event docs confirm `Escape` normally reaches `cancelOperation:` through the responder chain, but a focused text field can intercept key handling before a floating panel gets the dismissal command; that matches the Mini failure where `Esc` and `⌘W` did nothing inside the inline license-entry view.
+- The shared SaneUI fix should therefore live in the popup view/window layer: direct local key monitoring for `Escape` / `⌘W`, plus route-aware behavior (`Escape` backs out of inline license entry, then closes the popup from the top level).
+- GitHub/macOS examples use the same local-monitor pattern for transient modal/popup dismissal and remove the monitor on close; SaneUI should follow that pattern instead of app-local workarounds.
+- Critical Mini blind spot: SaneClip’s Xcode build is linked against the SwiftPM checkout in DerivedData, not the local `~/SaneApps/infra/SaneUI` repo, so shared fixes must be mirrored into the active package checkout for Mini runtime verification.
+
+## App Store History Popover Placement Refresh
+**Updated:** 2026-04-20 | **Status:** verified | **TTL:** 7d
+**Source:** Apple docs + GitHub/macOS examples + local SwiftUI API probe + Mini runtime audit
+- Apple’s popover sizing docs still match the practical rule here: `contentSize` / `preferredContentSize` are only desired sizes, and AppKit can adjust the final window size while the popover is visible. That means a stable anchor cannot rely on “set it once at startup and trust it forever.”
+- GitHub/macOS menu bar examples still use the same baseline pattern as SaneClip for status-item popovers: `popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)` plus an explicit `contentSize`. They do not generally rely on manual screen-coordinate repositioning for the normal anchored path.
+- Local SwiftUI API check confirmed the safe fixed-size wrapper signature for the hosting root is the full `frame(minWidth:idealWidth:maxWidth:minHeight:idealHeight:alignment:)` overload, not the shorter mixed `width + minHeight` form.
+- Mini runtime evidence shows the App Store bug is real and vertical-only. The menu-bar icon is at `1530,3` with size `33x24`, while the App Store popover opens at `1373,278` with size `346x274`. The normal direct build opens at `987,26` with size `346x526`.
+- The key numeric clue is that both variants share the same bottom edge: direct `26 + 526 = 552`, App Store `278 + 274 = 552`. So the window is not anchoring to the wrong x-position or the wrong menu-bar item; the shorter App Store variant is collapsing downward after placement.
+- Current best fix direction: keep the standard anchored `popover.show(relativeTo:...)` path, but harden the history popover to a stable minimum width/height at both the SwiftUI root and the popover controller before each show. Do not reintroduce brittle manual `setFrameOrigin` math for the normal anchored path.

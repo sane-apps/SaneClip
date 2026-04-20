@@ -530,10 +530,18 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
         // Create popover — pass licenseService so history view can check Pro status
         popover = NSPopover()
-        popover.contentSize = NSSize(width: 320, height: 500)
+        resetHistoryPopoverSize()
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(
             rootView: ClipboardHistoryView(clipboardManager: clipboardManager, licenseService: licenseService)
+                .frame(
+                    minWidth: ClipboardHistoryView.popoverWidth,
+                    idealWidth: ClipboardHistoryView.popoverWidth,
+                    maxWidth: ClipboardHistoryView.popoverWidth,
+                    minHeight: ClipboardHistoryView.popoverMinHeight,
+                    idealHeight: ClipboardHistoryView.popoverMinHeight,
+                    alignment: .top
+                )
                 .preferredColorScheme(.dark)
         )
 
@@ -777,29 +785,18 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showPopoverAtButton() {
-        guard let button = statusItem.button,
-              let buttonWindow = button.window else { return }
-
-        let buttonRect = button.convert(button.bounds, to: nil)
-        let screenRect = buttonWindow.convertToScreen(buttonRect)
-
-        // Position popover at the button's location
+        guard let button = statusItem.button else { return }
+        resetHistoryPopoverSize()
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
 
-        // Force correct positioning if needed
         if let popoverWindow = popover.contentViewController?.view.window {
-            let popoverSize = popoverWindow.frame.size
-            let newOrigin = NSPoint(
-                x: screenRect.midX - popoverSize.width / 2,
-                y: screenRect.minY - popoverSize.height
-            )
-            popoverWindow.setFrameOrigin(newOrigin)
             popoverWindow.makeKey()
         }
     }
 
     private func showPopoverAtCursor() {
         guard let button = statusItem.button else { return }
+        resetHistoryPopoverSize()
 
         // Use the status item as an anchor view, then reposition to cursor.
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
@@ -919,6 +916,15 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    private func resetHistoryPopoverSize() {
+        let size = NSSize(
+            width: ClipboardHistoryView.popoverWidth,
+            height: ClipboardHistoryView.popoverMinHeight
+        )
+        popover.contentSize = size
+        popover.contentViewController?.preferredContentSize = size
+    }
+
     private func showContextMenu() {
         guard let button = statusItem.button else { return }
 
@@ -984,9 +990,14 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func buildSnippetsSubmenu() -> NSMenuItem {
+        guard licenseService.isPro else {
+            let snippetsItem = NSMenuItem(title: "Snippets Pro \u{1F512}", action: #selector(showSnippetsUpsell), keyEquivalent: "")
+            snippetsItem.target = self
+            return snippetsItem
+        }
+
         let snippetsMenu = NSMenu()
-        let snippetsTitle = licenseService.isPro ? "Snippets" : "Snippets \u{1F512}"
-        let snippetsItem = NSMenuItem(title: snippetsTitle, action: nil, keyEquivalent: "")
+        let snippetsItem = NSMenuItem(title: "Snippets", action: nil, keyEquivalent: "")
         let recentSnippets = Array(SnippetManager.shared.snippets.prefix(10))
         if !recentSnippets.isEmpty {
             for (index, snippet) in recentSnippets.enumerated() {
@@ -1006,6 +1017,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         }
         snippetsItem.submenu = snippetsMenu
         return snippetsItem
+    }
+
+    @objc private func showSnippetsUpsell() {
+        ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: licenseService)
     }
 
     @objc private func showPopover() {

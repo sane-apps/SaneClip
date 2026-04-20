@@ -24,14 +24,11 @@ struct ClipboardItemRow: View {
     @State private var customCollection = ""
 
     private func lockedMenuTitle(_ title: String) -> String {
-        "\(title) \u{1F512}"
+        "\(title) Pro \u{1F512}"
     }
 
     private var pinMenuTitle: String {
-        if isPro {
-            return isPinned ? "Unpin" : "Pin"
-        }
-        return lockedMenuTitle(isPinned ? "Unpin" : "Pin")
+        isPinned ? "Unpin" : "Pin"
     }
 
     private var isImageItem: Bool {
@@ -350,7 +347,7 @@ struct ClipboardItemRow: View {
             Button("Paste") { clipboardManager.paste(item: item) }
 
             // Paste as Plain Text — Pro only
-            Button(isPro ? "Paste as Plain Text" : "Paste as Plain Text \u{1F512}") {
+            Button(isPro ? "Paste as Plain Text" : lockedMenuTitle("Paste as Plain Text")) {
                 clipboardManager.pasteAsPlainText(item: item)
             }
 
@@ -447,7 +444,7 @@ struct ClipboardItemRow: View {
             } else {
                 Button(lockedMenuTitle("Organize Items")) {
                     if let ls = licenseService {
-                        ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
+                        ProUpsellWindow.show(feature: ProFeature.organization, licenseService: ls)
                     }
                 }
             }

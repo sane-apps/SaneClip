@@ -1362,10 +1362,15 @@ struct SaneClipTests {
             contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
             encoding: .utf8
         )
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
 
         #expect(rowSource.contains("private func lockedMenuTitle(_ title: String) -> String"))
-        #expect(rowSource.contains("return isPinned ? \"Unpin\" : \"Pin\""))
-        #expect(rowSource.contains("return lockedMenuTitle(isPinned ? \"Unpin\" : \"Pin\")"))
+        #expect(rowSource.contains("\\(title) Pro \\u{1F512}"))
+        #expect(rowSource.contains("isPinned ? \"Unpin\" : \"Pin\""))
+        #expect(rowSource.contains("Button(isPro ? \"Paste as Plain Text\" : lockedMenuTitle(\"Paste as Plain Text\"))"))
         #expect(rowSource.contains("Button(lockedMenuTitle(\"Paste As...\"))"))
         #expect(rowSource.contains("Button(isPro ? \"Add to Paste Stack\" : lockedMenuTitle(\"Paste Stack\"))"))
         #expect(rowSource.contains("Button(lockedMenuTitle(\"Organize Items\"))"))
@@ -1376,13 +1381,75 @@ struct SaneClipTests {
         #expect(!rowSource.contains("Paste Stack — \\(upgradePriceLabel)"))
         #expect(!rowSource.contains("Remove Note — \\(upgradePriceLabel)"))
         #expect(snippetsSource.contains("Text(\"Pro\")"))
-        #expect(snippetsSource.contains("Button(\"Snippets \\u{1F512}\")"))
+        #expect(snippetsSource.contains("Button(\"Snippets Pro \\u{1F512}\")"))
+        #expect(snippetsSource.contains("Text(\"Add Snippet\")"))
+        #expect(!snippetsSource.contains("Add Snippet \\u{1F512}"))
         #expect(!snippetsSource.contains("Upgrade — \\(licenseService?.displayPriceLabel"))
         #expect(!snippetsSource.contains("Unlock Pro — \\(licenseService?.displayPriceLabel"))
         #expect(historySource.contains("Text(\"Pro\")"))
         #expect(!historySource.contains("Upgrade to Pro — \\(licenseService?.displayPriceLabel"))
         #expect(settingsSource.contains("Text(\"These settings require SaneClip Pro\")"))
         #expect(!settingsSource.contains("Text(\"Upgrade — \\(licenseService?.displayPriceLabel"))
+        #expect(appSource.contains("NSMenuItem(title: \"Snippets Pro \\u{1F512}\", action: #selector(showSnippetsUpsell), keyEquivalent: \"\")"))
+        #expect(appSource.contains("@objc private func showSnippetsUpsell()"))
+    }
+
+    @Test("Mac pinning matches the advertised free tier")
+    func macPinningMatchesAdvertisedFreeTier() throws {
+        let clipboardManagerSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/ClipboardManager.swift"),
+            encoding: .utf8
+        )
+        let rowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRow.swift"),
+            encoding: .utf8
+        )
+        let proFeatureSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("ProFeature.swift"),
+            encoding: .utf8
+        )
+
+        #expect(clipboardManagerSource.contains("func togglePin(item: ClipboardItem) {"))
+        #expect(!clipboardManagerSource.contains("ProUpsellWindow.show(feature: ProFeature.pinning"))
+        #expect(rowSource.contains("private var pinMenuTitle: String {\n        isPinned ? \"Unpin\" : \"Pin\"\n    }"))
+        #expect(proFeatureSource.contains("case organization = \"Organize Items\""))
+        #expect(!proFeatureSource.contains("case pinning = \"Pin Items\""))
+    }
+
+    @Test("Basic mode can pin and unpin items on Mac")
+    @MainActor
+    func basicModeCanPinAndUnpinItemsOnMac() throws {
+        try withClipboardManagerState { manager in
+            let item = ClipboardItem(content: .text("Pinned from Basic mode"))
+            manager.history = [item]
+
+            manager.togglePin(item: item)
+            #expect(manager.pinnedItems.map(\.id) == [item.id])
+
+            manager.togglePin(item: item)
+            #expect(manager.pinnedItems.isEmpty)
+        }
+    }
+
+    @Test("Menu bar popover uses standard anchor positioning")
+    func menuBarPopoverUsesStandardAnchorPositioning() throws {
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+        let historySource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardHistoryView.swift"),
+            encoding: .utf8
+        )
+
+        #expect(appSource.contains("popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)"))
+        #expect(appSource.contains("resetHistoryPopoverSize()"))
+        #expect(appSource.contains("popover.contentViewController?.preferredContentSize = size"))
+        #expect(historySource.contains("static let popoverWidth: CGFloat = 320"))
+        #expect(historySource.contains("static let popoverMinHeight: CGFloat = 500"))
+        #expect(!appSource.contains("let buttonRect = button.convert(button.bounds, to: nil)"))
+        #expect(!appSource.contains("let screenRect = buttonWindow.convertToScreen(buttonRect)"))
+        #expect(!appSource.contains("popoverWindow.setFrameOrigin(newOrigin)"))
     }
 
     @Test("Render settings screenshots when requested")

@@ -1297,12 +1297,6 @@ class ClipboardManager {
     }
 
     func togglePin(item: ClipboardItem) {
-        guard licenseService?.isPro == true else {
-            if let ls = licenseService {
-                ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
-            }
-            return
-        }
         if pinnedItems.contains(where: { $0.id == item.id }) {
             pinnedItems.removeAll { $0.id == item.id }
         } else {
@@ -1396,7 +1390,7 @@ class ClipboardManager {
     func updateItemTitle(id: UUID, title: String?) {
         guard licenseService?.isPro == true else {
             if let ls = licenseService {
-                ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
+                ProUpsellWindow.show(feature: ProFeature.organization, licenseService: ls)
             }
             return
         }
@@ -1442,7 +1436,7 @@ class ClipboardManager {
     func updateItemTags(id: UUID, tags: [String]) {
         guard licenseService?.isPro == true else {
             if let ls = licenseService {
-                ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
+                ProUpsellWindow.show(feature: ProFeature.organization, licenseService: ls)
             }
             return
         }
@@ -1468,7 +1462,7 @@ class ClipboardManager {
     func updateItemCollection(id: UUID, collection: String) {
         guard licenseService?.isPro == true else {
             if let ls = licenseService {
-                ProUpsellWindow.show(feature: ProFeature.pinning, licenseService: ls)
+                ProUpsellWindow.show(feature: ProFeature.organization, licenseService: ls)
             }
             return
         }

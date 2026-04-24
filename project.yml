@@ -166,6 +166,7 @@ targets:
         LSApplicationCategoryType: "public.app-category.productivity"
         NSAppleEventsUsageDescription: "SaneClip needs to paste clipboard content to other applications."
         NSAccessibilityUsageDescription: "SaneClip uses Accessibility to paste clipboard items directly into applications."
+        NSScreenCaptureUsageDescription: "SaneClip captures screenshots you request so it can save the image and optional OCR text locally in your clipboard history."
         # URL Scheme (Phase 3)
         CFBundleURLTypes:
           - CFBundleURLName: "SaneClip URL Scheme"
@@ -189,10 +190,10 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.2.15"
-        CURRENT_PROJECT_VERSION: "2215"
-        MARKETING_VERSION: "2.2.15"
-        CURRENT_PROJECT_VERSION: "2215"
+        MARKETING_VERSION: "2.3.0"
+        CURRENT_PROJECT_VERSION: "2300"
+        MARKETING_VERSION: "2.3.0"
+        CURRENT_PROJECT_VERSION: "2300"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -343,6 +344,7 @@ targets:
         LSUIElement: true
         ITSAppUsesNonExemptEncryption: false
         LSApplicationCategoryType: "public.app-category.productivity"
+        NSScreenCaptureUsageDescription: "SaneClip captures screenshots you request so it can save the image and optional OCR text locally in your clipboard history."
         CFBundleURLTypes:
           - CFBundleURLName: "SaneClip URL Scheme"
             CFBundleURLSchemes:
@@ -352,8 +354,8 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.2.15"
-        CURRENT_PROJECT_VERSION: "2215"
+        MARKETING_VERSION: "2.3.0"
+        CURRENT_PROJECT_VERSION: "2300"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -432,10 +434,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClipWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
-        MARKETING_VERSION: "2.2.15"
-        CURRENT_PROJECT_VERSION: "2215"
-        MARKETING_VERSION: "2.2.15"
-        CURRENT_PROJECT_VERSION: "2215"
+        MARKETING_VERSION: "2.3.0"
+        CURRENT_PROJECT_VERSION: "2300"
+        MARKETING_VERSION: "2.3.0"
+        CURRENT_PROJECT_VERSION: "2300"
         SWIFT_VERSION: 6.0
         CODE_SIGN_STYLE: Manual
         SKIP_INSTALL: YES
@@ -529,10 +531,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.2.15"
-        CURRENT_PROJECT_VERSION: "2215"
-        MARKETING_VERSION: "2.2.15"
-        CURRENT_PROJECT_VERSION: "2215"
+        MARKETING_VERSION: "2.3.0"
+        CURRENT_PROJECT_VERSION: "2300"
+        MARKETING_VERSION: "2.3.0"
+        CURRENT_PROJECT_VERSION: "2300"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -582,10 +584,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClipIOSWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ioswidgets
-        MARKETING_VERSION: "2.2.15"
-        CURRENT_PROJECT_VERSION: "2215"
-        MARKETING_VERSION: "2.2.15"
-        CURRENT_PROJECT_VERSION: "2215"
+        MARKETING_VERSION: "2.3.0"
+        CURRENT_PROJECT_VERSION: "2300"
+        MARKETING_VERSION: "2.3.0"
+        CURRENT_PROJECT_VERSION: "2300"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"
@@ -638,10 +640,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClipIOSShare
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.share
-        MARKETING_VERSION: "2.2.15"
-        CURRENT_PROJECT_VERSION: "2215"
-        MARKETING_VERSION: "2.2.15"
-        CURRENT_PROJECT_VERSION: "2215"
+        MARKETING_VERSION: "2.3.0"
+        CURRENT_PROJECT_VERSION: "2300"
+        MARKETING_VERSION: "2.3.0"
+        CURRENT_PROJECT_VERSION: "2300"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"

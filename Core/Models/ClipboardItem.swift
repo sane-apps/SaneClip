@@ -17,6 +17,7 @@ struct ClipboardItem: Identifiable {
     var tags: [String]
     var collection: String
     var note: String?
+    var ocrText: String?
 
     init(
         id: UUID = UUID(),
@@ -28,7 +29,8 @@ struct ClipboardItem: Identifiable {
         title: String? = nil,
         tags: [String] = [],
         collection: String = "Default",
-        note: String? = nil
+        note: String? = nil,
+        ocrText: String? = nil
     ) {
         self.id = id
         self.content = content
@@ -40,6 +42,7 @@ struct ClipboardItem: Identifiable {
         self.tags = tags
         self.collection = collection
         self.note = note
+        self.ocrText = ocrText
     }
 
     /// Get the app icon for the source app
@@ -74,6 +77,44 @@ struct ClipboardItem: Identifiable {
         }
     }
 
+    var ocrPreview: String? {
+        guard let ocrText else { return nil }
+        let trimmed = ocrText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        if trimmed.count > 100 {
+            return String(trimmed.prefix(100)) + "..."
+        }
+        return trimmed
+    }
+
+    var searchableText: String {
+        var parts: [String] = []
+        switch content {
+        case let .text(string):
+            parts.append(string)
+        case .image:
+            parts.append("[Image]")
+        }
+        if let ocrText, !ocrText.isEmpty {
+            parts.append(ocrText)
+        }
+        if let note, !note.isEmpty {
+            parts.append(note)
+        }
+        if let title, !title.isEmpty {
+            parts.append(title)
+        }
+        parts.append(contentsOf: tags)
+        parts.append(collection)
+        return parts.joined(separator: "\n")
+    }
+
+    func matchesSearch(_ query: String) -> Bool {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return true }
+        return searchableText.localizedCaseInsensitiveContains(trimmed)
+    }
+
     var displayTitle: String {
         if let title, !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return title
@@ -89,7 +130,8 @@ struct ClipboardItem: Identifiable {
             return "\(words)wd · \(chars)ch"
         case let .image(image):
             let size = image.size
-            return "\(Int(size.width))×\(Int(size.height))"
+            let dimensions = "\(Int(size.width))×\(Int(size.height))"
+            return ocrPreview == nil ? dimensions : "\(dimensions) · OCR"
         }
     }
 

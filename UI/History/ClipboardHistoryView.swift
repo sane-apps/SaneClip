@@ -162,16 +162,7 @@ struct ClipboardHistoryView: View {
 
         // Apply text search (matches content and notes)
         if !searchText.isEmpty {
-            items = items.filter { item in
-                if case let .text(string) = item.content,
-                   string.localizedCaseInsensitiveContains(searchText) {
-                    return true
-                }
-                if let note = item.note, note.localizedCaseInsensitiveContains(searchText) {
-                    return true
-                }
-                return false
-            }
+            items = items.filter { $0.matchesSearch(searchText) }
         }
 
         // Apply date filter
@@ -199,16 +190,7 @@ struct ClipboardHistoryView: View {
 
         // Apply text search (matches content and notes)
         if !searchText.isEmpty {
-            items = items.filter { item in
-                if case let .text(string) = item.content,
-                   string.localizedCaseInsensitiveContains(searchText) {
-                    return true
-                }
-                if let note = item.note, note.localizedCaseInsensitiveContains(searchText) {
-                    return true
-                }
-                return false
-            }
+            items = items.filter { $0.matchesSearch(searchText) }
         }
 
         // Apply date filter
@@ -980,4 +962,5 @@ struct ClipboardHistoryView: View {
         .accessibilityHidden(true)
     }
 }
+
 // swiftlint:enable file_length

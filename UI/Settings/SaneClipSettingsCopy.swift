@@ -231,6 +231,16 @@ enum SaneClipSettingsCopy {
         defaultValue: "Max Image Size"
     )
 
+    static let autoOCRScreenshotsLabel = String(
+        localized: "saneclip.settings.capture.auto_ocr_screenshots",
+        defaultValue: "OCR screenshots automatically"
+    )
+
+    static let ocrLanguageLabel = String(
+        localized: "saneclip.settings.capture.ocr_language",
+        defaultValue: "OCR Language"
+    )
+
     static let backupRestoreSectionTitle = String(
         localized: "saneclip.settings.section.backup_restore",
         defaultValue: "Backup & Restore"
@@ -249,6 +259,16 @@ enum SaneClipSettingsCopy {
     static let ignoreNextCopyLabel = String(
         localized: "saneclip.settings.capture.ignore_next_copy",
         defaultValue: "Ignore Next Copy"
+    )
+
+    static let captureScreenshotLabel = String(
+        localized: "saneclip.settings.capture.capture_screenshot",
+        defaultValue: "Capture Screenshot"
+    )
+
+    static let captureTextLabel = String(
+        localized: "saneclip.settings.capture.capture_text",
+        defaultValue: "Capture Text"
     )
 
     static let ignoreOnceButtonTitle = String(

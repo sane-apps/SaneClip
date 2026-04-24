@@ -3,10 +3,7 @@ import KeyboardShortcuts
 import SaneUI
 import SwiftUI
 #if !APP_STORE
-    @preconcurrency import ApplicationServices
-#endif
-#if !APP_STORE && !SETAPP
-    import Sparkle
+@preconcurrency import ApplicationServices
 #endif
 import LocalAuthentication
 import os.log
@@ -20,264 +17,14 @@ private func menuBarTemplateImage(named systemName: String) -> NSImage? {
     return image
 }
 
-#if !APP_STORE && !SETAPP
-
-    // MARK: - Update Service
-
-    enum SparkleErrorCode: Int32 {
-        case noUpdate = 1001
-        case runningFromDiskImage = 1003
-        case temporaryDirectory = 2000
-        case download = 2001
-        case unarchiving = 3000
-        case validation = 3002
-        case missingInstallerTool = 4003
-        case relaunch = 4004
-        case installation = 4005
-        case installationCanceled = 4007
-        case installationAuthorizeLater = 4008
-        case agentInvalidation = 4010
-        case installationWriteNoPermission = 4012
-    }
-
-    enum SparkleCacheMaintenance {
-        static let sparkleCacheFolder = "org.sparkle-project.Sparkle"
-        static let staleCacheFolders = ["Launcher", "Installation", "PersistentDownloads"]
-
-        static func sparkleCacheRoot(
-            bundleIdentifier: String,
-            homeDirectoryURL: URL = FileManager.default.homeDirectoryForCurrentUser
-        ) -> URL {
-            homeDirectoryURL
-                .appendingPathComponent("Library", isDirectory: true)
-                .appendingPathComponent("Caches", isDirectory: true)
-                .appendingPathComponent(bundleIdentifier, isDirectory: true)
-                .appendingPathComponent(sparkleCacheFolder, isDirectory: true)
-        }
-
-        static func staleArtifactURLs(
-            bundleIdentifier: String,
-            homeDirectoryURL: URL = FileManager.default.homeDirectoryForCurrentUser
-        ) -> [URL] {
-            let root = sparkleCacheRoot(bundleIdentifier: bundleIdentifier, homeDirectoryURL: homeDirectoryURL)
-            return staleCacheFolders.map { root.appendingPathComponent($0, isDirectory: true) }
-        }
-
-        @discardableResult
-        static func clearStaleArtifacts(
-            bundleIdentifier: String,
-            fileManager: FileManager = .default,
-            homeDirectoryURL: URL = FileManager.default.homeDirectoryForCurrentUser
-        ) -> [String] {
-            staleArtifactURLs(bundleIdentifier: bundleIdentifier, homeDirectoryURL: homeDirectoryURL).compactMap { url in
-                guard fileManager.fileExists(atPath: url.path) else { return nil }
-
-                do {
-                    try fileManager.removeItem(at: url)
-                    return url.lastPathComponent
-                } catch {
-                    return "\(url.lastPathComponent):\(error.localizedDescription)"
-                }
-            }
-        }
-
-        static func diagnostics(
-            bundleURL: URL = Bundle.main.bundleURL,
-            bundleIdentifier: String = Bundle.main.bundleIdentifier ?? "unknown",
-            fileManager: FileManager = .default,
-            homeDirectoryURL: URL = FileManager.default.homeDirectoryForCurrentUser
-        ) -> String {
-            let bundlePath = bundleURL.path
-            let writable = fileManager.isWritableFile(atPath: bundlePath)
-            let attributes = (try? fileManager.attributesOfItem(atPath: bundlePath)) ?? [:]
-            let owner = attributes[.ownerAccountName] as? String ?? "unknown"
-            let group = attributes[.groupOwnerAccountName] as? String ?? "unknown"
-            let permissions = attributes[.posixPermissions] as? NSNumber
-            let permissionsString = permissions.map { String($0.intValue, radix: 8) } ?? "unknown"
-            let staleFolders = staleArtifactURLs(bundleIdentifier: bundleIdentifier, homeDirectoryURL: homeDirectoryURL)
-                .filter { fileManager.fileExists(atPath: $0.path) }
-                .map(\.lastPathComponent)
-                .joined(separator: ",")
-            let presentFolders = staleFolders.isEmpty ? "none" : staleFolders
-
-            return "bundlePath=\(bundlePath) writable=\(writable) owner=\(owner):\(group) mode=\(permissionsString) sparkleCaches=\(presentFolders)"
-        }
-    }
-
-    @MainActor
-    class UpdateService: NSObject, ObservableObject, SPUUpdaterDelegate {
-        static let shared = UpdateService()
-
-        nonisolated static let manualDownloadURL = "https://saneclip.com/download"
-        nonisolated static let testFeedOverrideKey = "SANECLIP_TEST_FEED_URL"
-        nonisolated static let autoCheckOnLaunchKey = "SANECLIP_AUTO_CHECK_FOR_UPDATES"
-
-        nonisolated static func shouldInitialize(environment: [String: String] = ProcessInfo.processInfo.environment) -> Bool {
-            environment["XCTestConfigurationFilePath"] == nil &&
-                environment["XCTestSessionIdentifier"] == nil
-        }
-
-        nonisolated static func testFeedOverride(environment: [String: String] = ProcessInfo.processInfo.environment) -> String? {
-            guard let value = environment[testFeedOverrideKey]?.trimmingCharacters(in: .whitespacesAndNewlines),
-                  !value.isEmpty
-            else {
-                return nil
-            }
-
-            return value
-        }
-
-        nonisolated static func shouldAutoCheckOnLaunch(environment: [String: String] = ProcessInfo.processInfo.environment) -> Bool {
-            environment[autoCheckOnLaunchKey] == "1"
-        }
-
-        private var updaterController: SPUStandardUpdaterController?
-        private var isPresentingManualFallback = false
-
-        override init() {
-            super.init()
-            updaterController = SPUStandardUpdaterController(
-                startingUpdater: true,
-                updaterDelegate: self,
-                userDriverDelegate: nil
-            )
-            configureUpdatePolicy()
-            updaterController?.updater.checkForUpdatesInBackground()
-            appLogger.info("Sparkle updater initialized")
-        }
-
-        func checkForUpdates() {
-            appLogger.info("User triggered check for updates")
-            let removedCaches = Self.clearStaleSparkleArtifacts()
-            if removedCaches.isEmpty {
-                appLogger.info("No stale Sparkle cache artifacts found before manual update check")
-            } else {
-                appLogger.info("Cleared stale Sparkle cache artifacts before manual update check: \(removedCaches.joined(separator: ","), privacy: .public)")
-            }
-            updaterController?.checkForUpdates(nil)
-        }
-
-        private func configureUpdatePolicy() {
-            guard let updater = updaterController?.updater else { return }
-            updater.automaticallyDownloadsUpdates = true
-            updater.updateCheckInterval = SaneSparkleCheckFrequency.normalizedInterval(from: updater.updateCheckInterval)
-        }
-
-        nonisolated func updater(_: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
-            guard let nsError = error as NSError? else { return }
-            Task { @MainActor in
-                self.handleFinishedUpdateCycle(updateCheck: updateCheck, error: nsError)
-            }
-        }
-
-        private func handleFinishedUpdateCycle(updateCheck: SPUUpdateCheck, error: NSError) {
-            appLogger.error(
-                "Sparkle update cycle failed: domain=\(error.domain, privacy: .public) code=\(error.code) description=\(error.localizedDescription, privacy: .public)"
-            )
-            if Self.shouldOfferManualDownloadFallback(for: error, updateCheck: updateCheck) {
-                appLogger.error("Sparkle install diagnostics: \(Self.sparkleInstallationDiagnostics(), privacy: .public)")
-            }
-
-            guard Self.shouldOfferManualDownloadFallback(for: error, updateCheck: updateCheck) else { return }
-            presentManualDownloadFallback()
-        }
-
-        private func presentManualDownloadFallback() {
-            guard !isPresentingManualFallback else { return }
-            guard let url = URL(string: Self.manualDownloadURL) else { return }
-
-            isPresentingManualFallback = true
-            defer { isPresentingManualFallback = false }
-
-            NSApp.activate(ignoringOtherApps: true)
-
-            let alert = NSAlert()
-            alert.messageText = "Update couldn’t finish automatically"
-            alert.informativeText = "SaneClip couldn’t launch the installer on this Mac. Open the download page and install the latest version manually?"
-            alert.alertStyle = .warning
-            alert.addButton(withTitle: "Open Download Page")
-            alert.addButton(withTitle: "Cancel")
-
-            if alert.runModal() == .alertFirstButtonReturn {
-                NSWorkspace.shared.open(url)
-            }
-        }
-
-        nonisolated static func shouldOfferManualDownloadFallback(for error: NSError, updateCheck: SPUUpdateCheck) -> Bool {
-            guard updateCheck == .updates else { return false }
-            guard error.domain == SUSparkleErrorDomain else { return false }
-
-            switch SparkleErrorCode(rawValue: Int32(error.code)) {
-            case .none,
-                 .noUpdate?,
-                 .installationCanceled?,
-                 .installationAuthorizeLater?:
-                return false
-            case .runningFromDiskImage?,
-                 .temporaryDirectory?,
-                 .download?,
-                 .unarchiving?,
-                 .validation?,
-                 .missingInstallerTool?,
-                 .relaunch?,
-                 .installation?,
-                 .agentInvalidation?,
-                 .installationWriteNoPermission?:
-                return true
-            }
-        }
-
-        nonisolated static func clearStaleSparkleArtifacts(
-            bundleIdentifier: String = Bundle.main.bundleIdentifier ?? "com.saneclip.app",
-            fileManager: FileManager = .default,
-            homeDirectoryURL: URL = FileManager.default.homeDirectoryForCurrentUser
-        ) -> [String] {
-            SparkleCacheMaintenance.clearStaleArtifacts(
-                bundleIdentifier: bundleIdentifier,
-                fileManager: fileManager,
-                homeDirectoryURL: homeDirectoryURL
-            )
-        }
-
-        nonisolated static func sparkleInstallationDiagnostics(
-            bundleURL: URL = Bundle.main.bundleURL,
-            bundleIdentifier: String = Bundle.main.bundleIdentifier ?? "com.saneclip.app",
-            fileManager: FileManager = .default,
-            homeDirectoryURL: URL = FileManager.default.homeDirectoryForCurrentUser
-        ) -> String {
-            SparkleCacheMaintenance.diagnostics(
-                bundleURL: bundleURL,
-                bundleIdentifier: bundleIdentifier,
-                fileManager: fileManager,
-                homeDirectoryURL: homeDirectoryURL
-            )
-        }
-
-        var automaticallyChecksForUpdates: Bool {
-            get { updaterController?.updater.automaticallyChecksForUpdates ?? true }
-            set { updaterController?.updater.automaticallyChecksForUpdates = newValue }
-        }
-
-        var updateCheckFrequency: SaneSparkleCheckFrequency {
-            get {
-                let interval = updaterController?.updater.updateCheckInterval ?? SaneSparkleCheckFrequency.daily.interval
-                return SaneSparkleCheckFrequency.resolve(updateCheckInterval: interval)
-            }
-            set {
-                updaterController?.updater.updateCheckInterval = newValue.interval
-            }
-        }
-    }
-#endif
-
-// MARK: - Keyboard Shortcuts Extension
-
 extension KeyboardShortcuts.Name {
     static let showClipboardHistory = Self("showClipboardHistory")
     static let pasteAsPlainText = Self("pasteAsPlainText")
     static let pasteFromStack = Self("pasteFromStack")
     static let pasteSmartMode = Self("pasteSmartMode")
     static let ignoreNextCopy = Self("ignoreNextCopy")
+    static let captureScreenshot = Self("captureScreenshot")
+    static let captureText = Self("captureText")
     // Quick paste shortcuts for items 1-9
     static let pasteItem1 = Self("pasteItem1")
     static let pasteItem2 = Self("pasteItem2")
@@ -296,9 +43,11 @@ extension KeyboardShortcuts.Name {
 class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
-    private var clipboardManager: ClipboardManager!
+    var clipboardManager: ClipboardManager!
+    let screenCaptureService = ScreenCaptureService()
+    let captureOCRService = CaptureOCRService()
     #if !APP_STORE && !SETAPP
-        private var updateService: UpdateService!
+    private var updateService: UpdateService!
     #endif
     /// Track when user last authenticated with Touch ID (grace period)
     private var lastAuthenticationTime: Date?
@@ -307,26 +56,27 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - License
 
     #if APP_STORE
-        let licenseService = LicenseService(
-            appName: "SaneClip",
-            purchaseBackend: .appStore(productID: "com.saneclip.app.pro.unlock")
-        )
+    let licenseService = LicenseService(
+        appName: "SaneClip",
+        purchaseBackend: .appStore(productID: "com.saneclip.app.pro.unlock")
+    )
     #elseif SETAPP
-        let licenseService = LicenseService(
-            appName: "SaneClip",
-            purchaseBackend: .setapp
-        )
+    let licenseService = LicenseService(
+        appName: "SaneClip",
+        purchaseBackend: .setapp
+    )
     #else
-        let licenseService = LicenseService(
-            appName: "SaneClip",
-            checkoutURL: LicenseService.directCheckoutURL(appSlug: "saneclip")
-        )
+    let licenseService = LicenseService(
+        appName: "SaneClip",
+        checkoutURL: LicenseService.directCheckoutURL(appSlug: "saneclip")
+    )
     #endif
 
     private let hasSeenWelcomeKey = "hasSeenWelcome"
     private var requiresHistoryAuth: Bool {
         licenseService.isPro && SettingsModel.shared.requireTouchID
     }
+
     private var hasSeenWelcome: Bool {
         get { UserDefaults.standard.bool(forKey: hasSeenWelcomeKey) }
         set { UserDefaults.standard.set(newValue, forKey: hasSeenWelcomeKey) }
@@ -341,32 +91,32 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         NSApp.appearance = NSAppearance(named: .darkAqua)
 
         #if !DEBUG && !APP_STORE && !SETAPP
-            if SaneAppMover.moveToApplicationsFolderIfNeeded(prompt: .init(
-                messageText: "Move to Applications?",
-                informativeText: "{appName} works best from your Applications folder. Move it there now? You may be asked for your password.",
-                moveButtonTitle: "Move to Applications",
-                cancelButtonTitle: "Not Now"
-            )) { return }
+        if SaneAppMover.moveToApplicationsFolderIfNeeded(prompt: .init(
+            messageText: "Move to Applications?",
+            informativeText: "{appName} works best from your Applications folder. Move it there now? You may be asked for your password.",
+            moveButtonTitle: "Move to Applications",
+            cancelButtonTitle: "Not Now"
+        )) { return }
         #endif
 
         #if !APP_STORE && !SETAPP
-            if let testFeedOverride = UpdateService.testFeedOverride() {
-                UserDefaults.standard.set(testFeedOverride, forKey: "SUFeedURL")
-                appLogger.info("Using test Sparkle feed override: \(testFeedOverride, privacy: .public)")
-            }
+        if let testFeedOverride = UpdateService.testFeedOverride() {
+            UserDefaults.standard.set(testFeedOverride, forKey: "SUFeedURL")
+            appLogger.info("Using test Sparkle feed override: \(testFeedOverride, privacy: .public)")
+        }
 
-            // Initialize update service (Sparkle)
-            if UpdateService.shouldInitialize() {
-                updateService = UpdateService.shared
-            } else {
-                appLogger.info("Skipping Sparkle updater during XCTest host run")
-            }
+        // Initialize update service (Sparkle)
+        if UpdateService.shouldInitialize() {
+            updateService = UpdateService.shared
+        } else {
+            appLogger.info("Skipping Sparkle updater during XCTest host run")
+        }
 
-            if UpdateService.shouldAutoCheckOnLaunch() {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                    self?.updateService?.checkForUpdates()
-                }
+        if UpdateService.shouldAutoCheckOnLaunch() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                self?.updateService?.checkForUpdates()
             }
+        }
         #endif
 
         // Freemium: always allow app to start — no hard gate
@@ -408,11 +158,11 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     private func initializeSyncOnLaunch() {
         #if ENABLE_SYNC
-            guard Self.shouldInitializeSyncOnLaunch(
-                hasClipboardManager: ClipboardManager.shared != nil,
-                syncFeatureCompiled: true
-            ) else { return }
-            _ = SyncCoordinator.shared
+        guard Self.shouldInitializeSyncOnLaunch(
+            hasClipboardManager: ClipboardManager.shared != nil,
+            syncFeatureCompiled: true
+        ) else { return }
+        _ = SyncCoordinator.shared
         #endif
     }
 
@@ -444,47 +194,49 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     private func welcomePermissionConfig() -> WelcomeGatePermissionConfig {
         #if APP_STORE
-            return WelcomeGatePermissionConfig(
-                title: "Privacy First",
-                bullets: [
-                    ("video.slash.fill", "No screen recording."),
-                    ("eye.slash.fill", "No screenshots."),
-                    ("icloud.slash", "No data collected.")
-                ],
-                grantedMessage: "The App Store build does not use Accessibility access. Selecting a clip copies it, then you paste manually with Cmd+V."
-            )
+        return WelcomeGatePermissionConfig(
+            title: "Privacy First",
+            bullets: [
+                ("lock.shield.fill", "Capture stays on-device."),
+                ("hand.raised.fill", "Only captures when you ask."),
+                ("icloud.slash", "No data collected.")
+            ],
+            grantedMessage: "The App Store build does not use Accessibility access. Selecting a clip copies it, then you paste manually with Cmd+V."
+        )
         #else
-            return WelcomeGatePermissionConfig(
-                title: "Grant Access",
-                bullets: [
-                    ("video.slash.fill", "No screen recording."),
-                    ("eye.slash.fill", "No screenshots."),
-                    ("icloud.slash", "No data collected.")
-                ],
-                grantedMessage: "Permission granted — you're all set!",
-                actionLabel: "Open Accessibility Settings",
-                actionHint: "Toggle SaneClip on in the list that appears.",
-                initiallyGranted: AXIsProcessTrusted(),
-                refreshGranted: { AXIsProcessTrusted() },
-                action: {
-                    guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") else { return }
-                    NSWorkspace.shared.open(url)
-                }
-            )
+        return WelcomeGatePermissionConfig(
+            title: "Grant Access",
+            bullets: [
+                ("lock.shield.fill", "Capture stays on-device."),
+                ("hand.raised.fill", "Only captures when you ask."),
+                ("icloud.slash", "No data collected.")
+            ],
+            grantedMessage: "Permission granted — you're all set!",
+            actionLabel: "Open Accessibility Settings",
+            actionHint: "Toggle SaneClip on in the list that appears.",
+            initiallyGranted: AXIsProcessTrusted(),
+            refreshGranted: { AXIsProcessTrusted() },
+            action: {
+                guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") else { return }
+                NSWorkspace.shared.open(url)
+            }
+        )
         #endif
     }
 
     private func setupApp() {
         // Make license service available to settings
-        SettingsWindowController.licenseService = self.licenseService
-        appLogger.info("Settings license service seeded with isPro=\(self.licenseService.isPro)")
+        let appLicenseService = licenseService
+        SettingsWindowController.licenseService = appLicenseService
+        let appLicenseIsPro = appLicenseService.isPro
+        appLogger.info("Settings license service seeded with isPro=\(appLicenseIsPro)")
 
         // Apply dock visibility setting (must happen early)
         _ = SettingsModel.shared
 
         // Initialize clipboard manager and wire license service for Pro gating
         clipboardManager = ClipboardManager()
-        clipboardManager.licenseService = licenseService
+        clipboardManager.licenseService = appLicenseService
         ClipboardManager.shared = clipboardManager
 
         // Create status bar item
@@ -524,8 +276,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
         // Register as macOS Services provider (right-click → Services → "Save to SaneClip")
         #if !APP_STORE
-            NSApp.servicesProvider = self
-            NSApp.registerServicesMenuSendTypes([.string], returnTypes: [])
+        NSApp.servicesProvider = self
+        NSApp.registerServicesMenuSendTypes([.string], returnTypes: [])
         #endif
 
         // Create popover — pass licenseService so history view can check Pro status
@@ -589,6 +341,18 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
+        KeyboardShortcuts.onKeyUp(for: .captureScreenshot) { [weak self] in
+            Task { @MainActor in
+                await self?.runCaptureWorkflow(.screenshot)
+            }
+        }
+
+        KeyboardShortcuts.onKeyUp(for: .captureText) { [weak self] in
+            Task { @MainActor in
+                await self?.runCaptureWorkflow(.text)
+            }
+        }
+
         // Quick paste shortcuts 1-9
         let shortcuts: [KeyboardShortcuts.Name] = [
             .pasteItem1, .pasteItem2, .pasteItem3, .pasteItem4, .pasteItem5,
@@ -636,6 +400,16 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         if KeyboardShortcuts.getShortcut(for: .ignoreNextCopy) == nil {
             KeyboardShortcuts.setShortcut(.init(.i, modifiers: [.command, .shift, .control]), for: .ignoreNextCopy)
             appLogger.info("Set default shortcut: Cmd+Shift+Ctrl+I for ignore next copy")
+        }
+
+        if KeyboardShortcuts.getShortcut(for: .captureScreenshot) == nil {
+            KeyboardShortcuts.setShortcut(.init(.s, modifiers: [.command, .shift, .control]), for: .captureScreenshot)
+            appLogger.info("Set default shortcut: Cmd+Shift+Ctrl+S for capture screenshot")
+        }
+
+        if KeyboardShortcuts.getShortcut(for: .captureText) == nil {
+            KeyboardShortcuts.setShortcut(.init(.t, modifiers: [.command, .shift, .control]), for: .captureText)
+            appLogger.info("Set default shortcut: Cmd+Shift+Ctrl+T for capture text")
         }
 
         // Quick paste shortcuts: Cmd+Ctrl+1 through 9
@@ -692,9 +466,9 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     #if ENABLE_SYNC
-        @objc private func openSyncSettings() {
-            SettingsWindowController.open(tab: .sync)
-        }
+    @objc private func openSyncSettings() {
+        SettingsWindowController.open(tab: .sync)
+    }
     #endif
 
     @objc private func openStorageSettings() {
@@ -840,9 +614,9 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         appMenu.addItem(settingsItem)
 
         #if SETAPP
-            let whatsNewItem = NSMenuItem(title: "What's New...", action: #selector(showReleaseNotes), keyEquivalent: "")
-            whatsNewItem.target = self
-            appMenu.addItem(whatsNewItem)
+        let whatsNewItem = NSMenuItem(title: "What's New...", action: #selector(showReleaseNotes), keyEquivalent: "")
+        whatsNewItem.target = self
+        appMenu.addItem(whatsNewItem)
         #endif
 
         appMenu.addItem(NSMenuItem.separator())
@@ -856,6 +630,24 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         mainMenu.addItem(editMenuItem)
 
         let editMenu = NSMenu(title: "Edit")
+        let captureScreenshotItem = NSMenuItem(
+            title: CaptureWorkflow.screenshot.menuTitle,
+            action: #selector(captureScreenshotFromMenu),
+            keyEquivalent: ""
+        )
+        captureScreenshotItem.target = self
+        editMenu.addItem(captureScreenshotItem)
+
+        let captureTextItem = NSMenuItem(
+            title: CaptureWorkflow.text.menuTitle,
+            action: #selector(captureTextFromMenu),
+            keyEquivalent: ""
+        )
+        captureTextItem.target = self
+        editMenu.addItem(captureTextItem)
+
+        editMenu.addItem(NSMenuItem.separator())
+
         let searchHistoryItem = NSMenuItem(title: "Search History", action: #selector(focusHistorySearch), keyEquivalent: "f")
         searchHistoryItem.keyEquivalentModifierMask = [.command]
         searchHistoryItem.target = self
@@ -886,16 +678,16 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         ]
 
         #if ENABLE_SYNC
-            items.append(settingsMenuItem(title: "Sync", action: #selector(openSyncSettings), key: "3"))
-            items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "4"))
-            items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "5"))
-            items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "6"))
-            items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "7"))
+        items.append(settingsMenuItem(title: "Sync", action: #selector(openSyncSettings), key: "3"))
+        items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "4"))
+        items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "5"))
+        items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "6"))
+        items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "7"))
         #else
-            items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "3"))
-            items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "4"))
-            items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "5"))
-            items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "6"))
+        items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "3"))
+        items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "4"))
+        items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "5"))
+        items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "6"))
         #endif
 
         return items
@@ -930,6 +722,24 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
         let menu = NSMenu()
 
+        let captureScreenshotItem = NSMenuItem(
+            title: CaptureWorkflow.screenshot.menuTitle,
+            action: #selector(captureScreenshotFromMenu),
+            keyEquivalent: ""
+        )
+        captureScreenshotItem.target = self
+        menu.addItem(captureScreenshotItem)
+
+        let captureTextItem = NSMenuItem(
+            title: CaptureWorkflow.text.menuTitle,
+            action: #selector(captureTextFromMenu),
+            keyEquivalent: ""
+        )
+        captureTextItem.target = self
+        menu.addItem(captureTextItem)
+
+        menu.addItem(NSMenuItem.separator())
+
         let showItem = NSMenuItem(title: "Show History", action: #selector(showPopover), keyEquivalent: "")
         showItem.target = self
         menu.addItem(showItem)
@@ -950,15 +760,15 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(settingsItem)
 
         #if SETAPP
-            let whatsNewItem = NSMenuItem(title: "What's New...", action: #selector(showReleaseNotes), keyEquivalent: "")
-            whatsNewItem.target = self
-            menu.addItem(whatsNewItem)
+        let whatsNewItem = NSMenuItem(title: "What's New...", action: #selector(showReleaseNotes), keyEquivalent: "")
+        whatsNewItem.target = self
+        menu.addItem(whatsNewItem)
         #endif
 
         #if !APP_STORE && !SETAPP
-            let updatesItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
-            updatesItem.target = self
-            menu.addItem(updatesItem)
+        let updatesItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
+        updatesItem.target = self
+        menu.addItem(updatesItem)
         #endif
 
         menu.addItem(NSMenuItem.separator())
@@ -1127,6 +937,24 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDockMenu(_: NSApplication) -> NSMenu? {
         let menu = NSMenu()
 
+        let captureScreenshotItem = NSMenuItem(
+            title: CaptureWorkflow.screenshot.menuTitle,
+            action: #selector(captureScreenshotFromMenu),
+            keyEquivalent: ""
+        )
+        captureScreenshotItem.target = self
+        menu.addItem(captureScreenshotItem)
+
+        let captureTextItem = NSMenuItem(
+            title: CaptureWorkflow.text.menuTitle,
+            action: #selector(captureTextFromMenu),
+            keyEquivalent: ""
+        )
+        captureTextItem.target = self
+        menu.addItem(captureTextItem)
+
+        menu.addItem(NSMenuItem.separator())
+
         // Show History
         let showHistoryItem = NSMenuItem(title: "Show History", action: #selector(showPopover), keyEquivalent: "")
         showHistoryItem.target = self
@@ -1148,10 +976,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem.separator())
 
         #if !APP_STORE && !SETAPP
-            // Check for Updates
-            let updatesItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
-            updatesItem.target = self
-            menu.addItem(updatesItem)
+        // Check for Updates
+        let updatesItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
+        updatesItem.target = self
+        menu.addItem(updatesItem)
         #endif
 
         // Settings
@@ -1163,39 +991,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     #if !APP_STORE && !SETAPP
-        @objc private func checkForUpdates() {
-            updateService.checkForUpdates()
-        }
-    #endif
-
-    // MARK: - macOS Services
-
-    @objc func saveToSaneClip(
-        _ pboard: NSPasteboard,
-        userData _: String?,
-        error errorPointer: AutoreleasingUnsafeMutablePointer<NSString?>
-    ) {
-        guard let text = pboard.string(forType: .string), !text.isEmpty else {
-            errorPointer.pointee = "No text found on pasteboard" as NSString
-            return
-        }
-
-        let frontmostApp = NSWorkspace.shared.frontmostApplication
-        let bundleID = frontmostApp?.bundleIdentifier
-        let appName = frontmostApp?.localizedName
-
-        // Respect excluded apps
-        if let bundleID, SettingsModel.shared.isAppExcluded(bundleID) {
-            return
-        }
-
-        let item = ClipboardItem(
-            content: .text(text),
-            sourceAppBundleID: bundleID,
-            sourceAppName: appName
-        )
-        clipboardManager.addItemFromService(item)
-
-        SettingsModel.shared.pasteSound.play()
+    @objc private func checkForUpdates() {
+        updateService.checkForUpdates()
     }
+    #endif
 }

@@ -3,10 +3,10 @@ import CloudKit
 #if !APP_STORE
     import Sparkle
 #endif
+@testable import SaneClip
 import SaneUI
 import SwiftUI
 import Testing
-@testable import SaneClip
 
 private final class MockKeychainService: KeychainServiceProtocol, @unchecked Sendable {
     private var bools: [String: Bool] = [:]
@@ -43,6 +43,20 @@ struct SaneClipTests {
         URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
+    }
+
+    @MainActor
+    private func makeTestImage(size: NSSize = NSSize(width: 120, height: 72)) -> NSImage {
+        let image = NSImage(size: size)
+        image.lockFocus()
+        NSColor.windowBackgroundColor.setFill()
+        NSRect(origin: .zero, size: size).fill()
+        NSColor.systemBlue.setFill()
+        NSBezierPath(roundedRect: NSRect(x: 12, y: 12, width: size.width - 24, height: size.height - 24),
+                     xRadius: 8,
+                     yRadius: 8).fill()
+        image.unlockFocus()
+        return image
     }
 
     @MainActor
@@ -95,6 +109,119 @@ struct SaneClipTests {
 
         #expect(item.sourceAppBundleID == nil)
         #expect(item.sourceAppName == nil)
+    }
+
+    @Test("ClipboardItem image OCR sidecar is previewed and searchable")
+    @MainActor
+    func clipboardItemImageOCRSearch() {
+        let item = ClipboardItem(
+            content: .image(makeTestImage()),
+            sourceAppName: "Screen Capture",
+            title: "Receipt window",
+            tags: ["receipt"],
+            collection: "Captures",
+            note: "Expense candidate",
+            ocrText: "Invoice total $42.00\nSane Apps LLC"
+        )
+
+        #expect(item.ocrPreview == "Invoice total $42.00\nSane Apps LLC")
+        #expect(item.stats.contains("OCR"))
+        #expect(item.matchesSearch("invoice total"))
+        #expect(item.matchesSearch("expense candidate"))
+        #expect(item.matchesSearch("receipt window"))
+        #expect(!item.matchesSearch("not present"))
+    }
+
+    @Test("SavedClipboardItem preserves OCR and decodes older history without it")
+    func savedClipboardItemOCRBackwardCompatibility() throws {
+        let oldJSON = """
+        {
+          "id": "11111111-1111-1111-1111-111111111111",
+          "text": "[Image]",
+          "timestamp": 0,
+          "sourceAppName": "Screen Capture"
+        }
+        """
+        let oldItem = try JSONDecoder().decode(SavedClipboardItem.self, from: Data(oldJSON.utf8))
+        #expect(oldItem.ocrText == nil)
+
+        let saved = SavedClipboardItem(
+            id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!,
+            text: "[Image]",
+            timestamp: Date(timeIntervalSinceReferenceDate: 42),
+            sourceAppName: "Screen Capture",
+            imageThumbnailFilename: "thumb.jpg",
+            imageDataFilename: "original.png",
+            ocrText: "Recognized local text"
+        )
+
+        let encoded = try JSONEncoder().encode(saved)
+        let decoded = try JSONDecoder().decode(SavedClipboardItem.self, from: encoded)
+        #expect(decoded.ocrText == "Recognized local text")
+        #expect(decoded.imageDataFilename == "original.png")
+    }
+
+    @Test("ClipboardManager imports captured image OCR within text limits")
+    @MainActor
+    func clipboardManagerImportsCapturedImageOCR() throws {
+        let settings = SettingsModel.shared
+        let originalTextLimit = settings.maxCaptureTextBytes
+        defer { settings.maxCaptureTextBytes = originalTextLimit }
+        settings.maxCaptureTextBytes = 64 * 1024
+
+        try withClipboardManagerState { manager in
+            try manager.importCapturedImage(
+                makeTestImage(),
+                sourceAppName: ClipboardManager.captureSourceAppName,
+                ocrText: "  Captured receipt total $19.00  "
+            )
+
+            let item = try #require(manager.history.first)
+            #expect(item.ocrText == "Captured receipt total $19.00")
+            #expect(item.matchesSearch("receipt total"))
+            #expect(item.sourceAppName == ClipboardManager.captureSourceAppName)
+        }
+    }
+
+    @Test("ClipboardManager drops oversized OCR sidecars without dropping the image")
+    @MainActor
+    func clipboardManagerDropsOversizedImageOCRSidecar() throws {
+        let settings = SettingsModel.shared
+        let originalTextLimit = settings.maxCaptureTextBytes
+        defer { settings.maxCaptureTextBytes = originalTextLimit }
+        settings.maxCaptureTextBytes = 64 * 1024
+
+        try withClipboardManagerState { manager in
+            try manager.importCapturedImage(
+                makeTestImage(),
+                ocrText: String(repeating: "x", count: 64 * 1024 + 1)
+            )
+
+            let item = try #require(manager.history.first)
+            #expect(item.ocrText == nil)
+            guard case .image = item.content else {
+                Issue.record("Expected captured image to remain in history")
+                return
+            }
+        }
+    }
+
+    @Test("ClipboardManager image export filenames are safe")
+    func clipboardManagerImageExportFilenameSanitizesTitles() {
+        #expect(
+            ClipboardManager.exportFilename(
+                from: "Invoice/Total:$42?*",
+                fallback: "SaneClip Capture",
+                fileExtension: "png"
+            ) == "InvoiceTotal42.png"
+        )
+        #expect(
+            ClipboardManager.exportFilename(
+                from: "[Image]",
+                fallback: "SaneClip Capture",
+                fileExtension: "png"
+            ) == "SaneClip Capture.png"
+        )
     }
 
     @Test("ClipboardManager joins multi-item plain text for capture")
@@ -204,7 +331,7 @@ struct SaneClipTests {
 
     @Test("ClipboardManager accessibility prompt cooldown prevents loops")
     func clipboardManagerAccessibilityPromptCooldown() {
-        let now = Date(timeIntervalSince1970: 1_000)
+        let now = Date(timeIntervalSince1970: 1000)
         let future = now.addingTimeInterval(15)
 
         #expect(ClipboardManager.shouldShowAccessibilityPrompt(now: now, suppressedUntil: nil))
@@ -582,7 +709,7 @@ struct SaneClipTests {
 
         let payload: [String: Any] = [
             "version": 1,
-            "openHistoryAtCursor": true
+            "openHistoryAtCursor": true,
         ]
         let exported = try JSONSerialization.data(withJSONObject: payload)
 
@@ -590,6 +717,42 @@ struct SaneClipTests {
         try settings.importSettings(from: exported)
 
         #expect(settings.openHistoryAtCursor == true)
+    }
+
+    @Test("SettingsModel round-trips capture OCR settings")
+    @MainActor
+    func settingsModelCaptureOCRRoundTrip() throws {
+        let settings = SettingsModel.shared
+        let originalAutoOCR = settings.autoOCRCapturedScreenshots
+        let originalLanguage = settings.captureOCRLanguage
+        defer {
+            settings.autoOCRCapturedScreenshots = originalAutoOCR
+            settings.captureOCRLanguage = originalLanguage
+        }
+
+        let payload: [String: Any] = [
+            "version": 1,
+            "autoOCRCapturedScreenshots": false,
+            "captureOCRLanguage": CaptureOCRLanguage.spanish.rawValue,
+        ]
+        settings.autoOCRCapturedScreenshots = true
+        settings.captureOCRLanguage = .automatic
+        try settings.importSettings(from: JSONSerialization.data(withJSONObject: payload))
+
+        #expect(settings.autoOCRCapturedScreenshots == false)
+        #expect(settings.captureOCRLanguage == .spanish)
+
+        let exported = try #require(
+            try JSONSerialization.jsonObject(with: settings.exportSettings()) as? [String: Any]
+        )
+        #expect(exported["autoOCRCapturedScreenshots"] as? Bool == false)
+        #expect(exported["captureOCRLanguage"] as? String == CaptureOCRLanguage.spanish.rawValue)
+
+        let legacyPayload: [String: Any] = [
+            "captureOCRLanguage": CaptureOCRLanguage.englishUS.displayName,
+        ]
+        try settings.importSettings(from: JSONSerialization.data(withJSONObject: legacyPayload))
+        #expect(settings.captureOCRLanguage == .englishUS)
     }
 
     @Test("SettingsModel keeps Dock hidden by default")
@@ -640,17 +803,17 @@ struct SaneClipTests {
         let input = #"{"name":"John","age":30}"#
         let result = TextTransform.jsonPrettyPrint.apply(to: input)
 
-        #expect(result.contains("  "))  // Has indentation
-        #expect(result.contains("\n"))  // Has newlines
+        #expect(result.contains("  ")) // Has indentation
+        #expect(result.contains("\n")) // Has newlines
         #expect(result.contains("\"name\""))
     }
 
     @Test("JSON pretty print returns original for invalid JSON")
-    func testJsonPrettyPrintInvalid() {
+    func jsonPrettyPrintInvalid() {
         let input = "not valid json { broken"
         let result = TextTransform.jsonPrettyPrint.apply(to: input)
 
-        #expect(result == input)  // Returns original unchanged
+        #expect(result == input) // Returns original unchanged
     }
 
     @Test("Strip HTML removes tags and keeps text")
@@ -677,7 +840,7 @@ struct SaneClipTests {
     }
 
     @Test("Strip Markdown handles links")
-    func testMarkdownLinksStripped() {
+    func markdownLinksStripped() {
         let input = "Check out [this link](https://example.com) for more info"
         let result = TextTransform.markdownToPlain.apply(to: input)
 
@@ -759,7 +922,7 @@ struct SaneClipTests {
     // MARK: - Sensitive Data Detection Tests (Phase 3)
 
     @Test("Detects valid credit card numbers with Luhn validation")
-    func testCreditCardDetection() {
+    func creditCardDetection() {
         let detector = SensitiveDataDetector.shared
 
         // Valid Visa test number
@@ -774,7 +937,7 @@ struct SaneClipTests {
     }
 
     @Test("Detects SSN patterns")
-    func testSSNDetection() {
+    func sSNDetection() {
         let detector = SensitiveDataDetector.shared
 
         // Standard format with dashes
@@ -789,7 +952,7 @@ struct SaneClipTests {
     }
 
     @Test("Detects common API key patterns")
-    func testAPIKeyDetection() {
+    func aPIKeyDetection() {
         let detector = SensitiveDataDetector.shared
 
         // OpenAI key pattern
@@ -806,7 +969,7 @@ struct SaneClipTests {
     }
 
     @Test("Detects password patterns")
-    func testPasswordDetection() {
+    func passwordDetection() {
         let detector = SensitiveDataDetector.shared
 
         let passwordAssignment = "password: mySecretPass123"
@@ -817,7 +980,7 @@ struct SaneClipTests {
     }
 
     @Test("Detects private key blocks")
-    func testPrivateKeyDetection() {
+    func privateKeyDetection() {
         let detector = SensitiveDataDetector.shared
 
         let rsaKey = """
@@ -832,7 +995,7 @@ struct SaneClipTests {
     }
 
     @Test("Detects email addresses")
-    func testEmailDetection() {
+    func emailDetection() {
         let detector = SensitiveDataDetector.shared
 
         let email = "Contact me at john.doe@example.com for more info"
@@ -840,7 +1003,7 @@ struct SaneClipTests {
     }
 
     @Test("No false positives on normal text")
-    func testNoFalsePositives() {
+    func noFalsePositives() {
         let detector = SensitiveDataDetector.shared
 
         let normalText = "Hello, this is a normal message with no sensitive data."
@@ -1176,7 +1339,7 @@ struct SaneClipTests {
 
         let plist: [String: Any] = [
             "CFBundleIdentifier": "com.example.fake",
-            "CFBundleName": "Fake"
+            "CFBundleName": "Fake",
         ]
         let plistData = try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
         try plistData.write(to: plistURL)
@@ -1271,13 +1434,121 @@ struct SaneClipTests {
         #expect(iosSettingsSource.contains("githubRepo: \"sane-apps/SaneClip\""))
     }
 
+    @Test("Capture feature is wired into shortcuts and menus")
+    func captureFeatureWiringIsPresent() throws {
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+        let settingsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
+            encoding: .utf8
+        )
+        let captureWorkflowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/Capture/CaptureWorkflow.swift"),
+            encoding: .utf8
+        )
+        let captureActionSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/Capture/SaneClipAppDelegate+Capture.swift"),
+            encoding: .utf8
+        )
+
+        #expect(appSource.contains("static let captureScreenshot = Self(\"captureScreenshot\")"))
+        #expect(appSource.contains("static let captureText = Self(\"captureText\")"))
+        #expect(captureWorkflowSource.contains("Capture Screenshot..."))
+        #expect(captureWorkflowSource.contains("Capture Text..."))
+        #expect(appSource.contains("KeyboardShortcuts.onKeyUp(for: .captureScreenshot)"))
+        #expect(appSource.contains("KeyboardShortcuts.onKeyUp(for: .captureText)"))
+        #expect(captureActionSource.contains("recognizedTextForScreenshot(result.image, language: ocrLanguage)"))
+        #expect(captureActionSource.contains("ocrText: ocrText"))
+        #expect(settingsSource.contains("KeyboardShortcuts.Recorder(for: .captureScreenshot)"))
+        #expect(settingsSource.contains("KeyboardShortcuts.Recorder(for: .captureText)"))
+        #expect(settingsSource.contains("SaneClipSettingsCopy.autoOCRScreenshotsLabel"))
+        #expect(settingsSource.contains("CaptureOCRLanguage.allCases"))
+    }
+
+    @Test("Capture implementation uses ScreenCaptureKit and Vision")
+    func captureImplementationUsesAppleFrameworks() throws {
+        let captureSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/Capture/ScreenCaptureService.swift"),
+            encoding: .utf8
+        )
+        let ocrSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/Capture/CaptureOCRService.swift"),
+            encoding: .utf8
+        )
+
+        #expect(captureSource.contains("SCContentSharingPickerObserver"))
+        #expect(captureSource.contains("SCScreenshotManager.captureImage"))
+        #expect(captureSource.contains("configuration.allowedPickerModes = [.singleWindow, .singleDisplay]"))
+        #expect(captureSource.contains("captureTimeoutTask = Task"))
+        #expect(captureSource.contains("stillCaptureTimeoutNanoseconds"))
+        #expect(captureSource.contains("ScreenCaptureError.timedOut"))
+        #expect(captureSource.contains("!self.isResolvingSelection"))
+        #expect(captureSource.contains("captureScreenshot(contentFilter: filter"))
+        #expect(captureSource.contains("captureImage(contentFilter: filter"))
+        #expect(ocrSource.contains("VNRecognizeTextRequest"))
+        #expect(ocrSource.contains("request.recognitionLevel = .accurate"))
+        #expect(ocrSource.contains("request.recognitionLanguages = [languageCode]"))
+        #expect(ocrSource.contains("request.automaticallyDetectsLanguage = true"))
+    }
+
+    @Test("Capture duplicate triggers are ignored instead of alerting")
+    func captureDuplicateRequestDoesNotShowErrorAlert() throws {
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/Capture/SaneClipAppDelegate+Capture.swift"),
+            encoding: .utf8
+        )
+
+        #expect(appSource.contains("} catch ScreenCaptureError.captureAlreadyInProgress {"))
+        #expect(appSource.contains("Capture request ignored because the picker is already active."))
+    }
+
+    @Test("Capture image preview exposes OCR workflow actions")
+    func captureImagePreviewExposesOCRActions() throws {
+        let rowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRow.swift"),
+            encoding: .utf8
+        )
+        let sheetSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ImageCapturePreviewSheet.swift"),
+            encoding: .utf8
+        )
+        let historySource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardHistoryView.swift"),
+            encoding: .utf8
+        )
+
+        #expect(rowSource.contains("ImageCapturePreviewSheet(item: item, clipboardManager: clipboardManager)"))
+        #expect(rowSource.contains("item.ocrPreview"))
+        #expect(rowSource.contains("Copy OCR Text"))
+        #expect(rowSource.contains("exportImageAsPNG(item: item)"))
+        #expect(sheetSource.contains("Recognized Text"))
+        #expect(sheetSource.contains("Copy Image"))
+        #expect(sheetSource.contains("Copy OCR Text"))
+        #expect(sheetSource.contains("Save As..."))
+        #expect(historySource.contains("items.filter { $0.matchesSearch(searchText) }"))
+    }
+
+    @Test("Welcome copy no longer claims screenshots are disabled")
+    func welcomeCopyMatchesCaptureFeature() throws {
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+
+        #expect(appSource.contains("Capture stays on-device."))
+        #expect(appSource.contains("Only captures when you ask."))
+        #expect(!appSource.contains("\"No screenshots.\""))
+    }
+
     @Test("Settings screens keep readable typography and contrast tokens")
     func settingsScreensUseReadableTypography() throws {
         let settingsFiles = [
             "UI/Settings/SettingsView.swift",
             "UI/Settings/SnippetsSettingsView.swift",
             "UI/Settings/StorageStatsView.swift",
-            "Core/Sync/SyncSettingsView.swift"
+            "Core/Sync/SyncSettingsView.swift",
         ]
         let disallowedSubstrings = [
             ".font(.caption)",
@@ -1286,7 +1557,7 @@ struct SaneClipTests {
             ".foregroundStyle(.tertiary)",
             ".font(.system(size: 9)",
             ".font(.system(size: 10)",
-            ".font(.system(size: 11)"
+            ".font(.system(size: 11)",
         ]
 
         for relativePath in settingsFiles {
@@ -1418,8 +1689,8 @@ struct SaneClipTests {
 
     @Test("Basic mode can pin and unpin items on Mac")
     @MainActor
-    func basicModeCanPinAndUnpinItemsOnMac() throws {
-        try withClipboardManagerState { manager in
+    func basicModeCanPinAndUnpinItemsOnMac() {
+        withClipboardManagerState { manager in
             let item = ClipboardItem(content: .text("Pinned from Basic mode"))
             manager.history = [item]
 
@@ -1472,8 +1743,8 @@ struct SaneClipTests {
                     .ignoresSafeArea()
                 GeneralSettingsView(licenseService: nil)
             }
-                .preferredColorScheme(.dark)
-                .frame(width: 1000, height: 760),
+            .preferredColorScheme(.dark)
+            .frame(width: 1000, height: 760),
             size: CGSize(width: 1000, height: 760),
             to: outputDir.appendingPathComponent("settings-general-render.png")
         )
@@ -1502,8 +1773,8 @@ struct SaneClipTests {
                 GeneralSettingsView(licenseService: previewHistoryLicenseService)
             }
             .preferredColorScheme(.dark)
-            .frame(width: 1000, height: 1500),
-            size: CGSize(width: 1000, height: 1500),
+            .frame(width: 1000, height: 1900),
+            size: CGSize(width: 1000, height: 1900),
             to: outputDir.appendingPathComponent("settings-general-history-render.png")
         )
 
@@ -1513,8 +1784,8 @@ struct SaneClipTests {
                     .ignoresSafeArea()
                 ShortcutsSettingsView(licenseService: nil)
             }
-                .preferredColorScheme(.dark)
-                .frame(width: 1000, height: 760),
+            .preferredColorScheme(.dark)
+            .frame(width: 1000, height: 760),
             size: CGSize(width: 1000, height: 760),
             to: outputDir.appendingPathComponent("settings-shortcuts-render.png")
         )
@@ -1525,8 +1796,8 @@ struct SaneClipTests {
                     .ignoresSafeArea()
                 SnippetsSettingsView(licenseService: nil)
             }
-                .preferredColorScheme(.dark)
-                .frame(width: 1000, height: 760),
+            .preferredColorScheme(.dark)
+            .frame(width: 1000, height: 760),
             size: CGSize(width: 1000, height: 760),
             to: outputDir.appendingPathComponent("settings-snippets-render.png")
         )
@@ -1537,8 +1808,8 @@ struct SaneClipTests {
                     .ignoresSafeArea()
                 SyncSettingsView()
             }
-                .preferredColorScheme(.dark)
-                .frame(width: 1000, height: 760),
+            .preferredColorScheme(.dark)
+            .frame(width: 1000, height: 760),
             size: CGSize(width: 1000, height: 760),
             to: outputDir.appendingPathComponent("settings-sync-render.png")
         )
@@ -1555,8 +1826,8 @@ struct SaneClipTests {
                     .ignoresSafeArea()
                 SyncSettingsView(coordinator: previewSyncCoordinator)
             }
-                .preferredColorScheme(.dark)
-                .frame(width: 1000, height: 860),
+            .preferredColorScheme(.dark)
+            .frame(width: 1000, height: 860),
             size: CGSize(width: 1000, height: 860),
             to: outputDir.appendingPathComponent("settings-sync-enabled-render.png")
         )
@@ -1568,8 +1839,8 @@ struct SaneClipTests {
                 StorageStatsView()
                     .padding(20)
             }
-                .preferredColorScheme(.dark)
-                .frame(width: 1000, height: 760),
+            .preferredColorScheme(.dark)
+            .frame(width: 1000, height: 760),
             size: CGSize(width: 1000, height: 760),
             to: outputDir.appendingPathComponent("settings-storage-render.png")
         )
@@ -1583,7 +1854,7 @@ struct SaneClipTests {
                 name: "KeyboardShortcuts",
                 url: "https://github.com/sindresorhus/KeyboardShortcuts",
                 text: "MIT License"
-            )
+            ),
         ]
         try renderPNG(
             ZStack {
@@ -1596,8 +1867,8 @@ struct SaneClipTests {
                 }
                 .padding(20)
             }
-                .preferredColorScheme(.dark)
-                .frame(width: 1000, height: 760),
+            .preferredColorScheme(.dark)
+            .frame(width: 1000, height: 760),
             size: CGSize(width: 1000, height: 760),
             to: outputDir.appendingPathComponent("settings-license-render.png")
         )
@@ -1613,8 +1884,8 @@ struct SaneClipTests {
                     licenses: previewAboutLicenses
                 )
             }
-                .preferredColorScheme(.dark)
-                .frame(width: 1000, height: 760),
+            .preferredColorScheme(.dark)
+            .frame(width: 1000, height: 760),
             size: CGSize(width: 1000, height: 760),
             to: outputDir.appendingPathComponent("settings-about-render.png")
         )
@@ -1671,8 +1942,16 @@ struct SaneClipTests {
                 content: .text("Temporary build number 2214"),
                 sourceAppName: "Xcode"
             )
+            let capturedImage = ClipboardItem(
+                content: .image(makeTestImage()),
+                sourceAppName: "Screen Capture",
+                title: "Screenshot receipt",
+                tags: ["capture"],
+                collection: "Captures",
+                ocrText: "Invoice total $42.00"
+            )
 
-            manager.history = [disposable, collected, noted, tagged, pinned]
+            manager.history = [capturedImage, disposable, collected, noted, tagged, pinned]
             manager.pinnedItems = [pinned]
             manager.pasteStack = [disposable]
 
@@ -1742,7 +2021,7 @@ struct SaneClipTests {
     private func screenshotOutputDirectory() -> String? {
         if let rawOutputDir = ProcessInfo.processInfo.environment["SANECLIP_SCREENSHOT_DIR"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
-           !rawOutputDir.isEmpty
+            !rawOutputDir.isEmpty
         {
             return rawOutputDir
         }

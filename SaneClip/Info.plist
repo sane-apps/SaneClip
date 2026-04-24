@@ -35,10 +35,14 @@
 	<false/>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
+	<key>LSUIElement</key>
+	<true/>
 	<key>NSAccessibilityUsageDescription</key>
 	<string>SaneClip uses Accessibility to paste clipboard items directly into applications.</string>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>SaneClip needs to paste clipboard content to other applications.</string>
+	<key>NSScreenCaptureUsageDescription</key>
+	<string>SaneClip captures screenshots you request so it can save the image and optional OCR text locally in your clipboard history.</string>
 	<key>NSServices</key>
 	<array>
 		<dict>
@@ -57,8 +61,6 @@
 			</array>
 		</dict>
 	</array>
-	<key>LSUIElement</key>
-	<true/>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUEnableInstallerLauncherService</key>

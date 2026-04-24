@@ -21,6 +21,7 @@ struct ClipboardItemRow: View {
     @State private var editCollection = "Default"
     @State private var editNote = ""
     @State private var showCollectionSheet = false
+    @State private var showImagePreviewSheet = false
     @State private var customCollection = ""
 
     private func lockedMenuTitle(_ title: String) -> String {
@@ -44,6 +45,9 @@ struct ClipboardItemRow: View {
         // Content type and preview
         if case .image = item.content {
             parts.append("Image")
+            if let ocrPreview = item.ocrPreview {
+                parts.append("recognized text: \(ocrPreview)")
+            }
         } else if item.isURL {
             parts.append("Link: \(item.preview)")
         } else if item.isCode {
@@ -231,6 +235,18 @@ struct ClipboardItemRow: View {
                         .padding(.leading, 20) // Align with content (past the icon)
                     }
 
+                    if let ocrPreview = item.ocrPreview {
+                        HStack(spacing: 4) {
+                            Image(systemName: "text.viewfinder")
+                                .font(.caption2)
+                            Text(ocrPreview)
+                                .font(.caption)
+                                .lineLimit(1)
+                        }
+                        .foregroundStyle(.primary.opacity(0.8))
+                        .padding(.leading, 20)
+                    }
+
                     if !item.tags.isEmpty {
                         HStack(spacing: 4) {
                             ForEach(item.tags.prefix(3), id: \.self) { tag in
@@ -300,6 +316,18 @@ struct ClipboardItemRow: View {
                                 .cornerRadius(4)
                         }
 
+                        if case .image = item.content {
+                            Button {
+                                showImagePreviewSheet = true
+                            } label: {
+                                Image(systemName: "eye")
+                                    .font(.caption)
+                                    .foregroundStyle(accentColor)
+                            }
+                            .buttonStyle(.plain)
+                            .help("Preview image")
+                        }
+
                         if item.collection != "Default" {
                             Text(item.collection)
                                 .font(.system(size: 10, weight: .medium))
@@ -352,6 +380,20 @@ struct ClipboardItemRow: View {
             }
 
             Button("Copy") { clipboardManager.copyWithoutPaste(item: item) }
+
+            if case .image = item.content {
+                Button("Preview...") {
+                    showImagePreviewSheet = true
+                }
+                if item.ocrPreview != nil {
+                    Button("Copy OCR Text") {
+                        clipboardManager.copyOCRTextWithoutPaste(item: item, notifyUser: true)
+                    }
+                }
+                Button("Save Image As...") {
+                    clipboardManager.exportImageAsPNG(item: item)
+                }
+            }
 
             Button(isQueuedForMerge ? "Remove from Merge Queue" : "Add to Merge Queue") {
                 onToggleMergeQueue?()
@@ -566,6 +608,9 @@ struct ClipboardItemRow: View {
             }
             .padding(16)
             .frame(width: 320)
+        }
+        .sheet(isPresented: $showImagePreviewSheet) {
+            ImageCapturePreviewSheet(item: item, clipboardManager: clipboardManager)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityDescription)

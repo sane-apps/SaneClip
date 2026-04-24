@@ -35,6 +35,38 @@ enum PasteMode: String, CaseIterable {
     }
 }
 
+enum CaptureOCRLanguage: String, CaseIterable {
+    case automatic
+    case englishUS
+    case spanish
+    case french
+    case german
+
+    var displayName: String {
+        switch self {
+        case .automatic: "Automatic"
+        case .englishUS: "English"
+        case .spanish: "Spanish"
+        case .french: "French"
+        case .german: "German"
+        }
+    }
+
+    var recognitionLanguageCode: String? {
+        switch self {
+        case .automatic: nil
+        case .englishUS: "en-US"
+        case .spanish: "es-ES"
+        case .french: "fr-FR"
+        case .german: "de-DE"
+        }
+    }
+
+    static func persistedValue(_ value: String) -> CaptureOCRLanguage? {
+        CaptureOCRLanguage(rawValue: value) ?? allCases.first { $0.displayName == value }
+    }
+}
+
 @MainActor
 @Observable
 class SettingsModel {
@@ -227,6 +259,20 @@ class SettingsModel {
         }
     }
 
+    /// Run OCR automatically when a screenshot is captured as an image.
+    var autoOCRCapturedScreenshots: Bool {
+        didSet {
+            UserDefaults.standard.set(autoOCRCapturedScreenshots, forKey: "autoOCRCapturedScreenshots")
+        }
+    }
+
+    /// Preferred OCR language for capture workflows.
+    var captureOCRLanguage: CaptureOCRLanguage {
+        didSet {
+            UserDefaults.standard.set(captureOCRLanguage.rawValue, forKey: "captureOCRLanguage")
+        }
+    }
+
     func isAppExcluded(_ bundleID: String?) -> Bool {
         guard let bundleID else { return false }
         return excludedApps.contains(bundleID)
@@ -278,6 +324,10 @@ class SettingsModel {
         let savedImageBytes = UserDefaults.standard.object(forKey: "maxCaptureImageBytes") as? Int ?? 5_000_000
         let normalizedImageBytes = Self.normalizedCaptureImageBytes(savedImageBytes)
         maxCaptureImageBytes = normalizedImageBytes
+        autoOCRCapturedScreenshots = UserDefaults.standard.object(forKey: "autoOCRCapturedScreenshots") as? Bool ?? true
+        captureOCRLanguage = CaptureOCRLanguage.persistedValue(
+            UserDefaults.standard.string(forKey: "captureOCRLanguage") ?? ""
+        ) ?? .automatic
 
         if normalizedTextBytes != savedTextBytes {
             UserDefaults.standard.set(normalizedTextBytes, forKey: "maxCaptureTextBytes")
@@ -331,6 +381,8 @@ class SettingsModel {
             "perAppPasteModes": perAppPasteModes,
             "maxCaptureTextBytes": maxCaptureTextBytes,
             "maxCaptureImageBytes": maxCaptureImageBytes,
+            "autoOCRCapturedScreenshots": autoOCRCapturedScreenshots,
+            "captureOCRLanguage": captureOCRLanguage.rawValue,
             // Include clipboard rules
             "rules": [
                 "stripTrackingParams": ClipboardRulesManager.shared.stripTrackingParams,
@@ -414,6 +466,13 @@ class SettingsModel {
         }
         if let value = settings["maxCaptureImageBytes"] as? Int {
             maxCaptureImageBytes = Self.normalizedCaptureImageBytes(value)
+        }
+        if let value = settings["autoOCRCapturedScreenshots"] as? Bool {
+            autoOCRCapturedScreenshots = value
+        }
+        if let value = settings["captureOCRLanguage"] as? String,
+           let language = CaptureOCRLanguage.persistedValue(value) {
+            captureOCRLanguage = language
         }
 
         // Apply clipboard rules if present

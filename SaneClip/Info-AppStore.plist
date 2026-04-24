@@ -37,5 +37,7 @@
 	<string>public.app-category.productivity</string>
 	<key>LSUIElement</key>
 	<true/>
+	<key>NSScreenCaptureUsageDescription</key>
+	<string>SaneClip captures screenshots you request so it can save the image and optional OCR text locally in your clipboard history.</string>
 </dict>
 </plist>

@@ -1,9 +1,9 @@
 // swiftlint:disable file_length
 import KeyboardShortcuts
 import LocalAuthentication
+import os.log
 import SaneUI
 import SwiftUI
-import os.log
 
 private let settingsLogger = Logger(subsystem: "com.saneclip.app", category: "Settings")
 let clipReadableSecondary = Color.white.opacity(0.88)
@@ -31,7 +31,7 @@ struct SettingsView: View {
         case general = "General"
         case shortcuts = "Shortcuts"
         #if ENABLE_SYNC
-            case sync = "Sync"
+        case sync = "Sync"
         #endif
         case snippets = "Snippets"
         case storage = "Storage"
@@ -45,7 +45,7 @@ struct SettingsView: View {
             case .general: SaneSettingsStrings.generalTabTitle
             case .shortcuts: SaneSettingsStrings.shortcutsTabTitle
             #if ENABLE_SYNC
-                case .sync: SaneSettingsStrings.syncTabTitle
+            case .sync: SaneSettingsStrings.syncTabTitle
             #endif
             case .snippets: SaneSettingsStrings.snippetsTabTitle
             case .storage: SaneSettingsStrings.storageTabTitle
@@ -59,7 +59,7 @@ struct SettingsView: View {
             case .general: "gear"
             case .shortcuts: "keyboard"
             #if ENABLE_SYNC
-                case .sync: "arrow.triangle.2.circlepath.icloud"
+            case .sync: "arrow.triangle.2.circlepath.icloud"
             #endif
             case .snippets: "text.quote"
             case .storage: "chart.pie"
@@ -73,7 +73,7 @@ struct SettingsView: View {
             case .general: SaneSettingsIconSemantic.general.color
             case .shortcuts: SaneSettingsIconSemantic.shortcuts.color
             #if ENABLE_SYNC
-                case .sync: SaneSettingsIconSemantic.sync.color
+            case .sync: SaneSettingsIconSemantic.sync.color
             #endif
             case .snippets: SaneSettingsIconSemantic.content.color
             case .storage: SaneSettingsIconSemantic.storage.color
@@ -324,10 +324,10 @@ struct GeneralSettingsView: View {
     @State private var appPresetBundleID = ""
     @State private var appPresetMode: PasteMode = .standard
     #if !APP_STORE && !SETAPP
-        @State private var autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
-        @State private var updateCheckFrequency = UpdateService.shared.updateCheckFrequency
+    @State private var autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
+    @State private var updateCheckFrequency = UpdateService.shared.updateCheckFrequency
     #else
-        @State private var autoCheckUpdates = false
+    @State private var autoCheckUpdates = false
     #endif
     @State private var isAuthenticating = false
 
@@ -586,58 +586,58 @@ struct GeneralSettingsView: View {
                 }
 
                 #if !APP_STORE && !SETAPP
-                    CompactSection(SaneClipSettingsCopy.softwareUpdatesSectionTitle) {
-                        SaneSparkleRow(
-                            automaticallyChecks: Binding(
-                                get: { autoCheckUpdates },
-                                set: { newValue in
-                                    autoCheckUpdates = newValue
-                                    UpdateService.shared.automaticallyChecksForUpdates = newValue
-                                }
-                            ),
-                            checkFrequency: Binding(
-                                get: { updateCheckFrequency },
-                                set: { newValue in
-                                    updateCheckFrequency = newValue
-                                    UpdateService.shared.updateCheckFrequency = newValue
-                                }
-                            ),
-                            labels: .init(
-                                automaticCheckLabel: SaneClipSettingsCopy.updateAutomaticallyLabel,
-                                automaticCheckHelp: SaneClipSettingsCopy.updateAutomaticallyHelp,
-                                checkFrequencyLabel: SaneClipSettingsCopy.updateFrequencyLabel,
-                                checkFrequencyHelp: SaneClipSettingsCopy.updateFrequencyHelp,
-                                actionsLabel: SaneClipSettingsCopy.updatesActionsLabel,
-                                checkingLabel: SaneClipSettingsCopy.checkingButtonTitle,
-                                checkNowLabel: SaneClipSettingsCopy.checkNowButtonTitle,
-                                checkNowHelp: SaneClipSettingsCopy.checkNowHelp,
-                                dailyTitle: String(localized: "saneclip.settings.updates.daily", defaultValue: "Daily"),
-                                weeklyTitle: String(localized: "saneclip.settings.updates.weekly", defaultValue: "Weekly")
-                            ),
-                            onCheckNow: { UpdateService.shared.checkForUpdates() }
-                        )
-                    }
+                CompactSection(SaneClipSettingsCopy.softwareUpdatesSectionTitle) {
+                    SaneSparkleRow(
+                        automaticallyChecks: Binding(
+                            get: { autoCheckUpdates },
+                            set: { newValue in
+                                autoCheckUpdates = newValue
+                                UpdateService.shared.automaticallyChecksForUpdates = newValue
+                            }
+                        ),
+                        checkFrequency: Binding(
+                            get: { updateCheckFrequency },
+                            set: { newValue in
+                                updateCheckFrequency = newValue
+                                UpdateService.shared.updateCheckFrequency = newValue
+                            }
+                        ),
+                        labels: .init(
+                            automaticCheckLabel: SaneClipSettingsCopy.updateAutomaticallyLabel,
+                            automaticCheckHelp: SaneClipSettingsCopy.updateAutomaticallyHelp,
+                            checkFrequencyLabel: SaneClipSettingsCopy.updateFrequencyLabel,
+                            checkFrequencyHelp: SaneClipSettingsCopy.updateFrequencyHelp,
+                            actionsLabel: SaneClipSettingsCopy.updatesActionsLabel,
+                            checkingLabel: SaneClipSettingsCopy.checkingButtonTitle,
+                            checkNowLabel: SaneClipSettingsCopy.checkNowButtonTitle,
+                            checkNowHelp: SaneClipSettingsCopy.checkNowHelp,
+                            dailyTitle: String(localized: "saneclip.settings.updates.daily", defaultValue: "Daily"),
+                            weeklyTitle: String(localized: "saneclip.settings.updates.weekly", defaultValue: "Weekly")
+                        ),
+                        onCheckNow: { UpdateService.shared.checkForUpdates() }
+                    )
+                }
                 #endif
 
-                    CompactSection(SaneClipSettingsCopy.historySectionTitle) {
-                        CompactRow(SaneClipSettingsCopy.maximumItemsLabel) {
-                            if isPro {
-                                Picker("", selection: Binding(
-                                    get: { settings.maxHistorySize },
-                                    set: { settings.maxHistorySize = SettingsModel.normalizedMaxHistorySize($0) }
-                                )) {
-                                    ForEach(historySizeChoices, id: \.self) { choice in
-                                        Text(SettingsModel.historySizeLabel(choice)).tag(choice)
-                                    }
+                CompactSection(SaneClipSettingsCopy.historySectionTitle) {
+                    CompactRow(SaneClipSettingsCopy.maximumItemsLabel) {
+                        if isPro {
+                            Picker("", selection: Binding(
+                                get: { settings.maxHistorySize },
+                                set: { settings.maxHistorySize = SettingsModel.normalizedMaxHistorySize($0) }
+                            )) {
+                                ForEach(historySizeChoices, id: \.self) { choice in
+                                    Text(SettingsModel.historySizeLabel(choice)).tag(choice)
                                 }
-                                .pickerStyle(.menu)
-                                .frame(width: 120)
-                                .help("Pro keeps as much history as you configure, including unlimited.")
-                            } else {
-                                Button {
-                                    if let ls = licenseService {
-                                        ProUpsellWindow.show(feature: ProFeature.unlimitedHistory, licenseService: ls)
-                                    }
+                            }
+                            .pickerStyle(.menu)
+                            .frame(width: 120)
+                            .help("Pro keeps as much history as you configure, including unlimited.")
+                        } else {
+                            Button {
+                                if let ls = licenseService {
+                                    ProUpsellWindow.show(feature: ProFeature.unlimitedHistory, licenseService: ls)
+                                }
                             } label: {
                                 HStack(spacing: 6) {
                                     Text("50")
@@ -774,6 +774,24 @@ struct GeneralSettingsView: View {
                         .pickerStyle(.menu)
                         .frame(width: 110)
                     }
+                    CompactDivider()
+                    CompactToggle(label: SaneClipSettingsCopy.autoOCRScreenshotsLabel, isOn: Binding(
+                        get: { settings.autoOCRCapturedScreenshots },
+                        set: { settings.autoOCRCapturedScreenshots = $0 }
+                    ))
+                    CompactDivider()
+                    CompactRow(SaneClipSettingsCopy.ocrLanguageLabel) {
+                        Picker("", selection: Binding(
+                            get: { settings.captureOCRLanguage },
+                            set: { settings.captureOCRLanguage = $0 }
+                        )) {
+                            ForEach(CaptureOCRLanguage.allCases, id: \.self) { language in
+                                Text(language.displayName).tag(language)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .frame(width: 130)
+                    }
                 }
 
                 ClipboardRulesSection(licenseService: licenseService)
@@ -800,8 +818,8 @@ struct GeneralSettingsView: View {
         }
         .onAppear {
             #if !APP_STORE && !SETAPP
-                autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
-                updateCheckFrequency = UpdateService.shared.updateCheckFrequency
+            autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
+            updateCheckFrequency = UpdateService.shared.updateCheckFrequency
             #endif
         }
     }
@@ -836,7 +854,7 @@ struct GeneralSettingsView: View {
         let resolvedConfig = weightConfig.applying(colorConfig)
 
         guard let symbol = NSImage(systemSymbolName: systemImage, accessibilityDescription: nil)?
-            .withSymbolConfiguration(resolvedConfig)
+                .withSymbolConfiguration(resolvedConfig)
         else {
             return NSImage()
         }
@@ -1147,8 +1165,8 @@ struct ExcludedAppsInline: View {
     nonisolated static func selectedBundleID(fromSelectedAppURL url: URL) -> String? {
         guard url.pathExtension == "app" else { return nil }
         guard let bundleID = Bundle(url: url)?.bundleIdentifier?
-            .trimmingCharacters(in: .whitespacesAndNewlines),
-            !bundleID.isEmpty
+                .trimmingCharacters(in: .whitespacesAndNewlines),
+              !bundleID.isEmpty
         else { return nil }
         return bundleID
     }
@@ -1366,6 +1384,14 @@ struct ShortcutsSettingsView: View {
                 CompactSection("Main Shortcuts") {
                     CompactRow("Show Clipboard History") {
                         KeyboardShortcuts.Recorder(for: .showClipboardHistory)
+                    }
+                    CompactDivider()
+                    CompactRow(SaneClipSettingsCopy.captureScreenshotLabel) {
+                        KeyboardShortcuts.Recorder(for: .captureScreenshot)
+                    }
+                    CompactDivider()
+                    CompactRow(SaneClipSettingsCopy.captureTextLabel) {
+                        KeyboardShortcuts.Recorder(for: .captureText)
                     }
                     CompactDivider()
                     CompactToggle(label: "Open history at mouse cursor", isOn: Binding(
@@ -1655,4 +1681,5 @@ private struct ProLockedSectionBanner: View {
         .controlSize(.small)
     }
 }
+
 // swiftlint:enable file_length

@@ -1,13 +1,72 @@
 # Session Handoff — SaneClip
 
-**Last updated:** 2026-04-09
-**Current project version:** `2.2.13` (build `2213`)
+**Last updated:** 2026-04-23
+**Current project version:** `2.3.0` (build `2300`)
 
 ## Current State
 
-- The current repo version is `2.2.13`; direct-download recovery work and the iOS screenshot/theme fixes landed after the older notes below.
+- The current repo version is `2.3.0`; this is the capture/OCR feature train.
 - `CHANGELOG.md` is the current release ledger. Use it instead of the stale `v2.0 released / App Store REJECTED` summary below.
 - Treat the older sections in this file as archival notes only.
+
+## Addendum - 2026-04-23 (Capture to SaneClip v1)
+
+- Added `Capture Screenshot...` and `Capture Text...` to the main `Edit` menu, the menu bar shell, and the shortcuts settings tab.
+- New defaults:
+  - `Cmd+Shift+Ctrl+S` → capture screenshot
+  - `Cmd+Shift+Ctrl+T` → capture text
+- Main implementation lives in:
+  - `Core/Capture/ScreenCaptureService.swift`
+  - `Core/Capture/CaptureOCRService.swift`
+  - `Core/Capture/SaneClipAppDelegate+Capture.swift`
+  - `Core/ClipboardManager.swift`
+  - `UI/History/ImageCapturePreviewSheet.swift`
+- Screenshot capture now stores the original PNG plus the downsized thumbnail in history persistence.
+- Text capture now OCRs the selected screen/window and saves the recognized text as a normal clipboard item with source app `Screen Capture`.
+- Captured screenshot image items can carry OCR sidecar text for search, preview, copy-OCR, and export workflows.
+- Onboarding/settings copy was updated so the app no longer claims screenshots are disabled.
+
+### Important Runtime Fix
+
+- The first implementation could get stuck in `capture already in progress` after the picker selection. Logs showed `SCContentSharingPicker` delivered the selected filter, but the still-image capture never completed.
+- Fix: dismiss the picker before still capture, use a guarded selection-resume path, and use `SCScreenshotManager.captureScreenshot(...)` on macOS 26+ with `captureImage(...)` fallback.
+- Verified on the Mini:
+  - picker appears correctly
+  - `Capture Text` copies OCR text to the clipboard and writes a `Screen Capture` history item
+  - repeated text captures work without getting stuck
+  - `Capture Screenshot` puts image data on the pasteboard and writes both thumbnail + original image assets to persisted history
+
+### Persistence Path Gotcha
+
+- For the live Mini verification run, history and image assets were written under the container path:
+  - `~/Library/Containers/com.saneclip.app/Data/Library/Application Support/SaneClip/`
+- Do not assume the non-sandboxed `~/Library/Application Support/SaneClip/` path during release verification if the canonical app on the Mini is using the containerized lane.
+
+### App Store Status After Capture Work
+
+- `appstore_preflight` is clean for macOS after adding `NSScreenCaptureUsageDescription` to both `SaneClip/Info.plist` and `SaneClip/Info-AppStore.plist`.
+- `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` were bumped to `2.3.0` / `2300`; App Store Connect reports both macOS and iOS `2.3.0` lanes clear.
+- Latest App Store preflight result: no blockers, only the expected uncommitted-files warning.
+- Latest Mini verification: `SaneMaster verify --timeout 1800` passed `143/143` tests. Remaining lint warnings are existing file-length warnings in `SaneClipApp.swift` and `Core/Sync/SyncCoordinator.swift`.
+- Latest Mini runtime check: signed Release build staged to `/Applications/SaneClip.app`, launched successfully, and compiled app plist shows `CFBundleShortVersionString=2.3.0`, `CFBundleVersion=2300`, and the screen-capture usage string.
+- Latest visual check: fresh Mini render screenshots in `/tmp/saneclip-capture-renders` copied to `outputs/capture-renders/latest`; direct inspection showed capture controls, shortcuts, image OCR rows, and About screen are professional. NVIDIA vision audit remains blocked by provider HTTP 400, even on small JPEG input.
+
+### Closeout - 2026-04-23
+
+#### Done
+- Capture/OCR feature set is implemented, formatted to the repo's SwiftLint style, and prepared as `2.3.0` build `2300`.
+- Mini verification passed after final formatting: `143/143` tests, signed Release build staged/launched from `/Applications/SaneClip.app`, and App Store preflight has no blockers.
+- `gh issue list --limit 20` returned no open issues at closeout.
+
+#### Docs
+- `SESSION_HANDOFF.md` and Serena memory `SaneClip/capture-v1-apr23-2026` are current for this work.
+
+#### SOP
+- SOP compliance: 9/10. Remaining gap is the intentional human-click ScreenCaptureKit picker E2E pass, which is blocked from reliable synthetic automation by macOS security.
+
+#### Next
+- On the Mini tomorrow, trigger Capture Screenshot/Text and manually click the Apple ScreenCaptureKit picker Share button once, then verify the resulting image/OCR item appears in SaneClip history.
+- If that human-click E2E passes, update marketing/screenshots/release notes for the `2.3.0` capture workflow.
 
 ## Addendum - 2026-04-14 (Pricing Rollout)
 

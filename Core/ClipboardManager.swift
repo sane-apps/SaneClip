@@ -6,10 +6,10 @@ import SaneUI
 import SwiftUI
 import UniformTypeIdentifiers
 #if !APP_STORE
-    @preconcurrency import ApplicationServices
+@preconcurrency import ApplicationServices
 #endif
 #if APP_STORE
-    import UserNotifications
+import UserNotifications
 #endif
 import WidgetKit
 
@@ -20,15 +20,34 @@ class ClipboardManager {
     static var shared: ClipboardManager!
 
     #if !APP_STORE
-        nonisolated static let accessibilityAlertTitle = "Auto-Paste Needs Access"
-        nonisolated static let accessibilityAlertMessage = "Clip copied. Enable Accessibility for one-key paste.\nAlready enabled? Quit and reopen."
-        nonisolated static let accessibilityOpenButtonTitle = "Open Access"
-        nonisolated static let accessibilityRetryButtonTitle = "Retry"
-        nonisolated static let accessibilityManualButtonTitle = "Manual"
+    nonisolated static let accessibilityAlertTitle = "Auto-Paste Needs Access"
+    nonisolated static let accessibilityAlertMessage = "Clip copied. Enable Accessibility for one-key paste.\nAlready enabled? Quit and reopen."
+    nonisolated static let accessibilityOpenButtonTitle = "Open Access"
+    nonisolated static let accessibilityRetryButtonTitle = "Retry"
+    nonisolated static let accessibilityManualButtonTitle = "Manual"
     #endif
 
     /// Free tier history cap — Pro users get unlimited.
     nonisolated static let freeHistoryCap = 50
+    nonisolated static let captureSourceAppName = "Screen Capture"
+
+    enum CaptureImportError: LocalizedError {
+        case imageTooLarge
+        case textTooLarge
+        case emptyText
+
+        var errorDescription: String? {
+            switch self {
+            case .imageTooLarge:
+                "The captured image is larger than your current image capture limit."
+            case .textTooLarge:
+                "The captured text is larger than your current text capture limit."
+            case .emptyText:
+                "No text was found in the captured content."
+            }
+        }
+    }
+
     struct HistoryClearPlan {
         let matchedCount: Int
         let protectedCount: Int
@@ -83,6 +102,7 @@ class ClipboardManager {
             enforceHistoryLimitIfNeeded()
         }
     }
+
     /// Tracks the pasteboard changeCount at which our last self-write completed.
     /// checkClipboard() skips processing while changeCount hasn't advanced past this value.
     /// This is more robust than a simple boolean because it handles the dual changeCount
@@ -240,7 +260,7 @@ class ClipboardManager {
         history.removeAll { item in
             let shouldRemove = !isPinned(item) && item.timestamp < cutoff
             if shouldRemove, case .image = item.content {
-                deleteThumbnail(id: item.id)
+                deleteImageAssets(id: item.id)
             }
             return shouldRemove
         }
@@ -350,9 +370,9 @@ class ClipboardManager {
         for rtfType in rtfTypes {
             if let rtfData = item.data(forType: rtfType),
                let attributed = try? NSAttributedString(
-                   data: rtfData,
-                   options: [.documentType: NSAttributedString.DocumentType.rtf],
-                   documentAttributes: nil
+                data: rtfData,
+                options: [.documentType: NSAttributedString.DocumentType.rtf],
+                documentAttributes: nil
                ),
                let normalized = normalizedNonEmptyText(attributed.string) {
                 return normalized
@@ -362,12 +382,12 @@ class ClipboardManager {
         for htmlType in htmlTypes {
             if let htmlData = item.data(forType: htmlType),
                let attributed = try? NSAttributedString(
-                   data: htmlData,
-                   options: [
-                       .documentType: NSAttributedString.DocumentType.html,
-                       .characterEncoding: String.Encoding.utf8.rawValue
-                   ],
-                   documentAttributes: nil
+                data: htmlData,
+                options: [
+                    .documentType: NSAttributedString.DocumentType.html,
+                    .characterEncoding: String.Encoding.utf8.rawValue
+                ],
+                documentAttributes: nil
                ),
                let normalized = normalizedNonEmptyText(attributed.string) {
                 return normalized
@@ -432,12 +452,12 @@ class ClipboardManager {
         let wrapped = "<span>\(fragment)</span>"
         guard let data = wrapped.data(using: .utf8),
               let attributed = try? NSAttributedString(
-                  data: data,
-                  options: [
-                      .documentType: NSAttributedString.DocumentType.html,
-                      .characterEncoding: String.Encoding.utf8.rawValue
-                  ],
-                  documentAttributes: nil
+                data: data,
+                options: [
+                    .documentType: NSAttributedString.DocumentType.html,
+                    .characterEncoding: String.Encoding.utf8.rawValue
+                ],
+                documentAttributes: nil
               )
         else {
             return fragment
@@ -584,8 +604,8 @@ class ClipboardManager {
 
         if let pasteboardItems = pasteboard.pasteboardItems,
            let preferredText = Self.preferredTextForCapture(
-               from: pasteboardItems,
-               sourceAppBundleID: sourceAppBundleID
+            from: pasteboardItems,
+            sourceAppBundleID: sourceAppBundleID
            ) {
             addTextClipboardItem(
                 preferredText,
@@ -666,6 +686,64 @@ class ClipboardManager {
         capturePausedUntil = nil
     }
 
+    func importCapturedImage(
+        _ image: NSImage,
+        sourceAppBundleID: String? = nil,
+        sourceAppName: String? = nil,
+        ocrText: String? = nil
+    ) throws {
+        let imageBytes = pngData(for: image)?.count ?? image.tiffRepresentation?.count ?? 0
+        guard isImageDataWithinCaptureLimit(imageBytes) else {
+            logger.warning("Skipping captured image over limit (\(imageBytes / 1_000_000)MB)")
+            throw CaptureImportError.imageTooLarge
+        }
+
+        let item = ClipboardItem(
+            content: .image(image),
+            sourceAppBundleID: sourceAppBundleID,
+            sourceAppName: sourceAppName ?? Self.captureSourceAppName,
+            ocrText: normalizedOCRText(ocrText)
+        )
+        addItem(item)
+        copyWithoutPaste(item: item, notifyUser: true)
+    }
+
+    func importCapturedText(
+        _ text: String,
+        sourceAppBundleID: String? = nil,
+        sourceAppName: String? = nil
+    ) throws {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            throw CaptureImportError.emptyText
+        }
+
+        let processedString = processString(trimmed)
+        guard isTextWithinCaptureLimit(processedString) else {
+            logger.info("Skipped oversized captured text (\(processedString.utf8.count) bytes)")
+            throw CaptureImportError.textTooLarge
+        }
+
+        let item = ClipboardItem(
+            content: .text(processedString),
+            sourceAppBundleID: sourceAppBundleID,
+            sourceAppName: sourceAppName ?? Self.captureSourceAppName
+        )
+        addItem(item)
+        copyWithoutPaste(item: item, notifyUser: true)
+    }
+
+    private func normalizedOCRText(_ text: String?) -> String? {
+        guard let text else { return nil }
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        guard isTextWithinCaptureLimit(trimmed) else {
+            logger.info("Skipped oversized OCR sidecar text (\(trimmed.utf8.count) bytes)")
+            return nil
+        }
+        return trimmed
+    }
+
     private func processString(_ string: String) -> String {
         guard licenseService?.isPro == true else {
             return string
@@ -694,17 +772,17 @@ class ClipboardManager {
         saveHistory()
 
         #if ENABLE_SYNC
-            // Queue the new item for iCloud sync
-            let shared = SharedClipboardItem(
-                id: item.id,
-                content: item.sharedContent,
-                timestamp: item.timestamp,
-                sourceAppBundleID: item.sourceAppBundleID,
-                sourceAppName: item.sourceAppName,
-                pasteCount: item.pasteCount,
-                note: item.note
-            )
-            SyncCoordinator.shared.queueItemForSync(shared)
+        // Queue the new item for iCloud sync
+        let shared = SharedClipboardItem(
+            id: item.id,
+            content: item.sharedContent,
+            timestamp: item.timestamp,
+            sourceAppBundleID: item.sourceAppBundleID,
+            sourceAppName: item.sourceAppName,
+            pasteCount: item.pasteCount,
+            note: item.note
+        )
+        SyncCoordinator.shared.queueItemForSync(shared)
         #endif
 
         let currentCount = history.count
@@ -1008,162 +1086,162 @@ class ClipboardManager {
         isPasting = true
         NotificationCenter.default.post(name: .dismissForPaste, object: nil)
         #if APP_STORE
-            showCopiedNotification()
+        showCopiedNotification()
+        if reopenPopoverAfterPaste {
+            NotificationCenter.default.post(name: .reopenHistoryAfterPaste, object: nil)
+        }
+        isPasting = false
+        #else
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(300))
+            self.simulatePaste()
             if reopenPopoverAfterPaste {
                 NotificationCenter.default.post(name: .reopenHistoryAfterPaste, object: nil)
             }
-            isPasting = false
-        #else
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(300))
-                self.simulatePaste()
-                if reopenPopoverAfterPaste {
-                    NotificationCenter.default.post(name: .reopenHistoryAfterPaste, object: nil)
-                }
-                self.isPasting = false
-            }
+            self.isPasting = false
+        }
         #endif
     }
 
     #if APP_STORE
-        /// Show a brief "Copied to clipboard" notification for App Store builds
-        /// where paste simulation (CGEvent) is not available in the sandbox.
-        private func showCopiedNotification() {
-            logger.debug("App Store mode: copied to clipboard, user must paste manually")
-            // Request notification permission on first use, then deliver
-            let center = UNUserNotificationCenter.current()
-            center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
-                guard granted else { return }
-                let content = UNMutableNotificationContent()
-                content.title = "Copied to Clipboard"
-                content.body = "Press \u{2318}V to paste"
-                let request = UNNotificationRequest(
-                    identifier: "com.saneclip.copied.\(UUID().uuidString)",
-                    content: content,
-                    trigger: nil
-                )
-                center.add(request)
-            }
+    /// Show a brief "Copied to clipboard" notification for App Store builds
+    /// where paste simulation (CGEvent) is not available in the sandbox.
+    private func showCopiedNotification() {
+        logger.debug("App Store mode: copied to clipboard, user must paste manually")
+        // Request notification permission on first use, then deliver
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
+            guard granted else { return }
+            let content = UNMutableNotificationContent()
+            content.title = "Copied to Clipboard"
+            content.body = "Press \u{2318}V to paste"
+            let request = UNNotificationRequest(
+                identifier: "com.saneclip.copied.\(UUID().uuidString)",
+                content: content,
+                trigger: nil
+            )
+            center.add(request)
         }
+    }
     #else
-        /// Whether accessibility permission alert is currently showing (prevents duplicates)
-        private var isShowingPermissionAlert = false
+    /// Whether accessibility permission alert is currently showing (prevents duplicates)
+    private var isShowingPermissionAlert = false
 
-        @discardableResult
-        func triggerPasteFromExternalRequest() -> Bool {
-            simulatePaste()
-        }
+    @discardableResult
+    func triggerPasteFromExternalRequest() -> Bool {
+        simulatePaste()
+    }
 
-        @discardableResult
-        private func simulatePaste() -> Bool {
-            guard isAccessibilityTrusted() else {
-                logger.error("Accessibility permission not granted — paste blocked")
-                guard !isShowingPermissionAlert else { return false }
-                guard Self.shouldShowAccessibilityPrompt(
-                    now: Date(),
-                    suppressedUntil: suppressPermissionPromptUntil
-                ) else {
-                    logger.debug("Accessibility alert suppressed after manual fallback")
-                    return false
-                }
-                isShowingPermissionAlert = true
-                // Dispatch to escape the async Task context — runModal() needs its own run loop
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
-                    let action = self.showAccessibilityAlert()
-                    self.handleAccessibilityAlertAction(action)
-                    self.isShowingPermissionAlert = false
-                }
+    @discardableResult
+    private func simulatePaste() -> Bool {
+        guard isAccessibilityTrusted() else {
+            logger.error("Accessibility permission not granted — paste blocked")
+            guard !isShowingPermissionAlert else { return false }
+            guard Self.shouldShowAccessibilityPrompt(
+                now: Date(),
+                suppressedUntil: suppressPermissionPromptUntil
+            ) else {
+                logger.debug("Accessibility alert suppressed after manual fallback")
                 return false
             }
-
-            guard let source = CGEventSource(stateID: .hidSystemState) else {
-                logger.error("Failed to create CGEventSource for paste simulation")
-                return false
+            isShowingPermissionAlert = true
+            // Dispatch to escape the async Task context — runModal() needs its own run loop
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                let action = self.showAccessibilityAlert()
+                self.handleAccessibilityAlertAction(action)
+                self.isShowingPermissionAlert = false
             }
+            return false
+        }
 
-            guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
-                  let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false)
-            else {
-                logger.error("Failed to create CGEvent for paste simulation")
-                return false
+        guard let source = CGEventSource(stateID: .hidSystemState) else {
+            logger.error("Failed to create CGEventSource for paste simulation")
+            return false
+        }
+
+        guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
+              let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false)
+        else {
+            logger.error("Failed to create CGEvent for paste simulation")
+            return false
+        }
+
+        keyDown.flags = .maskCommand
+        keyUp.flags = .maskCommand
+
+        keyDown.post(tap: .cghidEventTap)
+        keyUp.post(tap: .cghidEventTap)
+        return true
+    }
+
+    private enum AccessibilityAlertAction {
+        case openAccess
+        case retry
+        case manual
+    }
+
+    nonisolated static func shouldShowAccessibilityPrompt(now: Date, suppressedUntil: Date?) -> Bool {
+        guard let suppressedUntil else { return true }
+        return now >= suppressedUntil
+    }
+
+    private func isAccessibilityTrusted(promptSystemIfMissing: Bool = false) -> Bool {
+        if promptSystemIfMissing {
+            let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
+            return AXIsProcessTrustedWithOptions(options)
+        }
+        return AXIsProcessTrusted()
+    }
+
+    private func openAccessibilitySettings() {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    private func handleAccessibilityAlertAction(_ action: AccessibilityAlertAction) {
+        switch action {
+        case .openAccess:
+            suppressPermissionPromptUntil = Date().addingTimeInterval(10)
+            openAccessibilitySettings()
+        case .retry:
+            if isAccessibilityTrusted(promptSystemIfMissing: true) || isAccessibilityTrusted() {
+                _ = simulatePaste()
+            } else {
+                suppressPermissionPromptUntil = Date().addingTimeInterval(5)
             }
-
-            keyDown.flags = .maskCommand
-            keyUp.flags = .maskCommand
-
-            keyDown.post(tap: .cghidEventTap)
-            keyUp.post(tap: .cghidEventTap)
-            return true
+        case .manual:
+            suppressPermissionPromptUntil = Date().addingTimeInterval(permissionPromptCooldown)
         }
+    }
 
-        private enum AccessibilityAlertAction {
-            case openAccess
-            case retry
-            case manual
+    /// Show a standalone NSAlert for accessibility permission.
+    /// Works even when the panel isn't visible (e.g. quick-paste hotkeys).
+    private func showAccessibilityAlert() -> AccessibilityAlertAction {
+        let alert = NSAlert()
+        alert.messageText = Self.accessibilityAlertTitle
+        alert.informativeText = Self.accessibilityAlertMessage
+        alert.addButton(withTitle: Self.accessibilityOpenButtonTitle)
+        alert.addButton(withTitle: Self.accessibilityRetryButtonTitle)
+        alert.addButton(withTitle: Self.accessibilityManualButtonTitle)
+        alert.alertStyle = .warning
+
+        switch alert.runModal() {
+        case .alertFirstButtonReturn:
+            return .openAccess
+        case .alertSecondButtonReturn:
+            return .retry
+        default:
+            return .manual
         }
-
-        nonisolated static func shouldShowAccessibilityPrompt(now: Date, suppressedUntil: Date?) -> Bool {
-            guard let suppressedUntil else { return true }
-            return now >= suppressedUntil
-        }
-
-        private func isAccessibilityTrusted(promptSystemIfMissing: Bool = false) -> Bool {
-            if promptSystemIfMissing {
-                let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
-                return AXIsProcessTrustedWithOptions(options)
-            }
-            return AXIsProcessTrusted()
-        }
-
-        private func openAccessibilitySettings() {
-            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-                NSWorkspace.shared.open(url)
-            }
-        }
-
-        private func handleAccessibilityAlertAction(_ action: AccessibilityAlertAction) {
-            switch action {
-            case .openAccess:
-                suppressPermissionPromptUntil = Date().addingTimeInterval(10)
-                openAccessibilitySettings()
-            case .retry:
-                if isAccessibilityTrusted(promptSystemIfMissing: true) || isAccessibilityTrusted() {
-                    _ = simulatePaste()
-                } else {
-                    suppressPermissionPromptUntil = Date().addingTimeInterval(5)
-                }
-            case .manual:
-                suppressPermissionPromptUntil = Date().addingTimeInterval(permissionPromptCooldown)
-            }
-        }
-
-        /// Show a standalone NSAlert for accessibility permission.
-        /// Works even when the panel isn't visible (e.g. quick-paste hotkeys).
-        private func showAccessibilityAlert() -> AccessibilityAlertAction {
-            let alert = NSAlert()
-            alert.messageText = Self.accessibilityAlertTitle
-            alert.informativeText = Self.accessibilityAlertMessage
-            alert.addButton(withTitle: Self.accessibilityOpenButtonTitle)
-            alert.addButton(withTitle: Self.accessibilityRetryButtonTitle)
-            alert.addButton(withTitle: Self.accessibilityManualButtonTitle)
-            alert.alertStyle = .warning
-
-            switch alert.runModal() {
-            case .alertFirstButtonReturn:
-                return .openAccess
-            case .alertSecondButtonReturn:
-                return .retry
-            default:
-                return .manual
-            }
-        }
+    }
     #endif
 
     func delete(item: ClipboardItem) {
         // Clean up thumbnail file if this is an image item
         if case .image = item.content {
-            deleteThumbnail(id: item.id)
+            deleteImageAssets(id: item.id)
         }
 
         history.removeAll { $0.id == item.id }
@@ -1173,47 +1251,47 @@ class ClipboardManager {
         savePasteStack()
 
         #if ENABLE_SYNC
-            SyncCoordinator.shared.queueDeleteForSync(itemID: item.id)
+        SyncCoordinator.shared.queueDeleteForSync(itemID: item.id)
         #endif
     }
 
     // MARK: - Sync Support
 
     #if ENABLE_SYNC
-        /// Insert an item received from iCloud sync (no re-sync trigger)
-        func insertSyncedItem(_ item: ClipboardItem) {
-            // Don't add duplicates
-            guard !history.contains(where: { $0.id == item.id }) else { return }
-            history.insert(item, at: 0)
+    /// Insert an item received from iCloud sync (no re-sync trigger)
+    func insertSyncedItem(_ item: ClipboardItem) {
+        // Don't add duplicates
+        guard !history.contains(where: { $0.id == item.id }) else { return }
+        history.insert(item, at: 0)
 
-            // Trim to max size, cleaning up thumbnails for removed items
-            let syncLimit = effectiveHistoryLimit() ?? (maxHistorySize > 0 ? maxHistorySize : nil)
-            if let syncLimit, history.count > syncLimit {
-                let removed = history.suffix(from: syncLimit)
-                for removedItem in removed {
-                    if case .image = removedItem.content {
-                        deleteThumbnail(id: removedItem.id)
-                    }
+        // Trim to max size, cleaning up thumbnails for removed items
+        let syncLimit = effectiveHistoryLimit() ?? (maxHistorySize > 0 ? maxHistorySize : nil)
+        if let syncLimit, history.count > syncLimit {
+            let removed = history.suffix(from: syncLimit)
+            for removedItem in removed {
+                if case .image = removedItem.content {
+                    deleteImageAssets(id: removedItem.id)
                 }
-                history = Array(history.prefix(syncLimit))
             }
-
-            saveHistory()
-            logger.debug("Inserted synced item: \(item.id)")
+            history = Array(history.prefix(syncLimit))
         }
 
-        /// Delete an item received from iCloud sync (no re-sync trigger)
-        func deleteSyncedItem(_ itemID: UUID) {
-            // Clean up thumbnail if it's an image item
-            if let item = history.first(where: { $0.id == itemID }),
-               case .image = item.content {
-                deleteThumbnail(id: itemID)
-            }
-            history.removeAll { $0.id == itemID }
-            pinnedItems.removeAll { $0.id == itemID }
-            saveHistory()
-            logger.debug("Deleted synced item: \(itemID)")
+        saveHistory()
+        logger.debug("Inserted synced item: \(item.id)")
+    }
+
+    /// Delete an item received from iCloud sync (no re-sync trigger)
+    func deleteSyncedItem(_ itemID: UUID) {
+        // Clean up thumbnail if it's an image item
+        if let item = history.first(where: { $0.id == itemID }),
+           case .image = item.content {
+            deleteImageAssets(id: itemID)
         }
+        history.removeAll { $0.id == itemID }
+        pinnedItems.removeAll { $0.id == itemID }
+        saveHistory()
+        logger.debug("Deleted synced item: \(itemID)")
+    }
     #endif
 
     func smartClearPlan(matching ids: Set<UUID>? = nil) -> HistoryClearPlan {
@@ -1255,7 +1333,7 @@ class ClipboardManager {
 
         for item in history where removedIDs.contains(item.id) {
             if case .image = item.content {
-                deleteThumbnail(id: item.id)
+                deleteImageAssets(id: item.id)
             }
         }
 
@@ -1275,7 +1353,7 @@ class ClipboardManager {
         for item in pinnedItems + history where ids.contains(item.id) {
             guard seen.insert(item.id).inserted else { continue }
             if case .image = item.content {
-                deleteThumbnail(id: item.id)
+                deleteImageAssets(id: item.id)
             }
         }
 
@@ -1306,7 +1384,7 @@ class ClipboardManager {
     }
 
     /// Copy item to clipboard without triggering paste (Cmd+V)
-    func copyWithoutPaste(item: ClipboardItem) {
+    func copyWithoutPaste(item: ClipboardItem, notifyUser: Bool = false) {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
 
@@ -1321,8 +1399,64 @@ class ClipboardManager {
         selfWriteChangeCount = pasteboard.changeCount
 
         SettingsModel.shared.pasteSound.play()
+        #if APP_STORE
+        if notifyUser {
+            showCopiedNotification()
+        }
+        #endif
 
         logger.debug("Copied item to clipboard (no paste)")
+    }
+
+    func copyOCRTextWithoutPaste(item: ClipboardItem, notifyUser: Bool = false) {
+        guard let ocrText = item.ocrText?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !ocrText.isEmpty else { return }
+
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(ocrText, forType: .string)
+        selfWriteChangeCount = pasteboard.changeCount
+
+        SettingsModel.shared.pasteSound.play()
+        #if APP_STORE
+        if notifyUser {
+            showCopiedNotification()
+        }
+        #endif
+
+        logger.debug("Copied OCR text to clipboard (no paste)")
+    }
+
+    func exportImageAsPNG(item: ClipboardItem) {
+        guard case let .image(image) = item.content,
+              let data = pngData(for: image) else { return }
+
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.png]
+        panel.canCreateDirectories = true
+        panel.nameFieldStringValue = Self.exportFilename(
+            from: item.displayTitle,
+            fallback: "SaneClip Capture",
+            fileExtension: "png"
+        )
+
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+
+        do {
+            try data.write(to: url, options: .atomic)
+        } catch {
+            logger.error("Failed to export image: \(error.localizedDescription)")
+        }
+    }
+
+    nonisolated static func exportFilename(from title: String, fallback: String, fileExtension: String) -> String {
+        let cleanName = title == "[Image]" ? fallback : title
+        let sanitized = String(
+            cleanName.prefix(64)
+                .replacingOccurrences(of: "[^a-zA-Z0-9 _\\-]", with: "", options: .regularExpression)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+        return "\(sanitized.isEmpty ? fallback : sanitized).\(fileExtension)"
     }
 
     /// Update an item's text content (for edit functionality)
@@ -1341,7 +1475,8 @@ class ClipboardManager {
                 title: existing.title,
                 tags: existing.tags,
                 collection: existing.collection,
-                note: existing.note
+                note: existing.note,
+                ocrText: existing.ocrText
             )
             history[index] = updatedItem
 
@@ -1633,6 +1768,41 @@ class ClipboardManager {
         return dir
     }
 
+    private var imageDataDirectory: URL {
+        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let dir = appSupport
+            .appendingPathComponent("SaneClip", isDirectory: true)
+            .appendingPathComponent("images", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir
+    }
+
+    private func pngData(for image: NSImage) -> Data? {
+        guard let tiffData = image.tiffRepresentation,
+              let bitmap = NSBitmapImageRep(data: tiffData)
+        else {
+            return nil
+        }
+        return bitmap.representation(using: .png, properties: [:])
+    }
+
+    private func saveOriginalImageData(image: NSImage, id: UUID) -> String? {
+        guard let pngData = pngData(for: image) else {
+            logger.warning("Failed to create PNG data for item \(id)")
+            return nil
+        }
+
+        let filename = "\(id.uuidString).png"
+        let fileURL = imageDataDirectory.appendingPathComponent(filename)
+        do {
+            try pngData.write(to: fileURL, options: .atomic)
+            return filename
+        } catch {
+            logger.warning("Failed to write image data: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
     /// Save a downsized thumbnail for an image item, returns the filename
     private func saveThumbnail(image: NSImage, id: UUID) -> String? {
         let maxDimension: CGFloat = 200
@@ -1681,9 +1851,24 @@ class ClipboardManager {
         try? FileManager.default.removeItem(at: fileURL)
     }
 
+    private func deleteOriginalImageData(id: UUID) {
+        let fileURL = imageDataDirectory.appendingPathComponent("\(id.uuidString).png")
+        try? FileManager.default.removeItem(at: fileURL)
+    }
+
+    private func deleteImageAssets(id: UUID) {
+        deleteThumbnail(id: id)
+        deleteOriginalImageData(id: id)
+    }
+
     /// Load a thumbnail image from disk
     private func loadThumbnail(filename: String) -> NSImage? {
         let fileURL = thumbnailsDirectory.appendingPathComponent(filename)
+        return NSImage(contentsOf: fileURL)
+    }
+
+    private func loadOriginalImageData(filename: String) -> NSImage? {
+        let fileURL = imageDataDirectory.appendingPathComponent(filename)
         return NSImage(contentsOf: fileURL)
     }
 
@@ -1705,11 +1890,13 @@ class ClipboardManager {
                     title: item.title,
                     tags: item.tags,
                     collection: item.collection,
-                    note: item.note
+                    note: item.note,
+                    ocrText: item.ocrText
                 )
             case let .image(image):
-                // Save thumbnail to disk; skip if save fails
-                guard let filename = saveThumbnail(image: image, id: item.id) else { return nil }
+                let thumbnailFilename = saveThumbnail(image: image, id: item.id)
+                let originalFilename = saveOriginalImageData(image: image, id: item.id)
+                guard thumbnailFilename != nil || originalFilename != nil else { return nil }
                 return SavedClipboardItem(
                     id: item.id,
                     text: "[Image]",
@@ -1721,7 +1908,9 @@ class ClipboardManager {
                     tags: item.tags,
                     collection: item.collection,
                     note: item.note,
-                    imageThumbnailFilename: filename
+                    imageThumbnailFilename: thumbnailFilename,
+                    imageDataFilename: originalFilename,
+                    ocrText: item.ocrText
                 )
             }
         }
@@ -1826,6 +2015,23 @@ class ClipboardManager {
                 let note = saved.note?.isEmpty == true ? nil : saved.note
 
                 // Image item: load thumbnail from disk
+                if let originalFilename = saved.imageDataFilename,
+                   let image = loadOriginalImageData(filename: originalFilename) {
+                    return ClipboardItem(
+                        id: saved.id,
+                        content: .image(image),
+                        timestamp: saved.timestamp,
+                        sourceAppBundleID: saved.sourceAppBundleID,
+                        sourceAppName: saved.sourceAppName,
+                        pasteCount: saved.pasteCount,
+                        title: saved.title,
+                        tags: saved.tags,
+                        collection: saved.collection,
+                        note: note,
+                        ocrText: saved.ocrText
+                    )
+                }
+
                 if let thumbnailFilename = saved.imageThumbnailFilename,
                    let image = loadThumbnail(filename: thumbnailFilename) {
                     return ClipboardItem(
@@ -1838,13 +2044,14 @@ class ClipboardManager {
                         title: saved.title,
                         tags: saved.tags,
                         collection: saved.collection,
-                        note: note
+                        note: note,
+                        ocrText: saved.ocrText
                     )
                 }
 
                 // Skip image items whose thumbnail is missing (file deleted externally)
-                if saved.imageThumbnailFilename != nil {
-                    logger.warning("Thumbnail missing for item \(saved.id), skipping")
+                if saved.imageThumbnailFilename != nil || saved.imageDataFilename != nil {
+                    logger.warning("Image assets missing for item \(saved.id), skipping")
                     return nil
                 }
 
@@ -1859,7 +2066,8 @@ class ClipboardManager {
                     title: saved.title,
                     tags: saved.tags,
                     collection: saved.collection,
-                    note: note
+                    note: note,
+                    ocrText: saved.ocrText
                 )
             }
 
@@ -1891,7 +2099,7 @@ class ClipboardManager {
         let removed = history.suffix(from: effectiveMax)
         for item in removed {
             if case .image = item.content {
-                deleteThumbnail(id: item.id)
+                deleteImageAssets(id: item.id)
             }
         }
 
@@ -2046,4 +2254,5 @@ class ClipboardManager {
         logger.info("Exported clipboard item as PDF to \(url.path)")
     }
 }
+
 // swiftlint:enable file_length

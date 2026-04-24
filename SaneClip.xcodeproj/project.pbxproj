@@ -39,6 +39,7 @@
 		3EF2F8F390E9B433A6DA76B7 /* ProFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8607149CD7305298C711068F /* ProFeature.swift */; };
 		40193D9A8C368063B2311EFD /* SaneClipSettingsCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C603FFD30732501E2A3640 /* SaneClipSettingsCopy.swift */; };
 		414A920720EECE33D2310A7C /* DMGIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = AD5C75ADF36A7D05AEEFAE0C /* DMGIcon.icns */; };
+		42A602CD49FBE9B4949BE70E /* CaptureWorkflow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856D3787AB5746CA53E00516 /* CaptureWorkflow.swift */; };
 		46005E0A8C560CCBD262C301 /* SyncDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D786C9674AE3DE8113632A /* SyncDataModel.swift */; };
 		4B2B8214AB250D15350054F9 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592FBED989BC40A70F0B5060 /* KeychainHelper.swift */; };
 		4BBBBA9D613C81A9CBEF0B0A /* GetRecentClipsIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF6FECCD60F5BFD8E7FD9484 /* GetRecentClipsIntent.swift */; };
@@ -48,14 +49,17 @@
 		57B416379732AE920E6501C7 /* ProFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8607149CD7305298C711068F /* ProFeature.swift */; };
 		583CB11FD27C1CEE8C164715 /* SyncConflictResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098AA40BC8DC5C2501EECC1C /* SyncConflictResolver.swift */; };
 		5C783E3733DC788E035E5F27 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1808F717600EB63D59B347DB /* SyncCoordinator.swift */; };
+		5CDCB79E9D4672C86165AF05 /* SaneClipAppDelegate+Services.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550322A15EB237CAE1FE0641 /* SaneClipAppDelegate+Services.swift */; };
 		5DC8E283BF2B6BE71C2BEDED /* AutoPurgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B181DC2ABBFC0F6C29A7CB9 /* AutoPurgeService.swift */; };
 		5ED4D24BD177013CA44D2963 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74750429D17786620EF008E /* main.swift */; };
 		600907227B6AB59919B7487E /* SaneUI in Frameworks */ = {isa = PBXBuildFile; productRef = 73D5F153A41A50F1EADAF7B5 /* SaneUI */; };
 		60E0917C7EE6C533E0E339D6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E0713E5848E1A9394B7528D /* SettingsView.swift */; };
 		688027DE4259A7F8C38DA1C4 /* CopyClipIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FCC4B9D9BD539DC99A6AD4D /* CopyClipIntent.swift */; };
 		6B47CA6E1CF35E4F6F645980 /* SecurityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1775AC6444F4E26AD66FA435 /* SecurityTests.swift */; };
+		6D37CB542C4DB58534DF6C7F /* UpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED712A386E53DB95657DAB2 /* UpdateService.swift */; };
 		74554CCC6E39DFED46437C7C /* BrandColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5449565520B6E5CF68C78D6B /* BrandColors.swift */; };
 		7A565742375608A744388912 /* SaneClipIOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ECEE64E98BCC2FC7D58874A /* SaneClipIOSApp.swift */; };
+		7BCF128097B10B189E733BE3 /* ScreenCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66E8B4132ED5E6E908FCC1F /* ScreenCaptureService.swift */; };
 		7C2DB9FDEE7F3D537CF02CA1 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 0668E59A15F0F31C5BE746B0 /* KeyboardShortcuts */; };
 		7DE4EF5779326DC1A1C6EE43 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1808F717600EB63D59B347DB /* SyncCoordinator.swift */; };
 		7E6E29E295A478AD08C4DB0E /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73D02F6E4DBB9312E67A0AD /* ClipboardManager.swift */; };
@@ -68,7 +72,9 @@
 		8941A3DAF4AF4FC8A5F19C3F /* BrandColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5449565520B6E5CF68C78D6B /* BrandColors.swift */; };
 		8B41EC7476C54EDF1695272D /* Setapp in Frameworks */ = {isa = PBXBuildFile; productRef = 5E88037D71BF21DCA450C871 /* Setapp */; };
 		8B91331218ABFBC1D64F05B7 /* SavedClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576DAA4FC86516A7F31F8B5F /* SavedClipboardItem.swift */; };
+		8BA0C72A571CC8FA56D934DC /* ImageCapturePreviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A259C64B747B2C66114C12 /* ImageCapturePreviewSheet.swift */; };
 		8D5889EE4B31459E191B26C8 /* URLSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32272353D437FBA78581647 /* URLSchemeHandler.swift */; };
+		8E8726EFD712EF53789A2CB3 /* CaptureOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9613B8818EB56DB927C1A423 /* CaptureOCRService.swift */; };
 		8F31DE283B9863618AE187AD /* ClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E255CCFA37A4633D75D64EF2 /* ClipboardItem.swift */; };
 		8F673D52C1F3E0E5C9C6D682 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E0713E5848E1A9394B7528D /* SettingsView.swift */; };
 		910D65D5D36CDB48306D2946 /* ClipboardRulesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B94CC9C6F7E02316FEE7E6C4 /* ClipboardRulesManager.swift */; };
@@ -86,14 +92,19 @@
 		A7C25C4197EB4F9E316E7BE7 /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
 		A7C368341E57283E181494D1 /* SaneClipWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 09C2D5E2943BC51ED6D88512 /* SaneClipWidgets.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A813505E28B4DBCCCB87031A /* SaneUI in Frameworks */ = {isa = PBXBuildFile; productRef = 2AE9B42AED97B159C47F60C9 /* SaneUI */; };
+		A91D2080BB36C7B7EB9FF5F0 /* CaptureWorkflow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856D3787AB5746CA53E00516 /* CaptureWorkflow.swift */; };
 		A96EEBFA6859C02D03B17678 /* ClipboardItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352F7E56F26119F6981AEFB2 /* ClipboardItemRow.swift */; };
 		AC08AFB9FA7B23BD5E397E74 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592FBED989BC40A70F0B5060 /* KeychainHelper.swift */; };
+		AD5435192E9F19337B39DF95 /* SaneClipAppDelegate+Services.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550322A15EB237CAE1FE0641 /* SaneClipAppDelegate+Services.swift */; };
+		AF2CDF1ECA917FA212A56B84 /* CaptureOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9613B8818EB56DB927C1A423 /* CaptureOCRService.swift */; };
 		AF3AE027744E2CB0565E719B /* DiagnosticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29612677A8240D0E5F68DAAF /* DiagnosticsService.swift */; };
 		B0B8D913624A4E8023971397 /* BrandColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5449565520B6E5CF68C78D6B /* BrandColors.swift */; };
 		B2476ABD47BB178A8C73E879 /* SaneClipShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D77AB048F107D7E2F8AB415 /* SaneClipShortcuts.swift */; };
 		B3761DF4123417A5EA8C0DF3 /* SaneClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FFF4DCFB95C5B26D00A640F /* SaneClipApp.swift */; };
 		B57A1F4413F20309605CEE35 /* SyncSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08983A3D7903ACF79993349 /* SyncSettingsView.swift */; };
 		BBF45E3383FFD8719385069B /* SyncConflictResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098AA40BC8DC5C2501EECC1C /* SyncConflictResolver.swift */; };
+		BD6B9217C4FE19690D7BC54F /* ImageCapturePreviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A259C64B747B2C66114C12 /* ImageCapturePreviewSheet.swift */; };
+		BEB34F0FC058041AFB501983 /* ScreenCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66E8B4132ED5E6E908FCC1F /* ScreenCaptureService.swift */; };
 		C122DD15A6F4D4806FA7D39F /* SyncDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D786C9674AE3DE8113632A /* SyncDataModel.swift */; };
 		C78345E2DAD8B460E1C99FC2 /* SyncDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D786C9674AE3DE8113632A /* SyncDataModel.swift */; };
 		C856E4EE52C74475EE8D8CB3 /* SaneClipWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817694FD0F55D259B3F10FDA /* SaneClipWidgets.swift */; };
@@ -108,6 +119,7 @@
 		D43CFBAE93357055AB6E3423 /* SaneClipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B639CB4375AE4479924B74 /* SaneClipTests.swift */; };
 		D9E962C435414799E3C255BD /* ClipboardRulesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B94CC9C6F7E02316FEE7E6C4 /* ClipboardRulesManager.swift */; };
 		DA1E360C2BD5254C912633BE /* ClipboardHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581B9D70FB3BBB83D6583386 /* ClipboardHistoryView.swift */; };
+		DA98CD312096F687F34858F3 /* SaneClipAppDelegate+Capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C007C3335F2CE246EB8D640 /* SaneClipAppDelegate+Capture.swift */; };
 		DAB08CE697B1C069882BF53B /* SnippetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FBE5E8C8A623FA0C27ECBE /* SnippetManager.swift */; };
 		DCCB437A7D9404CB8330057C /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E776995068A491A32269B2E /* OnboardingView.swift */; };
 		DD0A52895A6DC74A92D88CE0 /* SaneClipIOSWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2BF58DEC0153C26EA351A8 /* SaneClipIOSWidgets.swift */; };
@@ -117,6 +129,7 @@
 		E1F118A7B4867A2E6F26A819 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1808F717600EB63D59B347DB /* SyncCoordinator.swift */; };
 		E429379D80B77779F626ACAE /* Snippet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25007B56789ED465BA3544BA /* Snippet.swift */; };
 		E4BBDD04577B7398507E9597 /* ClipboardItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35354A7D3201B61455110B3F /* ClipboardItemCell.swift */; };
+		E812BF831FF6958B56458D9E /* SaneClipAppDelegate+Capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C007C3335F2CE246EB8D640 /* SaneClipAppDelegate+Capture.swift */; };
 		E8CED0030E5FEF296EEAB302 /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73D02F6E4DBB9312E67A0AD /* ClipboardManager.swift */; };
 		EB24D0BF4955DA6A272A6781 /* SensitiveDataDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6448822D405CC78AFFF787 /* SensitiveDataDetector.swift */; };
 		EE952008E84456B696D4ABF8 /* SetappIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64578021E526032605A2A68D /* SetappIntegration.swift */; };
@@ -127,6 +140,7 @@
 		F6C0F161CBEAFA2C67714A57 /* DiagnosticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29612677A8240D0E5F68DAAF /* DiagnosticsService.swift */; };
 		F903EA3E74F83ADB70AC45F1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF3C7603DE7E07A2AC7D3C74 /* Assets.xcassets */; };
 		FB023FB9283A573C5E3BD4CB /* ClipboardItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352F7E56F26119F6981AEFB2 /* ClipboardItemRow.swift */; };
+		FD7351718B82AD9E811A7457 /* UpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED712A386E53DB95657DAB2 /* UpdateService.swift */; };
 		FDD144B1AFB419C804989B70 /* SyncSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08983A3D7903ACF79993349 /* SyncSettingsView.swift */; };
 /* End PBXBuildFile section */
 
@@ -221,6 +235,7 @@
 		19827830127FF21617618069 /* RecentClipsIOSWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentClipsIOSWidget.swift; sourceTree = "<group>"; };
 		2330CDCBAA8760CAF780861E /* SaneClipShareDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipShareDebug.entitlements; sourceTree = "<group>"; };
 		25007B56789ED465BA3544BA /* Snippet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snippet.swift; sourceTree = "<group>"; };
+		26A259C64B747B2C66114C12 /* ImageCapturePreviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCapturePreviewSheet.swift; sourceTree = "<group>"; };
 		29612677A8240D0E5F68DAAF /* DiagnosticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsService.swift; sourceTree = "<group>"; };
 		2FA17931D596332935591539 /* SaneClipIOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipIOS.entitlements; sourceTree = "<group>"; };
 		305BB1EB756CA0FC1DAAFFAD /* SaneClipIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipIntents.swift; sourceTree = "<group>"; };
@@ -231,6 +246,7 @@
 		4BCD829890D1F0F66702EC52 /* SaneClipIOSWidgetsDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipIOSWidgetsDebug.entitlements; sourceTree = "<group>"; };
 		4D77AB048F107D7E2F8AB415 /* SaneClipShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipShortcuts.swift; sourceTree = "<group>"; };
 		5449565520B6E5CF68C78D6B /* BrandColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandColors.swift; sourceTree = "<group>"; };
+		550322A15EB237CAE1FE0641 /* SaneClipAppDelegate+Services.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SaneClipAppDelegate+Services.swift"; sourceTree = "<group>"; };
 		576DAA4FC86516A7F31F8B5F /* SavedClipboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedClipboardItem.swift; sourceTree = "<group>"; };
 		581B9D70FB3BBB83D6583386 /* ClipboardHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryView.swift; sourceTree = "<group>"; };
 		592FBED989BC40A70F0B5060 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
@@ -247,17 +263,20 @@
 		7B181DC2ABBFC0F6C29A7CB9 /* AutoPurgeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoPurgeService.swift; sourceTree = "<group>"; };
 		7B6E13A4E249D85E296D3A5C /* SaneClipIOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SaneClipIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BEA795AFED8797FFAE0DD3E /* TextTransformService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTransformService.swift; sourceTree = "<group>"; };
+		7C007C3335F2CE246EB8D640 /* SaneClipAppDelegate+Capture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SaneClipAppDelegate+Capture.swift"; sourceTree = "<group>"; };
 		7C13160E8B6EC2A2DB6B0BB5 /* SaneClipTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SaneClipTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C6448822D405CC78AFFF787 /* SensitiveDataDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensitiveDataDetector.swift; sourceTree = "<group>"; };
 		7D5C28D690980C222E8B0E03 /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		817694FD0F55D259B3F10FDA /* SaneClipWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipWidgets.swift; sourceTree = "<group>"; };
 		82FA89438430FB80B145A7C5 /* HistoryEncryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEncryption.swift; sourceTree = "<group>"; };
+		856D3787AB5746CA53E00516 /* CaptureWorkflow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureWorkflow.swift; sourceTree = "<group>"; };
 		8607149CD7305298C711068F /* ProFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProFeature.swift; sourceTree = "<group>"; };
 		8D2D1E638F1E9A0D4C8C9E45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8FCC4B9D9BD539DC99A6AD4D /* CopyClipIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyClipIntent.swift; sourceTree = "<group>"; };
 		8FFF4DCFB95C5B26D00A640F /* SaneClipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipApp.swift; sourceTree = "<group>"; };
 		9371FC1CADBC7CB49A105A80 /* SnippetsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetsSettingsView.swift; sourceTree = "<group>"; };
 		9381D3ACF3CE661318DF305D /* WebhookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookService.swift; sourceTree = "<group>"; };
+		9613B8818EB56DB927C1A423 /* CaptureOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureOCRService.swift; sourceTree = "<group>"; };
 		96D8AACBEE2BC4471F934DC2 /* SaneClipIOSDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipIOSDebug.entitlements; sourceTree = "<group>"; };
 		9DBD4FED60D446DFDA669D6A /* DirectDistributionSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectDistributionSupport.swift; sourceTree = "<group>"; };
 		9E776995068A491A32269B2E /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -267,6 +286,7 @@
 		A942FCE8A60E673C341FFB02 /* SettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTab.swift; sourceTree = "<group>"; };
 		AA6709551974949109A6A239 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		AD5C75ADF36A7D05AEEFAE0C /* DMGIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = DMGIcon.icns; sourceTree = "<group>"; };
+		AED712A386E53DB95657DAB2 /* UpdateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateService.swift; sourceTree = "<group>"; };
 		B08983A3D7903ACF79993349 /* SyncSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSettingsView.swift; sourceTree = "<group>"; };
 		B6FBE5E8C8A623FA0C27ECBE /* SnippetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetManager.swift; sourceTree = "<group>"; };
 		B74750429D17786620EF008E /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
@@ -279,6 +299,7 @@
 		D10F261894209685FFC6BF8E /* ClipboardHistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryViewModel.swift; sourceTree = "<group>"; };
 		D3D14834E50FCC1F8B8C59CD /* SaneClipWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipWidgets.entitlements; sourceTree = "<group>"; };
 		D3D786C9674AE3DE8113632A /* SyncDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncDataModel.swift; sourceTree = "<group>"; };
+		D66E8B4132ED5E6E908FCC1F /* ScreenCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCaptureService.swift; sourceTree = "<group>"; };
 		D73D02F6E4DBB9312E67A0AD /* ClipboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardManager.swift; sourceTree = "<group>"; };
 		DD2BF58DEC0153C26EA351A8 /* SaneClipIOSWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipIOSWidgets.swift; sourceTree = "<group>"; };
 		DFBF87F7472E2026DE0E0EF6 /* SaneClipWidgetsDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipWidgetsDebug.entitlements; sourceTree = "<group>"; };
@@ -335,7 +356,9 @@
 			isa = PBXGroup;
 			children = (
 				29612677A8240D0E5F68DAAF /* DiagnosticsService.swift */,
+				550322A15EB237CAE1FE0641 /* SaneClipAppDelegate+Services.swift */,
 				64578021E526032605A2A68D /* SetappIntegration.swift */,
+				AED712A386E53DB95657DAB2 /* UpdateService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -372,6 +395,7 @@
 				7D5C28D690980C222E8B0E03 /* SettingsModel.swift */,
 				B6FBE5E8C8A623FA0C27ECBE /* SnippetManager.swift */,
 				7BEA795AFED8797FFAE0DD3E /* TextTransformService.swift */,
+				58DDD45FD0D646A8B653E879 /* Capture */,
 				8963796CABEF00573B399B2C /* Intents */,
 				01121E53FCA5AD4EBABF86B1 /* Models */,
 				903C3BC12BB2E45AD8A34011 /* Security */,
@@ -427,11 +451,23 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		58DDD45FD0D646A8B653E879 /* Capture */ = {
+			isa = PBXGroup;
+			children = (
+				9613B8818EB56DB927C1A423 /* CaptureOCRService.swift */,
+				856D3787AB5746CA53E00516 /* CaptureWorkflow.swift */,
+				7C007C3335F2CE246EB8D640 /* SaneClipAppDelegate+Capture.swift */,
+				D66E8B4132ED5E6E908FCC1F /* ScreenCaptureService.swift */,
+			);
+			path = Capture;
+			sourceTree = "<group>";
+		};
 		69BCB2544EE5E14D64C7050A /* History */ = {
 			isa = PBXGroup;
 			children = (
 				581B9D70FB3BBB83D6583386 /* ClipboardHistoryView.swift */,
 				352F7E56F26119F6981AEFB2 /* ClipboardItemRow.swift */,
+				26A259C64B747B2C66114C12 /* ImageCapturePreviewSheet.swift */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -922,6 +958,8 @@
 			files = (
 				A712578147519AE5096B2F66 /* AutoPurgeService.swift in Sources */,
 				B0B8D913624A4E8023971397 /* BrandColors.swift in Sources */,
+				8E8726EFD712EF53789A2CB3 /* CaptureOCRService.swift in Sources */,
+				42A602CD49FBE9B4949BE70E /* CaptureWorkflow.swift in Sources */,
 				F0C28F326D9F7A34349533D4 /* ClipboardHistoryView.swift in Sources */,
 				8F31DE283B9863618AE187AD /* ClipboardItem.swift in Sources */,
 				A96EEBFA6859C02D03B17678 /* ClipboardItemRow.swift in Sources */,
@@ -930,12 +968,16 @@
 				AF3AE027744E2CB0565E719B /* DiagnosticsService.swift in Sources */,
 				995784D4DDD6C70020EC143F /* DirectDistributionSupport.swift in Sources */,
 				0FC838A6FB6D18A900B0B5F0 /* HistoryEncryption.swift in Sources */,
+				BD6B9217C4FE19690D7BC54F /* ImageCapturePreviewSheet.swift in Sources */,
 				AC08AFB9FA7B23BD5E397E74 /* KeychainHelper.swift in Sources */,
 				57B416379732AE920E6501C7 /* ProFeature.swift in Sources */,
 				320FEED3394C8C797BDDABBD /* SaneClipApp.swift in Sources */,
+				E812BF831FF6958B56458D9E /* SaneClipAppDelegate+Capture.swift in Sources */,
+				5CDCB79E9D4672C86165AF05 /* SaneClipAppDelegate+Services.swift in Sources */,
 				859F847595C08FF8676DE3CA /* SaneClipIntents.swift in Sources */,
 				16EC6DFFCD225AF8FDFAF128 /* SaneClipSettingsCopy.swift in Sources */,
 				F43EFF7601DB8A53C03847A3 /* SavedClipboardItem.swift in Sources */,
+				7BCF128097B10B189E733BE3 /* ScreenCaptureService.swift in Sources */,
 				EB24D0BF4955DA6A272A6781 /* SensitiveDataDetector.swift in Sources */,
 				EE952008E84456B696D4ABF8 /* SetappIntegration.swift in Sources */,
 				9B7EB9FCE9048313BC41114B /* SettingsModel.swift in Sources */,
@@ -951,6 +993,7 @@
 				B57A1F4413F20309605CEE35 /* SyncSettingsView.swift in Sources */,
 				870D1423D4230D0A40E6DD4D /* TextTransformService.swift in Sources */,
 				30F0D05CB5B2891518E3BCC3 /* URLSchemeHandler.swift in Sources */,
+				6D37CB542C4DB58534DF6C7F /* UpdateService.swift in Sources */,
 				2DFE809A5FAA09F9A393BDF1 /* WebhookService.swift in Sources */,
 				2A7F5EB801B10D6C2030A1C6 /* WidgetClipboardItem.swift in Sources */,
 				8595552721917F1C86C09F2E /* main.swift in Sources */,
@@ -972,6 +1015,8 @@
 			files = (
 				5DC8E283BF2B6BE71C2BEDED /* AutoPurgeService.swift in Sources */,
 				74554CCC6E39DFED46437C7C /* BrandColors.swift in Sources */,
+				AF2CDF1ECA917FA212A56B84 /* CaptureOCRService.swift in Sources */,
+				A91D2080BB36C7B7EB9FF5F0 /* CaptureWorkflow.swift in Sources */,
 				DA1E360C2BD5254C912633BE /* ClipboardHistoryView.swift in Sources */,
 				1F8EB081EA6E82B6C0C73C88 /* ClipboardItem.swift in Sources */,
 				FB023FB9283A573C5E3BD4CB /* ClipboardItemRow.swift in Sources */,
@@ -980,12 +1025,16 @@
 				F6C0F161CBEAFA2C67714A57 /* DiagnosticsService.swift in Sources */,
 				CEE1670CAECAAE56000EBBF1 /* DirectDistributionSupport.swift in Sources */,
 				DFC8A7437D713D82B5224D1E /* HistoryEncryption.swift in Sources */,
+				8BA0C72A571CC8FA56D934DC /* ImageCapturePreviewSheet.swift in Sources */,
 				281630B49BCFA5B27C0C93B4 /* KeychainHelper.swift in Sources */,
 				3EF2F8F390E9B433A6DA76B7 /* ProFeature.swift in Sources */,
 				B3761DF4123417A5EA8C0DF3 /* SaneClipApp.swift in Sources */,
+				DA98CD312096F687F34858F3 /* SaneClipAppDelegate+Capture.swift in Sources */,
+				AD5435192E9F19337B39DF95 /* SaneClipAppDelegate+Services.swift in Sources */,
 				95711D419E5C0F66ED022198 /* SaneClipIntents.swift in Sources */,
 				40193D9A8C368063B2311EFD /* SaneClipSettingsCopy.swift in Sources */,
 				8B91331218ABFBC1D64F05B7 /* SavedClipboardItem.swift in Sources */,
+				BEB34F0FC058041AFB501983 /* ScreenCaptureService.swift in Sources */,
 				D0121F4D70D88480A053611D /* SensitiveDataDetector.swift in Sources */,
 				A19EE790490B7CC63CBBD941 /* SetappIntegration.swift in Sources */,
 				33E5382D17E0E77A658BF322 /* SettingsModel.swift in Sources */,
@@ -1001,6 +1050,7 @@
 				FDD144B1AFB419C804989B70 /* SyncSettingsView.swift in Sources */,
 				07EBD6613F07245138A3332A /* TextTransformService.swift in Sources */,
 				8D5889EE4B31459E191B26C8 /* URLSchemeHandler.swift in Sources */,
+				FD7351718B82AD9E811A7457 /* UpdateService.swift in Sources */,
 				88429CF77152B054F581B567 /* WebhookService.swift in Sources */,
 				206167C3D8A88F249AAB0FE2 /* WidgetClipboardItem.swift in Sources */,
 				5ED4D24BD177013CA44D2963 /* main.swift in Sources */,
@@ -1057,7 +1107,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1067,7 +1117,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -1084,11 +1134,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp.widgets";
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;
@@ -1103,12 +1153,12 @@
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShareDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1124,12 +1174,12 @@
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShare.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip iOS Share App Store";
@@ -1209,11 +1259,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;
@@ -1228,7 +1278,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1236,7 +1286,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -1249,11 +1299,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1357,7 +1407,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1365,7 +1415,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -1384,7 +1434,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1394,7 +1444,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC -D SETAPP";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp";
 				PRODUCT_NAME = SaneClip;
@@ -1410,12 +1460,12 @@
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShare.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1450,7 +1500,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1459,7 +1509,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip iOS Widgets App Store";
@@ -1474,11 +1524,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1564,11 +1614,11 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip Widgets Developer ID";
@@ -1582,11 +1632,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1684,11 +1734,11 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp.widgets";
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;
@@ -1704,7 +1754,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOSDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -1713,7 +1763,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -1730,7 +1780,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1740,7 +1790,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -1760,7 +1810,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1770,7 +1820,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC -D SETAPP";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp";
 				PRODUCT_NAME = SaneClip;
@@ -1790,7 +1840,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1800,7 +1850,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -1821,7 +1871,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1831,7 +1881,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
@@ -1851,7 +1901,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1862,7 +1912,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_SWIFT_FLAGS = "-D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -1883,7 +1933,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1893,7 +1943,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -1909,7 +1959,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1918,7 +1968,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -1957,7 +2007,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1967,7 +2017,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -1982,7 +2032,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1990,7 +2040,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2010,7 +2060,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -2020,7 +2070,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
@@ -2037,7 +2087,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -2047,7 +2097,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_SWIFT_FLAGS = "-D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2066,7 +2116,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -2076,7 +2126,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2093,7 +2143,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -2102,7 +2152,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -2201,7 +2251,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2209,7 +2259,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2248,7 +2298,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -2258,7 +2308,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2274,7 +2324,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -2282,7 +2332,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -2295,7 +2345,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2303,7 +2353,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2320,11 +2370,11 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip Widgets Mac App Store";
@@ -2402,7 +2452,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgetsDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -2411,7 +2461,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2428,11 +2478,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2215;
+				CURRENT_PROJECT_VERSION = 2300;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.2.15;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;

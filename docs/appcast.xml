@@ -6,7 +6,30 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                <item>
+                                        <item>
+            <title>2.3.0</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Fri, 24 Apr 2026 14:47:45 -0400</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Redesigned setup with clearer Basic and Pro guidance.</li>
+                <li>Makes Accessibility and Screen Recording setup easier for capture workflows.</li>
+                <li>Resumes setup on the permissions step after restart instead of starting over.</li>
+                <li>Makes capture permission recovery easier if you skipped access the first time.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.0.zip"
+                       sparkle:version="2300"
+                       sparkle:shortVersionString="2.3.0"
+                       length="3713509"
+                       type="application/octet-stream"
+                       sparkle:edSignature="1/bnI6kBm+IiUJ08i5psXeffYoSSccgEsaBKJXXvx+x475gBo3QdtPUimVOI/1Id4QJsXawnSdSbrWPxK9SuCw=="/>
+        </item>
+<item>
             <title>2.2.15</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Mon, 20 Apr 2026 17:39:42 -0400</pubDate>

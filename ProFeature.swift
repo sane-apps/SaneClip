@@ -7,6 +7,7 @@ enum ProFeature: String, ProFeatureDescribing, CaseIterable {
     case plainTextPaste = "Paste as Plain Text"
     case smartPaste = "Smart Paste"
     case textTransforms = "Text Transforms"
+    case ocrCapture = "OCR Capture"
     case pasteStack = "Paste Stack"
     case snippets = "Snippets"
     case organization = "Organize Items"
@@ -29,6 +30,8 @@ enum ProFeature: String, ProFeatureDescribing, CaseIterable {
             "Auto-detects code and URLs. Code pastes as plain text; URLs are cleaned of tracking parameters."
         case .textTransforms:
             "Paste with one-tap transforms: UPPERCASE, lowercase, Title Case, camelCase, and more."
+        case .ocrCapture:
+            "Capture text from windows and screenshots, and save OCR sidecar text for searchable image history."
         case .pasteStack:
             "Queue multiple items for sequential pasting — perfect for filling forms or structured workflows."
         case .snippets:
@@ -58,6 +61,8 @@ enum ProFeature: String, ProFeatureDescribing, CaseIterable {
             "wand.and.stars"
         case .textTransforms:
             "textformat.abc"
+        case .ocrCapture:
+            "text.viewfinder"
         case .pasteStack:
             "square.stack.3d.up"
         case .snippets:

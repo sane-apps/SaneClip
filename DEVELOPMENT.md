@@ -420,7 +420,7 @@ Use SaneMaster for macOS builds/tests. Xcode Tools MCP handles build/test/previe
 ./scripts/SaneMaster.rb release
 
 # 2. Upload DMG to Cloudflare R2 (the only hosted DMG)
-npx wrangler r2 object put sanebar-downloads/SaneClip-X.Y.Z.dmg \
+npx wrangler r2 object put saneclip-downloads/SaneClip-X.Y.Z.dmg \
   --file=releases/SaneClip-X.Y.Z.dmg --content-type="application/octet-stream" --remote
 
 # 3. Update appcast.xml (Sparkle)
@@ -429,3 +429,4 @@ npx wrangler r2 object put sanebar-downloads/SaneClip-X.Y.Z.dmg \
 
 **Remember:** Release uses `com.saneclip.app` bundle ID. Debug uses `com.saneclip.dev`.
 **Note:** We do NOT host DMGs on GitHub Releases. Cloudflare R2 + `dist.saneclip.com` is the source of truth.
+Direct download + Sparkle is the canonical Mac release channel. Homebrew is optional only when the cask is intentionally published and the Basic/Pro gate is verified; do not describe Homebrew as the default channel in app docs.

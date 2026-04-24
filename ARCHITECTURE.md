@@ -143,6 +143,7 @@ stateDiagram-v2
   - DMGs uploaded to Cloudflare R2 (not committed to GitHub)
   - Sparkle feed configured in `SaneClip/Info.plist`
   - Lemon Squeezy handles direct licensing
+  - Direct download + Sparkle is canonical; Homebrew is optional only when intentionally published and the Basic/Pro gate is verified
 - **App Store channel**:
   - StoreKit + App Store updates
   - no external licensing path in the App Store build

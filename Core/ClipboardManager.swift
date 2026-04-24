@@ -1188,7 +1188,7 @@ class ClipboardManager {
 
     private func isAccessibilityTrusted(promptSystemIfMissing: Bool = false) -> Bool {
         if promptSystemIfMissing {
-            let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
+            let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
             return AXIsProcessTrustedWithOptions(options)
         }
         return AXIsProcessTrusted()

@@ -1,13 +1,33 @@
 import AppKit
+import CoreGraphics
 import Foundation
 import OSLog
 @preconcurrency import ScreenCaptureKit
+
+enum ScreenCapturePermissionService {
+    static func isGranted() -> Bool {
+        CGPreflightScreenCaptureAccess()
+    }
+
+    @discardableResult
+    static func requestAccess() -> Bool {
+        CGRequestScreenCaptureAccess()
+    }
+
+    static func openSettings() {
+        guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture") else {
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+}
 
 enum ScreenCaptureError: LocalizedError {
     case captureAlreadyInProgress
     case cancelled
     case timedOut
     case pickerStartFailed
+    case screenCapturePermissionDenied
     case imageUnavailable
     case invalidImage
     case noRecognizedText
@@ -22,6 +42,8 @@ enum ScreenCaptureError: LocalizedError {
             "The capture picker timed out. Try again."
         case .pickerStartFailed:
             "SaneClip couldn't start the capture picker."
+        case .screenCapturePermissionDenied:
+            "SaneClip needs Screen Recording permission before it can capture text or screenshots."
         case .imageUnavailable:
             "SaneClip couldn't capture the selected content."
         case .invalidImage:
@@ -85,6 +107,10 @@ final class ScreenCaptureService: NSObject, SCContentSharingPickerObserver, @unc
 
     @MainActor
     func captureImage() async throws -> CaptureResult {
+        guard ScreenCapturePermissionService.isGranted() || ScreenCapturePermissionService.requestAccess() else {
+            throw ScreenCaptureError.screenCapturePermissionDenied
+        }
+
         guard continuation == nil else {
             if !isResolvingSelection {
                 picker.present()
@@ -117,7 +143,7 @@ final class ScreenCaptureService: NSObject, SCContentSharingPickerObserver, @unc
 
     nonisolated func contentSharingPickerStartDidFailWithError(_ error: any Error) {
         Task { @MainActor in
-            self.finish(with: .failure(error))
+            self.finish(with: .failure(self.normalizeCaptureError(error)))
         }
     }
 
@@ -199,7 +225,7 @@ final class ScreenCaptureService: NSObject, SCContentSharingPickerObserver, @unc
             } catch {
                 await MainActor.run {
                     self.logger.error("Capture failed: \(error.localizedDescription, privacy: .public)")
-                    self.finish(with: .failure(error))
+                    self.finish(with: .failure(self.normalizeCaptureError(error)))
                 }
             }
         }
@@ -277,5 +303,18 @@ final class ScreenCaptureService: NSObject, SCContentSharingPickerObserver, @unc
         }
 
         return (nil, "Screen Capture")
+    }
+
+    private func normalizeCaptureError(_ error: Error) -> Error {
+        guard !(error is ScreenCaptureError) else { return error }
+        let description = error.localizedDescription.lowercased()
+        if description.contains("declined tcc")
+            || description.contains("screen capture")
+            || description.contains("screen recording")
+            || description.contains("not authorized")
+            || description.contains("not permitted") {
+            return ScreenCaptureError.screenCapturePermissionDenied
+        }
+        return error
     }
 }

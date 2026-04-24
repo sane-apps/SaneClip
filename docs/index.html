@@ -7,10 +7,10 @@
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SaneClip — Secure Clipboard Manager for Mac</title>
-    <meta name="description" content="Free clipboard manager for Mac. Upgrade to Pro for Touch ID history lock, AES-256 encryption, smart paste, snippets, and unlimited history.">
+    <meta name="description" content="Free clipboard manager for Mac. Upgrade to Pro for OCR capture, Touch ID history lock, AES-256 encryption, smart paste, snippets, and unlimited history.">
     <link rel="canonical" href="https://saneclip.com">
     <meta property="og:title" content="SaneClip — Secure Clipboard Manager for Mac">
-    <meta property="og:description" content="Free clipboard manager for Mac. Upgrade to Pro for Touch ID history lock, AES-256 encryption, smart paste, snippets, and unlimited history.">
+    <meta property="og:description" content="Free clipboard manager for Mac. Upgrade to Pro for OCR capture, Touch ID history lock, AES-256 encryption, smart paste, snippets, and unlimited history.">
     <meta property="og:url" content="https://saneclip.com">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="SaneClip">
@@ -19,7 +19,7 @@
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="SaneClip — Secure Clipboard Manager for Mac">
-    <meta name="twitter:description" content="Free clipboard manager for Mac. Upgrade to Pro for Touch ID history lock, AES-256 encryption, smart paste, snippets, and unlimited history.">
+    <meta name="twitter:description" content="Free clipboard manager for Mac. Upgrade to Pro for OCR capture, Touch ID history lock, AES-256 encryption, smart paste, snippets, and unlimited history.">
     <meta name="twitter:image" content="https://saneclip.com/images/og-image.png">
     <meta name="twitter:site" content="@saneapps">
     <meta name="keywords" content="clipboard manager, macos, clipboard history, touch id, paste, copy, mac clipboard, clipboard app, pasteboard, copy paste manager, macos sequoia, best clipboard manager">
@@ -37,7 +37,7 @@
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         "name": "SaneClip",
-        "description": "A secure clipboard manager for macOS. Free core workflow with optional Pro upgrade for Touch ID lock, encryption, and advanced paste tools.",
+        "description": "A secure clipboard manager for macOS. Free core workflow with optional Pro upgrade for OCR capture, Touch ID lock, encryption, and advanced paste tools.",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "macOS 15 Sequoia or later",
         "offers": {
@@ -1526,10 +1526,10 @@
                         <p class="pricing-price-note">Forever — no catch</p>
                         <ul class="pricing-features">
                             <li>Clipboard history (50 items)</li>
+                            <li>Search, source filtering, and pinning</li>
                             <li>Standard paste</li>
-                            <li>Search &amp; source filtering</li>
-                            <li>Optional open-at-cursor launch mode</li>
-                            <li>Free iPhone &amp; iPad companion app</li>
+                            <li>Capture Screenshot into history</li>
+                            <li>Free iPhone &amp; iPad companion app with optional private iCloud sync</li>
                             <li>100% On-Device privacy</li>
                         </ul>
                         <a href="/download" class="pricing-cta pricing-cta-free" data-cta="download_free">
@@ -1547,6 +1547,7 @@
                             <li>Everything in Basic, plus:</li>
                             <li class="extra">Unlimited clipboard history</li>
                             <li class="extra">Touch ID history lock</li>
+                            <li class="extra">OCR capture for text grabs and searchable screenshots</li>
                             <li class="extra">Paste as plain text</li>
                             <li class="extra">Smart paste (URL cleaning, code detection)</li>
                             <li class="extra">Text transforms (UPPER, lower, Title, JSON, strip HTML)</li>
@@ -1652,6 +1653,22 @@
 
                 <!-- === ROW 2: UNIQUE TO SANECLIP (featured glow) === -->
 
+                <!-- OCR Capture -->
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-popover.png', 'OCR Capture — Grab text from screenshots and save searchable sidecars')" class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="14" rx="2"></rect>
+                            <path d="M7 20h10"></path>
+                            <path d="M8 9h3"></path>
+                            <path d="M8 13h5"></path>
+                            <path d="M15 9h2"></path>
+                            <path d="M15 13h2"></path>
+                        </svg>
+                    </div>
+                    <h3>OCR Capture</h3>
+                    <p>Capture text from windows and screenshots, then keep the recognized text attached as a <strong>searchable sidecar</strong> in your clipboard history.</p>
+                </a>
+
                 <!-- Password Manager Safe -->
                 <div class="feature-card">
                     <div class="feature-icon">
@@ -1729,7 +1746,7 @@
                 </div>
 
                 <!-- Search & Unlimited History -->
-                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-popover.png', 'Search &amp; History — Find anything you ever copied')" class="feature-card">
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-popover.png', 'Search &amp; History — Find anything you ever copied or captured')" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="11" cy="11" r="8"></circle>
@@ -1737,7 +1754,7 @@
                         </svg>
                     </div>
                     <h3>Search &amp; Unlimited History</h3>
-                    <p>Stores everything you copy — text and images. <strong>Search instantly</strong> by content, edit items, and see word counts at a glance.</p>
+                    <p>Stores everything you copy — text and images. <strong>Search instantly</strong> by content, OCR sidecars, source app, and pinned status.</p>
                 </a>
 
                 <!-- Keyboard Shortcuts -->
@@ -1753,7 +1770,7 @@
                 </a>
 
                 <!-- Pin Items & Snippets -->
-                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-snippets.png', 'Pin &amp; Snippets — Keep important text always accessible')" class="feature-card">
+                <a href="javascript:void(0)" onclick="openLightbox('images/screenshot-snippets.png', 'Pins &amp; Snippets — Keep important text and reusable workflows always accessible')" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="17" x2="12" y2="22"></line>
@@ -1809,7 +1826,7 @@
         <div class="container">
             <h2 class="section-title">How SaneClip Stacks Up</h2>
             <p class="section-subtitle">I built what I wished existed. Here's how it compares.</p>
-            <p class="section-subtitle" style="margin-top: -10px; font-size: 0.95rem;">Current Pro coverage includes Item Notes, Clipboard Rules, Export/Import, Snippets, Paste Stack, and Unlimited History.</p>
+            <p class="section-subtitle" style="margin-top: -10px; font-size: 0.95rem;">Current Pro coverage includes OCR Capture, Touch ID Lock, History Encryption, Smart Paste, Plain Text Paste, Snippets, Clipboard Rules, Organization tools, Export/Import, Paste Stack, and Unlimited History.</p>
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
                     <thead>
@@ -1829,7 +1846,7 @@
                                 <span class="feature-label">AES-256 Encryption</span>
                                 <span class="feature-desc">History encrypted at rest on disk</span>
                             </td>
-                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td class="highlight-col"><span class="check">&#10003;</span> Pro</td>
                             <td><span class="cross">&#10007;</span></td>
                             <td><span class="cross">&#10007;</span></td>
                             <td><span class="cross">&#10007;</span></td>
@@ -1840,7 +1857,7 @@
                                 <span class="feature-label">Touch ID Protection</span>
                                 <span class="feature-desc">Biometric lock on clipboard history</span>
                             </td>
-                            <td class="highlight-col"><span class="check">&#10003;</span></td>
+                            <td class="highlight-col"><span class="check">&#10003;</span> Pro</td>
                             <td><span class="cross">&#10007;</span></td>
                             <td><span class="cross">&#10007;</span></td>
                             <td><span class="cross">&#10007;</span></td>
@@ -2124,11 +2141,11 @@
                     <div class="sustainability-options">
                         <a href="/download" class="sustainability-option">
                             <h4>Download Free</h4>
-                            <p>50-item clipboard history, standard paste, search/filtering, plus the free iPhone &amp; iPad companion app. No account, no catch.</p>
+                            <p>50-item clipboard history, search, pinning, screenshots, and the free iPhone &amp; iPad companion app. No account, no catch.</p>
                         </a>
                         <a href="https://go.saneapps.com/buy/saneclip?ref=website" class="sustainability-option featured">
                             <h4>Upgrade to Pro — $14.99</h4>
-                            <p>Unlimited history, Touch ID lock, encryption, smart paste, snippets, and more. One-time payment, yours forever.</p>
+                            <p>OCR capture, unlimited history, Touch ID lock, encryption, smart paste, snippets, and more. One-time payment, yours forever.</p>
                         </a>
                     </div>
                 </div>

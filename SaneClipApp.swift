@@ -73,6 +73,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     #endif
 
     private let hasSeenWelcomeKey = "hasSeenWelcome"
+    private let welcomeResumePageKey = "welcomeResumePage"
+    private let permissionsWelcomePage = 5
     private var requiresHistoryAuth: Bool {
         licenseService.isPro && SettingsModel.shared.requireTouchID
     }
@@ -80,6 +82,15 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     private var hasSeenWelcome: Bool {
         get { UserDefaults.standard.bool(forKey: hasSeenWelcomeKey) }
         set { UserDefaults.standard.set(newValue, forKey: hasSeenWelcomeKey) }
+    }
+
+    private var welcomeResumePage: Int {
+        get { UserDefaults.standard.object(forKey: welcomeResumePageKey) as? Int ?? 0 }
+        set { UserDefaults.standard.set(newValue, forKey: welcomeResumePageKey) }
+    }
+
+    private func clearWelcomeResumePage() {
+        UserDefaults.standard.removeObject(forKey: welcomeResumePageKey)
     }
 
     deinit {
@@ -125,6 +136,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         initializeSyncOnLaunch()
         SetappIntegration.logPurchaseType()
         if hasSeenWelcome {
+            clearWelcomeResumePage()
             SetappIntegration.showReleaseNotesIfNeeded()
         }
 
@@ -167,59 +179,133 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showWelcomeWindow() {
-        let onboardingProFeatures: [(icon: String, text: String)] =
-            [("checkmark", "Everything in Basic, plus:")] +
-            ProFeature.allCases.map { ($0.featureIcon, $0.featureName) }
+        let onboardingBasicFeatures: [(icon: String, text: String)] = [
+            ("clipboard", "Clipboard history — last 50 items"),
+            ("magnifyingglass", "Search, source-aware filtering, and pinning"),
+            ("cursorarrow.motionlines", "Open history at the menu bar icon or mouse cursor"),
+            ("camera.viewfinder", "Capture Screenshot saves images into history"),
+            ("iphone", "Free iPhone & iPad companion app with optional private iCloud sync"),
+            ("lock.shield", "On-device privacy defaults and excluded apps")
+        ]
+
+        let onboardingProFeatures: [(icon: String, text: String)] = [
+            ("checkmark", "Everything in Basic, plus:"),
+            ("infinity", "Unlimited clipboard history"),
+            ("textformat.alt", "Paste as plain text, Smart Paste, and text transforms"),
+            ("text.viewfinder", "OCR Capture for text grabs and searchable screenshot sidecars"),
+            ("square.stack.3d.up", "Paste Stack for forms and structured workflows"),
+            ("text.quote", "Snippets with placeholders"),
+            ("tag.fill", "Titles, tags, collections, and item notes"),
+            ("ruler", "Clipboard Rules to auto-clean what you copy"),
+            ("touchid", "Touch ID history lock and history encryption"),
+            ("arrow.up.arrow.down.circle", "Export / import history")
+        ]
 
         WelcomeWindow.show(
             appName: "SaneClip",
             appIcon: "list.clipboard.fill",
-            freeFeatures: [
-                ("clipboard", "Clipboard history — last 50 items"),
-                ("doc.on.doc", "Standard paste with original formatting"),
-                ("magnifyingglass", "Search and source-aware filtering"),
-                ("cursorarrow.motionlines", "Open history at the menu bar icon or mouse cursor"),
-                ("iphone", "iPhone companion app with iCloud sync"),
-                ("lock.shield", "100% on-device privacy defaults")
-            ],
+            freeFeatures: onboardingBasicFeatures,
             proFeatures: onboardingProFeatures,
             permissionConfig: welcomePermissionConfig(),
             licenseService: licenseService,
+            initialPage: welcomeResumePage,
+            onPageChange: { [weak self] page in
+                self?.welcomeResumePage = page
+            },
             onDismiss: { [weak self] in
+                self?.clearWelcomeResumePage()
                 self?.hasSeenWelcome = true
                 SetappIntegration.showReleaseNotesIfNeeded(delay: 0.2)
             }
         )
     }
 
+    private var captureTextMenuItemTitle: String {
+        licenseService.isPro ? CaptureWorkflow.text.menuTitle : "Capture Text Pro 🔒"
+    }
+
+    private func requestAccessibilityAccess() {
+        let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
+        if AXIsProcessTrustedWithOptions(options) || AXIsProcessTrusted() {
+            return
+        }
+
+        guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") else { return }
+        NSWorkspace.shared.open(url)
+    }
+
+    private func requestScreenRecordingAccess() {
+        welcomeResumePage = permissionsWelcomePage
+
+        if ScreenCapturePermissionService.isGranted() {
+            return
+        }
+
+        if !ScreenCapturePermissionService.requestAccess() {
+            ScreenCapturePermissionService.openSettings()
+        }
+    }
+
     private func welcomePermissionConfig() -> WelcomeGatePermissionConfig {
         #if APP_STORE
         return WelcomeGatePermissionConfig(
-            title: "Privacy First",
-            bullets: [
-                ("lock.shield.fill", "Capture stays on-device."),
-                ("hand.raised.fill", "Only captures when you ask."),
-                ("icloud.slash", "No data collected.")
-            ],
-            grantedMessage: "The App Store build does not use Accessibility access. Selecting a clip copies it, then you paste manually with Cmd+V."
+            title: "Grant Access",
+            sections: [
+                .init(
+                    title: "Screen Recording",
+                    bullets: [
+                        ("text.viewfinder", "Capture Screenshot and Pro OCR capture need Screen Recording."),
+                        ("lock.shield.fill", "macOS should prompt right away or open the correct Settings pane."),
+                        ("arrow.clockwise", "After granting it, quit and reopen SaneClip once before testing capture.")
+                    ],
+                    grantedMessage: "Screen Recording is enabled. If capture still fails, quit and reopen SaneClip once.",
+                    actionLabel: "Request Screen Recording",
+                    actionHint: "If macOS does not finish the request inline, SaneClip will open the right Settings pane.",
+                    initiallyGranted: ScreenCapturePermissionService.isGranted(),
+                    refreshGranted: { ScreenCapturePermissionService.isGranted() },
+                    action: {
+                        self.requestScreenRecordingAccess()
+                    }
+                )
+            ]
         )
         #else
         return WelcomeGatePermissionConfig(
             title: "Grant Access",
-            bullets: [
-                ("lock.shield.fill", "Capture stays on-device."),
-                ("hand.raised.fill", "Only captures when you ask."),
-                ("icloud.slash", "No data collected.")
-            ],
-            grantedMessage: "Permission granted — you're all set!",
-            actionLabel: "Open Accessibility Settings",
-            actionHint: "Toggle SaneClip on in the list that appears.",
-            initiallyGranted: AXIsProcessTrusted(),
-            refreshGranted: { AXIsProcessTrusted() },
-            action: {
-                guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") else { return }
-                NSWorkspace.shared.open(url)
-            }
+            sections: [
+                .init(
+                    title: "Accessibility",
+                    bullets: [
+                        ("cursorarrow.click.2", "Accessibility enables one-click paste and keyboard workflows."),
+                        ("checkmark.circle", "Click once and macOS should request SaneClip directly."),
+                        ("hand.tap.fill", "You only need this if you want SaneClip to paste for you.")
+                    ],
+                    grantedMessage: "Accessibility is enabled. One-click paste is ready.",
+                    actionLabel: "Request Accessibility Access",
+                    actionHint: "If macOS does not finish the request inline, SaneClip will open the right Settings pane.",
+                    initiallyGranted: AXIsProcessTrusted(),
+                    refreshGranted: { AXIsProcessTrusted() },
+                    action: {
+                        self.requestAccessibilityAccess()
+                    }
+                ),
+                .init(
+                    title: "Screen Recording",
+                    bullets: [
+                        ("text.viewfinder", "Capture Screenshot and Pro OCR capture need Screen Recording."),
+                        ("lock.shield.fill", "macOS should prompt right away or open the correct Settings pane."),
+                        ("arrow.clockwise", "After granting it, quit and reopen SaneClip once before testing capture.")
+                    ],
+                    grantedMessage: "Screen Recording is enabled. If capture still fails, quit and reopen SaneClip once.",
+                    actionLabel: "Request Screen Recording",
+                    actionHint: "If macOS does not finish the request inline, SaneClip will open the right Settings pane.",
+                    initiallyGranted: ScreenCapturePermissionService.isGranted(),
+                    refreshGranted: { ScreenCapturePermissionService.isGranted() },
+                    action: {
+                        self.requestScreenRecordingAccess()
+                    }
+                )
+            ]
         )
         #endif
     }
@@ -407,7 +493,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             appLogger.info("Set default shortcut: Cmd+Shift+Ctrl+S for capture screenshot")
         }
 
-        if KeyboardShortcuts.getShortcut(for: .captureText) == nil {
+        if licenseService.isPro, KeyboardShortcuts.getShortcut(for: .captureText) == nil {
             KeyboardShortcuts.setShortcut(.init(.t, modifiers: [.command, .shift, .control]), for: .captureText)
             appLogger.info("Set default shortcut: Cmd+Shift+Ctrl+T for capture text")
         }
@@ -431,7 +517,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         let legacyDefaults: [(name: KeyboardShortcuts.Name, shortcut: KeyboardShortcuts.Shortcut)] = [
             (.pasteAsPlainText, .init(.v, modifiers: [.command, .shift, .option])),
             (.pasteFromStack, .init(.v, modifiers: [.command, .control])),
-            (.pasteSmartMode, .init(.v, modifiers: [.command, .shift, .control]))
+            (.pasteSmartMode, .init(.v, modifiers: [.command, .shift, .control])),
+            (.captureText, .init(.t, modifiers: [.command, .shift, .control]))
         ]
 
         for legacy in legacyDefaults
@@ -639,7 +726,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         editMenu.addItem(captureScreenshotItem)
 
         let captureTextItem = NSMenuItem(
-            title: CaptureWorkflow.text.menuTitle,
+            title: captureTextMenuItemTitle,
             action: #selector(captureTextFromMenu),
             keyEquivalent: ""
         )
@@ -731,7 +818,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(captureScreenshotItem)
 
         let captureTextItem = NSMenuItem(
-            title: CaptureWorkflow.text.menuTitle,
+            title: captureTextMenuItemTitle,
             action: #selector(captureTextFromMenu),
             keyEquivalent: ""
         )
@@ -946,7 +1033,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(captureScreenshotItem)
 
         let captureTextItem = NSMenuItem(
-            title: CaptureWorkflow.text.menuTitle,
+            title: captureTextMenuItemTitle,
             action: #selector(captureTextFromMenu),
             keyEquivalent: ""
         )

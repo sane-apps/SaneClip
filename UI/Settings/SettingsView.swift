@@ -1,4 +1,5 @@
 // swiftlint:disable file_length
+import AppKit
 import KeyboardShortcuts
 import LocalAuthentication
 import os.log
@@ -321,6 +322,7 @@ private func showSettingsWarning(message: String, info: String) {
 struct GeneralSettingsView: View {
     var licenseService: LicenseService?
     @State private var settings = SettingsModel.shared
+    @State private var screenCapturePermissionGranted = ScreenCapturePermissionService.isGranted()
     @State private var appPresetBundleID = ""
     @State private var appPresetMode: PasteMode = .standard
     #if !APP_STORE && !SETAPP
@@ -775,22 +777,46 @@ struct GeneralSettingsView: View {
                         .frame(width: 110)
                     }
                     CompactDivider()
-                    CompactToggle(label: SaneClipSettingsCopy.autoOCRScreenshotsLabel, isOn: Binding(
-                        get: { settings.autoOCRCapturedScreenshots },
-                        set: { settings.autoOCRCapturedScreenshots = $0 }
-                    ))
+                    if isPro {
+                        CompactToggle(label: SaneClipSettingsCopy.autoOCRScreenshotsLabel, isOn: Binding(
+                            get: { settings.autoOCRCapturedScreenshots },
+                            set: { settings.autoOCRCapturedScreenshots = $0 }
+                        ))
+                    } else {
+                        ProLockedRow(label: SaneClipSettingsCopy.autoOCRScreenshotsLabel, feature: .ocrCapture, licenseService: licenseService)
+                    }
                     CompactDivider()
-                    CompactRow(SaneClipSettingsCopy.ocrLanguageLabel) {
-                        Picker("", selection: Binding(
-                            get: { settings.captureOCRLanguage },
-                            set: { settings.captureOCRLanguage = $0 }
-                        )) {
-                            ForEach(CaptureOCRLanguage.allCases, id: \.self) { language in
-                                Text(language.displayName).tag(language)
+                    CompactRow(SaneClipSettingsCopy.screenRecordingPermissionLabel) {
+                        HStack(spacing: 8) {
+                            Text(screenCapturePermissionGranted
+                                ? SaneClipSettingsCopy.screenRecordingGrantedStatus
+                                : SaneClipSettingsCopy.screenRecordingMissingStatus)
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(screenCapturePermissionGranted ? .green : .white)
+
+                            Button(SaneClipSettingsCopy.openScreenRecordingSettingsButtonTitle) {
+                                ScreenCapturePermissionService.openSettings()
                             }
+                            .buttonStyle(ClipActionButtonStyle())
+                            .controlSize(.small)
                         }
-                        .pickerStyle(.menu)
-                        .frame(width: 130)
+                    }
+                    CompactDivider()
+                    if isPro {
+                        CompactRow(SaneClipSettingsCopy.ocrLanguageLabel) {
+                            Picker("", selection: Binding(
+                                get: { settings.captureOCRLanguage },
+                                set: { settings.captureOCRLanguage = $0 }
+                            )) {
+                                ForEach(CaptureOCRLanguage.allCases, id: \.self) { language in
+                                    Text(language.displayName).tag(language)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .frame(width: 130)
+                        }
+                    } else {
+                        ProLockedRow(label: SaneClipSettingsCopy.ocrLanguageLabel, feature: .ocrCapture, licenseService: licenseService)
                     }
                 }
 
@@ -821,7 +847,15 @@ struct GeneralSettingsView: View {
             autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
             updateCheckFrequency = UpdateService.shared.updateCheckFrequency
             #endif
+            refreshPermissionState()
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            refreshPermissionState()
+        }
+    }
+
+    private func refreshPermissionState() {
+        screenCapturePermissionGranted = ScreenCapturePermissionService.isGranted()
     }
 
     @MainActor
@@ -1390,8 +1424,12 @@ struct ShortcutsSettingsView: View {
                         KeyboardShortcuts.Recorder(for: .captureScreenshot)
                     }
                     CompactDivider()
-                    CompactRow(SaneClipSettingsCopy.captureTextLabel) {
-                        KeyboardShortcuts.Recorder(for: .captureText)
+                    if isPro {
+                        CompactRow(SaneClipSettingsCopy.captureTextLabel) {
+                            KeyboardShortcuts.Recorder(for: .captureText)
+                        }
+                    } else {
+                        ProLockedRow(label: "\(SaneClipSettingsCopy.captureTextLabel) shortcut", feature: .ocrCapture, licenseService: licenseService)
                     }
                     CompactDivider()
                     CompactToggle(label: "Open history at mouse cursor", isOn: Binding(

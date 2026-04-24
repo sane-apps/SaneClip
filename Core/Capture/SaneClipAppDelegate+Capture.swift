@@ -1,5 +1,6 @@
 import AppKit
 import os.log
+import SaneUI
 
 private let captureWorkflowLogger = Logger(subsystem: "com.saneclip.app", category: "Capture")
 
@@ -19,6 +20,11 @@ extension SaneClipAppDelegate {
 
     func runCaptureWorkflow(_ workflow: CaptureWorkflow) async {
         NSApp.activate(ignoringOtherApps: true)
+
+        if workflow == .text, licenseService.isPro == false {
+            ProUpsellWindow.show(feature: ProFeature.ocrCapture, licenseService: licenseService)
+            return
+        }
 
         do {
             let result = try await screenCaptureService.captureImage()
@@ -48,6 +54,8 @@ extension SaneClipAppDelegate {
         } catch ScreenCaptureError.captureAlreadyInProgress {
             captureWorkflowLogger.info("Capture request ignored because the picker is already active.")
             return
+        } catch ScreenCaptureError.screenCapturePermissionDenied {
+            presentScreenCapturePermissionAlert(title: workflow.alertTitle)
         } catch ClipboardManager.CaptureImportError.emptyText {
             presentCaptureAlert(
                 title: workflow.alertTitle,
@@ -62,6 +70,7 @@ extension SaneClipAppDelegate {
     }
 
     private func recognizedTextForScreenshot(_ image: NSImage, language: CaptureOCRLanguage) async -> String? {
+        guard licenseService.isPro else { return nil }
         guard SettingsModel.shared.autoOCRCapturedScreenshots else { return nil }
         do {
             let text = try await captureOCRService.recognizeText(in: image, language: language)
@@ -81,5 +90,18 @@ extension SaneClipAppDelegate {
         alert.informativeText = message
         alert.alertStyle = .warning
         alert.runModal()
+    }
+
+    private func presentScreenCapturePermissionAlert(title: String) {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = "SaneClip needs Screen Recording permission for Capture Screenshot and Pro OCR capture. Turn it on in System Settings, then try again."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Open Screen Recording Settings")
+        alert.addButton(withTitle: "Not Now")
+
+        if alert.runModal() == .alertFirstButtonReturn {
+            ScreenCapturePermissionService.openSettings()
+        }
     }
 }

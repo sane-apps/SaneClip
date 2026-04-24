@@ -4,7 +4,7 @@
 
 ### The Only Clipboard Manager That Takes Privacy Seriously
 
-**AES-256 encryption · Touch ID protection · On-device by default · No personal-content upload**
+**Privacy-first clipboard history · On-device by default · No personal-content upload · Pro adds Touch ID + AES-256 encryption**
 
 [![GitHub stars](https://img.shields.io/github/stars/sane-apps/SaneClip?style=flat-square)](https://github.com/sane-apps/SaneClip/stargazers)
 [![License: PolyForm Shield](https://img.shields.io/badge/License-PolyForm%20Shield-blue.svg?style=flat-square)](LICENSE)
@@ -77,15 +77,17 @@ The prior `2.2.13` mobile follow-up restored the color-coded source indicators o
 - Standard paste with original formatting
 - Search and source-aware filtering
 - Pin and unpin important clips
+- Capture Screenshot into history
 - Excluded apps and auto-delete controls
 - Optional "open at mouse cursor" launch mode
-- iPhone companion app with iCloud sync
+- Free iPhone/iPad companion app with optional private iCloud sync
 - On-device privacy defaults
 
 ### Pro adds
 - Unlimited history
 - Touch ID history lock
 - History encryption (AES-256-GCM)
+- OCR Capture for text grabs and searchable screenshot sidecars
 - Smart paste + plain text paste
 - Text transforms
 - Paste stack (FIFO/LIFO)
@@ -238,25 +240,25 @@ See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) for full details.
 
 ## 📦 Installation
 
-**SaneClip Basic is $0.** Clipboard history, search, pinning, excluded apps, and the free iPhone/iPad companion app are included.
+**SaneClip Basic is $0.** Clipboard history, search, pinning, screenshots, private defaults, and the free iPhone/iPad companion app are included.
 
 **Mac Pro is a one-time unlock.** The iPhone/iPad companion remains a separate free App Store download that uses your iCloud account for sync.
 
-Want more? **[Upgrade to Pro ($14.99 once)](https://go.saneapps.com/buy/saneclip?ref=github-readme)** for unlimited history, Touch ID lock, encryption-at-rest, smart paste, snippets, and advanced rules.
+Want more? **[Upgrade to Pro ($14.99 once)](https://go.saneapps.com/buy/saneclip?ref=github-readme)** for OCR capture, unlimited history, Touch ID lock, encryption-at-rest, smarter paste, snippets, and advanced rules.
 
 ### Install
 
 ```bash
-# Homebrew (recommended)
+# Homebrew (optional)
 brew install --cask sane-apps/tap/saneclip
 
-# Already have SaneClip installed? Let Homebrew manage it:
+# Already use Homebrew and want it to manage an existing install:
 brew install --cask --adopt sane-apps/tap/saneclip
 ```
 
 Or **[download directly](https://saneclip.com)** · or [build from source](#-development)
 
-SaneClip updates itself automatically via Sparkle. `brew upgrade` works too if you prefer.
+The direct download is the canonical Mac release channel and updates itself automatically via Sparkle. `brew upgrade` works too if you choose the Homebrew cask.
 
 ### Requirements
 
@@ -363,15 +365,15 @@ SaneClip is available in two versions with different capabilities:
 | Feature | Direct Download | Mac App Store |
 |---------|:--------------------:|:-------------:|
 | Clipboard History & Search | ✅ | ✅ |
-| AES-256-GCM Encryption | ✅ | ✅ |
-| Touch ID Protection | ✅ | ✅ |
+| AES-256-GCM Encryption | ✅ Pro | ✅ Pro |
+| Touch ID Protection | ✅ Pro | ✅ Pro |
 | Sensitive Data Detection | ✅ | ✅ |
 | Snippets & Text Transforms | ✅ | ✅ |
 | Keyboard Shortcuts | ✅ | ✅ |
 | Siri Shortcuts & Widgets | ✅ | ✅ |
 | **Auto-Paste into apps** | ✅ One-click paste | ❌ Copies to clipboard; press Cmd+V to paste |
 | **Automatic Updates** | ✅ Built-in auto-updater | ✅ Via App Store |
-| **iCloud Sync** | ❌ | ✅ |
+| **iCloud Sync** | ✅ | ✅ |
 
 > **Why the difference?** The Mac App Store version runs in Apple's sandbox, which blocks simulated keyboard events (used for auto-paste). Instead, the App Store version copies items to your clipboard and shows a notification — just press Cmd+V to paste. All other features work identically.
 
@@ -417,7 +419,7 @@ Looking at alternatives? Here's how SaneClip stacks up:
 | 100% Private | ✅ | ❌ | ✅ | ✅ | ✅ |
 | **Price** | **$14.99** | $30/yr | Free | $13 | Free |
 
-**Bottom line:** The first 7 rows are SaneClip-only features. No other clipboard manager offers encryption, Touch ID, sensitive data detection, or webhook automation. If privacy and security matter to you, SaneClip is the only choice.
+**Bottom line:** SaneClip combines strong privacy controls, automation, OCR capture, and a free companion app in a way the usual clipboard managers still do not.
 
 ---
 

@@ -1480,6 +1480,8 @@ struct SaneClipTests {
 
         #expect(captureSource.contains("SCContentSharingPickerObserver"))
         #expect(captureSource.contains("SCScreenshotManager.captureImage"))
+        #expect(captureSource.contains("ScreenCapturePermissionService.isGranted() || ScreenCapturePermissionService.requestAccess()"))
+        #expect(captureSource.contains("ScreenCaptureError.screenCapturePermissionDenied"))
         #expect(captureSource.contains("configuration.allowedPickerModes = [.singleWindow, .singleDisplay]"))
         #expect(captureSource.contains("captureTimeoutTask = Task"))
         #expect(captureSource.contains("stillCaptureTimeoutNanoseconds"))
@@ -1487,6 +1489,9 @@ struct SaneClipTests {
         #expect(captureSource.contains("!self.isResolvingSelection"))
         #expect(captureSource.contains("captureScreenshot(contentFilter: filter"))
         #expect(captureSource.contains("captureImage(contentFilter: filter"))
+        #expect(captureSource.contains("CGPreflightScreenCaptureAccess()"))
+        #expect(captureSource.contains("CGRequestScreenCaptureAccess()"))
+        #expect(captureSource.contains("Privacy_ScreenCapture"))
         #expect(ocrSource.contains("VNRecognizeTextRequest"))
         #expect(ocrSource.contains("request.recognitionLevel = .accurate"))
         #expect(ocrSource.contains("request.recognitionLanguages = [languageCode]"))
@@ -1501,7 +1506,9 @@ struct SaneClipTests {
         )
 
         #expect(appSource.contains("} catch ScreenCaptureError.captureAlreadyInProgress {"))
+        #expect(appSource.contains("} catch ScreenCaptureError.screenCapturePermissionDenied {"))
         #expect(appSource.contains("Capture request ignored because the picker is already active."))
+        #expect(appSource.contains("Open Screen Recording Settings"))
     }
 
     @Test("Capture image preview exposes OCR workflow actions")
@@ -1536,10 +1543,77 @@ struct SaneClipTests {
             contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
             encoding: .utf8
         )
+        let settingsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
+            encoding: .utf8
+        )
 
-        #expect(appSource.contains("Capture stays on-device."))
-        #expect(appSource.contains("Only captures when you ask."))
+        #expect(appSource.contains("Capture Screenshot and Pro OCR capture need Screen Recording."))
+        #expect(appSource.contains("Accessibility enables one-click paste and keyboard workflows."))
+        #expect(appSource.contains("After granting it, quit and reopen SaneClip once before testing capture."))
+        #expect(appSource.contains("Request Accessibility Access"))
+        #expect(appSource.contains("Request Screen Recording"))
+        #expect(appSource.contains("AXIsProcessTrustedWithOptions(options)"))
+        #expect(appSource.contains("ScreenCapturePermissionService.requestAccess()"))
         #expect(!appSource.contains("\"No screenshots.\""))
+        #expect(settingsSource.contains("SaneClipSettingsCopy.screenRecordingPermissionLabel"))
+        #expect(settingsSource.contains("ScreenCapturePermissionService.openSettings()"))
+    }
+
+    @Test("Welcome onboarding resumes on the permissions page after relaunch")
+    func welcomeOnboardingCanResumeAfterPermissionRestart() throws {
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+
+        #expect(appSource.contains("private let welcomeResumePageKey = \"welcomeResumePage\""))
+        #expect(appSource.contains("private let permissionsWelcomePage = 5"))
+        #expect(appSource.contains("private var welcomeResumePage: Int"))
+        #expect(appSource.contains("clearWelcomeResumePage()"))
+        #expect(appSource.contains("initialPage: welcomeResumePage"))
+        #expect(appSource.contains("onPageChange: { [weak self] page in"))
+        #expect(appSource.contains("self?.welcomeResumePage = page"))
+        #expect(appSource.contains("welcomeResumePage = permissionsWelcomePage"))
+    }
+
+    @Test("Public docs match the current Basic and Pro matrix")
+    func publicDocsMatchCurrentProductMatrix() throws {
+        let readmeSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("README.md"),
+            encoding: .utf8
+        )
+        let privacyHTMLSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("docs/privacy.html"),
+            encoding: .utf8
+        )
+        let supportHTMLSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("docs/support.html"),
+            encoding: .utf8
+        )
+        let encryptGuideSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("docs/how-to-encrypt-clipboard-history-mac.html"),
+            encoding: .utf8
+        )
+        let websiteSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("docs/index.html"),
+            encoding: .utf8
+        )
+
+        #expect(readmeSource.contains("Capture Screenshot into history"))
+        #expect(readmeSource.contains("OCR Capture for text grabs and searchable screenshot sidecars"))
+        #expect(readmeSource.contains("Free iPhone/iPad companion app with optional private iCloud sync"))
+        #expect(readmeSource.contains("History encryption (AES-256-GCM)"))
+        #expect(readmeSource.contains("AES-256-GCM Encryption | ✅ Pro | ✅ Pro |"))
+        #expect(privacyHTMLSource.contains("optional Pro setting"))
+        #expect(!privacyHTMLSource.contains("enabled by default"))
+        #expect(supportHTMLSource.contains("Request Accessibility Access"))
+        #expect(supportHTMLSource.contains("If you also enable Pro history encryption"))
+        #expect(encryptGuideSource.contains("AES-256-GCM Encryption (Pro)"))
+        #expect(encryptGuideSource.contains("Open Settings &gt; Security and enable History Encryption"))
+        #expect(!encryptGuideSource.contains("Always On"))
+        #expect(websiteSource.contains("Current Pro coverage includes OCR Capture, Touch ID Lock, History Encryption"))
+        #expect(websiteSource.contains("<span class=\"check\">&#10003;</span> Pro</td>"))
     }
 
     @Test("Settings screens keep readable typography and contrast tokens")
@@ -1662,6 +1736,8 @@ struct SaneClipTests {
         #expect(settingsSource.contains("Text(\"These settings require SaneClip Pro\")"))
         #expect(!settingsSource.contains("Text(\"Upgrade — \\(licenseService?.displayPriceLabel"))
         #expect(appSource.contains("NSMenuItem(title: \"Snippets Pro \\u{1F512}\", action: #selector(showSnippetsUpsell), keyEquivalent: \"\")"))
+        #expect(appSource.contains("private var captureTextMenuItemTitle: String {"))
+        #expect(appSource.contains("licenseService.isPro ? CaptureWorkflow.text.menuTitle : \"Capture Text Pro 🔒\""))
         #expect(appSource.contains("@objc private func showSnippetsUpsell()"))
     }
 

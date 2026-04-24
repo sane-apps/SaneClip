@@ -241,6 +241,26 @@ enum SaneClipSettingsCopy {
         defaultValue: "OCR Language"
     )
 
+    static let screenRecordingPermissionLabel = String(
+        localized: "saneclip.settings.capture.screen_recording_permission",
+        defaultValue: "Screen Recording"
+    )
+
+    static let screenRecordingGrantedStatus = String(
+        localized: "saneclip.settings.capture.screen_recording_granted",
+        defaultValue: "Granted"
+    )
+
+    static let screenRecordingMissingStatus = String(
+        localized: "saneclip.settings.capture.screen_recording_missing",
+        defaultValue: "Not Granted"
+    )
+
+    static let openScreenRecordingSettingsButtonTitle = String(
+        localized: "saneclip.settings.capture.open_screen_recording_settings",
+        defaultValue: "Open Settings"
+    )
+
     static let backupRestoreSectionTitle = String(
         localized: "saneclip.settings.section.backup_restore",
         defaultValue: "Backup & Restore"

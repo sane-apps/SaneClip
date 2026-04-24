@@ -420,7 +420,7 @@ struct ClipboardItemRow: View {
 
             Divider()
 
-            // Organize — Pin is Pro only, Paste Stack is Pro only
+            // Organize — Pin stays free; Paste Stack and deeper organization are Pro.
             Button(pinMenuTitle) {
                 clipboardManager.togglePin(item: item)
             }

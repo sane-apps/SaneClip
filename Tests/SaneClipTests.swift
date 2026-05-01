@@ -1612,8 +1612,9 @@ struct SaneClipTests {
         #expect(encryptGuideSource.contains("AES-256-GCM Encryption (Pro)"))
         #expect(encryptGuideSource.contains("Open Settings &gt; Security and enable History Encryption"))
         #expect(!encryptGuideSource.contains("Always On"))
-        #expect(websiteSource.contains("Current Pro coverage includes OCR Capture, Touch ID Lock, History Encryption"))
-        #expect(websiteSource.contains("<span class=\"check\">&#10003;</span> Pro</td>"))
+        #expect(websiteSource.contains("How SaneClip Stacks Up"))
+        #expect(websiteSource.contains("Here's how SaneClip Pro compares."))
+        #expect(!websiteSource.contains("<span class=\"check\">&#10003;</span> Pro</td>"))
     }
 
     @Test("Settings screens keep readable typography and contrast tokens")

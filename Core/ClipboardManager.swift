@@ -770,6 +770,7 @@ class ClipboardManager {
         // Trim to current tier limit, cleaning up thumbnails for removed items.
         enforceHistoryLimitIfNeeded(saveAfterTrim: false)
         saveHistory()
+        logFirstValueActionIfNeeded()
 
         #if ENABLE_SYNC
         // Queue the new item for iCloud sync
@@ -787,6 +788,15 @@ class ClipboardManager {
 
         let currentCount = history.count
         logger.debug("Added clipboard item, history count: \(currentCount)")
+    }
+
+    private func logFirstValueActionIfNeeded() {
+        let key = "SaneApps.EventTracker.logged.saneclip.first_value_action"
+        guard !UserDefaults.standard.bool(forKey: key) else { return }
+        UserDefaults.standard.set(true, forKey: key)
+        Task.detached {
+            await EventTracker.log("first_value_action", app: "saneclip")
+        }
     }
 
     func paste(item: ClipboardItem) {

@@ -57,14 +57,14 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ---
 
-## 🆕 Current macOS Direct Download: v2.2.15
+## 🆕 Current macOS Direct Download: v2.3.0
 
 **Current direct-download release (Apr 2026)**
 
-- ✅ Makes pinning free on Mac so Basic matches the App Store promise and the iPhone companion
-- ✅ Clarifies Pro upgrade messaging around organization tools while keeping the advanced workflow layer in Pro
-- ✅ Keeps the clipboard history popover pinned under the menu bar icon more reliably
-- ✅ Improves the upgrade popup so license entry and dismissal behave cleanly
+- ✅ Ships the current Basic/Pro clipboard workflow across Mac and mobile companion surfaces
+- ✅ Keeps the direct download, App Store, Homebrew, and hosted release metadata aligned on 2.3.0
+- ✅ Preserves the latest iCloud/mobile companion polish and refreshed release packaging
+- ✅ Keeps prior 2.2.x pinning, upgrade, and popover reliability improvements
 
 The prior `2.2.13` mobile follow-up restored the color-coded source indicators on iPhone and iPad and improved recovery for older Mac updater installs.
 

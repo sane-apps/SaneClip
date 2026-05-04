@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.0] - 2026-04-25
+
+Adds the current direct-download and App Store release line with the refreshed Basic/Pro clipboard workflow, updated release packaging, and the latest iCloud/mobile companion polish.
+
+---
+
 ## [2.2.15] - 2026-04-20
 
 Makes pinning free on Mac so Basic matches the App Store promise and the iPhone companion.

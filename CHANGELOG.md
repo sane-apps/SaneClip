@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.3] - 2026-05-09
+
+Improves startup reliability on macOS 15, fixes clipboard edit-save behavior, restores shortcut reset and snippet visibility fixes, and keeps App Store builds aligned with Apple review requirements.
+
+---
+
 ## [2.3.2] - 2026-05-09
 
 Fixes editing saved clipboard items, clarifies Capture Text from Screen permissions, adds visible snippet paste controls, and adds a reset action for the clipboard history shortcut.

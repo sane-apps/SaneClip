@@ -6,7 +6,27 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                                <item>
+                                                        <item>
+            <title>2.3.2</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Sat, 09 May 2026 02:06:54 -0400</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Fixes editing saved clipboard items, clarifies Capture Text from Screen permissions, adds visible snippet paste controls, and adds a reset action for the clipboard history shortcut.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.2.zip"
+                       sparkle:version="2302"
+                       sparkle:shortVersionString="2.3.2"
+                       length="3716343"
+                       type="application/octet-stream"
+                       sparkle:edSignature="8gpGv1VFlm4crf6Vz9IFkiniiEijy7btvaXTnLPSDokf1yhVomBZk2WrOkk6WizUSrcrLtdv1Fe3i/PGHpLjDQ=="/>
+        </item>
+<item>
             <title>2.3.1</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Sat, 09 May 2026 02:00:36 -0400</pubDate>

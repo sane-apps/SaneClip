@@ -14,11 +14,11 @@ enum ScreenCapturePermissionService {
         CGRequestScreenCaptureAccess()
     }
 
+    @MainActor
     static func openSettings() {
-        guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture") else {
-            return
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture") {
+            NSWorkspace.shared.open(url)
         }
-        NSWorkspace.shared.open(url)
     }
 }
 
@@ -107,7 +107,7 @@ final class ScreenCaptureService: NSObject, SCContentSharingPickerObserver, @unc
 
     @MainActor
     func captureImage() async throws -> CaptureResult {
-        guard ScreenCapturePermissionService.isGranted() || ScreenCapturePermissionService.requestAccess() else {
+        guard ScreenCapturePermissionService.isGranted() else {
             throw ScreenCaptureError.screenCapturePermissionDenied
         }
 
@@ -185,8 +185,8 @@ final class ScreenCaptureService: NSObject, SCContentSharingPickerObserver, @unc
             guard !Task.isCancelled else { return }
 
             await MainActor.run { [weak self] in
-                guard let self, self.continuation != nil else { return }
-                self.finish(with: .failure(ScreenCaptureError.timedOut))
+                guard let self, continuation != nil else { return }
+                finish(with: .failure(ScreenCaptureError.timedOut))
             }
         }
     }
@@ -209,7 +209,7 @@ final class ScreenCaptureService: NSObject, SCContentSharingPickerObserver, @unc
 
             do {
                 try? await Task.sleep(nanoseconds: Self.pickerDismissalDelayNanoseconds)
-                let image = try await self.captureCGImage(from: filter, configuration: configuration)
+                let image = try await captureCGImage(from: filter, configuration: configuration)
                 let nsImage = NSImage(
                     cgImage: image,
                     size: NSSize(width: image.width, height: image.height)
@@ -232,46 +232,7 @@ final class ScreenCaptureService: NSObject, SCContentSharingPickerObserver, @unc
     }
 
     private func captureCGImage(from filter: SCContentFilter, configuration: SCStreamConfiguration) async throws -> CGImage {
-        if #available(macOS 26.0, *) {
-            do {
-                return try await captureModernScreenshot(from: filter, streamConfiguration: configuration)
-            } catch {
-                logger.warning("Modern ScreenCaptureKit screenshot failed; trying compatibility capture: \(error.localizedDescription, privacy: .public)")
-            }
-        }
-
-        return try await captureScreenCaptureKitImage(from: filter, configuration: configuration)
-    }
-
-    @available(macOS 26.0, *)
-    private func captureModernScreenshot(
-        from filter: SCContentFilter,
-        streamConfiguration: SCStreamConfiguration
-    ) async throws -> CGImage {
-        let configuration = SCScreenshotConfiguration()
-        configuration.width = streamConfiguration.width
-        configuration.height = streamConfiguration.height
-        configuration.showsCursor = false
-        configuration.ignoreShadows = true
-        configuration.includeChildWindows = true
-        configuration.displayIntent = .local
-        configuration.dynamicRange = .sdr
-
-        return try await withCheckedThrowingContinuation { continuation in
-            let gate = CaptureResumeGate<CGImage>(continuation)
-            SCScreenshotManager.captureScreenshot(contentFilter: filter, configuration: configuration) { output, error in
-                if let image = output?.sdrImage {
-                    gate.resume(.success(image))
-                } else {
-                    gate.resume(.failure(error ?? ScreenCaptureError.imageUnavailable))
-                }
-            }
-
-            Task {
-                try? await Task.sleep(nanoseconds: Self.stillCaptureTimeoutNanoseconds)
-                gate.resume(.failure(ScreenCaptureError.timedOut))
-            }
-        }
+        try await captureScreenCaptureKitImage(from: filter, configuration: configuration)
     }
 
     private func captureScreenCaptureKitImage(

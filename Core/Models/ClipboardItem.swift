@@ -127,7 +127,9 @@ struct ClipboardItem: Identifiable {
         case let .text(string):
             let words = string.split { $0.isWhitespace || $0.isNewline }.count
             let chars = string.count
-            return "\(words)wd · \(chars)ch"
+            let wordLabel = words == 1 ? "word" : "words"
+            let charLabel = chars == 1 ? "char" : "chars"
+            return "\(words) \(wordLabel) · \(chars) \(charLabel)"
         case let .image(image):
             let size = image.size
             let dimensions = "\(Int(size.width))×\(Int(size.height))"
@@ -199,21 +201,21 @@ struct ClipboardItem: Identifiable {
         }
     }
 
-    /// Compact time ago string with smart scaling
+    /// Relative timestamp string with smart scaling
     var timeAgo: String {
-        let seconds = Int(-timestamp.timeIntervalSinceNow)
+        let seconds = max(0, Int(-timestamp.timeIntervalSinceNow))
         if seconds < 60 {
-            return "\(seconds)s"
+            return "\(seconds)s ago"
         }
         let minutes = seconds / 60
         if minutes < 60 {
-            return "\(minutes)m"
+            return "\(minutes)m ago"
         }
         let hours = minutes / 60
         if hours < 24 {
-            return "\(hours)h"
+            return "\(hours)h ago"
         }
         let days = hours / 24
-        return "\(days)d"
+        return "\(days)d ago"
     }
 }

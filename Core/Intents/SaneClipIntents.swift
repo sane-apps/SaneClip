@@ -178,6 +178,10 @@ struct PasteSnippetIntent: AppIntent {
             throw IntentError.snippetNotFound
         }
 
+        guard !snippetManager.hasUserPlaceholders(snippet: snippet) else {
+            throw IntentError.snippetRequiresPlaceholderValues
+        }
+
         // Expand with default values only (no custom placeholders via Shortcuts)
         let expanded = snippetManager.expand(snippet: snippet, values: [:])
 
@@ -220,6 +224,7 @@ enum IntentError: Error, CustomLocalizedStringResourceConvertible {
     case indexOutOfBounds
     case snippetNotFound
     case proFeatureRequiresPro
+    case snippetRequiresPlaceholderValues
 
     var localizedStringResource: LocalizedStringResource {
         switch self {
@@ -231,6 +236,8 @@ enum IntentError: Error, CustomLocalizedStringResourceConvertible {
             return "Snippet not found"
         case .proFeatureRequiresPro:
             return "This feature requires SaneClip Pro"
+        case .snippetRequiresPlaceholderValues:
+            return "This snippet needs placeholder values. Paste it from the SaneClip menu instead."
         }
     }
 }

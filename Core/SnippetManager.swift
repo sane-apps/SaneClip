@@ -2,6 +2,15 @@ import Foundation
 import AppKit
 import os.log
 
+struct SnippetLibrarySection: Identifiable, Equatable {
+    static let uncategorizedTitle = "Uncategorized"
+
+    let title: String
+    let snippets: [Snippet]
+
+    var id: String { title }
+}
+
 /// Manages snippet storage, retrieval, and expansion
 @MainActor
 @Observable
@@ -73,9 +82,13 @@ class SnippetManager {
 
     /// Check if snippet has any user-prompted placeholders (not special ones)
     func hasUserPlaceholders(snippet: Snippet) -> Bool {
+        !userPlaceholders(in: snippet).isEmpty
+    }
+
+    func userPlaceholders(in snippet: Snippet) -> [String] {
         let all = extractPlaceholders(from: snippet.template)
         let special = Set(["date", "time", "clipboard"])
-        return all.contains { !special.contains($0.lowercased()) }
+        return all.filter { !special.contains($0.lowercased()) }
     }
 
     // MARK: - CRUD Operations
@@ -122,6 +135,26 @@ class SnippetManager {
     /// Get all unique categories
     var categories: [String] {
         Array(Set(snippets.compactMap { $0.category })).sorted()
+    }
+
+    nonisolated static func librarySections(for snippets: [Snippet]) -> [SnippetLibrarySection] {
+        let grouped = Dictionary(grouping: snippets) { snippet in
+            let category = snippet.category?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return category.isEmpty ? SnippetLibrarySection.uncategorizedTitle : category
+        }
+
+        return grouped.keys.sorted { lhs, rhs in
+            if lhs == SnippetLibrarySection.uncategorizedTitle { return false }
+            if rhs == SnippetLibrarySection.uncategorizedTitle { return true }
+            return lhs.localizedCaseInsensitiveCompare(rhs) == .orderedAscending
+        }.map { title in
+            SnippetLibrarySection(
+                title: title,
+                snippets: (grouped[title] ?? []).sorted {
+                    $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+                }
+            )
+        }
     }
 
     // MARK: - Persistence

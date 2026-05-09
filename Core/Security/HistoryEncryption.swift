@@ -36,8 +36,15 @@ struct HistoryEncryption: Sendable {
     // MARK: - Key Management
 
     private static func getOrCreateKey() throws -> SymmetricKey {
-        if let keyData = KeychainHelper.load(account: KeychainHelper.historyEncryptionKeyAccount) {
+        switch KeychainHelper.loadResult(account: KeychainHelper.historyEncryptionKeyAccount) {
+        case let .found(keyData):
             return SymmetricKey(data: keyData)
+        case .missing:
+            break
+        case .interactionNotAllowed:
+            throw EncryptionError.keyAccessRequiresUserApproval
+        case .failed:
+            throw EncryptionError.keyStoreFailed
         }
 
         // Generate new 256-bit key
@@ -55,11 +62,13 @@ struct HistoryEncryption: Sendable {
 
     enum EncryptionError: Error, LocalizedError {
         case sealFailed
+        case keyAccessRequiresUserApproval
         case keyStoreFailed
 
         var errorDescription: String? {
             switch self {
             case .sealFailed: return "Failed to encrypt data"
+            case .keyAccessRequiresUserApproval: return "SaneClip needs permission to access the existing history encryption key"
             case .keyStoreFailed: return "Failed to store encryption key in Keychain"
             }
         }

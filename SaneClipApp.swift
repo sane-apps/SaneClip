@@ -3,7 +3,7 @@ import KeyboardShortcuts
 import SaneUI
 import SwiftUI
 #if !APP_STORE
-@preconcurrency import ApplicationServices
+    @preconcurrency import ApplicationServices
 #endif
 import LocalAuthentication
 import os.log
@@ -47,7 +47,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     let screenCaptureService = ScreenCaptureService()
     let captureOCRService = CaptureOCRService()
     #if !APP_STORE && !SETAPP
-    private var updateService: UpdateService!
+        private var updateService: UpdateService!
     #endif
     /// Track when user last authenticated with Touch ID (grace period)
     private var lastAuthenticationTime: Date?
@@ -56,20 +56,20 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - License
 
     #if APP_STORE
-    let licenseService = LicenseService(
-        appName: "SaneClip",
-        purchaseBackend: .appStore(productID: "com.saneclip.app.pro.unlock")
-    )
+        let licenseService = LicenseService(
+            appName: "SaneClip",
+            purchaseBackend: .appStore(productID: "com.saneclip.app.pro.unlock")
+        )
     #elseif SETAPP
-    let licenseService = LicenseService(
-        appName: "SaneClip",
-        purchaseBackend: .setapp
-    )
+        let licenseService = LicenseService(
+            appName: "SaneClip",
+            purchaseBackend: .setapp
+        )
     #else
-    let licenseService = LicenseService(
-        appName: "SaneClip",
-        checkoutURL: LicenseService.directCheckoutURL(appSlug: "saneclip")
-    )
+        let licenseService = LicenseService(
+            appName: "SaneClip",
+            checkoutURL: LicenseService.directCheckoutURL(appSlug: "saneclip")
+        )
     #endif
 
     private let hasSeenWelcomeKey = "hasSeenWelcome"
@@ -102,32 +102,32 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         NSApp.appearance = NSAppearance(named: .darkAqua)
 
         #if !DEBUG && !APP_STORE && !SETAPP
-        if SaneAppMover.moveToApplicationsFolderIfNeeded(prompt: .init(
-            messageText: "Move to Applications?",
-            informativeText: "{appName} works best from your Applications folder. Move it there now? You may be asked for your password.",
-            moveButtonTitle: "Move to Applications",
-            cancelButtonTitle: "Not Now"
-        )) { return }
+            if SaneAppMover.moveToApplicationsFolderIfNeeded(prompt: .init(
+                messageText: "Move to Applications?",
+                informativeText: "{appName} works best from your Applications folder. Move it there now? You may be asked for your password.",
+                moveButtonTitle: "Move to Applications",
+                cancelButtonTitle: "Not Now"
+            )) { return }
         #endif
 
         #if !APP_STORE && !SETAPP
-        if let testFeedOverride = UpdateService.testFeedOverride() {
-            UserDefaults.standard.set(testFeedOverride, forKey: "SUFeedURL")
-            appLogger.info("Using test Sparkle feed override: \(testFeedOverride, privacy: .public)")
-        }
-
-        // Initialize update service (Sparkle)
-        if UpdateService.shouldInitialize() {
-            updateService = UpdateService.shared
-        } else {
-            appLogger.info("Skipping Sparkle updater during XCTest host run")
-        }
-
-        if UpdateService.shouldAutoCheckOnLaunch() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                self?.updateService?.checkForUpdates()
+            if let testFeedOverride = UpdateService.testFeedOverride() {
+                UserDefaults.standard.set(testFeedOverride, forKey: "SUFeedURL")
+                appLogger.info("Using test Sparkle feed override: \(testFeedOverride, privacy: .public)")
             }
-        }
+
+            // Initialize update service (Sparkle)
+            if UpdateService.shouldInitialize() {
+                updateService = UpdateService.shared
+            } else {
+                appLogger.info("Skipping Sparkle updater during XCTest host run")
+            }
+
+            if UpdateService.shouldAutoCheckOnLaunch() {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                    self?.updateService?.checkForUpdates()
+                }
+            }
         #endif
 
         // Freemium: always allow app to start — no hard gate
@@ -143,9 +143,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         // Fire launch event (capture isPro on main actor before detaching)
         let launchIsPro = licenseService.isPro
         let isFirstLaunch = !hasSeenWelcome
-        if SaneBackgroundAppDefaults.launchAtLogin {
-            _ = SaneLoginItemPolicy.enableByDefaultIfNeeded(isFirstLaunch: isFirstLaunch)
-        }
+        SaneLoginItemPolicy.scheduleDefaultLaunchAtLoginPrompt(appName: "SaneClip")
         Task.detached {
             await EventTracker.log(launchIsPro ? "app_launch_pro" : "app_launch_free", app: "saneclip")
             if isFirstLaunch, !launchIsPro {
@@ -170,11 +168,11 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     private func initializeSyncOnLaunch() {
         #if ENABLE_SYNC
-        guard Self.shouldInitializeSyncOnLaunch(
-            hasClipboardManager: ClipboardManager.shared != nil,
-            syncFeatureCompiled: true
-        ) else { return }
-        _ = SyncCoordinator.shared
+            guard Self.shouldInitializeSyncOnLaunch(
+                hasClipboardManager: ClipboardManager.shared != nil,
+                syncFeatureCompiled: true
+            ) else { return }
+            _ = SyncCoordinator.shared
         #endif
     }
 
@@ -225,13 +223,16 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func requestAccessibilityAccess() {
+        #if APP_STORE
+            return
+        #else
         let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
         if AXIsProcessTrustedWithOptions(options) || AXIsProcessTrusted() {
             return
         }
 
-        guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") else { return }
-        NSWorkspace.shared.open(url)
+        SaneSystemSettingsDestination.accessibility.open()
+        #endif
     }
 
     private func requestScreenRecordingAccess() {
@@ -248,65 +249,65 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     private func welcomePermissionConfig() -> WelcomeGatePermissionConfig {
         #if APP_STORE
-        return WelcomeGatePermissionConfig(
-            title: "Grant Access",
-            sections: [
-                .init(
-                    title: "Screen Recording",
-                    bullets: [
-                        ("text.viewfinder", "Capture Screenshot and Capture Text from Screen need Screen Recording."),
-                        ("lock.shield.fill", "macOS should prompt right away or open the correct Settings pane."),
-                        ("arrow.clockwise", "After granting it, quit and reopen SaneClip once before testing capture.")
-                    ],
-                    grantedMessage: "Screen Recording is enabled. If capture still fails, quit and reopen SaneClip once.",
-                    actionLabel: "Request Screen Recording",
-                    actionHint: "If macOS does not finish the request inline, SaneClip will open the right Settings pane.",
-                    initiallyGranted: ScreenCapturePermissionService.isGranted(),
-                    refreshGranted: { ScreenCapturePermissionService.isGranted() },
-                    action: {
-                        self.requestScreenRecordingAccess()
-                    }
-                )
-            ]
-        )
+            return WelcomeGatePermissionConfig(
+                title: "Grant Access",
+                sections: [
+                    .init(
+                        title: "Screen Recording",
+                        bullets: [
+                            ("text.viewfinder", "Capture Screenshot and Capture Text from Screen need Screen Recording."),
+                            ("lock.shield.fill", "macOS should prompt right away or open the correct Settings pane."),
+                            ("arrow.clockwise", "After granting it, quit and reopen SaneClip once before testing capture.")
+                        ],
+                        grantedMessage: "Screen Recording is enabled. If capture still fails, quit and reopen SaneClip once.",
+                        actionLabel: "Request Screen Recording",
+                        actionHint: "If macOS does not finish the request inline, SaneClip will open the right Settings pane.",
+                        initiallyGranted: ScreenCapturePermissionService.isGranted(),
+                        refreshGranted: { ScreenCapturePermissionService.isGranted() },
+                        action: {
+                            self.requestScreenRecordingAccess()
+                        }
+                    )
+                ]
+            )
         #else
-        return WelcomeGatePermissionConfig(
-            title: "Grant Access",
-            sections: [
-                .init(
-                    title: "Accessibility",
-                    bullets: [
-                        ("cursorarrow.click.2", "Accessibility enables one-click paste and keyboard workflows."),
-                        ("checkmark.circle", "Click once and macOS should request SaneClip directly."),
-                        ("hand.tap.fill", "You only need this if you want SaneClip to paste for you.")
-                    ],
-                    grantedMessage: "Accessibility is enabled. One-click paste is ready.",
-                    actionLabel: "Request Accessibility Access",
-                    actionHint: "If macOS does not finish the request inline, SaneClip will open the right Settings pane.",
-                    initiallyGranted: AXIsProcessTrusted(),
-                    refreshGranted: { AXIsProcessTrusted() },
-                    action: {
-                        self.requestAccessibilityAccess()
-                    }
-                ),
-                .init(
-                    title: "Screen Recording",
-                    bullets: [
-                        ("text.viewfinder", "Capture Screenshot and Capture Text from Screen need Screen Recording."),
-                        ("lock.shield.fill", "macOS should prompt right away or open the correct Settings pane."),
-                        ("arrow.clockwise", "After granting it, quit and reopen SaneClip once before testing capture.")
-                    ],
-                    grantedMessage: "Screen Recording is enabled. If capture still fails, quit and reopen SaneClip once.",
-                    actionLabel: "Request Screen Recording",
-                    actionHint: "If macOS does not finish the request inline, SaneClip will open the right Settings pane.",
-                    initiallyGranted: ScreenCapturePermissionService.isGranted(),
-                    refreshGranted: { ScreenCapturePermissionService.isGranted() },
-                    action: {
-                        self.requestScreenRecordingAccess()
-                    }
-                )
-            ]
-        )
+            return WelcomeGatePermissionConfig(
+                title: "Grant Access",
+                sections: [
+                    .init(
+                        title: "Accessibility",
+                        bullets: [
+                            ("cursorarrow.click.2", "Accessibility enables one-click paste and keyboard workflows."),
+                            ("checkmark.circle", "Click once and macOS should request SaneClip directly."),
+                            ("hand.tap.fill", "You only need this if you want SaneClip to paste for you.")
+                        ],
+                        grantedMessage: "Accessibility is enabled. One-click paste is ready.",
+                        actionLabel: "Request Accessibility Access",
+                        actionHint: "If macOS does not finish the request inline, SaneClip will open the right Settings pane.",
+                        initiallyGranted: AXIsProcessTrusted(),
+                        refreshGranted: { AXIsProcessTrusted() },
+                        action: {
+                            self.requestAccessibilityAccess()
+                        }
+                    ),
+                    .init(
+                        title: "Screen Recording",
+                        bullets: [
+                            ("text.viewfinder", "Capture Screenshot and Capture Text from Screen need Screen Recording."),
+                            ("lock.shield.fill", "macOS should prompt right away or open the correct Settings pane."),
+                            ("arrow.clockwise", "After granting it, quit and reopen SaneClip once before testing capture.")
+                        ],
+                        grantedMessage: "Screen Recording is enabled. If capture still fails, quit and reopen SaneClip once.",
+                        actionLabel: "Request Screen Recording",
+                        actionHint: "If macOS does not finish the request inline, SaneClip will open the right Settings pane.",
+                        initiallyGranted: ScreenCapturePermissionService.isGranted(),
+                        refreshGranted: { ScreenCapturePermissionService.isGranted() },
+                        action: {
+                            self.requestScreenRecordingAccess()
+                        }
+                    )
+                ]
+            )
         #endif
     }
 
@@ -362,8 +363,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
         // Register as macOS Services provider (right-click → Services → "Save to SaneClip")
         #if !APP_STORE
-        NSApp.servicesProvider = self
-        NSApp.registerServicesMenuSendTypes([.string], returnTypes: [])
+            NSApp.servicesProvider = self
+            NSApp.registerServicesMenuSendTypes([.string], returnTypes: [])
         #endif
 
         // Create popover — pass licenseService so history view can check Pro status
@@ -522,7 +523,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         ]
 
         for legacy in legacyDefaults
-        where KeyboardShortcuts.getShortcut(for: legacy.name) == legacy.shortcut {
+            where KeyboardShortcuts.getShortcut(for: legacy.name) == legacy.shortcut {
             KeyboardShortcuts.reset(legacy.name)
             appLogger.info("Cleared legacy Pro shortcut for Basic user")
         }
@@ -553,9 +554,9 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     #if ENABLE_SYNC
-    @objc private func openSyncSettings() {
-        SettingsWindowController.open(tab: .sync)
-    }
+        @objc private func openSyncSettings() {
+            SettingsWindowController.open(tab: .sync)
+        }
     #endif
 
     @objc private func openStorageSettings() {
@@ -695,22 +696,29 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         mainMenu.addItem(appMenuItem)
 
         let appMenu = NSMenu(title: "SaneClip")
-        let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ",")
-        settingsItem.keyEquivalentModifierMask = [.command]
-        settingsItem.target = self
-        appMenu.addItem(settingsItem)
+        #if APP_STORE
+            addAppStoreCoreUtilityItems(to: appMenu, settingsKeyEquivalent: ",")
+        #else
+            appMenu.addItem(SaneStandardMenu.aboutAndBugReportItem(target: self, action: #selector(openAboutSettings)))
+            appMenu.addItem(SaneStandardMenu.settingsItem(target: self, action: #selector(openSettings)))
+            appMenu.addItem(SaneStandardMenu.licenseItem(target: self, action: #selector(openLicenseSettings)))
 
-        #if SETAPP
-        let whatsNewItem = NSMenuItem(title: "What's New...", action: #selector(showReleaseNotes), keyEquivalent: "")
-        whatsNewItem.target = self
-        appMenu.addItem(whatsNewItem)
+            #if !SETAPP
+                appMenu.addItem(SaneStandardMenu.checkForUpdatesItem(target: self, action: #selector(checkForUpdates)))
+            #endif
+
+            #if SETAPP
+                appMenu.addItem(SaneStandardMenu.whatsNewItem(target: self, action: #selector(showReleaseNotes)))
+            #endif
         #endif
 
         appMenu.addItem(NSMenuItem.separator())
 
-        let quitItem = NSMenuItem(title: "Quit SaneClip", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
-        quitItem.keyEquivalentModifierMask = [.command]
-        appMenu.addItem(quitItem)
+        #if APP_STORE
+            addAppStoreQuitItem(to: appMenu)
+        #else
+            appMenu.addItem(SaneStandardMenu.quitItem(appName: "SaneClip", target: NSApplication.shared, action: #selector(NSApplication.terminate(_:))))
+        #endif
         appMenuItem.submenu = appMenu
 
         let editMenuItem = NSMenuItem()
@@ -765,16 +773,16 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         ]
 
         #if ENABLE_SYNC
-        items.append(settingsMenuItem(title: "Sync", action: #selector(openSyncSettings), key: "3"))
-        items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "4"))
-        items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "5"))
-        items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "6"))
-        items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "7"))
+            items.append(settingsMenuItem(title: "Sync", action: #selector(openSyncSettings), key: "3"))
+            items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "4"))
+            items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "5"))
+            items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "6"))
+            items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "7"))
         #else
-        items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "3"))
-        items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "4"))
-        items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "5"))
-        items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "6"))
+            items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "3"))
+            items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "4"))
+            items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "5"))
+            items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "6"))
         #endif
 
         return items
@@ -806,7 +814,11 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     private func showContextMenu() {
         guard let button = statusItem.button else { return }
+        let menu = buildContextMenu()
+        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.bounds.minY), in: button)
+    }
 
+    private func buildContextMenu() -> NSMenu {
         let menu = NSMenu()
 
         let captureScreenshotItem = NSMenuItem(
@@ -842,33 +854,56 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ",")
-        settingsItem.target = self
-        menu.addItem(settingsItem)
-
-        #if SETAPP
-        let whatsNewItem = NSMenuItem(title: "What's New...", action: #selector(showReleaseNotes), keyEquivalent: "")
-        whatsNewItem.target = self
-        menu.addItem(whatsNewItem)
+        #if APP_STORE
+            addAppStoreCoreUtilityItems(to: menu, settingsKeyEquivalent: "")
+            addAppStoreQuitItem(to: menu)
+        #else
+            SaneStandardMenu.addCoreUtilityItems(
+                to: menu,
+                appName: "SaneClip",
+                target: self,
+                settingsAction: #selector(openSettings),
+                licenseAction: #selector(openLicenseSettings),
+                checkForUpdatesAction: directUpdateAction,
+                aboutAndBugReportAction: #selector(openAboutSettings),
+                whatsNewAction: setappWhatsNewAction,
+                quitTarget: NSApplication.shared,
+                quitAction: #selector(NSApplication.terminate(_:)),
+                settingsKeyEquivalent: ""
+            )
         #endif
 
-        #if !APP_STORE && !SETAPP
-        let updatesItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
-        updatesItem.target = self
-        menu.addItem(updatesItem)
-        #endif
-
-        menu.addItem(NSMenuItem.separator())
-
-        let quit = NSMenuItem(
-            title: "Quit SaneClip", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"
-        )
-        menu.addItem(quit)
-
-        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.bounds.minY), in: button)
+        return menu
     }
 
     // MARK: - Shared Menu Helpers
+
+    #if APP_STORE
+        private func addAppStoreCoreUtilityItems(to menu: NSMenu, settingsKeyEquivalent: String) {
+            let aboutItem = NSMenuItem(title: "About / Report a Bug...", action: #selector(openAboutSettings), keyEquivalent: "")
+            aboutItem.target = self
+            menu.addItem(aboutItem)
+
+            let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: settingsKeyEquivalent)
+            settingsItem.target = self
+            settingsItem.keyEquivalentModifierMask = settingsKeyEquivalent.isEmpty ? [] : [.command]
+            menu.addItem(settingsItem)
+
+            let licenseItem = NSMenuItem(title: "License...", action: #selector(openLicenseSettings), keyEquivalent: "")
+            licenseItem.target = self
+            menu.addItem(licenseItem)
+        }
+
+        private func addAppStoreQuitItem(to menu: NSMenu) {
+            let quitItem = NSMenuItem(
+                title: "Quit SaneClip",
+                action: #selector(NSApplication.terminate(_:)),
+                keyEquivalent: "q"
+            )
+            quitItem.target = NSApplication.shared
+            menu.addItem(quitItem)
+        }
+    #endif
 
     private func addRecentItemsToMenu(_ menu: NSMenu) {
         let recentItems = Array(clipboardManager.history.prefix(5))
@@ -893,31 +928,50 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             return snippetsItem
         }
 
-        let snippetsMenu = NSMenu()
         let snippetsItem = NSMenuItem(title: "Snippets", action: nil, keyEquivalent: "")
-        let recentSnippets = Array(SnippetManager.shared.snippets.prefix(10))
-        if !recentSnippets.isEmpty {
-            for (index, snippet) in recentSnippets.enumerated() {
-                let snippetMenuItem = NSMenuItem(
-                    title: snippet.name,
-                    action: #selector(pasteSnippetFromMenu(_:)),
-                    keyEquivalent: ""
-                )
-                snippetMenuItem.tag = index
-                snippetMenuItem.target = self
-                snippetsMenu.addItem(snippetMenuItem)
+        let snippetsMenu = NSMenu()
+        let sections = SnippetManager.librarySections(for: SnippetManager.shared.snippets)
+        if !sections.isEmpty {
+            let helpItem = NSMenuItem(title: "Paste into the frontmost email or document", action: nil, keyEquivalent: "")
+            helpItem.isEnabled = false
+            snippetsMenu.addItem(helpItem)
+            snippetsMenu.addItem(NSMenuItem.separator())
+
+            for section in sections {
+                let categoryItem = NSMenuItem(title: section.title, action: nil, keyEquivalent: "")
+                let categoryMenu = NSMenu()
+                for snippet in section.snippets {
+                    let snippetMenuItem = NSMenuItem(
+                        title: snippet.name,
+                        action: #selector(pasteSnippetFromMenu(_:)),
+                        keyEquivalent: ""
+                    )
+                    snippetMenuItem.representedObject = snippet.id.uuidString
+                    snippetMenuItem.target = self
+                    categoryMenu.addItem(snippetMenuItem)
+                }
+                categoryItem.submenu = categoryMenu
+                snippetsMenu.addItem(categoryItem)
             }
         } else {
             let emptyItem = NSMenuItem(title: "No snippets", action: nil, keyEquivalent: "")
             emptyItem.isEnabled = false
             snippetsMenu.addItem(emptyItem)
         }
+        snippetsMenu.addItem(NSMenuItem.separator())
+        let settingsItem = NSMenuItem(title: "Open Snippets Settings...", action: #selector(openSnippetsSettingsFromMenu), keyEquivalent: "")
+        settingsItem.target = self
+        snippetsMenu.addItem(settingsItem)
         snippetsItem.submenu = snippetsMenu
         return snippetsItem
     }
 
     @objc private func showSnippetsUpsell() {
         ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: licenseService)
+    }
+
+    @objc private func openSnippetsSettingsFromMenu() {
+        SettingsWindowController.open(tab: .snippets)
     }
 
     @objc private func showPopover() {
@@ -967,10 +1021,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func pasteSnippetFromMenu(_ sender: NSMenuItem) {
-        let index = sender.tag
-        let snippets = SnippetManager.shared.snippets
-        guard index < snippets.count else { return }
-        let snippet = snippets[index]
+        guard let idString = sender.representedObject as? String,
+              let id = UUID(uuidString: idString),
+              let snippet = SnippetManager.shared.snippets.first(where: { $0.id == id })
+        else { return }
 
         if requiresHistoryAuth {
             if let lastAuth = lastAuthenticationTime,
@@ -1022,64 +1076,26 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Dock Menu
 
     func applicationDockMenu(_: NSApplication) -> NSMenu? {
-        let menu = NSMenu()
-
-        let captureScreenshotItem = NSMenuItem(
-            title: CaptureWorkflow.screenshot.menuTitle,
-            action: #selector(captureScreenshotFromMenu),
-            keyEquivalent: ""
-        )
-        captureScreenshotItem.target = self
-        menu.addItem(captureScreenshotItem)
-
-        let captureTextItem = NSMenuItem(
-            title: captureTextMenuItemTitle,
-            action: #selector(captureTextFromMenu),
-            keyEquivalent: ""
-        )
-        captureTextItem.target = self
-        menu.addItem(captureTextItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        // Show History
-        let showHistoryItem = NSMenuItem(title: "Show History", action: #selector(showPopover), keyEquivalent: "")
-        showHistoryItem.target = self
-        menu.addItem(showHistoryItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        // Recent items & snippets
-        addRecentItemsToMenu(menu)
-        menu.addItem(buildSnippetsSubmenu())
-
-        menu.addItem(NSMenuItem.separator())
-
-        // Clear History
-        let clearHistoryItem = NSMenuItem(title: "Clear History", action: #selector(clearHistoryFromMenu), keyEquivalent: "")
-        clearHistoryItem.target = self
-        menu.addItem(clearHistoryItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        #if !APP_STORE && !SETAPP
-        // Check for Updates
-        let updatesItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
-        updatesItem.target = self
-        menu.addItem(updatesItem)
-        #endif
-
-        // Settings
-        let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: "")
-        settingsItem.target = self
-        menu.addItem(settingsItem)
-
-        return menu
+        buildContextMenu()
     }
 
     #if !APP_STORE && !SETAPP
-    @objc private func checkForUpdates() {
-        updateService.checkForUpdates()
-    }
+        private var directUpdateAction: Selector? {
+            #selector(checkForUpdates)
+        }
+
+        @objc private func checkForUpdates() {
+            updateService.checkForUpdates()
+        }
+    #else
+        private var directUpdateAction: Selector? { nil }
+    #endif
+
+    #if SETAPP
+        private var setappWhatsNewAction: Selector? {
+            #selector(showReleaseNotes)
+        }
+    #else
+        private var setappWhatsNewAction: Selector? { nil }
     #endif
 }

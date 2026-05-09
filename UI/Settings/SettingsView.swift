@@ -1419,16 +1419,15 @@ struct ShortcutsSettingsView: View {
                     CompactRow("Show Clipboard History") {
                         HStack(spacing: 8) {
                             KeyboardShortcuts.Recorder(for: .showClipboardHistory)
-                            Button {
+                            Button("Reset") {
                                 KeyboardShortcuts.setShortcut(
                                     .init(.v, modifiers: [.command, .shift]),
                                     for: .showClipboardHistory
                                 )
-                            } label: {
-                                Label("Reset", systemImage: "arrow.counterclockwise")
                             }
-                            .buttonStyle(ClipActionButtonStyle(compact: true))
+                            .buttonStyle(ClipActionButtonStyle())
                             .controlSize(.small)
+                            .help("Restore Command-Shift-V for Show Clipboard History")
                         }
                     }
                     CompactDivider()
@@ -1601,63 +1600,79 @@ struct ClipboardRulesSection: View {
             if !isPro {
                 ProLockedSectionBanner(feature: .clipboardRules, licenseService: licenseService)
             }
-            CompactToggle(
-                label: "Strip URL tracking parameters",
-                isOn: Binding(
-                    get: { rules.stripTrackingParams },
-                    set: { rules.stripTrackingParams = $0 }
+
+            if isPro {
+                CompactToggle(
+                    label: "Strip URL tracking parameters",
+                    isOn: Binding(
+                        get: { rules.stripTrackingParams },
+                        set: { rules.stripTrackingParams = $0 }
+                    )
                 )
-            )
-            .help("Remove utm_*, fbclid, and other tracking params from URLs — requires Pro")
-            .disabled(!isPro)
+                .help("Remove utm_*, fbclid, and other tracking params from URLs")
+            } else {
+                ProLockedRow(label: "Strip URL tracking parameters", feature: .clipboardRules, licenseService: licenseService)
+            }
 
             CompactDivider()
 
-            CompactToggle(
-                label: "Auto-trim whitespace",
-                isOn: Binding(
-                    get: { rules.autoTrimWhitespace },
-                    set: { rules.autoTrimWhitespace = $0 }
+            if isPro {
+                CompactToggle(
+                    label: "Auto-trim whitespace",
+                    isOn: Binding(
+                        get: { rules.autoTrimWhitespace },
+                        set: { rules.autoTrimWhitespace = $0 }
+                    )
                 )
-            )
-            .help("Remove leading/trailing spaces from copied text — requires Pro")
-            .disabled(!isPro)
+                .help("Remove leading/trailing spaces from copied text")
+            } else {
+                ProLockedRow(label: "Auto-trim whitespace", feature: .clipboardRules, licenseService: licenseService)
+            }
 
             CompactDivider()
 
-            CompactToggle(
-                label: "Normalize line endings",
-                isOn: Binding(
-                    get: { rules.normalizeLineEndings },
-                    set: { rules.normalizeLineEndings = $0 }
+            if isPro {
+                CompactToggle(
+                    label: "Normalize line endings",
+                    isOn: Binding(
+                        get: { rules.normalizeLineEndings },
+                        set: { rules.normalizeLineEndings = $0 }
+                    )
                 )
-            )
-            .help("Convert Windows (CRLF) to Unix (LF) line endings — requires Pro")
-            .disabled(!isPro)
+                .help("Convert Windows (CRLF) to Unix (LF) line endings")
+            } else {
+                ProLockedRow(label: "Normalize line endings", feature: .clipboardRules, licenseService: licenseService)
+            }
 
             CompactDivider()
 
-            CompactToggle(
-                label: "Remove duplicate spaces",
-                isOn: Binding(
-                    get: { rules.removeDuplicateSpaces },
-                    set: { rules.removeDuplicateSpaces = $0 }
+            if isPro {
+                CompactToggle(
+                    label: "Remove duplicate spaces",
+                    isOn: Binding(
+                        get: { rules.removeDuplicateSpaces },
+                        set: { rules.removeDuplicateSpaces = $0 }
+                    )
                 )
-            )
-            .help("Collapse multiple consecutive spaces into one — requires Pro")
-            .disabled(!isPro)
+                .help("Collapse multiple consecutive spaces into one")
+            } else {
+                ProLockedRow(label: "Remove duplicate spaces", feature: .clipboardRules, licenseService: licenseService)
+            }
 
             CompactDivider()
 
-            CompactToggle(
-                label: "Lowercase URL hosts",
-                isOn: Binding(
-                    get: { rules.lowercaseURLs },
-                    set: { rules.lowercaseURLs = $0 }
+            if isPro {
+                CompactToggle(
+                    label: "Lowercase URL hosts",
+                    isOn: Binding(
+                        get: { rules.lowercaseURLs },
+                        set: { rules.lowercaseURLs = $0 }
+                    )
                 )
-            )
-            .help("Convert URL hostnames to lowercase — requires Pro")
-            .disabled(!isPro)
+                .help("Convert URL hostnames to lowercase")
+            } else {
+                ProLockedRow(label: "Lowercase URL hosts", feature: .clipboardRules, licenseService: licenseService)
+            }
         }
     }
 }

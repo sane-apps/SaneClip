@@ -952,7 +952,8 @@ class ClipboardManager {
             }
             return
         }
-        let expanded = SnippetManager.shared.expand(snippet: snippet, values: values)
+        guard let resolvedValues = valuesForSnippet(snippet, providedValues: values) else { return }
+        let expanded = SnippetManager.shared.expand(snippet: snippet, values: resolvedValues)
 
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
@@ -963,6 +964,49 @@ class ClipboardManager {
 
         SettingsModel.shared.pasteSound.play()
         dismissAndPaste()
+    }
+
+    private func valuesForSnippet(_ snippet: Snippet, providedValues: [String: String]) -> [String: String]? {
+        let placeholders = SnippetManager.shared.userPlaceholders(in: snippet)
+        guard !placeholders.isEmpty else { return providedValues }
+        let missingPlaceholders = placeholders.filter { providedValues[$0] == nil }
+        guard !missingPlaceholders.isEmpty else { return providedValues }
+
+        let stack = NSStackView()
+        stack.orientation = .vertical
+        stack.spacing = 8
+        stack.edgeInsets = NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+
+        var fields: [String: NSTextField] = [:]
+        for placeholder in missingPlaceholders {
+            let label = NSTextField(labelWithString: placeholder)
+            label.textColor = .labelColor
+            let field = NSTextField(string: "")
+            field.placeholderString = placeholder
+            field.widthAnchor.constraint(equalToConstant: 260).isActive = true
+
+            let row = NSStackView(views: [label, field])
+            row.orientation = .horizontal
+            row.spacing = 8
+            label.widthAnchor.constraint(equalToConstant: 90).isActive = true
+            stack.addArrangedSubview(row)
+            fields[placeholder] = field
+        }
+
+        let alert = NSAlert()
+        alert.messageText = "Fill Snippet Placeholders"
+        alert.informativeText = "Enter values before pasting \(snippet.name)."
+        alert.alertStyle = .informational
+        alert.accessoryView = stack
+        alert.addButton(withTitle: "Paste")
+        alert.addButton(withTitle: "Cancel")
+
+        guard alert.runModal() == .alertFirstButtonReturn else { return nil }
+        var resolved = providedValues
+        for placeholder in missingPlaceholders {
+            resolved[placeholder] = fields[placeholder]?.stringValue ?? ""
+        }
+        return resolved
     }
 
     // MARK: - Paste Stack
@@ -1205,9 +1249,7 @@ class ClipboardManager {
     }
 
     private func openAccessibilitySettings() {
-        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-            NSWorkspace.shared.open(url)
-        }
+        SaneSystemSettingsDestination.accessibility.open()
     }
 
     private func handleAccessibilityAlertAction(_ action: AccessibilityAlertAction) {
@@ -1504,14 +1546,15 @@ class ClipboardManager {
         }
     }
 
+    /// Update edit-sheet fields in one save so row-owned sheets do not race multiple persistence writes.
     func updateItem(
         id: UUID,
         newContent: String? = nil,
-        title: String? = nil,
-        tags: [String] = [],
-        collection: String = "Default",
-        note: String? = nil,
-        updateMetadata: Bool = false
+        title: String?,
+        tags: [String],
+        collection: String,
+        note: String?,
+        updateMetadata: Bool
     ) {
         if updateMetadata, licenseService?.isPro != true {
             if let ls = licenseService {
@@ -1520,35 +1563,48 @@ class ClipboardManager {
             return
         }
 
-        guard let index = history.firstIndex(where: { $0.id == id }) else { return }
-        var updatedItem = history[index]
+        let normalizedTags = Array(
+            Set(
+                tags
+                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty }
+            )
+        )
+        .sorted()
+        let trimmedTitle = title?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let finalTitle = (trimmedTitle?.isEmpty ?? true) ? nil : trimmedTitle
+        let trimmedCollection = collection.trimmingCharacters(in: .whitespacesAndNewlines)
+        let finalCollection = trimmedCollection.isEmpty ? "Default" : trimmedCollection
+        let trimmedNote = note?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let finalNote = (trimmedNote?.isEmpty ?? true) ? nil : trimmedNote
 
-        if let newContent {
-            guard !newContent.isEmpty else { return }
-            updatedItem = ClipboardItem(
-                id: updatedItem.id,
-                content: .text(newContent),
-                timestamp: updatedItem.timestamp,
-                sourceAppBundleID: updatedItem.sourceAppBundleID,
-                sourceAppName: updatedItem.sourceAppName,
-                pasteCount: updatedItem.pasteCount,
-                title: updatedItem.title,
-                tags: updatedItem.tags,
-                collection: updatedItem.collection,
-                note: updatedItem.note,
-                ocrText: updatedItem.ocrText
+        func updatedCopy(from existing: ClipboardItem) -> ClipboardItem? {
+            let content: ClipboardContent
+            if let newContent {
+                guard !newContent.isEmpty else { return nil }
+                content = .text(newContent)
+            } else {
+                content = existing.content
+            }
+
+            return ClipboardItem(
+                id: existing.id,
+                content: content,
+                timestamp: existing.timestamp,
+                sourceAppBundleID: existing.sourceAppBundleID,
+                sourceAppName: existing.sourceAppName,
+                pasteCount: existing.pasteCount,
+                title: updateMetadata ? finalTitle : existing.title,
+                tags: updateMetadata ? normalizedTags : existing.tags,
+                collection: updateMetadata ? finalCollection : existing.collection,
+                note: updateMetadata ? finalNote : existing.note,
+                ocrText: existing.ocrText
             )
         }
 
-        if updateMetadata {
-            let trimmedTitle = title?.trimmingCharacters(in: .whitespacesAndNewlines)
-            updatedItem.title = (trimmedTitle?.isEmpty ?? true) ? nil : trimmedTitle
-            updatedItem.tags = Self.normalizedTags(tags)
-            let trimmedCollection = collection.trimmingCharacters(in: .whitespacesAndNewlines)
-            updatedItem.collection = trimmedCollection.isEmpty ? "Default" : trimmedCollection
-            let trimmedNote = note?.trimmingCharacters(in: .whitespacesAndNewlines)
-            updatedItem.note = (trimmedNote?.isEmpty ?? true) ? nil : trimmedNote
-        }
+        guard let index = history.firstIndex(where: { $0.id == id }),
+              let updatedItem = updatedCopy(from: history[index])
+        else { return }
 
         history[index] = updatedItem
         if let pinnedIndex = pinnedItems.firstIndex(where: { $0.id == id }) {
@@ -1560,7 +1616,7 @@ class ClipboardManager {
         }
 
         saveHistory()
-        logger.debug("Updated item \(id)")
+        logger.debug("Updated edit-sheet fields for item \(id)")
     }
 
     /// Update an item's note
@@ -1644,7 +1700,14 @@ class ClipboardManager {
             }
             return
         }
-        let normalized = Self.normalizedTags(tags)
+        let normalized = Array(
+            Set(
+                tags
+                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty }
+            )
+        )
+        .sorted()
 
         if let index = history.firstIndex(where: { $0.id == id }) {
             history[index].tags = normalized
@@ -1680,17 +1743,6 @@ class ClipboardManager {
         let names = Set(history.map(\.collection).filter { !$0.isEmpty })
         let withDefault = names.union(["Default"])
         return withDefault.sorted()
-    }
-
-    private nonisolated static func normalizedTags(_ tags: [String]) -> [String] {
-        Array(
-            Set(
-                tags
-                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                    .filter { !$0.isEmpty }
-            )
-        )
-        .sorted()
     }
 
     @discardableResult
@@ -1991,8 +2043,8 @@ class ClipboardManager {
         do {
             var data = try JSONEncoder().encode(savedItems)
 
-            // Encrypt only when Pro is active and encryption is enabled.
-            if licenseService?.isPro == true, SettingsModel.shared.encryptHistory {
+            // Encrypt local clipboard history whenever the user has encryption enabled.
+            if SettingsModel.shared.encryptHistory {
                 data = try HistoryEncryption.encrypt(data)
             }
 

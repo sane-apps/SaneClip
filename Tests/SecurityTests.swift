@@ -159,6 +159,18 @@ struct WebhookSecurityTests {
 // MARK: - Keychain Tests
 
 struct KeychainTests {
+    private func projectRootURL() -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
+
+    private func saneAppsRootURL() -> URL {
+        projectRootURL()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
+
     @Test("Keychain stores and retrieves strings")
     func keychainStringRoundTrip() {
         let testAccount = "test-keychain-\(UUID().uuidString)"
@@ -211,6 +223,38 @@ struct KeychainTests {
 
         let loaded = KeychainHelper.loadString(account: testAccount)
         #expect(loaded == "updated")
+    }
+
+    @Test("Startup keychain reads do not trigger authentication UI")
+    func startupKeychainReadsAreNonInteractive() throws {
+        let keychainHelperSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/Security/KeychainHelper.swift"),
+            encoding: .utf8
+        )
+        let saneUIKeychainSource = try String(
+            contentsOf: saneAppsRootURL().appendingPathComponent("infra/SaneUI/Sources/SaneUI/License/KeychainService.swift"),
+            encoding: .utf8
+        )
+
+        #expect(keychainHelperSource.contains("interactionNotAllowed = true"))
+        #expect(keychainHelperSource.contains("kSecUseAuthenticationContext"))
+        #expect(saneUIKeychainSource.contains("interactionNotAllowed = true"))
+        #expect(saneUIKeychainSource.contains("kSecUseAuthenticationContext"))
+    }
+
+    @Test("Inaccessible history key is not replaced as missing")
+    func inaccessibleHistoryKeyIsNotReplaced() throws {
+        let historyEncryptionSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/Security/HistoryEncryption.swift"),
+            encoding: .utf8
+        )
+
+        #expect(historyEncryptionSource.contains("KeychainHelper.loadResult"))
+        #expect(historyEncryptionSource.contains("case .interactionNotAllowed"))
+        #expect(historyEncryptionSource.contains("keyAccessRequiresUserApproval"))
+        let blockedKeyPath = try #require(historyEncryptionSource.range(of: "case .interactionNotAllowed")?.lowerBound)
+        let keyGenerationPath = try #require(historyEncryptionSource.range(of: "SymmetricKey(size: .bits256)")?.lowerBound)
+        #expect(blockedKeyPath < keyGenerationPath)
     }
 }
 

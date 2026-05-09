@@ -1,7 +1,7 @@
 # Session Handoff — SaneClip
 
 **Last updated:** 2026-05-09
-**Current project version:** `2.3.0` (build `2300`)
+**Current project version:** `2.3.2` (build `2302`)
 
 ## Current State
 
@@ -11,11 +11,11 @@
   - Screen Recording permission copy now names the real capabilities: Capture Screenshot and Capture Text from Screen.
   - History item editing uses a single batch update path so content, title/tags/collection/note, pinned copies, and paste-stack mirrors do not drift.
   - Snippet rows now expose a visible Paste/Paste Pro action and the context menu includes Paste before edit/manage actions, improving discoverability.
-  - Shortcuts settings includes an inline reset affordance for Show Clipboard History.
-  - Latest recorded Mini verification for this pass: SaneClip verify passed with 154 tests.
+  - Shortcuts settings includes an inline Reset affordance for Show Clipboard History that restores Command-Shift-V.
+  - Latest recorded Mini verification for this pass: SaneClip verify passed with 152 tests on 2026-05-09 after the Reset affordance landed. The run includes `Edit sheet saves item changes through the batch update path`, which maps to Noah's trapped edit-window report in GitHub #9.
   - Live GitHub state at closeout: `#9` edit-save, `#10` clipboard-history shortcut, `#11` Capture Text, and `#12` snippets paste discoverability remain open and map to this local pass. Do not close or comment publicly without exact draft approval.
 
-- The current repo version is `2.3.0`; this is the capture/OCR feature train.
+- The current repo version is `2.3.2`; this is the capture/OCR feature train.
 - `CHANGELOG.md` is the current release ledger. Use it instead of the stale `v2.0 released / App Store REJECTED` summary below.
 - Treat the older sections in this file as archival notes only.
 
@@ -223,3 +223,12 @@ Plan exists at `~/.claude/plans/jaunty-cooking-goblet.md` — add `note: String?
 - Feb 9: Infrastructure validation, Mac mini testing
 - Feb 7: iOS visual polish, iOS app overhaul
 - Feb 3: SaneClip 1.4 DMG release
+# SaneClip Session Handoff
+
+## Current State (2026-05-09 Launch Crash / Release Readiness)
+
+- Customer email #688 from Peter included `SaneClip-2026-05-09-143149.ips`; SaneClip 2.3.2 crashed at dyld launch on macOS 15.7.5 with missing ScreenCaptureKit symbol `_OBJC_CLASS_$_SCScreenshotConfiguration`.
+- Root cause: `Core/Capture/ScreenCaptureService.swift` referenced the macOS 26-only `SCScreenshotConfiguration` class while the direct build ships with minimum macOS 15.0. The reference made the binary unsafe on current macOS 15 even though the code was inside an availability branch.
+- Fix in progress: removed the macOS 26 screenshot path and retained the compatible `SCScreenshotManager.captureImage` path. `Tests/SaneClipTests.swift` now asserts `SCScreenshotConfiguration` and `captureScreenshot(contentFilter:)` are absent from the capture source.
+- Must verify before release: Mini `./scripts/SaneMaster.rb verify --timeout 1200`, binary symbol scan for no `SCScreenshotConfiguration`, release-mode launch, then draft a reply to #688 and resolve duplicate #685 after user approval.
+- Open GitHub issues #9-#12 are still marked `release:patched-pending` and need maintainer replies after verification.

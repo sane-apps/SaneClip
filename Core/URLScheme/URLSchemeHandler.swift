@@ -284,14 +284,7 @@ final class URLSchemeHandler {
             return false
         }
 
-        // Merge placeholder values from URL
-        var mergedValues = values
-        let placeholders = snippetManager.extractPlaceholders(from: snippet.template)
-        for placeholder in placeholders where mergedValues[placeholder] == nil {
-            mergedValues[placeholder] = ""
-        }
-
-        let expanded = snippetManager.expand(snippet: snippet, values: mergedValues)
+        let expanded = snippetManager.expand(snippet: snippet, values: values)
         let preview = String(expanded.prefix(60))
 
         guard showConfirmation(
@@ -301,7 +294,7 @@ final class URLSchemeHandler {
 
         guard let clipboardManager = ClipboardManager.shared else { return false }
         let canUseSnippets = clipboardManager.licenseService?.isPro == true
-        clipboardManager.pasteSnippet(snippet, values: mergedValues)
+        clipboardManager.pasteSnippet(snippet, values: values)
         return canUseSnippets
     }
 

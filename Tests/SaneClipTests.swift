@@ -111,6 +111,15 @@ struct SaneClipTests {
         #expect(item.sourceAppName == nil)
     }
 
+    @Test("Clipboard item metadata is user readable")
+    func clipboardItemMetadataIsUserReadable() {
+        let item = ClipboardItem(content: .text("one two three"))
+
+        #expect(item.stats == "3 words · 13 chars")
+        #expect(item.timeAgo.contains("ago"))
+        #expect(!item.stats.contains("wd"))
+    }
+
     @Test("ClipboardItem image OCR sidecar is previewed and searchable")
     @MainActor
     func clipboardItemImageOCRSearch() {
@@ -667,7 +676,15 @@ struct SaneClipTests {
             manager.pinnedItems = [item]
             manager.pasteStack = [item]
 
-            manager.updateItem(id: item.id, newContent: "after")
+            manager.updateItem(
+                id: item.id,
+                newContent: "after",
+                title: item.title,
+                tags: item.tags,
+                collection: item.collection,
+                note: item.note,
+                updateMetadata: false
+            )
 
             guard case let .text(historyText) = manager.history[0].content else {
                 Issue.record("Expected history item to remain text")
@@ -695,19 +712,21 @@ struct SaneClipTests {
             encoding: .utf8
         )
 
-        guard let sheetStart = rowSource.range(of: "EditClipboardItemSheet("),
-              let sheetEnd = rowSource.range(of: ".sheet(isPresented: $showCollectionSheet)") else {
-            Issue.record("Could not find edit sheet source")
+        guard let helperStart = rowSource.range(of: "private func saveEditSheet()"),
+              let helperEnd = rowSource.range(of: "    // MARK: - Accessibility")
+        else {
+            Issue.record("Could not find saveEditSheet helper source")
             return
         }
 
-        let editSheetSource = String(rowSource[sheetStart.lowerBound..<sheetEnd.lowerBound])
-        #expect(editSheetSource.contains("clipboardManager.updateItem("))
-        #expect(!editSheetSource.contains("updateItemContent("))
-        #expect(!editSheetSource.contains("updateItemTitle("))
-        #expect(!editSheetSource.contains("updateItemTags("))
-        #expect(!editSheetSource.contains("updateItemCollection("))
-        #expect(!editSheetSource.contains("updateItemNote("))
+        let saveEditSheetSource = String(rowSource[helperStart.lowerBound ..< helperEnd.lowerBound])
+        #expect(saveEditSheetSource.contains("clipboardManager.updateItem("))
+        #expect(rowSource.contains("onSave: saveEditSheet"))
+        #expect(!saveEditSheetSource.contains("updateItemContent("))
+        #expect(!saveEditSheetSource.contains("updateItemTitle("))
+        #expect(!saveEditSheetSource.contains("updateItemTags("))
+        #expect(!saveEditSheetSource.contains("updateItemCollection("))
+        #expect(!saveEditSheetSource.contains("updateItemNote("))
     }
 
     @Test("Snippet intents require Pro")
@@ -1510,6 +1529,7 @@ struct SaneClipTests {
         #expect(appSource.contains("static let captureText = Self(\"captureText\")"))
         #expect(captureWorkflowSource.contains("Capture Screenshot..."))
         #expect(captureWorkflowSource.contains("Capture Text from Screen..."))
+        #expect(appSource.contains("KeyboardShortcuts.onKeyUp(for: .showClipboardHistory)"))
         #expect(appSource.contains("KeyboardShortcuts.onKeyUp(for: .captureScreenshot)"))
         #expect(appSource.contains("KeyboardShortcuts.onKeyUp(for: .captureText)"))
         #expect(captureActionSource.contains("recognizedTextForScreenshot(result.image, language: ocrLanguage)"))
@@ -1518,6 +1538,25 @@ struct SaneClipTests {
         #expect(settingsSource.contains("KeyboardShortcuts.Recorder(for: .captureText)"))
         #expect(settingsSource.contains("SaneClipSettingsCopy.autoOCRScreenshotsLabel"))
         #expect(settingsSource.contains("CaptureOCRLanguage.allCases"))
+    }
+
+    @Test("History shortcut default keeps the documented Command Shift V shortcut")
+    func historyShortcutDefaultKeepsDocumentedCommandShiftV() throws {
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+        let settingsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
+            encoding: .utf8
+        )
+
+        #expect(appSource.contains("KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .shift]), for: .showClipboardHistory)"))
+        #expect(settingsSource.contains("Button(\"Reset\")"))
+        #expect(settingsSource.contains("for: .showClipboardHistory"))
+        #expect(settingsSource.contains("Restore Command-Shift-V for Show Clipboard History"))
+        #expect(!appSource.contains("SaneClipShortcutDefaults"))
+        #expect(!appSource.contains("showClipboardHistoryShortcutMigratedFromCommandShiftV"))
     }
 
     @Test("Capture implementation uses ScreenCaptureKit and Vision")
@@ -1533,22 +1572,38 @@ struct SaneClipTests {
 
         #expect(captureSource.contains("SCContentSharingPickerObserver"))
         #expect(captureSource.contains("SCScreenshotManager.captureImage"))
-        #expect(captureSource.contains("ScreenCapturePermissionService.isGranted() || ScreenCapturePermissionService.requestAccess()"))
+        #expect(captureSource.contains("guard ScreenCapturePermissionService.isGranted() else"))
+        #expect(!captureSource.contains("ScreenCapturePermissionService.isGranted() || ScreenCapturePermissionService.requestAccess()"))
         #expect(captureSource.contains("ScreenCaptureError.screenCapturePermissionDenied"))
         #expect(captureSource.contains("configuration.allowedPickerModes = [.singleWindow, .singleDisplay]"))
         #expect(captureSource.contains("captureTimeoutTask = Task"))
         #expect(captureSource.contains("stillCaptureTimeoutNanoseconds"))
         #expect(captureSource.contains("ScreenCaptureError.timedOut"))
         #expect(captureSource.contains("!self.isResolvingSelection"))
-        #expect(captureSource.contains("captureScreenshot(contentFilter: filter"))
         #expect(captureSource.contains("captureImage(contentFilter: filter"))
+        #expect(!captureSource.contains("SCScreenshotConfiguration"))
+        #expect(!captureSource.contains("captureScreenshot(contentFilter: filter"))
         #expect(captureSource.contains("CGPreflightScreenCaptureAccess()"))
         #expect(captureSource.contains("CGRequestScreenCaptureAccess()"))
         #expect(captureSource.contains("Privacy_ScreenCapture"))
+        #expect(!captureSource.contains("SaneSystemSettingsDestination.screenRecording.open()"))
         #expect(ocrSource.contains("VNRecognizeTextRequest"))
         #expect(ocrSource.contains("request.recognitionLevel = .accurate"))
         #expect(ocrSource.contains("request.recognitionLanguages = [languageCode]"))
         #expect(ocrSource.contains("request.automaticallyDetectsLanguage = true"))
+    }
+
+    @Test("Capture text copy explains the screen selection and permission behavior")
+    func captureTextCopyExplainsScreenSelectionAndPermissionBehavior() throws {
+        let captureActionSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/Capture/SaneClipAppDelegate+Capture.swift"),
+            encoding: .utf8
+        )
+
+        #expect(CaptureWorkflow.text.menuTitle == "Capture Text from Screen...")
+        #expect(CaptureWorkflow.text.alertTitle == "Capture Text from Screen")
+        #expect(captureActionSource.contains("presentScreenCapturePermissionAlert(title: workflow.alertTitle)"))
+        #expect(captureActionSource.contains("SaneClip needs Screen Recording permission for Capture Screenshot and Capture Text from Screen."))
     }
 
     @Test("Capture duplicate triggers are ignored instead of alerting")
@@ -1608,6 +1663,8 @@ struct SaneClipTests {
         #expect(appSource.contains("Request Screen Recording"))
         #expect(appSource.contains("AXIsProcessTrustedWithOptions(options)"))
         #expect(appSource.contains("ScreenCapturePermissionService.requestAccess()"))
+        #expect(appSource.contains("SaneSystemSettingsDestination.accessibility.open()"))
+        #expect(!appSource.contains("Privacy_Accessibility"))
         #expect(!appSource.contains("\"No screenshots.\""))
         #expect(settingsSource.contains("SaneClipSettingsCopy.screenRecordingPermissionLabel"))
         #expect(settingsSource.contains("ScreenCapturePermissionService.openSettings()"))
@@ -1659,6 +1716,10 @@ struct SaneClipTests {
         #expect(readmeSource.contains("History encryption (AES-256-GCM)"))
         #expect(readmeSource.contains("AES-256-GCM Encryption | ✅ Pro | ✅ Pro |"))
         #expect(privacyHTMLSource.contains("optional Pro setting"))
+        #expect(privacyHTMLSource.contains("privacy-preserving aggregate counts"))
+        #expect(privacyHTMLSource.contains("license was activated"))
+        #expect(privacyHTMLSource.contains("do not include your clipboard contents"))
+        #expect(privacyHTMLSource.contains("include your clipboard contents, name, email, license key"))
         #expect(!privacyHTMLSource.contains("enabled by default"))
         #expect(supportHTMLSource.contains("Request Accessibility Access"))
         #expect(supportHTMLSource.contains("If you also enable Pro history encryption"))
@@ -1781,8 +1842,8 @@ struct SaneClipTests {
         #expect(!rowSource.contains("Remove Note — \\(upgradePriceLabel)"))
         #expect(snippetsSource.contains("Text(\"Pro\")"))
         #expect(snippetsSource.contains("Button(\"Snippets Pro \\u{1F512}\")"))
-        #expect(snippetsSource.contains("Button(\"Paste\")"))
-        #expect(snippetsSource.contains("ClipboardManager.shared?.pasteSnippet(snippet)"))
+        #expect(snippetsSource.contains("Button(\"Paste Now\")"))
+        #expect(snippetsSource.contains("clipboardManager?.pasteSnippet(snippet)"))
         #expect(snippetsSource.contains("Text(\"Add Snippet\")"))
         #expect(!snippetsSource.contains("Add Snippet \\u{1F512}"))
         #expect(!snippetsSource.contains("Upgrade — \\(licenseService?.displayPriceLabel"))
@@ -2118,7 +2179,7 @@ struct SaneClipTests {
     }
 
     @MainActor
-    private func renderPNG<Content: View>(_ view: Content, size: CGSize, to url: URL) throws {
+    private func renderPNG(_ view: some View, size: CGSize, to url: URL) throws {
         let controller = NSHostingController(rootView: view.frame(width: size.width, height: size.height))
         let window = NSWindow(
             contentRect: NSRect(origin: .zero, size: size),

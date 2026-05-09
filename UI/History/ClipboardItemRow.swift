@@ -37,6 +37,36 @@ struct ClipboardItemRow: View {
         return false
     }
 
+    private func saveEditSheet() {
+        let parsedTags = editTags
+            .split(separator: ",")
+            .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
+        if !isImageItem {
+            clipboardManager.updateItem(
+                id: item.id,
+                newContent: editText,
+                title: editTitle,
+                tags: parsedTags,
+                collection: editCollection,
+                note: editNote,
+                updateMetadata: isPro
+            )
+        } else if isPro {
+            clipboardManager.updateItem(
+                id: item.id,
+                title: editTitle,
+                tags: parsedTags,
+                collection: editCollection,
+                note: editNote,
+                updateMetadata: true
+            )
+        }
+
+        showEditSheet = false
+    }
+
     // MARK: - Accessibility
 
     private var accessibilityDescription: String {
@@ -566,33 +596,7 @@ struct ClipboardItemRow: View {
                 collection: $editCollection,
                 note: $editNote,
                 isImageItem: isImageItem,
-                onSave: {
-                    let parsedTags = editTags
-                        .split(separator: ",")
-                        .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
-                        .filter { !$0.isEmpty }
-                    if !isImageItem {
-                        clipboardManager.updateItem(
-                            id: item.id,
-                            newContent: editText,
-                            title: editTitle,
-                            tags: parsedTags,
-                            collection: editCollection,
-                            note: editNote,
-                            updateMetadata: isPro
-                        )
-                    } else if isPro {
-                        clipboardManager.updateItem(
-                            id: item.id,
-                            title: editTitle,
-                            tags: parsedTags,
-                            collection: editCollection,
-                            note: editNote,
-                            updateMetadata: true
-                        )
-                    }
-                    showEditSheet = false
-                },
+                onSave: saveEditSheet,
                 onCancel: {
                     showEditSheet = false
                 }

@@ -1,9 +1,17 @@
 import Foundation
+import LocalAuthentication
 import Security
 
 /// Thread-safe Keychain wrapper for storing secrets (webhook credentials, encryption keys)
 struct KeychainHelper: Sendable {
     static let service = Bundle.main.bundleIdentifier ?? "com.saneclip.app"
+
+    enum LoadResult: Equatable {
+        case found(Data)
+        case missing
+        case interactionNotAllowed
+        case failed(OSStatus)
+    }
 
     // MARK: - Account Constants
 
@@ -37,26 +45,37 @@ struct KeychainHelper: Sendable {
 
     /// Loads data from Keychain
     static func load(account: String) -> Data? {
+        guard case let .found(data) = loadResult(account: account) else { return nil }
+        return data
+    }
+
+    static func loadResult(account: String) -> LoadResult {
         if isKeychainBypassed {
             guard let encoded = fallbackDefaults.string(forKey: fallbackKey(account)),
                   let data = Data(base64Encoded: encoded)
-            else { return nil }
-            return data
+            else { return .missing }
+            return .found(data)
         }
 
-        let query: [String: Any] = [
+        var query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
             kSecReturnData as String: true,
             kSecMatchLimit as String: kSecMatchLimitOne
         ]
+        query[kSecUseAuthenticationContext as String] = nonInteractiveAuthenticationContext()
 
         var result: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
 
-        guard status == errSecSuccess else { return nil }
-        return result as? Data
+        if status == errSecItemNotFound { return .missing }
+        if status == errSecInteractionNotAllowed || status == errSecAuthFailed {
+            return .interactionNotAllowed
+        }
+        guard status == errSecSuccess else { return .failed(status) }
+        guard let data = result as? Data else { return .failed(errSecDecode) }
+        return .found(data)
     }
 
     /// Deletes an item from Keychain
@@ -83,12 +102,13 @@ struct KeychainHelper: Sendable {
             return fallbackDefaults.string(forKey: fallbackKey(account)) != nil
         }
 
-        let query: [String: Any] = [
+        var query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
             kSecReturnData as String: false
         ]
+        query[kSecUseAuthenticationContext as String] = nonInteractiveAuthenticationContext()
 
         let status = SecItemCopyMatching(query as CFDictionary, nil)
         return status == errSecSuccess
@@ -127,5 +147,11 @@ struct KeychainHelper: Sendable {
 
     private static func fallbackKey(_ account: String) -> String {
         "sane.no-keychain.\(service).\(account)"
+    }
+
+    private static func nonInteractiveAuthenticationContext() -> LAContext {
+        let context = LAContext()
+        context.interactionNotAllowed = true
+        return context
     }
 }

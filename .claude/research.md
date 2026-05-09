@@ -4,6 +4,12 @@
 > findings were promoted to Serena/memory on 2026-05-04. Older raw notes remain
 > recoverable in git history.
 
+## SaneUI Login Item API Migration | Updated: 2026-05-09 | Status: verified | TTL: 30d
+- Trigger: SaneClip verify failed after moving to current SaneUI because `SaneLoginItemPolicy.enableByDefaultIfNeeded` no longer exists.
+- Local source of truth: `~/SaneApps/infra/SaneUI/Sources/SaneUI/Components/SaneLoginItemToggle.swift` exposes `scheduleDefaultLaunchAtLoginPrompt(appName:delay:)`, `offerDefaultLaunchAtLoginIfNeeded(...)`, `setEnabled(...)`, and `shouldOfferDefaultPrompt(...)`.
+- Decision: apps should not silently auto-enable login items. For launch-time default behavior, call `SaneLoginItemPolicy.scheduleDefaultLaunchAtLoginPrompt(appName:)`; the shared policy gates by install location, prior prompt marker, default setting, and current `SMAppService` status.
+- SaneClip tests already encode this migration by expecting `scheduleDefaultLaunchAtLoginPrompt(appName: "SaneClip"` and rejecting `enableByDefaultIfNeeded`.
+
 ## SaneClip Editor Shortcuts / Text Input | Updated: 2026-05-09 | Status: verified | TTL: 30d
 - Trigger: GitHub issue #10 reported the Show Clipboard History shortcut not working; issue #9 reported edit-sheet save/close trouble. Release guard `saneclip-editor-shortcuts` requires fresh local + docs + web/GitHub evidence before shipping more keyboard behavior.
 - Apple SwiftUI docs confirm `.keyboardShortcut(.defaultAction)` is the standard Return shortcut for a default button and `.cancelAction` is Escape; these belong on explicit sheet buttons, not hidden global interceptors. Apple Input Events docs expose command handlers like `onMoveCommand`, `onDeleteCommand`, and `onCommand` for focused view command handling, so row navigation and text editing need separate gates.
@@ -11,6 +17,9 @@
 - Local code check: `ClipboardHistoryView.shouldHandleShortcut(...)` already disables history-row command shortcuts while a sheet is attached or text input is active, and tests cover sheet/text-input/list-navigation cases. The 2026-05-09 fix keeps that boundary and adds a visible Reset button for Show Clipboard History so users can restore Cmd+Shift+V without editing defaults.
 - Local code check: edit-sheet save now uses `ClipboardManager.updateItem(...)` as a single batch mutation for content/title/tags/collection/note. This avoids multiple independent saves while the sheet is closing and keeps history, pinned, and paste-stack mirrors synchronized.
 - Decision: do not add raw key-event interception for edit sheets. Use visible buttons with `.defaultAction`/`.cancelAction`, keep global shortcut registration in `KeyboardShortcuts`, and preserve text-input guards around row command shortcuts. Promote to DEVELOPMENT if this shortcut boundary recurs after the 2.3.1 release.
+- 2026-05-09 release reconciliation note: the May 8 stash included stale tests for a removed `SaneClipShortcutDefaults` migration to Ctrl+Cmd+Shift+H and `CaptureWorkflow.permissionMessage`. Current code intentionally keeps Show Clipboard History at Cmd+Shift+V, uses `KeyboardShortcuts.onKeyUp`, and keeps permission copy in `SaneClipAppDelegate+Capture.swift` / onboarding copy. Do not reintroduce the removed migration just to satisfy stale tests.
+- 2026-05-09 verify finding: SaneUI `SaneSystemSettingsDestination.open()` is `@MainActor`; any SaneClip wrapper that calls it, including `ScreenCapturePermissionService.openSettings()`, must also be main-actor isolated or called from a main-actor context. Mini verify failed at `Core/Capture/ScreenCaptureService.swift:19` when the wrapper stayed synchronous/nonisolated.
+- 2026-05-09 verify finding: after compile passed, the remaining Mini failures were stale source-string tests. `ClipboardItemRow.saveEditSheet()` now owns the `clipboardManager.updateItem(...)` batch call outside the `EditClipboardItemSheet(...)` argument slice, and `SnippetsSettingsView` exposes `Button("Paste Now")` with `clipboardManager?.pasteSnippet(snippet)`. Update tests to assert those current strings, not the older inline closure / `Button("Paste")` / `ClipboardManager.shared?` strings.
 
 ## Mac Basic vs Pro Gating Audit | Updated: 2026-04-20 | Status: active | TTL: 30d
 - Keep active until 2026-05-20.

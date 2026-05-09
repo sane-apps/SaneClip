@@ -20,6 +20,63 @@ release:
   r2_bucket: sanebar-downloads
   use_sparkle: true
   min_system_version: "15.0"
+  reviewed_auto_reconcile_stashes:
+    - stash_sha: "14e71f83362d8b3dc7c8c46ed583419355c9ca23"
+      subject: "On main: auto-reconcile-20260508-215529-stephans-macbook-air"
+      decision: deferred
+      reason: "Reviewed 2026-05-09. Hotfix-critical pieces for edit/save mirrors, snippets visibility, shortcut reset, capture permission recovery, direct update rows, and GitHub #9-#12 are represented in current code/tests. Remaining docs/project collateral is deferred, and the macOS 26 SCScreenshotConfiguration path is intentionally superseded by the compatibility-safe SCScreenshotManager.captureImage implementation after email #688 proved the newer class caused dyld launch crashes on supported macOS 15."
+    - stash_sha: "b7f4d97b20199ddc4ea5f7b350c49958eeabba4d"
+      subject: "On main: auto-reconcile-20260507-215529-stephans-macbook-air"
+      decision: deferred
+      reason: "Reviewed 2026-05-09. Setapp security/keychain and Setapp public-key collateral is not part of the direct-download crash hotfix release candidate; keep it for the Setapp lane instead of mixing it into the urgent direct release."
+    - stash_sha: "c3195ebc86bb5bf7796986751eb05f4753d815a4"
+      subject: "On main: auto-reconcile-20260506-215531-stephans-macbook-air"
+      decision: deferred
+      reason: "Reviewed 2026-05-09. Setapp Info.plist/project/scheme/app icon lane work is intentionally deferred from the direct-download hotfix release; Setapp submission must run its own preflight before any Setapp upload."
+    - stash_sha: "f48252ee117e5372a7299a9e300d2d4231fbe07d"
+      subject: "On main: auto-reconcile-20260501-215526-stephans-macbook-air"
+      decision: superseded
+      reason: "Reviewed 2026-05-09. Small telemetry/test collateral is stale for this direct crash hotfix; current customer-facing edit/save coverage is already handled by later code and tests."
+    - stash_sha: "b5bfec010a52a940e35fd1c1480d879e8a6f7ad9"
+      subject: "On main: auto-reconcile-20260430-215529-stephans-macbook-air"
+      decision: recovered
+      reason: "Reviewed 2026-05-09. The customer-facing README, settings, website, and changelog release-note content for edit/save, capture wording, snippets, and shortcut reset is represented in the current release candidate and appcast notes."
+    - stash_sha: "fcdeb789ff18abe43ff46b24a6a7c0a72308c808"
+      subject: "On main: auto-reconcile-20260429-215525-stephans-macbook-air"
+      decision: deferred
+      reason: "Reviewed 2026-05-09. Large Setapp/UI settings split and screenshot collateral is not part of the direct-download crash hotfix; it must be handled as a separate Setapp/settings refactor with fresh visual verification."
+    - stash_sha: "f81f808c5a0b1dbb23ffb60b1ed39603d3097c95"
+      subject: "On main: auto-reconcile-20260428-215531-stephans-macbook-air"
+      decision: deferred
+      reason: "Reviewed 2026-05-09. iOS/Setapp screenshot/public-key collateral is not required for the direct Mac crash hotfix and remains a separate lane."
+    - stash_sha: "4311d9149b74a870cac2f9a09f9ef39f7b0d3e5d"
+      subject: "On main: auto-reconcile-20260425-215529-stephans-macbook-air"
+      decision: recovered
+      reason: "Reviewed 2026-05-09. Privacy policy collateral for aggregate app counts and website analytics has been restored in PRIVACY.md and docs/privacy.html and covered by public-docs tests."
+    - stash_sha: "bbe87d36ba56a51220839d15df56c85d4d3750f0"
+      subject: "On main: auto-reconcile-20260423-215529-stephans-macbook-air"
+      decision: deferred
+      reason: "Reviewed 2026-05-09. Older OCR/capture/searchability train is not tied to email #688 or GitHub #9-#12. Keep it out of the direct crash hotfix; the release candidate intentionally avoids macOS 26-only screenshot APIs."
+    - stash_sha: "c8ca6ecc1ce86103fa3e54ede612e2105937681d"
+      subject: "On main: auto-reconcile-20260424-153503-stephans-macbook-air"
+      decision: recovered
+      reason: "Reviewed 2026-05-09. Research cache note only; durable findings have been reflected in SESSION_HANDOFF and current release checks."
+    - stash_sha: "fb581bed6f1daab0bb78912550982814be3fbdf7"
+      subject: "On main: auto-reconcile-20260418-055526-stephans-macbook-air"
+      decision: deferred
+      reason: "Reviewed 2026-05-09. App Store screenshot/storyboard and SEO guide collateral is not part of the direct-download hotfix candidate. App Store submission must run its own screenshot/preflight lane before upload."
+    - stash_sha: "5eec9156cb5fcc0fa954b27485d4832a687468b9"
+      subject: "On main: auto-reconcile-20260413-215540-stephans-macbook-air"
+      decision: superseded
+      reason: "Reviewed 2026-05-09. Old .gitignore/.claude settings residue is superseded by current shared SaneProcess ignore and Codex policy."
+    - stash_sha: "fbcc927c34ee159fe4784148ac48ab3e645d1504"
+      subject: "On main: auto-reconcile-20260411-055525-stephans-macbook-air"
+      decision: superseded
+      reason: "Reviewed 2026-05-09. Old .gitignore/.claude settings residue is superseded by current shared SaneProcess ignore and Codex policy."
+    - stash_sha: "9ca752c7d87ae81d1df20f4883f41d6001ba6a56"
+      subject: "On main: auto-reconcile-20260410-215527-stephans-macbook-air"
+      decision: superseded
+      reason: "Reviewed 2026-05-09. Old .gitignore residue is superseded by current canonical shared ignore rules."
   dmg:
     volume_icon: Resources/DMGIcon.icns
     file_icon: Resources/DMGIcon.icns

@@ -1,8 +1,10 @@
+import AppKit
 import SaneUI
 import SwiftUI
 
 struct SnippetsSettingsView: View {
     var licenseService: LicenseService?
+    var clipboardManager: ClipboardManager? = ClipboardManager.shared
     @State private var snippetManager = SnippetManager.shared
     @State private var searchText = ""
     @State private var selectedSnippet: Snippet?
@@ -13,6 +15,10 @@ struct SnippetsSettingsView: View {
 
     var filteredSnippets: [Snippet] {
         snippetManager.search(searchText)
+    }
+
+    var filteredSnippetSections: [SnippetLibrarySection] {
+        SnippetManager.librarySections(for: filteredSnippets)
     }
 
     var body: some View {
@@ -50,6 +56,8 @@ struct SnippetsSettingsView: View {
                 Divider()
             }
 
+            SnippetUsageHint()
+
             // Search bar
             HStack {
                 Image(systemName: "magnifyingglass")
@@ -81,36 +89,49 @@ struct SnippetsSettingsView: View {
                 )
             } else {
                 List(selection: $selectedSnippet) {
-                    ForEach(filteredSnippets) { snippet in
-                        SnippetRow(snippet: snippet, isPro: isPro) {
-                            pasteSnippet(snippet)
-                        }
-                            .tag(snippet)
-                            .contextMenu {
-                                if isPro {
-                                    Button("Paste") {
-                                        pasteSnippet(snippet)
-                                    }
-                                    Divider()
-                                    Button("Edit") {
-                                        selectedSnippet = snippet
-                                        showEditSheet = true
-                                    }
-                                    Button("Duplicate") {
-                                        duplicateSnippet(snippet)
-                                    }
-                                    Divider()
-                                    Button("Delete", role: .destructive) {
-                                        snippetManager.delete(id: snippet.id)
-                                    }
-                                } else {
-                                    Button("Snippets Pro \u{1F512}") {
-                                        if let ls = licenseService {
-                                            ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
+                    ForEach(filteredSnippetSections) { section in
+                        Section {
+                            ForEach(section.snippets) { snippet in
+                                SnippetRow(
+                                    snippet: snippet,
+                                    canPaste: isPro && clipboardManager != nil,
+                                    onCopy: { copySnippet(snippet) },
+                                    onPaste: { clipboardManager?.pasteSnippet(snippet) }
+                                )
+                                    .tag(snippet)
+                                    .contextMenu {
+                                        if isPro {
+                                            Button("Paste Now") {
+                                                clipboardManager?.pasteSnippet(snippet)
+                                            }
+                                            .disabled(clipboardManager == nil)
+                                            Button("Copy for Manual Paste") {
+                                                copySnippet(snippet)
+                                            }
+                                            Divider()
+                                            Button("Edit") {
+                                                selectedSnippet = snippet
+                                                showEditSheet = true
+                                            }
+                                            Button("Duplicate") {
+                                                duplicateSnippet(snippet)
+                                            }
+                                            Divider()
+                                            Button("Delete", role: .destructive) {
+                                                snippetManager.delete(id: snippet.id)
+                                            }
+                                        } else {
+                                            Button("Snippets Pro \u{1F512}") {
+                                                if let ls = licenseService {
+                                                    ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
+                                                }
+                                            }
                                         }
                                     }
-                                }
                             }
+                        } header: {
+                            SnippetSectionHeader(title: section.title, count: section.snippets.count)
+                        }
                     }
                 }
                 .listStyle(.inset)
@@ -186,8 +207,53 @@ struct SnippetsSettingsView: View {
         snippetManager.add(copy)
     }
 
-    private func pasteSnippet(_ snippet: Snippet) {
-        ClipboardManager.shared?.pasteSnippet(snippet)
+    private func copySnippet(_ snippet: Snippet) {
+        guard isPro else {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
+            }
+            return
+        }
+        guard let values = promptValuesIfNeeded(for: snippet) else { return }
+        let expanded = SnippetManager.shared.expand(snippet: snippet, values: values)
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(expanded, forType: .string)
+        SnippetManager.shared.incrementUseCount(for: snippet)
+    }
+
+    private func promptValuesIfNeeded(for snippet: Snippet) -> [String: String]? {
+        let placeholders = SnippetManager.shared.userPlaceholders(in: snippet)
+        guard !placeholders.isEmpty else { return [:] }
+
+        let stack = NSStackView()
+        stack.orientation = .vertical
+        stack.spacing = 8
+
+        var fields: [String: NSTextField] = [:]
+        for placeholder in placeholders {
+            let label = NSTextField(labelWithString: placeholder)
+            let field = NSTextField(string: "")
+            field.placeholderString = placeholder
+            field.widthAnchor.constraint(equalToConstant: 260).isActive = true
+
+            let row = NSStackView(views: [label, field])
+            row.orientation = .horizontal
+            row.spacing = 8
+            label.widthAnchor.constraint(equalToConstant: 90).isActive = true
+            stack.addArrangedSubview(row)
+            fields[placeholder] = field
+        }
+
+        let alert = NSAlert()
+        alert.messageText = "Fill Snippet Placeholders"
+        alert.informativeText = "Enter values before copying \(snippet.name)."
+        alert.alertStyle = .informational
+        alert.accessoryView = stack
+        alert.addButton(withTitle: "Copy")
+        alert.addButton(withTitle: "Cancel")
+
+        guard alert.runModal() == .alertFirstButtonReturn else { return nil }
+        return Dictionary(uniqueKeysWithValues: placeholders.map { ($0, fields[$0]?.stringValue ?? "") })
     }
 }
 
@@ -195,49 +261,93 @@ struct SnippetsSettingsView: View {
 
 struct SnippetRow: View {
     let snippet: Snippet
-    let isPro: Bool
-    let onPaste: () -> Void
+    var canPaste = false
+    var onCopy: (() -> Void)?
+    var onPaste: (() -> Void)?
 
     var body: some View {
-        HStack(alignment: .center, spacing: 10) {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text(snippet.name)
-                        .font(.headline)
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(snippet.name)
+                    .font(.headline)
 
-                    if let category = snippet.category {
-                        Text(category)
-                            .font(.system(size: 13, weight: .semibold))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.blue.opacity(0.2))
-                            .cornerRadius(4)
-                    }
-
-                    Spacer()
-
-                    if snippet.useCount > 0 {
-                        Text("\(snippet.useCount)x")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(clipReadableSecondary)
-                    }
+                if let category = snippet.category?.trimmingCharacters(in: .whitespacesAndNewlines),
+                   !category.isEmpty {
+                    Text(category)
+                        .font(.system(size: 13, weight: .semibold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.blue.opacity(0.2))
+                        .cornerRadius(4)
                 }
 
-                Text(snippet.template)
-                    .font(.system(size: 13))
-                    .foregroundStyle(clipReadableSecondary)
-                    .lineLimit(2)
+                Spacer()
+
+                if snippet.useCount > 0 {
+                    Text("\(snippet.useCount)x")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(clipReadableSecondary)
+                }
+
+                Button("Copy") {
+                    onCopy?()
+                }
+                .buttonStyle(ClipActionButtonStyle())
+                .controlSize(.small)
+                .help("Copy this snippet, then press Command-V in an email or document")
+
+                Button("Paste Now") {
+                    onPaste?()
+                }
+                .buttonStyle(ClipActionButtonStyle())
+                .controlSize(.small)
+                .disabled(!canPaste)
+                .help("Paste this snippet into the frontmost app")
             }
 
-            Button {
-                onPaste()
-            } label: {
-                Label(isPro ? "Paste" : "Paste Pro", systemImage: isPro ? "arrow.down.doc" : "lock.fill")
-            }
-            .buttonStyle(ClipActionButtonStyle(compact: true))
-            .controlSize(.small)
+            Text(snippet.template)
+                .font(.system(size: 13))
+                .foregroundStyle(clipReadableSecondary)
+                .lineLimit(2)
         }
         .padding(.vertical, 4)
+    }
+}
+
+private struct SnippetUsageHint: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label("Use the menu bar Snippets menu after placing the cursor in an email or document.", systemImage: "menubar.rectangle")
+            Label("Copy here for manual Command-V paste.", systemImage: "doc.on.clipboard")
+        }
+        .font(.system(size: 13, weight: .medium))
+        .foregroundStyle(.white.opacity(0.92))
+        .lineLimit(2)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.08))
+    }
+}
+
+private struct SnippetSectionHeader: View {
+    let title: String
+    let count: Int
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: title == "Email" ? "envelope.fill" : "folder.fill")
+                .font(.system(size: 11, weight: .semibold))
+            Text(title)
+                .font(.system(size: 12, weight: .semibold))
+            Text("\(count)")
+                .font(.system(size: 12, weight: .bold))
+                .padding(.horizontal, 6)
+                .padding(.vertical, 1)
+                .background(Color.white.opacity(0.14))
+                .clipShape(Capsule())
+        }
+        .foregroundStyle(.white)
     }
 }
 
@@ -282,7 +392,7 @@ struct SnippetEditorSheet: View {
             Form {
                 TextField("Name", text: $name)
 
-                TextField("Category (optional)", text: $category)
+                TextField("Category for grouping (optional)", text: $category)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Template")

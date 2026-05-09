@@ -6,7 +6,27 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                                        <item>
+                                                                <item>
+            <title>2.3.3</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Sat, 09 May 2026 19:35:38 -0400</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Improves startup reliability on macOS 15, fixes clipboard edit-save behavior, restores shortcut reset and snippet visibility fixes, and keeps App Store builds aligned with Apple review requirements.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.3.zip"
+                       sparkle:version="2303"
+                       sparkle:shortVersionString="2.3.3"
+                       length="3784590"
+                       type="application/octet-stream"
+                       sparkle:edSignature="wbx6h2lFEX5TXP2yX9E5z5KXXNcHnsTo6jSCD6Af8+8gfwsVD2U/wZEUXkzYwbVuwqlw+Qh+X5SpoTunv7d3DQ=="/>
+        </item>
+<item>
             <title>2.3.2</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Sat, 09 May 2026 02:06:54 -0400</pubDate>

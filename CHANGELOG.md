@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.1] - 2026-05-09
+
+Fixes editing saved clipboard items, clarifies Capture Text from Screen permissions, adds visible snippet paste controls, and adds a reset action for the clipboard history shortcut.
+
+---
+
 ## [2.3.0] - 2026-04-25
 
 Adds the current direct-download and App Store release line with the refreshed Basic/Pro clipboard workflow, updated release packaging, and the latest iCloud/mobile companion polish.

@@ -1504,6 +1504,65 @@ class ClipboardManager {
         }
     }
 
+    func updateItem(
+        id: UUID,
+        newContent: String? = nil,
+        title: String? = nil,
+        tags: [String] = [],
+        collection: String = "Default",
+        note: String? = nil,
+        updateMetadata: Bool = false
+    ) {
+        if updateMetadata, licenseService?.isPro != true {
+            if let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.organization, licenseService: ls)
+            }
+            return
+        }
+
+        guard let index = history.firstIndex(where: { $0.id == id }) else { return }
+        var updatedItem = history[index]
+
+        if let newContent {
+            guard !newContent.isEmpty else { return }
+            updatedItem = ClipboardItem(
+                id: updatedItem.id,
+                content: .text(newContent),
+                timestamp: updatedItem.timestamp,
+                sourceAppBundleID: updatedItem.sourceAppBundleID,
+                sourceAppName: updatedItem.sourceAppName,
+                pasteCount: updatedItem.pasteCount,
+                title: updatedItem.title,
+                tags: updatedItem.tags,
+                collection: updatedItem.collection,
+                note: updatedItem.note,
+                ocrText: updatedItem.ocrText
+            )
+        }
+
+        if updateMetadata {
+            let trimmedTitle = title?.trimmingCharacters(in: .whitespacesAndNewlines)
+            updatedItem.title = (trimmedTitle?.isEmpty ?? true) ? nil : trimmedTitle
+            updatedItem.tags = Self.normalizedTags(tags)
+            let trimmedCollection = collection.trimmingCharacters(in: .whitespacesAndNewlines)
+            updatedItem.collection = trimmedCollection.isEmpty ? "Default" : trimmedCollection
+            let trimmedNote = note?.trimmingCharacters(in: .whitespacesAndNewlines)
+            updatedItem.note = (trimmedNote?.isEmpty ?? true) ? nil : trimmedNote
+        }
+
+        history[index] = updatedItem
+        if let pinnedIndex = pinnedItems.firstIndex(where: { $0.id == id }) {
+            pinnedItems[pinnedIndex] = updatedItem
+        }
+        if let stackIndex = pasteStack.firstIndex(where: { $0.id == id }) {
+            pasteStack[stackIndex] = updatedItem
+            savePasteStack()
+        }
+
+        saveHistory()
+        logger.debug("Updated item \(id)")
+    }
+
     /// Update an item's note
     func updateItemNote(id: UUID, note: String?) {
         guard licenseService?.isPro == true else {
@@ -1585,14 +1644,7 @@ class ClipboardManager {
             }
             return
         }
-        let normalized = Array(
-            Set(
-                tags
-                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                    .filter { !$0.isEmpty }
-            )
-        )
-        .sorted()
+        let normalized = Self.normalizedTags(tags)
 
         if let index = history.firstIndex(where: { $0.id == id }) {
             history[index].tags = normalized
@@ -1628,6 +1680,17 @@ class ClipboardManager {
         let names = Set(history.map(\.collection).filter { !$0.isEmpty })
         let withDefault = names.union(["Default"])
         return withDefault.sorted()
+    }
+
+    private nonisolated static func normalizedTags(_ tags: [String]) -> [String] {
+        Array(
+            Set(
+                tags
+                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty }
+            )
+        )
+        .sorted()
     }
 
     @discardableResult

@@ -567,18 +567,29 @@ struct ClipboardItemRow: View {
                 note: $editNote,
                 isImageItem: isImageItem,
                 onSave: {
+                    let parsedTags = editTags
+                        .split(separator: ",")
+                        .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+                        .filter { !$0.isEmpty }
                     if !isImageItem {
-                        clipboardManager.updateItemContent(id: item.id, newContent: editText)
-                    }
-                    if isPro {
-                        clipboardManager.updateItemTitle(id: item.id, title: editTitle)
-                        let parsedTags = editTags
-                            .split(separator: ",")
-                            .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
-                            .filter { !$0.isEmpty }
-                        clipboardManager.updateItemTags(id: item.id, tags: parsedTags)
-                        clipboardManager.updateItemCollection(id: item.id, collection: editCollection)
-                        clipboardManager.updateItemNote(id: item.id, note: editNote)
+                        clipboardManager.updateItem(
+                            id: item.id,
+                            newContent: editText,
+                            title: editTitle,
+                            tags: parsedTags,
+                            collection: editCollection,
+                            note: editNote,
+                            updateMetadata: isPro
+                        )
+                    } else if isPro {
+                        clipboardManager.updateItem(
+                            id: item.id,
+                            title: editTitle,
+                            tags: parsedTags,
+                            collection: editCollection,
+                            note: editNote,
+                            updateMetadata: true
+                        )
                     }
                     showEditSheet = false
                 },

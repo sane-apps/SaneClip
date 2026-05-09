@@ -1417,7 +1417,19 @@ struct ShortcutsSettingsView: View {
             VStack(spacing: 24) {
                 CompactSection("Main Shortcuts") {
                     CompactRow("Show Clipboard History") {
-                        KeyboardShortcuts.Recorder(for: .showClipboardHistory)
+                        HStack(spacing: 8) {
+                            KeyboardShortcuts.Recorder(for: .showClipboardHistory)
+                            Button {
+                                KeyboardShortcuts.setShortcut(
+                                    .init(.v, modifiers: [.command, .shift]),
+                                    for: .showClipboardHistory
+                                )
+                            } label: {
+                                Label("Reset", systemImage: "arrow.counterclockwise")
+                            }
+                            .buttonStyle(ClipActionButtonStyle(compact: true))
+                            .controlSize(.small)
+                        }
                     }
                     CompactDivider()
                     CompactRow(SaneClipSettingsCopy.captureScreenshotLabel) {

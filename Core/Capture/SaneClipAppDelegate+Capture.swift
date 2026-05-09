@@ -95,7 +95,7 @@ extension SaneClipAppDelegate {
     private func presentScreenCapturePermissionAlert(title: String) {
         let alert = NSAlert()
         alert.messageText = title
-        alert.informativeText = "SaneClip needs Screen Recording permission for Capture Screenshot and Pro OCR capture. Turn it on in System Settings, then try again."
+        alert.informativeText = "SaneClip needs Screen Recording permission for Capture Screenshot and Capture Text from Screen. Turn it on in System Settings, then try again."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Open Screen Recording Settings")
         alert.addButton(withTitle: "Not Now")

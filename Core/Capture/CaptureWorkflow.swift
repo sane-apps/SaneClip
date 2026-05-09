@@ -7,7 +7,7 @@ enum CaptureWorkflow {
         case .screenshot:
             "Capture Screenshot..."
         case .text:
-            "Capture Text..."
+            "Capture Text from Screen..."
         }
     }
 
@@ -16,7 +16,7 @@ enum CaptureWorkflow {
         case .screenshot:
             "Capture Screenshot"
         case .text:
-            "Capture Text"
+            "Capture Text from Screen"
         }
     }
 }

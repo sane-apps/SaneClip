@@ -221,7 +221,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private var captureTextMenuItemTitle: String {
-        licenseService.isPro ? CaptureWorkflow.text.menuTitle : "Capture Text Pro 🔒"
+        licenseService.isPro ? CaptureWorkflow.text.menuTitle : "Capture Text from Screen Pro 🔒"
     }
 
     private func requestAccessibilityAccess() {
@@ -254,7 +254,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
                 .init(
                     title: "Screen Recording",
                     bullets: [
-                        ("text.viewfinder", "Capture Screenshot and Pro OCR capture need Screen Recording."),
+                        ("text.viewfinder", "Capture Screenshot and Capture Text from Screen need Screen Recording."),
                         ("lock.shield.fill", "macOS should prompt right away or open the correct Settings pane."),
                         ("arrow.clockwise", "After granting it, quit and reopen SaneClip once before testing capture.")
                     ],
@@ -292,7 +292,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
                 .init(
                     title: "Screen Recording",
                     bullets: [
-                        ("text.viewfinder", "Capture Screenshot and Pro OCR capture need Screen Recording."),
+                        ("text.viewfinder", "Capture Screenshot and Capture Text from Screen need Screen Recording."),
                         ("lock.shield.fill", "macOS should prompt right away or open the correct Settings pane."),
                         ("arrow.clockwise", "After granting it, quit and reopen SaneClip once before testing capture.")
                     ],

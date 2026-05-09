@@ -288,7 +288,7 @@ enum SaneClipSettingsCopy {
 
     static let captureTextLabel = String(
         localized: "saneclip.settings.capture.capture_text",
-        defaultValue: "Capture Text"
+        defaultValue: "Capture Text from Screen"
     )
 
     static let ignoreOnceButtonTitle = String(

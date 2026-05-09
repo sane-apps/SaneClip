@@ -1,9 +1,19 @@
 # Session Handoff — SaneClip
 
-**Last updated:** 2026-04-23
+**Last updated:** 2026-05-09
 **Current project version:** `2.3.0` (build `2300`)
 
 ## Current State
+
+- 2026-05-09 visual/discoverability and tester-feedback pass:
+  - Dock right-click and menu-bar right-click are expected to expose the same customer-critical actions through the shared menu contract: Settings, License, Check for Updates, About / Report a Bug, and Quit.
+  - Capture Text is now named `Capture Text from Screen` in menus, settings, and permission copy so it does not read like generic clipboard text capture.
+  - Screen Recording permission copy now names the real capabilities: Capture Screenshot and Capture Text from Screen.
+  - History item editing uses a single batch update path so content, title/tags/collection/note, pinned copies, and paste-stack mirrors do not drift.
+  - Snippet rows now expose a visible Paste/Paste Pro action and the context menu includes Paste before edit/manage actions, improving discoverability.
+  - Shortcuts settings includes an inline reset affordance for Show Clipboard History.
+  - Latest recorded Mini verification for this pass: SaneClip verify passed with 154 tests.
+  - Live GitHub state at closeout: `#9` edit-save, `#10` clipboard-history shortcut, `#11` Capture Text, and `#12` snippets paste discoverability remain open and map to this local pass. Do not close or comment publicly without exact draft approval.
 
 - The current repo version is `2.3.0`; this is the capture/OCR feature train.
 - `CHANGELOG.md` is the current release ledger. Use it instead of the stale `v2.0 released / App Store REJECTED` summary below.
@@ -49,14 +59,14 @@
 - Latest App Store preflight result: no blockers, only the expected uncommitted-files warning.
 - Latest Mini verification: `SaneMaster verify --timeout 1800` passed `143/143` tests. Remaining lint warnings are existing file-length warnings in `SaneClipApp.swift` and `Core/Sync/SyncCoordinator.swift`.
 - Latest Mini runtime check: signed Release build staged to `/Applications/SaneClip.app`, launched successfully, and compiled app plist shows `CFBundleShortVersionString=2.3.0`, `CFBundleVersion=2300`, and the screen-capture usage string.
-- Latest visual check: fresh Mini render screenshots in `/tmp/saneclip-capture-renders` copied to `outputs/capture-renders/latest`; direct inspection showed capture controls, shortcuts, image OCR rows, and About screen are professional. NVIDIA vision audit remains blocked by provider HTTP 400, even on small JPEG input.
+- Latest visual check: fresh Mini render screenshots in `/tmp/saneclip-capture-renders` copied to `outputs/capture-renders/latest`; direct inspection showed capture controls, shortcuts, image OCR rows, and About screen are professional.
 
 ### Closeout - 2026-04-23
 
 #### Done
 - Capture/OCR feature set is implemented, formatted to the repo's SwiftLint style, and prepared as `2.3.0` build `2300`.
 - Mini verification passed after final formatting: `143/143` tests, signed Release build staged/launched from `/Applications/SaneClip.app`, and App Store preflight has no blockers.
-- `gh issue list --limit 20` returned no open issues at closeout.
+- At the 2026-04-23 capture closeout, `gh issue list --limit 20` returned no open issues. This is now superseded by the 2026-05-09 live issue state above (`#9`-`#12` open).
 
 #### Docs
 - `SESSION_HANDOFF.md` and Serena memory `SaneClip/capture-v1-apr23-2026` are current for this work.
@@ -131,7 +141,7 @@
 
 4. **Backward-compatible `isSelfWrite` computed property** — URLSchemeHandler.swift still works via the computed accessor.
 
-5. **Ran full critic review** — 21 free NVIDIA reviews (7 perspectives × 3 models: mistral, deepseek, kimi-fast). All 21/21 flagged the isSelfWrite race. Consensus synthesis tagged 3 CERTAIN, 3 HIGH, 5 MEDIUM issues.
+5. **Ran full critic review** — 21 external review passes flagged the `isSelfWrite` race. Consensus synthesis tagged 3 CERTAIN, 3 HIGH, 5 MEDIUM issues.
 
 **Commit:** `7014863` — pushed to origin/main. Pre-commit AI review (mistral): LGTM.
 

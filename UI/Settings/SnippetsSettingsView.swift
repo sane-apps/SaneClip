@@ -82,10 +82,16 @@ struct SnippetsSettingsView: View {
             } else {
                 List(selection: $selectedSnippet) {
                     ForEach(filteredSnippets) { snippet in
-                        SnippetRow(snippet: snippet)
+                        SnippetRow(snippet: snippet, isPro: isPro) {
+                            pasteSnippet(snippet)
+                        }
                             .tag(snippet)
                             .contextMenu {
                                 if isPro {
+                                    Button("Paste") {
+                                        pasteSnippet(snippet)
+                                    }
+                                    Divider()
                                     Button("Edit") {
                                         selectedSnippet = snippet
                                         showEditSheet = true
@@ -179,41 +185,57 @@ struct SnippetsSettingsView: View {
         )
         snippetManager.add(copy)
     }
+
+    private func pasteSnippet(_ snippet: Snippet) {
+        ClipboardManager.shared?.pasteSnippet(snippet)
+    }
 }
 
 // MARK: - Snippet Row
 
 struct SnippetRow: View {
     let snippet: Snippet
+    let isPro: Bool
+    let onPaste: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(snippet.name)
-                    .font(.headline)
+        HStack(alignment: .center, spacing: 10) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(snippet.name)
+                        .font(.headline)
 
-                if let category = snippet.category {
-                    Text(category)
-                        .font(.system(size: 13, weight: .semibold))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.blue.opacity(0.2))
-                        .cornerRadius(4)
+                    if let category = snippet.category {
+                        Text(category)
+                            .font(.system(size: 13, weight: .semibold))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.blue.opacity(0.2))
+                            .cornerRadius(4)
+                    }
+
+                    Spacer()
+
+                    if snippet.useCount > 0 {
+                        Text("\(snippet.useCount)x")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(clipReadableSecondary)
+                    }
                 }
 
-                Spacer()
-
-                if snippet.useCount > 0 {
-                    Text("\(snippet.useCount)x")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(clipReadableSecondary)
-                }
+                Text(snippet.template)
+                    .font(.system(size: 13))
+                    .foregroundStyle(clipReadableSecondary)
+                    .lineLimit(2)
             }
 
-            Text(snippet.template)
-                .font(.system(size: 13))
-                .foregroundStyle(clipReadableSecondary)
-                .lineLimit(2)
+            Button {
+                onPaste()
+            } label: {
+                Label(isPro ? "Paste" : "Paste Pro", systemImage: isPro ? "arrow.down.doc" : "lock.fill")
+            }
+            .buttonStyle(ClipActionButtonStyle(compact: true))
+            .controlSize(.small)
         }
         .padding(.vertical, 4)
     }

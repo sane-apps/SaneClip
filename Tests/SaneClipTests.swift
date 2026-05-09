@@ -657,6 +657,59 @@ struct SaneClipTests {
         }
     }
 
+    @Test("ClipboardManager batch edit updates all item mirrors with one call")
+    @MainActor
+    func clipboardManagerBatchEditUpdatesMirrors() {
+        withClipboardManagerState { manager in
+            let item = ClipboardItem(content: .text("before"), sourceAppName: "Notes")
+
+            manager.history = [item]
+            manager.pinnedItems = [item]
+            manager.pasteStack = [item]
+
+            manager.updateItem(id: item.id, newContent: "after")
+
+            guard case let .text(historyText) = manager.history[0].content else {
+                Issue.record("Expected history item to remain text")
+                return
+            }
+            guard case let .text(pinnedText) = manager.pinnedItems[0].content else {
+                Issue.record("Expected pinned item to remain text")
+                return
+            }
+            guard case let .text(stackText) = manager.pasteStack[0].content else {
+                Issue.record("Expected paste stack item to remain text")
+                return
+            }
+
+            #expect(historyText == "after")
+            #expect(pinnedText == "after")
+            #expect(stackText == "after")
+        }
+    }
+
+    @Test("Edit sheet saves item changes through the batch update path")
+    func editSheetUsesBatchUpdatePath() throws {
+        let rowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRow.swift"),
+            encoding: .utf8
+        )
+
+        guard let sheetStart = rowSource.range(of: "EditClipboardItemSheet("),
+              let sheetEnd = rowSource.range(of: ".sheet(isPresented: $showCollectionSheet)") else {
+            Issue.record("Could not find edit sheet source")
+            return
+        }
+
+        let editSheetSource = String(rowSource[sheetStart.lowerBound..<sheetEnd.lowerBound])
+        #expect(editSheetSource.contains("clipboardManager.updateItem("))
+        #expect(!editSheetSource.contains("updateItemContent("))
+        #expect(!editSheetSource.contains("updateItemTitle("))
+        #expect(!editSheetSource.contains("updateItemTags("))
+        #expect(!editSheetSource.contains("updateItemCollection("))
+        #expect(!editSheetSource.contains("updateItemNote("))
+    }
+
     @Test("Snippet intents require Pro")
     @MainActor
     func snippetIntentsRequirePro() async {
@@ -1456,7 +1509,7 @@ struct SaneClipTests {
         #expect(appSource.contains("static let captureScreenshot = Self(\"captureScreenshot\")"))
         #expect(appSource.contains("static let captureText = Self(\"captureText\")"))
         #expect(captureWorkflowSource.contains("Capture Screenshot..."))
-        #expect(captureWorkflowSource.contains("Capture Text..."))
+        #expect(captureWorkflowSource.contains("Capture Text from Screen..."))
         #expect(appSource.contains("KeyboardShortcuts.onKeyUp(for: .captureScreenshot)"))
         #expect(appSource.contains("KeyboardShortcuts.onKeyUp(for: .captureText)"))
         #expect(captureActionSource.contains("recognizedTextForScreenshot(result.image, language: ocrLanguage)"))
@@ -1548,7 +1601,7 @@ struct SaneClipTests {
             encoding: .utf8
         )
 
-        #expect(appSource.contains("Capture Screenshot and Pro OCR capture need Screen Recording."))
+        #expect(appSource.contains("Capture Screenshot and Capture Text from Screen need Screen Recording."))
         #expect(appSource.contains("Accessibility enables one-click paste and keyboard workflows."))
         #expect(appSource.contains("After granting it, quit and reopen SaneClip once before testing capture."))
         #expect(appSource.contains("Request Accessibility Access"))
@@ -1728,6 +1781,8 @@ struct SaneClipTests {
         #expect(!rowSource.contains("Remove Note — \\(upgradePriceLabel)"))
         #expect(snippetsSource.contains("Text(\"Pro\")"))
         #expect(snippetsSource.contains("Button(\"Snippets Pro \\u{1F512}\")"))
+        #expect(snippetsSource.contains("Button(\"Paste\")"))
+        #expect(snippetsSource.contains("ClipboardManager.shared?.pasteSnippet(snippet)"))
         #expect(snippetsSource.contains("Text(\"Add Snippet\")"))
         #expect(!snippetsSource.contains("Add Snippet \\u{1F512}"))
         #expect(!snippetsSource.contains("Upgrade — \\(licenseService?.displayPriceLabel"))
@@ -1738,7 +1793,7 @@ struct SaneClipTests {
         #expect(!settingsSource.contains("Text(\"Upgrade — \\(licenseService?.displayPriceLabel"))
         #expect(appSource.contains("NSMenuItem(title: \"Snippets Pro \\u{1F512}\", action: #selector(showSnippetsUpsell), keyEquivalent: \"\")"))
         #expect(appSource.contains("private var captureTextMenuItemTitle: String {"))
-        #expect(appSource.contains("licenseService.isPro ? CaptureWorkflow.text.menuTitle : \"Capture Text Pro 🔒\""))
+        #expect(appSource.contains("licenseService.isPro ? CaptureWorkflow.text.menuTitle : \"Capture Text from Screen Pro 🔒\""))
         #expect(appSource.contains("@objc private func showSnippetsUpsell()"))
     }
 

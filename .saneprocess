@@ -21,6 +21,50 @@ release:
   use_sparkle: true
   min_system_version: "15.0"
   reviewed_auto_reconcile_stashes:
+    - stash_sha: "b5e4c5992a474829a159275d7e2e5b8b87b11c1b"
+      subject: "On main: auto-reconcile-20260508-215519-stephans-mac-mini"
+      decision: deferred
+      reason: "Reviewed 2026-05-09. Mixed hotfix lane. Current HEAD already has the edit/save, snippet visibility, shortcut reset, capture wording, and update-row fixes, while this stash also reintroduces macOS 26-only SCScreenshotConfiguration/captureScreenshot(...) and older 2.3.0/default-encryption copy. Keep it out of direct v2.3.3."
+    - stash_sha: "356fd5a95016c30c7c577ac203d471f26368cd33"
+      subject: "On main: auto-reconcile-20260507-215520-stephans-mac-mini"
+      decision: deferred
+      reason: "Reviewed 2026-05-09. Setapp-only lane work: Setapp entitlements/README changes plus project metadata rewound to 2.3.0. Not needed for the direct v2.3.3 hotfix; handle in the Setapp lane."
+    - stash_sha: "7153e8846e314948ded579cee71c903daa840607"
+      subject: "On main: auto-reconcile-20260506-215521-stephans-mac-mini"
+      decision: deferred
+      reason: "Reviewed 2026-05-09. Setapp lane scaffolding in .saneprocess, scheme/project config, and collateral. Separate from the direct-download crash hotfix and still needs its own Setapp verification path."
+    - stash_sha: "321ae3930ca7a0c29dd32bc9ade1c4af2fa8b252"
+      subject: "On main: auto-reconcile-20260430-215517-stephans-mac-mini"
+      decision: superseded
+      reason: "Reviewed 2026-05-09. Older pre-2.3.3 state. It drops the batch-edit, capture wording, and shortcut-reset assertions and rewrites docs/index.html back to 2.3.0. Current HEAD/appcast already cover the shipped direct-release behavior."
+    - stash_sha: "b2347f23c00d14be53a6daab772ead6514b1b3d2"
+      subject: "On main: auto-reconcile-20260430-055519-stephans-mac-mini"
+      decision: superseded
+      reason: "Reviewed 2026-05-09. Project-file-only rollback to 2.3.0/2300 with stale icon wiring. Superseded by current 2.3.3 project metadata and live release state."
+    - stash_sha: "13fce12306da6bf65167f9a2c503d69772e5f5cb"
+      subject: "On main: auto-reconcile-20260429-215516-stephans-mac-mini"
+      decision: deferred
+      reason: "Reviewed 2026-05-09. Large alternate Setapp/iOS/settings refactor. Includes iOS URL-scheme/onboarding hooks and a major settings split that is not required for the direct crash hotfix. Needs a separate lane-specific pass."
+    - stash_sha: "2e0224d11574569450eb413f91f130ae783e857a"
+      subject: "On main: auto-reconcile-20260428-215521-stephans-mac-mini"
+      decision: deferred
+      reason: "Reviewed 2026-05-09. iOS plus Setapp collateral only: iOS URL-scheme/onboarding-page support, Setapp key enforcement, and older version metadata. Separate App Store/Setapp lane, not direct v2.3.3."
+    - stash_sha: "05c534eee11ca73929009e691137cc58ba394b09"
+      subject: "On main: auto-reconcile-20260425-215520-stephans-mac-mini"
+      decision: superseded
+      reason: "Reviewed 2026-05-09. SESSION_HANDOFF-only rollback to 2026-04-25 / v2.3.0. Current handoff includes the May 9 release-readiness and #688 crash context, so this stash is stale."
+    - stash_sha: "570f66be5fe2c664f6d40d65849b6583ea7a8f7e"
+      subject: "On main: auto-reconcile-20260424-215517-stephans-mac-mini"
+      decision: superseded
+      reason: "Reviewed 2026-05-09. docs/index.html-only rollback of website softwareVersion from 2.3.3 to 2.3.0. Current direct-release docs already point at 2.3.3."
+    - stash_sha: "567f37bee3c1b07a9f2da98ac2b81f25bb926836"
+      subject: "On main: auto-reconcile-20260424-153452-stephans-mac-mini"
+      decision: superseded
+      reason: "Reviewed 2026-05-09. Older website/appcast/privacy metadata train. Rewinds appcast/download links and comparison copy away from the live 2.3.3 direct channel and newer privacy disclosures."
+    - stash_sha: "e139a73b7ee399917e4aeb03452f34bc980b930b"
+      subject: "On main: auto-reconcile-20260423-215519-stephans-mac-mini"
+      decision: superseded
+      reason: "Reviewed 2026-05-09. Very old capture train. Relative to HEAD it predates the current capture/OCR implementation and the no-SCScreenshotConfiguration hotfix assertions, so it should not land in the direct v2.3.3 release."
     - stash_sha: "14e71f83362d8b3dc7c8c46ed583419355c9ca23"
       subject: "On main: auto-reconcile-20260508-215529-stephans-macbook-air"
       decision: deferred

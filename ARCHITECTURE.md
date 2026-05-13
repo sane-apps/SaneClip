@@ -2,7 +2,7 @@
 
 > [README](README.md) · [ARCHITECTURE](ARCHITECTURE.md) · [DEVELOPMENT](DEVELOPMENT.md) · [PRIVACY](PRIVACY.md) · [SECURITY](SECURITY.md)
 
-Last updated: 2026-02-02
+Last updated: 2026-05-13
 
 ## Purpose
 
@@ -10,7 +10,7 @@ SaneClip is a macOS clipboard manager that captures clipboard history, applies r
 
 ## Non-goals
 
-- No cloud sync or analytics.
+- No SaneApps clipboard sync server and no ad-tech analytics. Optional iCloud sync uses the customer's iCloud account, and privacy-preserving operational counts never include clipboard content.
 - No clipboard capture for transient or password-manager types.
 - No network dependency for core clipboard functionality.
 

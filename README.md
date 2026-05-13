@@ -53,7 +53,7 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 | **📵 App Exclusions** | Block 1Password, banking apps, or any sensitive app from clipboard capture entirely. |
 | **🕵️ Sensitive Data Detection** | Automatically flags credit cards, SSNs, API keys, passwords, private keys. |
 
-**On-device by default. Optional iCloud sync between your devices. No clipboard-content upload to SaneApps. A few simple anonymous app counts help us improve the app.**
+**On-device by default. Clipboard contents never go to SaneApps servers. Optional iCloud sync uses your own iCloud account, and encrypted sync payloads stay unreadable to SaneApps when History Encryption is enabled. A few simple non-content app counts help us improve the app.**
 
 ---
 
@@ -220,9 +220,9 @@ Send HTTP notifications when clipboard events occur with HMAC-SHA256 signatures 
 
 SaneClip is **privacy-first**:
 
-- ✅ **100% On-Device by Default** — Your clipboard history stays on your Mac
-- ✅ **Optional iCloud Sync** — Syncs only between your own devices if you turn it on
-- ✅ **No Personal-Content Upload** — Clipboard contents are not sent to SaneApps servers
+- ✅ **On-Device by Default** — Your clipboard history stays on your Mac unless you enable sync or webhooks
+- ✅ **Optional iCloud Sync** — Syncs through your own iCloud account, not a SaneApps server
+- ✅ **No Clipboard-Content Upload to SaneApps** — Clipboard contents are not sent to SaneApps servers
 - ✅ **100% Transparent Code** — Verify yourself at [github.com/sane-apps/SaneClip](https://github.com/sane-apps/SaneClip)
 - ✅ **PolyForm Shield License** — Community-auditable, source-available
 
@@ -339,7 +339,7 @@ Before opening a PR:
 | Other Clipboard Managers | SaneClip |
 |--------------------------|----------|
 | ❌ Plaintext storage | ✅ AES-256-GCM encryption |
-| ❌ Third-party cloud sync | ✅ Optional private iCloud sync between your devices only |
+| ❌ Third-party cloud sync | ✅ Optional iCloud sync through your own account, not a SaneApps sync server |
 | ❌ Personal-content upload | ✅ Your clipboard contents stay on your Mac |
 | ❌ Closed source | ✅ 100% Transparent Code (PolyForm Shield) |
 | ❌ Subscription pricing | ✅ $14.99 one-time, free updates |

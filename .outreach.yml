@@ -64,5 +64,5 @@ x_search_keywords:
 
 # X/Twitter draft templates
 x_tweet_drafts:
-  - "SaneClip: Privacy-first clipboard manager. Touch ID protected, AES-256 encrypted, 100% on-device. No cloud, no tracking."
-  - "Just shipped SaneClip 1.4: Military-grade encryption for your clipboard history. Keychain integration, URL scheme confirmations, HTTPS webhooks."
+  - "SaneClip: Privacy-first clipboard manager. Clipboard contents never go to SaneApps servers, optional sync uses your own iCloud account, and History Encryption protects synced payloads before upload."
+  - "SaneClip is built around the clipboard staying yours: transparent code, no ad-tech tracking, no data sale, Touch ID lock, app exclusions, and optional encrypted history."

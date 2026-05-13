@@ -3,16 +3,18 @@
 > [README](README.md) · [ARCHITECTURE](ARCHITECTURE.md) · [DEVELOPMENT](DEVELOPMENT.md) · [PRIVACY](PRIVACY.md) · [SECURITY](SECURITY.md)
 
 **Effective Date:** March 26, 2026
-**Last Updated:** April 25, 2026
+**Last Updated:** May 13, 2026
 
-SaneClip is built to keep your clipboard history on your device. This page explains what stays local, when the app uses the network, and why.
+SaneClip is built so your clipboard stays yours. This page explains what stays local, when the app uses the network, and why.
 
 ## The Short Version
 
 - Your clipboard history stays on your Mac by default
-- Optional iCloud sync works only between your own devices if you turn it on
+- Clipboard contents are never sent to SaneApps servers
+- Optional iCloud sync uses your own iCloud account between your own devices, not a SaneApps sync server
+- When History Encryption is enabled, synced clipboard content is encrypted before upload and decrypted only on your devices
 - Optional webhooks send data only if you set them up
-- The app may send privacy-preserving aggregate counts, such as whether it opened in Free or Pro, whether an upgrade button was clicked, whether a license was activated, app version, build, and update status
+- The app may send privacy-preserving aggregate operational counts, such as whether it opened in Basic or Pro, whether an upgrade button was clicked, whether a license was activated, app version, build, and update status
 - No account is required
 
 ## What Stays Local
@@ -35,7 +37,7 @@ SaneClip uses the network only when:
 - It checks for app updates
 - It sends privacy-preserving aggregate counts, such as Free vs Pro launches, upgrade flow, license activation, app version, build, and update status
 
-Those app counts do not include your clipboard contents.
+Those app counts do not include your clipboard contents, personal files, copied text, copied images, or synced clip data.
 
 ## What SaneClip Does Not Collect
 
@@ -51,11 +53,19 @@ Those app counts do not include your clipboard contents.
 SaneClip uses:
 
 - **Sparkle** for update checks on the direct-download version
-- **CloudKit / iCloud** if you turn on sync
+- **CloudKit / iCloud** if you turn on sync between your devices
 - **SaneApps distribution service** for privacy-preserving aggregate app counts
 - **Cloudflare Web Analytics** on public website pages for cookie-free aggregate traffic stats, such as page views and referrers
 
 These website services apply to `saneclip.com` pages, not to your clipboard history inside the app.
+
+## iCloud Sync And Encryption
+
+SaneClip does not run a clipboard sync server. If you enable sync, SaneClip uses Apple's CloudKit in your own iCloud account to move clipboard items between your devices.
+
+When History Encryption is enabled, clipboard content is encrypted with AES-GCM before it is uploaded to CloudKit and decrypted on-device when SaneClip reads it back. In that mode, SaneApps cannot read your synced clipboard content, and Apple receives encrypted payloads rather than plaintext clipboard content.
+
+Without History Encryption, iCloud still uses Apple's transport and at-rest protections, but SaneClip does not represent that as app-level end-to-end encryption. The stronger "not readable by SaneApps or Apple" claim applies to History Encryption.
 
 ## Password Protection
 

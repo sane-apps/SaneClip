@@ -6,7 +6,27 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                                                <item>
+                                                                        <item>
+            <title>2.3.4</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Tue, 12 May 2026 22:31:11 -0400</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Fixes Capture Text after the macOS screen picker and moves clipboard history to Cmd-Shift-Control-Y.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.4.zip"
+                       sparkle:version="2304"
+                       sparkle:shortVersionString="2.3.4"
+                       length="3789058"
+                       type="application/octet-stream"
+                       sparkle:edSignature="ejoeLCc1WcZt+WIO4FiIFOPNN/R0WV4YADFaHOG32aiIxblIjr60sAU8i77ZaLwKuzsXrSlEnGhskRPN2sFSCQ=="/>
+        </item>
+<item>
             <title>2.3.3</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Sat, 09 May 2026 19:35:38 -0400</pubDate>

@@ -43,6 +43,7 @@ extension KeyboardShortcuts.Name {
 class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
+    private var historyWindow: NSWindow?
     var clipboardManager: ClipboardManager!
     let screenCaptureService = ScreenCaptureService()
     let captureOCRService = CaptureOCRService()
@@ -74,6 +75,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     private let hasSeenWelcomeKey = "hasSeenWelcome"
     private let welcomeResumePageKey = "welcomeResumePage"
+    private let historyShortcutReliableDefaultMigrationKey = "historyShortcutReliableDefaultMigration_v234_controlY"
     private let permissionsWelcomePage = 5
     private var requiresHistoryAuth: Bool {
         licenseService.isPro && SettingsModel.shared.requireTouchID
@@ -371,18 +373,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         popover = NSPopover()
         resetHistoryPopoverSize()
         popover.behavior = .transient
-        popover.contentViewController = NSHostingController(
-            rootView: ClipboardHistoryView(clipboardManager: clipboardManager, licenseService: licenseService)
-                .frame(
-                    minWidth: ClipboardHistoryView.popoverWidth,
-                    idealWidth: ClipboardHistoryView.popoverWidth,
-                    maxWidth: ClipboardHistoryView.popoverWidth,
-                    minHeight: ClipboardHistoryView.popoverMinHeight,
-                    idealHeight: ClipboardHistoryView.popoverMinHeight,
-                    alignment: .top
-                )
-                .preferredColorScheme(.dark)
-        )
+        popover.contentViewController = NSHostingController(rootView: historyRootView())
 
         installMainMenu()
 
@@ -399,7 +390,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         // Register handlers
         KeyboardShortcuts.onKeyUp(for: .showClipboardHistory) { [weak self] in
             Task { @MainActor in
-                self?.togglePopover()
+                self?.toggleHistoryWindow()
             }
         }
 
@@ -456,11 +447,13 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     private func setDefaultShortcutsIfNeeded() {
         clearLegacyProShortcutDefaultsForBasicUsers()
+        migrateHistoryShortcutFromCommandShiftVIfNeeded()
 
-        // Show clipboard history: Cmd+Shift+V
+        // Show clipboard history: Cmd+Shift+Control+Y. V-based shortcuts collide with common paste commands.
+        // H-based variants are avoided because macOS treats Command-H as a system hide action.
         if KeyboardShortcuts.getShortcut(for: .showClipboardHistory) == nil {
-            KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .shift]), for: .showClipboardHistory)
-            appLogger.info("Set default shortcut: Cmd+Shift+V for clipboard history")
+            KeyboardShortcuts.setShortcut(.init(.y, modifiers: [.command, .shift, .control]), for: .showClipboardHistory)
+            appLogger.info("Set default shortcut: Cmd+Shift+Control+Y for clipboard history")
         }
 
         // Pro-only defaults should not be assigned for Basic users.
@@ -508,6 +501,21 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         for (key, shortcut) in zip(keys, shortcuts) where KeyboardShortcuts.getShortcut(for: shortcut) == nil {
             KeyboardShortcuts.setShortcut(.init(key, modifiers: [.command, .control]), for: shortcut)
         }
+    }
+
+    private func migrateHistoryShortcutFromCommandShiftVIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: historyShortcutReliableDefaultMigrationKey) else { return }
+        defer { UserDefaults.standard.set(true, forKey: historyShortcutReliableDefaultMigrationKey) }
+
+        let unreliableDefaults = [
+            KeyboardShortcuts.Shortcut(.v, modifiers: [.command, .shift]),
+            KeyboardShortcuts.Shortcut(.v, modifiers: [.command, .option])
+        ]
+        guard let current = KeyboardShortcuts.getShortcut(for: .showClipboardHistory),
+              unreliableDefaults.contains(current) else { return }
+
+        KeyboardShortcuts.setShortcut(.init(.y, modifiers: [.command, .shift, .control]), for: .showClipboardHistory)
+        appLogger.info("Migrated clipboard history shortcut to Cmd+Shift+Control+Y")
     }
 
     /// Migration cleanup: old builds auto-assigned Pro shortcuts even for Basic users.
@@ -801,6 +809,51 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         } else {
             showPopoverAtButton()
         }
+    }
+
+    private func historyRootView() -> some View {
+        ClipboardHistoryView(clipboardManager: clipboardManager, licenseService: licenseService)
+            .frame(
+                minWidth: ClipboardHistoryView.popoverWidth,
+                idealWidth: ClipboardHistoryView.popoverWidth,
+                maxWidth: ClipboardHistoryView.popoverWidth,
+                minHeight: ClipboardHistoryView.popoverMinHeight,
+                idealHeight: ClipboardHistoryView.popoverMinHeight,
+                alignment: .top
+            )
+            .preferredColorScheme(.dark)
+    }
+
+    private func toggleHistoryWindow() {
+        if popover.isShown {
+            popover.performClose(nil)
+        }
+
+        if let historyWindow, historyWindow.isVisible {
+            historyWindow.close()
+            return
+        }
+
+        let window = historyWindow ?? NSPanel(
+            contentRect: NSRect(
+                x: 0,
+                y: 0,
+                width: ClipboardHistoryView.popoverWidth,
+                height: ClipboardHistoryView.popoverMinHeight
+            ),
+            styleMask: [.titled, .closable, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "SaneClip History"
+        window.contentViewController = NSHostingController(rootView: historyRootView())
+        window.isReleasedWhenClosed = false
+        window.level = .floating
+        window.center()
+        historyWindow = window
+
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
     }
 
     private func resetHistoryPopoverSize() {

@@ -1,9 +1,28 @@
 # Session Handoff — SaneClip
 
-**Last updated:** 2026-05-09
-**Current project version:** `2.3.2` (build `2302`)
+**Last updated:** 2026-05-12
+**Current project version:** `2.3.4` (build `2304`)
 
 ## Current State
+
+- 2026-05-12 v2.3.4 runtime barrier pass:
+  - Fixed Capture Text after the macOS screen/window picker by replacing the post-selection `SCScreenshotManager.captureImage` path with a picker-backed `SCStream` first-frame capture path in `Core/Capture/ScreenCaptureService.swift`.
+  - Mini proof after the fix: `./scripts/SaneMaster.rb verify --timeout 1200` passed 152 tests, `./scripts/SaneMaster.rb customer_ui_sweep --no-exit` passed, and the live release build completed Cmd-Shift-Ctrl-T picker selection with OCR clipboard output `SaneClip OCR final proof golf hotel 2026`.
+  - Visual proof receipt: `outputs/visual_smoke/visual_smoke_20260512-213744_72234/receipt.json`; clean local copy: `/Users/sj/Desktop/Screenshots/saneclip-mini-proof/final-clean-screen-no-popover.png`.
+  - Regenerated `SaneClip.xcodeproj` from `project.yml`; the staged Mini app now reports `CFBundleShortVersionString=2.3.4` and `CFBundleVersion=2304`.
+  - Fixed the history shortcut root issue by moving the customer-facing history shortcut to Command-Shift-Control-Y and opening a floating `SaneClip History` window instead of depending on menu-bar popover anchoring.
+  - Mini upgrade-path proof: simulated old Command-Shift-V defaults, relaunched `2.3.4/2304`, verified migration to `{"carbonModifiers":4864,"carbonKeyCode":16}`, pressed Command-Shift-Control-Y, observed `SaneClip History`, then pressed it again and observed the window close.
+  - Mini `./scripts/SaneMaster.rb verify --timeout 1200` passed 152 tests after the regenerated project and shortcut changes.
+  - Mini `./scripts/SaneMaster.rb customer_ui_sweep --no-exit` and `customer_ui_contract --no-exit` passed with 12 release-required actions; receipt generated `2026-05-12T22:19:37Z`.
+  - Snippets Pro runtime proof passed: opened Snippets settings, verified sample snippets, clicked `Copy for Manual Paste` for `Current Date` and observed `May 12, 2026` on the clipboard, then clicked `Paste Now` into a real TextEdit document and observed `Snippet target: May 12, 2026`.
+  - The earlier Capture Text Mini permission block is superseded: the Mini Screen Recording path was accepted, the picker/OCR workflow completed, and the root app bug was fixed in code.
+  - Edit/save has code/unit proof via `Edit sheet saves item changes through the batch update path`, but the customer context-menu click path is not yet runtime-complete in this SSH automation session; AX and coordinate right-click did not open the SwiftUI context menu. Do not close GitHub #9 until a real right-click/context-menu edit/save pass is captured.
+
+- 2026-05-12 customer-facing action release gate is now recorded for SaneClip:
+  - Added `Tests/CustomerUIActions.yml`, `scripts/customer_ui_action_sweep.rb`, and `.sane/customer_ui_action_receipt.json`.
+  - `./scripts/SaneMaster.rb customer_ui_contract --no-exit` passes with 12 required actions covered; receipt generated `2026-05-12T03:43:51Z` on host `mini`.
+  - Refreshed `.claude/research.md` for the existing `saneclip-editor-shortcuts` guard with current Apple SwiftUI docs, KeyboardShortcuts upstream scope, GitHub #9/#10 status, and local source checks.
+  - Mini `./scripts/SaneMaster.rb verify` passed 152 tests after the guard-clearing research refresh.
 
 - 2026-05-09 visual/discoverability and tester-feedback pass:
   - Dock right-click and menu-bar right-click are expected to expose the same customer-critical actions through the shared menu contract: Settings, License, Check for Updates, About / Report a Bug, and Quit.
@@ -11,11 +30,11 @@
   - Screen Recording permission copy now names the real capabilities: Capture Screenshot and Capture Text from Screen.
   - History item editing uses a single batch update path so content, title/tags/collection/note, pinned copies, and paste-stack mirrors do not drift.
   - Snippet rows now expose a visible Paste/Paste Pro action and the context menu includes Paste before edit/manage actions, improving discoverability.
-  - Shortcuts settings includes an inline Reset affordance for Show Clipboard History that restores Command-Shift-V.
+  - Shortcuts settings includes an inline Reset affordance for Show Clipboard History that restores Command-Shift-Control-Y; `2.3.4` migrates the unreliable legacy Command-Shift-V default to this combo.
   - Latest recorded Mini verification for this pass: SaneClip verify passed with 152 tests on 2026-05-09 after the Reset affordance landed. The run includes `Edit sheet saves item changes through the batch update path`, which maps to Noah's trapped edit-window report in GitHub #9.
   - Live GitHub state at closeout: `#9` edit-save, `#10` clipboard-history shortcut, `#11` Capture Text, and `#12` snippets paste discoverability remain open and map to this local pass. Do not close or comment publicly without exact draft approval.
 
-- The current repo version is `2.3.2`; this is the capture/OCR feature train.
+- The current repo version is `2.3.4`; this is the Capture Text stream-path and shortcut-reliability patch train.
 - `CHANGELOG.md` is the current release ledger. Use it instead of the stale `v2.0 released / App Store REJECTED` summary below.
 - Treat the older sections in this file as archival notes only.
 
@@ -225,10 +244,20 @@ Plan exists at `~/.claude/plans/jaunty-cooking-goblet.md` — add `note: String?
 - Feb 3: SaneClip 1.4 DMG release
 # SaneClip Session Handoff
 
+## Current State (2026-05-12 Capture Text Permission Loop)
+
+- Root cause confirmed on the Mini: the ScreenCaptureKit picker could return a selection, but `SCScreenshotManager.captureImage(contentFilter:configuration:)` then failed with `declined TCC` for SaneClip. The old code also had an early `CGPreflightScreenCaptureAccess()` gate that could reopen the app's permission prompt before the picker flow.
+- Fix implemented in `Core/Capture/ScreenCaptureService.swift`: Capture Text now lets `SCContentSharingPicker` own selection permission, then captures the selected content from the picker filter with `SCStream` + first video sample instead of `SCScreenshotManager.captureImage`. `SCStreamErrorDomain` code `-3801` is normalized back to the app's Screen Recording permission error.
+- Tests updated in `Tests/SaneClipTests.swift` and `scripts/customer_ui_action_sweep.rb` to require the `SCStreamOutput`/`CMSampleBufferGetImageBuffer` path and to reject `SCScreenshotManager.captureImage` plus the old early runtime permission guard.
+- Mini verification passed after the final source sync: `./scripts/SaneMaster.rb verify --timeout 1200` reported 152/152 tests passing.
+- Mini customer-surface proof passed: `./scripts/SaneMaster.rb customer_ui_sweep --no-exit` reported `Workflow sweep and contract passed`.
+- Final runtime proof on the Mini used `/Applications/SaneClip.app` staged by `./scripts/SaneMaster.rb test_mode --release --no-logs`. Command-Control-Shift-T opened the picker, a screen choice completed, and the clipboard contained `SaneClip OCR final proof golf hotel 2026`. Recent SaneClip logs show picker selection, `SCStream addStreamOutput`, `startCapture`, and `stopCapture` without the previous `declined TCC` failure.
+- Final visual receipt: `outputs/visual_smoke/visual_smoke_20260512-213744_72234/receipt.json` passed with Terminal-host screenshots and no cleanliness issues. Local copied proof: `/Users/sj/Desktop/Screenshots/saneclip-mini-proof/final-clean-screen-no-popover.png`.
+
 ## Current State (2026-05-09 Launch Crash / Release Readiness)
 
 - Customer email #688 from Peter included `SaneClip-2026-05-09-143149.ips`; SaneClip 2.3.2 crashed at dyld launch on macOS 15.7.5 with missing ScreenCaptureKit symbol `_OBJC_CLASS_$_SCScreenshotConfiguration`.
 - Root cause: `Core/Capture/ScreenCaptureService.swift` referenced the macOS 26-only `SCScreenshotConfiguration` class while the direct build ships with minimum macOS 15.0. The reference made the binary unsafe on current macOS 15 even though the code was inside an availability branch.
-- Fix in progress: removed the macOS 26 screenshot path and retained the compatible `SCScreenshotManager.captureImage` path. `Tests/SaneClipTests.swift` now asserts `SCScreenshotConfiguration` and `captureScreenshot(contentFilter:)` are absent from the capture source.
+- Superseded on 2026-05-12: `SCScreenshotManager.captureImage` also failed after picker selection on some systems. The current fix uses the picker-backed `SCStream` first-frame path and tests assert the old still-image API is absent.
 - Must verify before release: Mini `./scripts/SaneMaster.rb verify --timeout 1200`, binary symbol scan for no `SCScreenshotConfiguration`, release-mode launch, then draft a reply to #688 and resolve duplicate #685 after user approval.
 - Open GitHub issues #9-#12 are still marked `release:patched-pending` and need maintainer replies after verification.

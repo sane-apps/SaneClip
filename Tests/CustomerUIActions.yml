@@ -1,0 +1,661 @@
+---
+version: 1
+app: SaneClip
+actions:
+- id: status-menu-dock-core-actions
+  title: Status menu and Dock menu expose core SaneClip actions
+  surfaces:
+  - Menu bar status item
+  - Right-click status menu
+  - Dock menu
+  - Main app menu
+  steps:
+  - Open the shipped status menu and Dock menu.
+  - Verify Capture Screenshot, Capture Text from Screen, Show History, recent-item
+    paste, Snippets, Clear History, Settings, License, Check for Updates, About /
+    Report a Bug, and Quit are wired where applicable.
+  - For Quit and update checks, verify the menu item and first safe surface rather
+    than publishing or quitting during the sweep.
+  assertions:
+  - Status and Dock menus are built from the same customer action surface.
+  - Utility actions route to the shared SaneUI settings, license, update, about, and
+    bug report surfaces.
+  - Recent items and snippets can be selected without leaving duplicate app instances.
+  evidence:
+  - Mini source/test guard for status, Dock, and app menu wiring
+  - Screenshot evidence from Mini-rendered SaneClip UI fixtures
+  required_proof_level: full_runtime_completion
+  required_evidence_types:
+  - mini_click
+  - screenshot
+  - fixture
+  - log
+  historical_failure_classes:
+  - context_menu_extension_missing
+  - duplicate_or_stale_menu_item
+  - menu_entry_missing
+  - install_update_packaging
+  - data_loss_or_unexpected_mutation
+  - persistence_or_relaunch_reset
+  - layout_visual_regression
+  - pro_basic_gate_drift
+  - external_integration_stub
+  - state_count_drift
+  - docs_promise_drift
+  - activation_noop
+  functional_state:
+    description: Seeded clipboard history with representative text, URL, code, image,
+      snippet, collection, tag, and paste-stack items.
+    setup_steps:
+    - Load deterministic clipboard/history fixtures before opening customer surfaces.
+    - Restore fixture history after destructive row, stack, or clear actions.
+    fixture_paths:
+    - Tests/Fixtures/customer-ui/clipboard-history/
+  user_inputs:
+  - Open the shipped status menu and Dock menu.
+  - Verify Capture Screenshot, Capture Text from Screen, Show History, recent-item
+    paste, Snippets, Clear History, Settings, License, Check for Updates, About /
+    Report a Bug, and Quit are wired where applicable.
+  - For Quit and update checks, verify the menu item and first safe surface rather
+    than publishing or quitting during the sweep.
+  expected_outputs:
+  - Status and Dock menus are built from the same customer action surface.
+  - Utility actions route to the shared SaneUI settings, license, update, about, and
+    bug report surfaces.
+  - Recent items and snippets can be selected without leaving duplicate app instances.
+- id: history-search-filter-navigation
+  title: Clipboard history search, filters, navigation, and presets are live
+  surfaces:
+  - Clipboard history popover
+  - Search field
+  - Filter row
+  - Saved filter presets
+  - Keyboard navigation
+  steps:
+  - Open history from the menu bar or shortcut.
+  - Search, clear search, toggle filters, change date/type/collection/tag filters,
+    save/apply presets, and navigate the list with keyboard shortcuts.
+  - Paste or delete the selected row only in a safe fixture run.
+  assertions:
+  - Search and filters change the visible result set.
+  - Keyboard navigation ignores text fields and sheet focus.
+  - Presets persist and can be cleared without corrupting history.
+  evidence:
+  - Mini source/test guard for history filtering and keyboard navigation
+  - History popover screenshot fixture
+  required_proof_level: full_runtime_completion
+  required_evidence_types:
+  - mini_click
+  - screenshot
+  - fixture
+  - log
+  historical_failure_classes:
+  - duplicate_or_stale_menu_item
+  - menu_entry_missing
+  - shortcut_focus_or_dispatch
+  - data_loss_or_unexpected_mutation
+  - persistence_or_relaunch_reset
+  - layout_visual_regression
+  - pro_basic_gate_drift
+  - state_count_drift
+  - activation_noop
+  functional_state:
+    description: Seeded clipboard history with representative text, URL, code, image,
+      snippet, collection, tag, and paste-stack items.
+    setup_steps:
+    - Load deterministic clipboard/history fixtures before opening customer surfaces.
+    - Restore fixture history after destructive row, stack, or clear actions.
+    fixture_paths:
+    - Tests/Fixtures/customer-ui/clipboard-history/
+  user_inputs:
+  - Open history from the menu bar or shortcut.
+  - Search, clear search, toggle filters, change date/type/collection/tag filters,
+    save/apply presets, and navigate the list with keyboard shortcuts.
+  - Paste or delete the selected row only in a safe fixture run.
+  expected_outputs:
+  - Search and filters change the visible result set.
+  - Keyboard navigation ignores text fields and sheet focus.
+  - Presets persist and can be cleared without corrupting history.
+- id: history-item-row-actions
+  title: Clipboard item rows expose copy, paste, pin, edit, organize, image, and delete
+    actions
+  surfaces:
+  - Clipboard item row
+  - Row context menu
+  - Edit sheet
+  - Image OCR preview sheet
+  steps:
+  - Use row hover/action and context menu controls for representative text, URL, code,
+    and image items.
+  - Paste, copy, pin/unpin, edit content, update title/tags/collection/note, copy
+    OCR text, export an image, and delete a fixture item.
+  - Verify Basic users see Pro gates for Pro-only row actions.
+  assertions:
+  - Basic pinning remains available.
+  - Pro-only paste transforms, organization, notes, and image OCR actions are gated
+    or executed correctly.
+  - Edits use the batch update path so row metadata and pinned copies stay aligned.
+  evidence:
+  - Mini source/test guard for row context actions and edit persistence
+  - Existing fixture tests for Basic pinning and image OCR controls
+  required_proof_level: full_runtime_completion
+  required_evidence_types:
+  - mini_click
+  - screenshot
+  - fixture
+  - log
+  historical_failure_classes:
+  - context_menu_extension_missing
+  - duplicate_or_stale_menu_item
+  - menu_entry_missing
+  - install_update_packaging
+  - data_loss_or_unexpected_mutation
+  - persistence_or_relaunch_reset
+  - layout_visual_regression
+  - pro_basic_gate_drift
+  - state_count_drift
+  - docs_promise_drift
+  - activation_noop
+  functional_state:
+    description: Seeded clipboard history with representative text, URL, code, image,
+      snippet, collection, tag, and paste-stack items.
+    setup_steps:
+    - Load deterministic clipboard/history fixtures before opening customer surfaces.
+    - Restore fixture history after destructive row, stack, or clear actions.
+    fixture_paths:
+    - Tests/Fixtures/customer-ui/clipboard-history/
+  user_inputs:
+  - Use row hover/action and context menu controls for representative text, URL, code,
+    and image items.
+  - Paste, copy, pin/unpin, edit content, update title/tags/collection/note, copy
+    OCR text, export an image, and delete a fixture item.
+  - Verify Basic users see Pro gates for Pro-only row actions.
+  expected_outputs:
+  - Basic pinning remains available.
+  - Pro-only paste transforms, organization, notes, and image OCR actions are gated
+    or executed correctly.
+  - Edits use the batch update path so row metadata and pinned copies stay aligned.
+- id: paste-stack-actions
+  title: Paste Stack can add, paste, reorder, rename, note, undo, pause, and clear
+    items
+  surfaces:
+  - Clipboard history footer
+  - Paste Stack panel
+  - Row context menu
+  - General settings paste-stack controls
+  steps:
+  - Add fixture items to the paste stack.
+  - Open the stack panel, paste an item, move items, move to top, rename, add a note,
+    undo the last paste, pause consumption, and clear the stack.
+  - Verify Basic users see a Pro gate instead of silent no-op controls.
+  assertions:
+  - Stack controls mutate only the stack fixture.
+  - Consumption settings persist and are reflected in the panel.
+  - Basic/Pro gates match the public feature boundary.
+  evidence:
+  - Mini source/test guard for paste-stack UI and manager behavior
+  required_proof_level: full_runtime_completion
+  required_evidence_types:
+  - mini_click
+  - screenshot
+  - fixture
+  historical_failure_classes:
+  - context_menu_extension_missing
+  - duplicate_or_stale_menu_item
+  - menu_entry_missing
+  - data_loss_or_unexpected_mutation
+  - persistence_or_relaunch_reset
+  - layout_visual_regression
+  - pro_basic_gate_drift
+  - state_count_drift
+  - docs_promise_drift
+  - activation_noop
+  functional_state:
+    description: Seeded clipboard history with representative text, URL, code, image,
+      snippet, collection, tag, and paste-stack items.
+    setup_steps:
+    - Load deterministic clipboard/history fixtures before opening customer surfaces.
+    - Restore fixture history after destructive row, stack, or clear actions.
+    fixture_paths:
+    - Tests/Fixtures/customer-ui/clipboard-history/
+  user_inputs:
+  - Add fixture items to the paste stack.
+  - Open the stack panel, paste an item, move items, move to top, rename, add a note,
+    undo the last paste, pause consumption, and clear the stack.
+  - Verify Basic users see a Pro gate instead of silent no-op controls.
+  expected_outputs:
+  - Stack controls mutate only the stack fixture.
+  - Consumption settings persist and are reflected in the panel.
+  - Basic/Pro gates match the public feature boundary.
+- id: capture-screenshot-text-actions
+  title: Capture Screenshot and Capture Text from Screen verify safe first surfaces
+    and capture fixtures
+  surfaces:
+  - Status menu
+  - Edit menu
+  - Keyboard shortcuts
+  - Screen Recording permission prompt
+  - ScreenCaptureKit picker
+  - Image OCR preview sheet
+  steps:
+  - Verify menu and shortcut routes for Capture Screenshot and Capture Text from Screen.
+  - Verify the safe Screen Recording permission surface and copy.
+  - Verify fixture-level ScreenCaptureKit and OCR wiring without claiming a human
+    picker selection unless that fixture was actually run.
+  assertions:
+  - Capture actions do not auto-request screen recording from deep inside capture
+    service code.
+  - Permission denial opens an explainable first surface.
+  - OCR text and screenshot sidecars flow into history and preview controls when capture
+    fixtures are present.
+  evidence:
+  - Mini source/test guard for capture menus, shortcuts, permission copy, ScreenCaptureKit,
+    and OCR
+  - Capture render fixtures where available
+  required_proof_level: full_runtime_completion
+  required_evidence_types:
+  - mini_click
+  - screenshot
+  - fixture
+  - log
+  historical_failure_classes:
+  - duplicate_or_stale_menu_item
+  - menu_entry_missing
+  - shortcut_focus_or_dispatch
+  - hardware_or_tcc_runtime
+  - permission_recovery_dead_end
+  - data_loss_or_unexpected_mutation
+  - persistence_or_relaunch_reset
+  - layout_visual_regression
+  - pro_basic_gate_drift
+  - state_count_drift
+  - docs_promise_drift
+  - activation_noop
+  functional_state:
+    description: Seeded clipboard history with representative text, URL, code, image,
+      snippet, collection, tag, and paste-stack items.
+    setup_steps:
+    - Load deterministic clipboard/history fixtures before opening customer surfaces.
+    - Restore fixture history after destructive row, stack, or clear actions.
+    fixture_paths:
+    - Tests/Fixtures/customer-ui/clipboard-history/
+  user_inputs:
+  - Verify menu and shortcut routes for Capture Screenshot and Capture Text from Screen.
+  - Verify the safe Screen Recording permission surface and copy.
+  - Verify fixture-level ScreenCaptureKit and OCR wiring without claiming a human
+    picker selection unless that fixture was actually run.
+  expected_outputs:
+  - Capture actions do not auto-request screen recording from deep inside capture
+    service code.
+  - Permission denial opens an explainable first surface.
+  - OCR text and screenshot sidecars flow into history and preview controls when capture
+    fixtures are present.
+- id: settings-general-security-history-actions
+  title: General settings update startup, appearance, security, history, capture,
+    update, and import/export behavior
+  surfaces:
+  - Settings General tab
+  - Login item and Dock controls
+  - Security controls
+  - History controls
+  - Capture controls
+  - Software update controls
+  - Import and export panels
+  steps:
+  - Open General settings.
+  - Toggle login item, Dock icon, menu bar icon, paste sound, sensitive-data protection,
+    Touch ID, encryption, excluded apps, history size, expiry, capture limits, capture
+    pause/resume, update checks, import, and export where safe.
+  - For Touch ID, import/export, update checks, and selected-app panels, verify the
+    safe first surface or fixture rather than mutating user data.
+  assertions:
+  - Settings persist through SettingsModel or the shared SaneUI components.
+  - Security-disabling actions authenticate before changing protected state.
+  - External panels are opened only as safe first surfaces in the sweep.
+  evidence:
+  - Mini source/test guard for settings controls, panel helpers, and existing settings
+    tests
+  - Settings General screenshot fixture
+  required_proof_level: full_runtime_completion
+  required_evidence_types:
+  - mini_click
+  - screenshot
+  - fixture
+  - log
+  historical_failure_classes:
+  - duplicate_or_stale_menu_item
+  - menu_entry_missing
+  - install_update_packaging
+  - data_loss_or_unexpected_mutation
+  - persistence_or_relaunch_reset
+  - layout_visual_regression
+  - pro_basic_gate_drift
+  - external_integration_stub
+  - state_count_drift
+  - activation_noop
+  functional_state:
+    description: Seeded clipboard history with representative text, URL, code, image,
+      snippet, collection, tag, and paste-stack items.
+    setup_steps:
+    - Load deterministic clipboard/history fixtures before opening customer surfaces.
+    - Restore fixture history after destructive row, stack, or clear actions.
+    fixture_paths:
+    - Tests/Fixtures/customer-ui/clipboard-history/
+  user_inputs:
+  - Open General settings.
+  - Toggle login item, Dock icon, menu bar icon, paste sound, sensitive-data protection,
+    Touch ID, encryption, excluded apps, history size, expiry, capture limits, capture
+    pause/resume, update checks, import, and export where safe.
+  - For Touch ID, import/export, update checks, and selected-app panels, verify the
+    safe first surface or fixture rather than mutating user data.
+  expected_outputs:
+  - Settings persist through SettingsModel or the shared SaneUI components.
+  - Security-disabling actions authenticate before changing protected state.
+  - External panels are opened only as safe first surfaces in the sweep.
+- id: settings-shortcuts-actions
+  title: Shortcut settings expose recorders, defaults, reset, and Pro gates
+  surfaces:
+  - Settings Shortcuts tab
+  - KeyboardShortcuts recorders
+  - Reset affordance
+  steps:
+  - Open Shortcuts settings.
+  - Verify recorders for Show Clipboard History, Paste as Plain Text, Paste Stack,
+    Smart Paste, Ignore Next Copy, Capture Screenshot, Capture Text from Screen, and
+    quick-paste slots.
+  - Reset Show Clipboard History to Command-Shift-Control-Y in a fixture or source/test proof.
+  assertions:
+  - Default shortcuts match documented values.
+  - Basic mode does not retain legacy Pro-only shortcut defaults.
+  - Reset restores the documented Show Clipboard History shortcut.
+  evidence:
+  - Mini source/test guard for shortcut defaults, recorders, and reset copy
+  - Shortcuts settings screenshot fixture
+  required_proof_level: full_runtime_completion
+  required_evidence_types:
+  - mini_click
+  - screenshot
+  - fixture
+  - log
+  historical_failure_classes:
+  - duplicate_or_stale_menu_item
+  - menu_entry_missing
+  - shortcut_focus_or_dispatch
+  - data_loss_or_unexpected_mutation
+  - persistence_or_relaunch_reset
+  - layout_visual_regression
+  - pro_basic_gate_drift
+  - docs_promise_drift
+  - activation_noop
+  functional_state:
+    description: Seeded clipboard history with representative text, URL, code, image,
+      snippet, collection, tag, and paste-stack items.
+    setup_steps:
+    - Load deterministic clipboard/history fixtures before opening customer surfaces.
+    - Restore fixture history after destructive row, stack, or clear actions.
+    fixture_paths:
+    - Tests/Fixtures/customer-ui/clipboard-history/
+  user_inputs:
+  - Open Shortcuts settings.
+  - Verify recorders for Show Clipboard History, Paste as Plain Text, Paste Stack,
+    Smart Paste, Ignore Next Copy, Capture Screenshot, Capture Text from Screen, and
+    quick-paste slots.
+  - Reset Show Clipboard History to Command-Shift-Control-Y in a fixture or source/test proof.
+  expected_outputs:
+  - Default shortcuts match documented values.
+  - Basic mode does not retain legacy Pro-only shortcut defaults.
+  - Reset restores the documented Show Clipboard History shortcut.
+- id: snippets-management-actions
+  title: Snippets can search, add, edit, duplicate, delete, copy, paste, and fill
+    placeholders
+  surfaces:
+  - Settings Snippets tab
+  - Snippet row actions
+  - Snippet context menu
+  - Snippet placeholder prompt
+  - Status menu Snippets submenu
+  steps:
+  - Search snippets, add a snippet, edit it, duplicate it, delete it, copy for manual
+    paste, paste now, and fill placeholder values.
+  - Verify Basic users see a Pro gate and can reach the Snippets settings surface.
+  assertions:
+  - Snippet mutations persist through SnippetManager.
+  - Paste actions use ClipboardManager when available.
+  - Placeholder prompts can be canceled without changing the pasteboard.
+  evidence:
+  - Mini source/test guard for snippets settings and status menu snippets
+  required_proof_level: fixture_completion
+  required_evidence_types:
+  - fixture
+  - state_receipt
+  historical_failure_classes:
+  - context_menu_extension_missing
+  - duplicate_or_stale_menu_item
+  - menu_entry_missing
+  - data_loss_or_unexpected_mutation
+  - persistence_or_relaunch_reset
+  - layout_visual_regression
+  - pro_basic_gate_drift
+  - state_count_drift
+  - docs_promise_drift
+  - activation_noop
+  functional_state:
+    description: Seeded clipboard history with representative text, URL, code, image,
+      snippet, collection, tag, and paste-stack items.
+    setup_steps:
+    - Load deterministic clipboard/history fixtures before opening customer surfaces.
+    - Restore fixture history after destructive row, stack, or clear actions.
+    fixture_paths:
+    - Tests/Fixtures/customer-ui/clipboard-history/
+  user_inputs:
+  - Search snippets, add a snippet, edit it, duplicate it, delete it, copy for manual
+    paste, paste now, and fill placeholder values.
+  - Verify Basic users see a Pro gate and can reach the Snippets settings surface.
+  expected_outputs:
+  - Snippet mutations persist through SnippetManager.
+  - Paste actions use ClipboardManager when available.
+  - Placeholder prompts can be canceled without changing the pasteboard.
+- id: storage-stats-actions
+  title: Storage tab renders item counts, pinned count, file size, and item type breakdown
+  surfaces:
+  - Settings Storage tab
+  - Storage statistics cards
+  - Item type breakdown
+  steps:
+  - Open Storage settings.
+  - Verify total items, pinned count, storage size, and type breakdown render from
+    ClipboardManager state.
+  assertions:
+  - Storage stats handle empty and populated histories.
+  - Type icons match text, link, code, long text, and image categories.
+  evidence:
+  - Mini source/test guard for storage statistics rendering
+  - Storage settings screenshot fixture
+  required_proof_level: runtime_visual
+  required_evidence_types:
+  - mini_click
+  - screenshot
+  historical_failure_classes:
+  - persistence_or_relaunch_reset
+  - layout_visual_regression
+  - state_count_drift
+  - activation_noop
+  functional_state:
+    description: Seeded clipboard history with representative text, URL, code, image,
+      snippet, collection, tag, and paste-stack items.
+    setup_steps:
+    - Load deterministic clipboard/history fixtures before opening customer surfaces.
+    - Restore fixture history after destructive row, stack, or clear actions.
+    fixture_paths:
+    - Tests/Fixtures/customer-ui/clipboard-history/
+  user_inputs:
+  - Open Storage settings.
+  - Verify total items, pinned count, storage size, and type breakdown render from
+    ClipboardManager state.
+  expected_outputs:
+  - Storage stats handle empty and populated histories.
+  - Type icons match text, link, code, long text, and image categories.
+- id: sync-settings-actions
+  title: iCloud sync settings verify safe controls, diagnostics, devices, and reset
+    confirmation
+  surfaces:
+  - Settings Sync tab when ENABLE_SYNC is compiled
+  - iCloud Sync toggle
+  - Sync status diagnostics
+  - Connected devices list
+  - Reset Sync confirmation
+  steps:
+  - Open Sync settings in a sync-enabled build.
+  - Verify the sync toggle, status rows, connected-device list, privacy copy, and
+    Reset Sync confirmation surface.
+  - Do not claim CloudKit network completion unless a fixture or sync run proves it.
+  assertions:
+  - Sync UI is compiled only behind ENABLE_SYNC.
+  - Reset Sync requires confirmation and preserves local history.
+  - CloudKit behavior is proven by unit fixtures or left as an explicit external-service
+    boundary.
+  evidence:
+  - Mini source/test guard for sync UI and reset fixtures
+  - Sync settings screenshot fixture when available
+  required_proof_level: full_runtime_completion
+  required_evidence_types:
+  - mini_click
+  - screenshot
+  - fixture
+  - log
+  historical_failure_classes:
+  - permission_recovery_dead_end
+  - data_loss_or_unexpected_mutation
+  - persistence_or_relaunch_reset
+  - layout_visual_regression
+  - pro_basic_gate_drift
+  - external_integration_stub
+  - state_count_drift
+  - docs_promise_drift
+  - activation_noop
+  functional_state:
+    description: Seeded clipboard history with representative text, URL, code, image,
+      snippet, collection, tag, and paste-stack items.
+    setup_steps:
+    - Load deterministic clipboard/history fixtures before opening customer surfaces.
+    - Restore fixture history after destructive row, stack, or clear actions.
+    fixture_paths:
+    - Tests/Fixtures/customer-ui/clipboard-history/
+  user_inputs:
+  - Open Sync settings in a sync-enabled build.
+  - Verify the sync toggle, status rows, connected-device list, privacy copy, and
+    Reset Sync confirmation surface.
+  - Do not claim CloudKit network completion unless a fixture or sync run proves it.
+  expected_outputs:
+  - Sync UI is compiled only behind ENABLE_SYNC.
+  - Reset Sync requires confirmation and preserves local history.
+  - CloudKit behavior is proven by unit fixtures or left as an explicit external-service
+    boundary.
+- id: onboarding-permission-pro-gates
+  title: Onboarding, permissions, and Basic/Pro gates match shipped capabilities
+  surfaces:
+  - Welcome window
+  - Permission pages
+  - Pro upsell surfaces
+  - License settings
+  steps:
+  - Verify welcome copy lists Basic and Pro capabilities.
+  - Verify Accessibility and Screen Recording permission actions open safe first surfaces.
+  - Verify Basic users are not blocked from the app and Pro gates appear for Pro-only
+    features.
+  assertions:
+  - Permission copy names the actual features that need access.
+  - First-launch onboarding resumes on the permission page after restart.
+  - License, unlock, and restore purchase surfaces are reachable without hidden hard
+    gates.
+  evidence:
+  - Mini source/test guard for onboarding copy, permissions, Pro gates, and license
+    settings
+  required_proof_level: full_runtime_completion
+  required_evidence_types:
+  - mini_click
+  - screenshot
+  - fixture
+  - log
+  historical_failure_classes:
+  - hardware_or_tcc_runtime
+  - permission_recovery_dead_end
+  - data_loss_or_unexpected_mutation
+  - persistence_or_relaunch_reset
+  - layout_visual_regression
+  - pro_basic_gate_drift
+  - external_integration_stub
+  - state_count_drift
+  - docs_promise_drift
+  - activation_noop
+  functional_state:
+    description: Seeded clipboard history with representative text, URL, code, image,
+      snippet, collection, tag, and paste-stack items.
+    setup_steps:
+    - Load deterministic clipboard/history fixtures before opening customer surfaces.
+    - Restore fixture history after destructive row, stack, or clear actions.
+    fixture_paths:
+    - Tests/Fixtures/customer-ui/clipboard-history/
+  user_inputs:
+  - Verify welcome copy lists Basic and Pro capabilities.
+  - Verify Accessibility and Screen Recording permission actions open safe first surfaces.
+  - Verify Basic users are not blocked from the app and Pro gates appear for Pro-only
+    features.
+  expected_outputs:
+  - Permission copy names the actual features that need access.
+  - First-launch onboarding resumes on the permission page after restart.
+  - License, unlock, and restore purchase surfaces are reachable without hidden hard
+    gates.
+- id: ios-widget-extension-actions
+  title: iOS app, share extension, widgets, and App Intents expose customer actions
+    safely
+  surfaces:
+  - iOS history, pinned, and settings tabs
+  - iOS Share extension
+  - Recent and pinned widgets
+  - App Intents and Shortcuts
+  steps:
+  - Verify iOS history, pinned, settings, share extension, widget, and Shortcut entry
+    points are present in source/tests.
+  - Do not mark iOS device or CloudKit runtime completion unless a device/simulator
+    fixture actually ran.
+  assertions:
+  - Customer-visible companion app and extension surfaces compile from their source
+    of truth.
+  - Intent commands are parsed and guarded by tests.
+  - Runtime device verification remains a separate blocker if no fixture is available.
+  evidence:
+  - Mini source/test guard for iOS views, widgets, share extension, and intents
+  required_proof_level: full_runtime_completion
+  required_evidence_types:
+  - mini_click
+  - screenshot
+  - fixture
+  - log
+  historical_failure_classes:
+  - context_menu_extension_missing
+  - duplicate_or_stale_menu_item
+  - menu_entry_missing
+  - shortcut_focus_or_dispatch
+  - persistence_or_relaunch_reset
+  - layout_visual_regression
+  - state_count_drift
+  - activation_noop
+  functional_state:
+    description: Seeded clipboard history with representative text, URL, code, image,
+      snippet, collection, tag, and paste-stack items.
+    setup_steps:
+    - Load deterministic clipboard/history fixtures before opening customer surfaces.
+    - Restore fixture history after destructive row, stack, or clear actions.
+    fixture_paths:
+    - Tests/Fixtures/customer-ui/clipboard-history/
+  user_inputs:
+  - Verify iOS history, pinned, settings, share extension, widget, and Shortcut entry
+    points are present in source/tests.
+  - Do not mark iOS device or CloudKit runtime completion unless a device/simulator
+    fixture actually ran.
+  expected_outputs:
+  - Customer-visible companion app and extension surfaces compile from their source
+    of truth.
+  - Intent commands are parsed and guarded by tests.
+  - Runtime device verification remains a separate blocker if no fixture is available.

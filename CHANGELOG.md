@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.4] - 2026-05-12
+
+Fixes Capture Text after the macOS screen picker by capturing the selected content through the picker-backed ScreenCaptureKit stream path instead of the still-image API path that could loop back into Screen Recording/TCC failures.
+Migrates the unreliable legacy Command-Shift-V clipboard-history shortcut to Command-Shift-Control-Y and updates reset/docs copy to match.
+
+---
+
 ## [2.3.3] - 2026-05-09
 
 Improves startup reliability on macOS 15, fixes clipboard edit-save behavior, restores shortcut reset and snippet visibility fixes, and keeps App Store builds aligned with Apple review requirements.

@@ -1540,8 +1540,8 @@ struct SaneClipTests {
         #expect(settingsSource.contains("CaptureOCRLanguage.allCases"))
     }
 
-    @Test("History shortcut default keeps the documented Command Shift V shortcut")
-    func historyShortcutDefaultKeepsDocumentedCommandShiftV() throws {
+    @Test("History shortcut default uses reliable Command Shift Control Y shortcut")
+    func historyShortcutDefaultUsesReliableCommandShiftControlY() throws {
         let appSource = try String(
             contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
             encoding: .utf8
@@ -1551,12 +1551,18 @@ struct SaneClipTests {
             encoding: .utf8
         )
 
-        #expect(appSource.contains("KeyboardShortcuts.setShortcut(.init(.v, modifiers: [.command, .shift]), for: .showClipboardHistory)"))
+        #expect(appSource.contains("KeyboardShortcuts.setShortcut(.init(.y, modifiers: [.command, .shift, .control]), for: .showClipboardHistory)"))
+        #expect(appSource.contains("migrateHistoryShortcutFromCommandShiftVIfNeeded()"))
+        #expect(appSource.contains("toggleHistoryWindow()"))
+        #expect(appSource.contains("window.title = \"SaneClip History\""))
+        #expect(appSource.contains("historyShortcutReliableDefaultMigration_v234_controlY"))
+        #expect(appSource.contains("KeyboardShortcuts.Shortcut(.v, modifiers: [.command, .shift])"))
+        #expect(appSource.contains("KeyboardShortcuts.Shortcut(.v, modifiers: [.command, .option])"))
+        #expect(!appSource.contains("CGEvent.tapCreate("))
         #expect(settingsSource.contains("Button(\"Reset\")"))
         #expect(settingsSource.contains("for: .showClipboardHistory"))
-        #expect(settingsSource.contains("Restore Command-Shift-V for Show Clipboard History"))
+        #expect(settingsSource.contains("Restore Command-Shift-Control-Y for Show Clipboard History"))
         #expect(!appSource.contains("SaneClipShortcutDefaults"))
-        #expect(!appSource.contains("showClipboardHistoryShortcutMigratedFromCommandShiftV"))
     }
 
     @Test("Capture implementation uses ScreenCaptureKit and Vision")
@@ -1571,8 +1577,15 @@ struct SaneClipTests {
         )
 
         #expect(captureSource.contains("SCContentSharingPickerObserver"))
-        #expect(captureSource.contains("SCScreenshotManager.captureImage"))
-        #expect(captureSource.contains("guard ScreenCapturePermissionService.isGranted() else"))
+        #expect(captureSource.contains("SCStreamOutput"))
+        #expect(captureSource.contains("StreamFrameCapture(filter: filter, configuration: configuration, gate: gate)"))
+        #expect(captureSource.contains("try stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: queue)"))
+        #expect(captureSource.contains("stream.startCapture"))
+        #expect(captureSource.contains("CMSampleBufferGetImageBuffer(sampleBuffer)"))
+        #expect(!captureSource.contains("SCScreenshotManager.captureImage"))
+        #expect(!captureSource.contains("hasRuntimeCaptureAccess"))
+        #expect(!captureSource.contains("SCShareableContent.excludingDesktopWindows"))
+        #expect(!captureSource.contains("guard ScreenCapturePermissionService.isGranted() else"))
         #expect(!captureSource.contains("ScreenCapturePermissionService.isGranted() || ScreenCapturePermissionService.requestAccess()"))
         #expect(captureSource.contains("ScreenCaptureError.screenCapturePermissionDenied"))
         #expect(captureSource.contains("configuration.allowedPickerModes = [.singleWindow, .singleDisplay]"))
@@ -1580,11 +1593,12 @@ struct SaneClipTests {
         #expect(captureSource.contains("stillCaptureTimeoutNanoseconds"))
         #expect(captureSource.contains("ScreenCaptureError.timedOut"))
         #expect(captureSource.contains("!self.isResolvingSelection"))
-        #expect(captureSource.contains("captureImage(contentFilter: filter"))
         #expect(!captureSource.contains("SCScreenshotConfiguration"))
         #expect(!captureSource.contains("captureScreenshot(contentFilter: filter"))
         #expect(captureSource.contains("CGPreflightScreenCaptureAccess()"))
         #expect(captureSource.contains("CGRequestScreenCaptureAccess()"))
+        #expect(captureSource.contains("nsError.domain == SCStreamErrorDomain as String"))
+        #expect(captureSource.contains("nsError.code == -3801"))
         #expect(captureSource.contains("Privacy_ScreenCapture"))
         #expect(!captureSource.contains("SaneSystemSettingsDestination.screenRecording.open()"))
         #expect(ocrSource.contains("VNRecognizeTextRequest"))

@@ -1,5 +1,7 @@
 import AppKit
 import CoreGraphics
+import CoreImage
+import CoreMedia
 import Foundation
 import OSLog
 @preconcurrency import ScreenCaptureKit
@@ -78,6 +80,91 @@ private final class CaptureResumeGate<Value: Sendable>: @unchecked Sendable {
     }
 }
 
+private final class StreamFrameCapture: NSObject, SCStreamOutput, SCStreamDelegate, @unchecked Sendable {
+    private let gate: CaptureResumeGate<CGImage>
+    private let queue = DispatchQueue(label: "com.saneclip.capture.stream-frame")
+    private let lock = NSLock()
+    private let context = CIContext()
+    private var stream: SCStream?
+    private var didFinish = false
+    private var retainUntilFinish: StreamFrameCapture?
+
+    init(filter: SCContentFilter, configuration: SCStreamConfiguration, gate: CaptureResumeGate<CGImage>) {
+        self.gate = gate
+        super.init()
+        self.stream = SCStream(filter: filter, configuration: configuration, delegate: self)
+        self.retainUntilFinish = self
+    }
+
+    func start(timeoutNanoseconds: UInt64) {
+        guard let stream else {
+            finish(.failure(ScreenCaptureError.imageUnavailable))
+            return
+        }
+
+        do {
+            try stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: queue)
+        } catch {
+            finish(.failure(error))
+            return
+        }
+
+        stream.startCapture { [weak self] error in
+            if let error {
+                self?.finish(.failure(error))
+            }
+        }
+
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: timeoutNanoseconds)
+            self?.finish(.failure(ScreenCaptureError.timedOut))
+        }
+    }
+
+    nonisolated func stream(_: SCStream, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, of type: SCStreamOutputType) {
+        guard type == .screen,
+              CMSampleBufferIsValid(sampleBuffer),
+              let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+            return
+        }
+
+        let image = CIImage(cvPixelBuffer: pixelBuffer)
+        let rect = CGRect(
+            x: 0,
+            y: 0,
+            width: CVPixelBufferGetWidth(pixelBuffer),
+            height: CVPixelBufferGetHeight(pixelBuffer)
+        )
+
+        guard let cgImage = context.createCGImage(image, from: rect) else {
+            finish(.failure(ScreenCaptureError.imageUnavailable))
+            return
+        }
+
+        finish(.success(cgImage))
+    }
+
+    nonisolated func stream(_: SCStream, didStopWithError error: Error) {
+        finish(.failure(error))
+    }
+
+    private func finish(_ result: Swift.Result<CGImage, Error>) {
+        lock.lock()
+        guard !didFinish else {
+            lock.unlock()
+            return
+        }
+        didFinish = true
+        let activeStream = stream
+        stream = nil
+        lock.unlock()
+
+        activeStream?.stopCapture { _ in }
+        gate.resume(result)
+        retainUntilFinish = nil
+    }
+}
+
 final class ScreenCaptureService: NSObject, SCContentSharingPickerObserver, @unchecked Sendable {
     struct CaptureResult: Sendable {
         let image: NSImage
@@ -107,10 +194,6 @@ final class ScreenCaptureService: NSObject, SCContentSharingPickerObserver, @unc
 
     @MainActor
     func captureImage() async throws -> CaptureResult {
-        guard ScreenCapturePermissionService.isGranted() else {
-            throw ScreenCaptureError.screenCapturePermissionDenied
-        }
-
         guard continuation == nil else {
             if !isResolvingSelection {
                 picker.present()
@@ -241,18 +324,8 @@ final class ScreenCaptureService: NSObject, SCContentSharingPickerObserver, @unc
     ) async throws -> CGImage {
         try await withCheckedThrowingContinuation { continuation in
             let gate = CaptureResumeGate<CGImage>(continuation)
-            SCScreenshotManager.captureImage(contentFilter: filter, configuration: configuration) { image, error in
-                if let image {
-                    gate.resume(.success(image))
-                } else {
-                    gate.resume(.failure(error ?? ScreenCaptureError.imageUnavailable))
-                }
-            }
-
-            Task {
-                try? await Task.sleep(nanoseconds: Self.stillCaptureTimeoutNanoseconds)
-                gate.resume(.failure(ScreenCaptureError.timedOut))
-            }
+            StreamFrameCapture(filter: filter, configuration: configuration, gate: gate)
+                .start(timeoutNanoseconds: Self.stillCaptureTimeoutNanoseconds)
         }
     }
 
@@ -268,6 +341,12 @@ final class ScreenCaptureService: NSObject, SCContentSharingPickerObserver, @unc
 
     private func normalizeCaptureError(_ error: Error) -> Error {
         guard !(error is ScreenCaptureError) else { return error }
+        let nsError = error as NSError
+        if nsError.domain == SCStreamErrorDomain as String,
+           nsError.code == -3801 {
+            return ScreenCaptureError.screenCapturePermissionDenied
+        }
+
         let description = error.localizedDescription.lowercased()
         if description.contains("declined tcc")
             || description.contains("screen capture")

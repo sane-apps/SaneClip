@@ -1421,13 +1421,13 @@ struct ShortcutsSettingsView: View {
                             KeyboardShortcuts.Recorder(for: .showClipboardHistory)
                             Button("Reset") {
                                 KeyboardShortcuts.setShortcut(
-                                    .init(.v, modifiers: [.command, .shift]),
+                                    .init(.y, modifiers: [.command, .shift, .control]),
                                     for: .showClipboardHistory
                                 )
                             }
                             .buttonStyle(ClipActionButtonStyle())
                             .controlSize(.small)
-                            .help("Restore Command-Shift-V for Show Clipboard History")
+                            .help("Restore Command-Shift-Control-Y for Show Clipboard History")
                         }
                     }
                     CompactDivider()

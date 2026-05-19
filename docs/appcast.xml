@@ -6,7 +6,27 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                                                        <item>
+                                                                                <item>
+            <title>2.3.5</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Tue, 19 May 2026 15:09:26 -0400</pubDate>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Fixes license-key paste reliability in activation and settings.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.5.zip"
+                       sparkle:version="2305"
+                       sparkle:shortVersionString="2.3.5"
+                       length="3812443"
+                       type="application/octet-stream"
+                       sparkle:edSignature="xrwXCROdOaE3lLw+wCam/QEOA0yKnO0grEHkLWw7ZsfMxJ9Blyr3cwAyI9XFaQJwUsSIJ1oG01O0XfHkqog4Bg=="/>
+        </item>
+<item>
             <title>2.3.4</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Tue, 12 May 2026 22:31:11 -0400</pubDate>

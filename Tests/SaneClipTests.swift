@@ -1503,7 +1503,8 @@ struct SaneClipTests {
         #expect(!settingsSource.contains("mailto:hi@saneapps.com"))
         #expect(!directSupportSource.contains("struct SaneSparkleRow"))
         #expect(!iosSettingsSource.contains("mailto:hi@saneapps.com"))
-        #expect(iosSettingsSource.contains("githubRepo: \"sane-apps/SaneClip\""))
+        #expect(iosSettingsSource.contains("githubRepo: \"SaneClip\""))
+        #expect(!iosSettingsSource.contains("githubRepo: \"sane-apps/SaneClip\""))
     }
 
     @Test("Capture feature is wired into shortcuts and menus")

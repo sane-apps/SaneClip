@@ -89,4 +89,4 @@ You can:
 Questions about privacy?
 
 - GitHub: [github.com/sane-apps/SaneClip](https://github.com/sane-apps/SaneClip)
-- Email: [privacy@saneapps.com](mailto:privacy@saneapps.com)
+- Email: [hi@saneapps.com](mailto:hi@saneapps.com)

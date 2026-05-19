@@ -158,6 +158,12 @@ fastlane/test_output/
 fastlane/gym_output/
 
 # Code coverage
+
+# Local agent/research artifacts
+.claude/research.md
+.claude/.gitignore
+.codex/research.md
+DOCS_AUDIT_FINDINGS.md
 *.gcda
 *.gcno
 TestOutput.xcresult/

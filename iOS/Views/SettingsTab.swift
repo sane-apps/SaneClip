@@ -267,7 +267,7 @@ extension SaneDiagnosticsService {
     static let shared = SaneDiagnosticsService(
         appName: "SaneClip",
         subsystem: "com.saneclip.app",
-        githubRepo: "sane-apps/SaneClip",
+        githubRepo: "SaneClip",
         settingsCollector: collectSaneClipIOSSettings
     )
 

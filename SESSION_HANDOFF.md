@@ -1,9 +1,21 @@
 # Session Handoff — SaneClip
 
-**Last updated:** 2026-05-12
+**Last updated:** 2026-05-18
 **Current project version:** `2.3.4` (build `2304`)
 
 ## Current State
+
+- 2026-05-17 App Store listing repair:
+  - Generated valid macOS App Store screenshots at `docs/images/appstore-mac-*.png` and updated `.saneprocess` so the macOS lane no longer points at general docs screenshots with invalid Apple sizes.
+  - Verified the new macOS screenshot set with `appstore_submit.rb --test-screenshots`; all six resize to Apple's `2880x1800` desktop target.
+  - App Store Connect initially rejected screenshot replacement because macOS `2.3.4` was already `WAITING_FOR_REVIEW`. The macOS lane was withdrawn, screenshots uploaded, build `2304` reattached, metadata refreshed, and macOS `2.3.4` resubmitted. Final ASC state from the submit helper: `WAITING_FOR_REVIEW`.
+  - Follow-up blocker: full `appstore_preflight` still reports the combined iOS lane as final-state `READY_FOR_SALE` for `2.3.4`; the next combined macOS+iOS App Store submission needs a version bump.
+
+- 2026-05-15 reporting-route hardening:
+  - Fixed the iOS settings reporter to pass `githubRepo: "SaneClip"` instead of `githubRepo: "sane-apps/SaneClip"`, which produced a double-prefixed GitHub URL.
+  - Updated the regression in `Tests/SaneClipTests.swift` so this route cannot drift back.
+  - Updated GitHub templates/privacy contact copy so public issues warn about sensitive diagnostics and large media.
+  - Cross-repo guard: `SaneProcess/scripts/automation/github_reporting_guard_test.py` verifies this path.
 
 - 2026-05-12 v2.3.4 runtime barrier pass:
   - Fixed Capture Text after the macOS screen/window picker by replacing the post-selection `SCScreenshotManager.captureImage` path with a picker-backed `SCStream` first-frame capture path in `Core/Capture/ScreenCaptureService.swift`.
@@ -261,3 +273,37 @@ Plan exists at `~/.claude/plans/jaunty-cooking-goblet.md` — add `note: String?
 - Superseded on 2026-05-12: `SCScreenshotManager.captureImage` also failed after picker selection on some systems. The current fix uses the picker-backed `SCStream` first-frame path and tests assert the old still-image API is absent.
 - Must verify before release: Mini `./scripts/SaneMaster.rb verify --timeout 1200`, binary symbol scan for no `SCScreenshotConfiguration`, release-mode launch, then draft a reply to #688 and resolve duplicate #685 after user approval.
 - Open GitHub issues #9-#12 are still marked `release:patched-pending` and need maintainer replies after verification.
+
+## Launch Ops Calendar - 2026-05-14
+
+- `.outreach.yml` now classifies SaneClip as `released_but_launch_blocked_until_risk_cleanup`.
+- Scheduled gates: launch cleanup on 2026-05-23 and Clipboard/OCR launch decision on 2026-05-27. Do not run a public launch before piracy/DMCA triage, open issue replies, and fresh Mini release proof are clean.
+- 2026-05-14 launch package update: fixed landing-page static routes in `docs/index.html` (`Download Free`, `Privacy`, `Help`) and generated local Product Hunt candidate assets at `docs/images/product-hunt-thumbnail-240.png` and `docs/images/product-hunt-gallery-01.png` through `03.png`, plus `Videos/saneclip-private-clipboard-30s.mp4` (1920x1080, 30.0s). Current launch gate remains no-go because DMCA/support/App Store cleanup is still unresolved.
+
+## Launch Ops Calendar - 2026-05-15
+
+- Mini `./scripts/SaneMaster.rb launch_readiness` returned nonzero for SaneClip. No launch, directory, or public reply action was taken.
+- Blockers recorded from the gate: the active piracy page still needs DMCA handling, GitHub issues `#9` through `#12` still need verified replies or explicit no-go status, and App Store/iOS metadata plus conversion surfaces need a fresh check before larger traffic.
+- Existing support-surface URLs remain unchanged: [awesome-mac](https://github.com/jaywcjlove/awesome-mac/pull/1804) and [awesome-macOS](https://github.com/iCHAIT/awesome-macOS/pull/698).
+- Next launch-ops date stays 2026-05-23 for cleanup, not public launch.
+
+## Launch Ops Calendar - 2026-05-16
+
+- Mini `./scripts/SaneMaster.rb launch_readiness --json` stayed red for SaneClip, so no launch, directory, or public reply action was taken.
+- Fresh blocker receipt: the piracy page still needs DMCA handling, GitHub issues `#9` through `#12` still need verified replies or explicit no-go status, App Store/iOS metadata plus conversion surfaces still need a fresh check, and the launch video remains local-only until the cleanup lane is complete.
+- Existing support-surface URLs remain unchanged: [awesome-mac](https://github.com/jaywcjlove/awesome-mac/pull/1804) and [awesome-macOS](https://github.com/iCHAIT/awesome-macOS/pull/698).
+- Next launch-ops date stays 2026-05-23 for cleanup, not public launch.
+
+## Launch Ops Calendar - 2026-05-17
+
+- Mini `./scripts/SaneMaster.rb launch_readiness --json` stayed red again for SaneClip, so no launch, directory, or public reply action was taken.
+- Fresh blocker receipt: the piracy page is still `needs_dmca`, GitHub issues `#9` through `#12` still need verified replies or explicit no-go status, App Store/iOS metadata plus conversion surfaces still need a fresh check, and the 30-second video remains local-only until the cleanup lane is complete.
+- Existing support-surface URLs remain unchanged: [awesome-mac](https://github.com/jaywcjlove/awesome-mac/pull/1804) and [awesome-macOS](https://github.com/iCHAIT/awesome-macOS/pull/698).
+- Next launch-ops date stays 2026-05-23 for cleanup, not public launch.
+
+## Launch Ops Calendar - 2026-05-18
+
+- Mini `./scripts/SaneMaster.rb launch_readiness` stayed red again for SaneClip, so no launch, directory, or public reply action was taken.
+- Fresh blocker receipt: the piracy page is still `needs_dmca`, GitHub issues `#9` through `#12` still need verified replies or explicit no-go status, App Store/iOS metadata plus conversion surfaces still need a fresh check, and the 30-second video remains local-only until the cleanup lane is complete.
+- Existing support-surface URLs remain unchanged: [awesome-mac](https://github.com/jaywcjlove/awesome-mac/pull/1804) and [awesome-macOS](https://github.com/iCHAIT/awesome-macOS/pull/698).
+- Next launch-ops date stays 2026-05-23 for cleanup, not public launch.

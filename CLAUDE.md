@@ -34,7 +34,7 @@ Full philosophy: ~/SaneApps/meta/Brand/NORTH_STAR.md
 |------|-------------|
 | **This project** | `~/SaneApps/apps/SaneClip/` |
 | **Website** | `docs/` (Cloudflare Pages at saneclip.com) |
-| **Sister apps** | SaneBar, SaneHosts, SaneVideo, SaneSync |
+| **Sister apps** | SaneBar, SaneHosts, SaneVideo, SaneSync, SaneClick, SaneSales, SaneScan |
 
 ---
 

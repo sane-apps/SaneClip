@@ -10,7 +10,7 @@
 [![License: PolyForm Shield](https://img.shields.io/badge/License-PolyForm%20Shield-blue.svg?style=flat-square)](LICENSE)
 [![macOS](https://img.shields.io/badge/macOS-15.0+-blue?style=flat-square)](https://www.apple.com/macos/)
 [![Pricing](https://img.shields.io/badge/Pricing-Free_%2B_%2414.99_Pro-green?style=flat-square)](https://saneclip.com)
-[![Listed on awesome-macos](https://img.shields.io/badge/Listed%20on-open--source--mac--os--apps%20(40k%E2%98%85)-black?style=flat-square)](https://github.com/serhii-londar/open-source-mac-os-apps)
+[![Listed on macOS apps list](https://img.shields.io/badge/Listed%20on-macOS--apps--list%20(40k%E2%98%85)-black?style=flat-square)](https://github.com/serhii-londar/open-source-mac-os-apps)
 
 > **⭐ Star this repo if you find it useful!** · **[⬇️ Download Free](https://saneclip.com/download)** · **[💰 Upgrade to Pro for $14.99 once](https://go.saneapps.com/buy/saneclip?ref=github-readme)**
 

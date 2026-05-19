@@ -1,7 +1,7 @@
 ---
 name: Feature Request
 about: Suggest a new feature or improvement
-title: '[Feature] '
+title: "[Feature]: "
 labels: enhancement
 assignees: ''
 ---
@@ -20,7 +20,7 @@ assignees: ''
 
 ## Additional Context
 
-<!-- Mockups, examples from other apps, etc. -->
+<!-- Mockups, examples from other apps, etc. GitHub issues are public, so email hi@saneapps.com for sensitive examples. -->
 
 ## Priority
 

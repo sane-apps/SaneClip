@@ -8,6 +8,18 @@ lemon_squeezy_product_id: null  # TBD
 known_facts:
   - "Lemon Squeezy bounce emails are normal (test mode)"
 
+positioning:
+  one_liner: "Private clipboard history with OCR, Touch ID, and encrypted sync."
+  pricing: "Basic is free. Pro is $14.99 once."
+  privacy_claim: "Clipboard contents stay on device by default; optional sync uses the user's own iCloud with encrypted history."
+
+search_keywords:
+  - "clipboard manager mac"
+  - "clipboard history macos"
+  - "Paste alternative Mac"
+  - "Mac clipboard OCR"
+  - "clipboard manager Touch ID"
+
 # PIRACY ALERT — DMCA takedown needed
 piracy:
   - site: "macked.app"
@@ -33,8 +45,95 @@ launches:
     status: "submitted"
     notes: "17.8k star repo. PR #698."
 
-# Active launches (check status on each run)
-launches: []
+launch_calendar:
+  timezone: "America/New_York"
+  classification: "released_but_launch_blocked_until_risk_cleanup"
+  rule: "Do not schedule a broad public launch while piracy/DMCA and current release/support proof are unresolved. Use the launch window only after the clipboard/OCR story is clean and verified."
+  current_release_state:
+    version: "2.3.4"
+    status: "live_or_recent_direct_release"
+    evidence: "SESSION_HANDOFF records Mini verify/customer UI sweep and OCR picker proof, but also notes open issue follow-ups and App Store lane concerns."
+  blockers:
+    - "Piracy page still marked needs_dmca."
+    - "Open GitHub issues #9-#12 are release:patched-pending and need maintainer/customer replies after verification."
+    - "App Store/iOS metadata and conversion surfaces need a fresh check before large launch traffic."
+  scheduled:
+    - date: "2026-05-23"
+      time: "10:00"
+      channel: "Launch readiness cleanup"
+      status: "scheduled_by_cross_product_launch_ops"
+      action: "Run DMCA workflow for active crack page, recheck open patched-pending issues, verify current direct/App Store surface, and decide whether SaneClip can support a launch."
+      gate: "No PH/HN/IH launch until DMCA status, support replies, and current release proof are clean."
+      success_metric: "Blockers resolved or launch marked no-go with exact reasons."
+    - date: "2026-05-27"
+      time: "10:00"
+      channel: "Clipboard/OCR launch decision"
+      status: "conditional"
+      action: "If cleanup passed, prepare a privacy-first SaneClip launch package around encrypted clipboard history + OCR capture; otherwise keep monitoring only."
+      gate: "Fresh Mini verification and exact launch assets required."
+      success_metric: "Launch package scheduled or explicit no-go."
+  last_launch_readiness:
+    date: "2026-05-18"
+    status: "no_go"
+    launch_readiness_exit: 1
+    blocker_summary:
+      - "The piracy page is still marked needs_dmca."
+      - "Open GitHub issues #9-#12 still need verified maintainer/customer replies or an explicit no-go status."
+      - "App Store/iOS metadata and conversion surfaces still need a fresh check before larger launch traffic."
+      - "The 30-second launch video remains local-only until the cleanup lane is complete and hosted."
+    next_date: "2026-05-23"
+
+public_posting_policy:
+  approval_required: true
+  disclosure_required: "Always say 'I built SaneClip' when recommending it publicly."
+
+launch_package:
+  status: "blocked_until_risk_cleanup"
+  audience: "Mac users who need clipboard history, private snippets, OCR text capture, and iPhone/iPad continuity without a cloud clipboard company."
+  problem: "Clipboard managers can become a sensitive data trap: passwords, customer data, screenshots, and reusable snippets all pass through them."
+  solution: "SaneClip keeps clipboard history private with Touch ID, encryption, app exclusions, OCR capture, snippets, and optional iCloud sync."
+  primary_story: "A privacy-first clipboard manager for people who copy sensitive things."
+  pricing_proof: "Website shows Basic free and Pro $14.99 once; free ZIP and Buy Pro links are present."
+  privacy_proof: "Privacy page and launch copy must state that clipboard contents are not sent to SaneApps servers; optional sync uses the user's own iCloud path."
+  proof_assets:
+    - type: "website_hero"
+      status: "current"
+      path: "docs/index.html"
+    - type: "og_image"
+      status: "current"
+      path: "docs/images/og-image.png"
+    - type: "product_screenshot"
+      status: "current"
+      path: "docs/images/screenshot-popover.png"
+    - type: "product_screenshot"
+      status: "current"
+      path: "docs/images/screenshot-snippets.png"
+    - type: "video"
+      status: "local_candidate_generated_but_blocked_until_cleanup"
+      path: "Videos/saneclip-private-clipboard-30s.mp4"
+    - type: "product_hunt_thumbnail"
+      status: "current"
+      path: "docs/images/product-hunt-thumbnail-240.png"
+    - type: "product_hunt_gallery"
+      status: "current"
+      path: "docs/images/product-hunt-gallery-01.png"
+    - type: "product_hunt_gallery"
+      status: "current"
+      path: "docs/images/product-hunt-gallery-02.png"
+    - type: "product_hunt_gallery"
+      status: "current"
+      path: "docs/images/product-hunt-gallery-03.png"
+  channel_plan:
+    product_hunt: "no_go_until_dmca_support_and_assets_clean"
+    hacker_news: "fallback_only_after_cleanup"
+    indie_hackers: "feedback_story_after_cleanup"
+    x_replies: "targeted_only_when_user_asks_for_clipboard_manager_or_Paste_alternative"
+  go_no_go:
+    rule: "No public launch until DMCA, open support follow-ups, App Store/direct surfaces, video, and Mini proof are clean."
+  weak_launch_blockers:
+    - "Piracy page still marked needs_dmca."
+    - "Open GitHub issues #9-#12 need verified replies or explicit no-go status."
+    - "30-second video is local only and still needs human visual approval plus hosting after cleanup."
 
 # Competitor issues we've already responded to
 competitor_responses: []

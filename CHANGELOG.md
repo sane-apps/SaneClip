@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.5] - 2026-05-19
+
+Fixes license-key paste reliability in activation and settings.
+
+---
+
 ## [2.3.4] - 2026-05-12
 
 Fixes Capture Text after the macOS screen picker and moves clipboard history to Cmd-Shift-Control-Y.

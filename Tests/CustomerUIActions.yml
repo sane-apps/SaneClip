@@ -426,6 +426,7 @@ actions:
   - Mini source/test guard for snippets settings and status menu snippets
   required_proof_level: fixture_completion
   required_evidence_types:
+  - screenshot
   - fixture
   - state_receipt
   historical_failure_classes:

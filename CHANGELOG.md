@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.6] - 2026-05-21
+
+Improves password protection so generated passwords copied from browser extensions are skipped when Protect Passwords is enabled.
+
+---
+
 ## [2.3.5] - 2026-05-19
 
 Fixes license-key paste reliability in activation and settings.

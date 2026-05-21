@@ -2,9 +2,9 @@
   "app": "SaneClip",
   "status": "passed",
   "host": "mini",
-  "generated_at": "2026-05-13T03:23:48Z",
-  "manifest_sha256": "c31efe734a4c8ab314bcf6adfb3b886300e32d50651c67d2082382c1ee511878",
-  "source_fingerprint": "98258e8c93a0ff575da890286cad5ca3b2a37ffaffdb34d7cece54094b835d29",
+  "generated_at": "2026-05-21T19:38:05Z",
+  "manifest_sha256": "780d6707cb91d6d3b68f9a8fe2967645a554b62044b7515a95a897f58b54e802",
+  "source_fingerprint": "153ce75259da87e99df80709e52ef8e29a2f227186f79fb30b9700da28dce487",
   "tested_action_ids": [
     "status-menu-dock-core-actions",
     "history-search-filter-navigation",
@@ -46,10 +46,10 @@
           "For Quit and update checks, verify the menu item and first safe surface rather than publishing or quitting during the sweep."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json",
           "docs/images/screenshot-menu.png",
-          "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -60,7 +60,7 @@
         {
           "type": "mini_click",
           "detail": "Mini interaction transcript for status-menu-dock-core-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json"
         },
         {
           "type": "screenshot",
@@ -70,12 +70,12 @@
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for status-menu-dock-core-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for status-menu-dock-core-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         }
       ]
     },
@@ -105,10 +105,10 @@
           "Paste or delete the selected row only in a safe fixture run."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json",
-          "docs/images/screenshot-popover.png",
-          "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json",
+          "docs/images/appstore-mac-popover.png",
+          "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -119,22 +119,22 @@
         {
           "type": "mini_click",
           "detail": "Mini interaction transcript for history-search-filter-navigation",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json"
         },
         {
           "type": "screenshot",
           "detail": "Mini visual proof for history-search-filter-navigation",
-          "path": "docs/images/screenshot-popover.png"
+          "path": "docs/images/appstore-mac-popover.png"
         },
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for history-search-filter-navigation",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for history-search-filter-navigation",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         }
       ]
     },
@@ -164,10 +164,10 @@
           "Verify Basic users see Pro gates for Pro-only row actions."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json",
           "docs/images/screenshot-popover.png",
-          "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -178,7 +178,7 @@
         {
           "type": "mini_click",
           "detail": "Mini interaction transcript for history-item-row-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json"
         },
         {
           "type": "screenshot",
@@ -188,12 +188,12 @@
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for history-item-row-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for history-item-row-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         }
       ]
     },
@@ -223,9 +223,9 @@
           "Verify Basic users see a Pro gate instead of silent no-op controls."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json",
-          "docs/images/screenshot-popover.png",
-          "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json"
+          "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json",
+          "docs/images/product-hunt-gallery-01.png",
+          "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json"
         ]
       },
       "evidence": [
@@ -236,17 +236,17 @@
         {
           "type": "mini_click",
           "detail": "Mini interaction transcript for paste-stack-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json"
         },
         {
           "type": "screenshot",
           "detail": "Mini visual proof for paste-stack-actions",
-          "path": "docs/images/screenshot-popover.png"
+          "path": "docs/images/product-hunt-gallery-01.png"
         },
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for paste-stack-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json"
         }
       ]
     },
@@ -276,10 +276,10 @@
           "Verify fixture-level ScreenCaptureKit and OCR wiring without claiming a human picker selection unless that fixture was actually run."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json",
-          "docs/images/screenshot-settings.png",
-          "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json",
+          "docs/images/appstore-mac-settings.png",
+          "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -290,22 +290,22 @@
         {
           "type": "mini_click",
           "detail": "Mini interaction transcript for capture-screenshot-text-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json"
         },
         {
           "type": "screenshot",
           "detail": "Mini visual proof for capture-screenshot-text-actions",
-          "path": "docs/images/screenshot-settings.png"
+          "path": "docs/images/appstore-mac-settings.png"
         },
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for capture-screenshot-text-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for capture-screenshot-text-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         },
         {
           "type": "external_boundary",
@@ -339,10 +339,10 @@
           "For Touch ID, import/export, update checks, and selected-app panels, verify the safe first surface or fixture rather than mutating user data."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json",
           "docs/images/screenshot-settings.png",
-          "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -353,7 +353,7 @@
         {
           "type": "mini_click",
           "detail": "Mini interaction transcript for settings-general-security-history-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json"
         },
         {
           "type": "screenshot",
@@ -363,12 +363,12 @@
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for settings-general-security-history-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for settings-general-security-history-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         },
         {
           "type": "external_boundary",
@@ -402,10 +402,10 @@
           "Reset Show Clipboard History to Command-Shift-Control-Y in a fixture or source/test proof."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json",
           "docs/images/screenshot-shortcuts.png",
-          "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -416,7 +416,7 @@
         {
           "type": "mini_click",
           "detail": "Mini interaction transcript for settings-shortcuts-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json"
         },
         {
           "type": "screenshot",
@@ -426,12 +426,12 @@
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for settings-shortcuts-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for settings-shortcuts-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         }
       ]
     },
@@ -459,8 +459,9 @@
           "Verify Basic users see a Pro gate and can reach the Snippets settings surface."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260513T032348Z/settings-state-receipt.json"
+          "docs/images/screenshot-snippets.png",
+          "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/settings-state-receipt.json"
         ]
       },
       "evidence": [
@@ -469,14 +470,19 @@
           "detail": "7 shipped source/test markers verified on the Mini"
         },
         {
+          "type": "screenshot",
+          "detail": "Mini visual proof for snippets-management-actions",
+          "path": "docs/images/screenshot-snippets.png"
+        },
+        {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for snippets-management-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json"
         },
         {
           "type": "state_receipt",
           "detail": "State receipt for snippets-management-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/settings-state-receipt.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/settings-state-receipt.json"
         }
       ]
     },
@@ -503,7 +509,7 @@
           "Verify total items, pinned count, storage size, and type breakdown render from ClipboardManager state."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json",
           "docs/images/screenshot-storage.png"
         ]
       },
@@ -515,7 +521,7 @@
         {
           "type": "mini_click",
           "detail": "Mini interaction transcript for storage-stats-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json"
         },
         {
           "type": "screenshot",
@@ -550,10 +556,10 @@
           "Do not claim CloudKit network completion unless a fixture or sync run proves it."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json",
-          "docs/images/screenshot-settings.png",
-          "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json",
+          "docs/images/product-hunt-gallery-02.png",
+          "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -564,22 +570,22 @@
         {
           "type": "mini_click",
           "detail": "Mini interaction transcript for sync-settings-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json"
         },
         {
           "type": "screenshot",
           "detail": "Mini visual proof for sync-settings-actions",
-          "path": "docs/images/screenshot-settings.png"
+          "path": "docs/images/product-hunt-gallery-02.png"
         },
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for sync-settings-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for sync-settings-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         },
         {
           "type": "external_boundary",
@@ -613,10 +619,10 @@
           "Verify Basic users are not blocked from the app and Pro gates appear for Pro-only features."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json",
-          "docs/images/screenshot-settings.png",
-          "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json",
+          "docs/images/product-hunt-gallery-03.png",
+          "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -627,22 +633,22 @@
         {
           "type": "mini_click",
           "detail": "Mini interaction transcript for onboarding-permission-pro-gates",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json"
         },
         {
           "type": "screenshot",
           "detail": "Mini visual proof for onboarding-permission-pro-gates",
-          "path": "docs/images/screenshot-settings.png"
+          "path": "docs/images/product-hunt-gallery-03.png"
         },
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for onboarding-permission-pro-gates",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for onboarding-permission-pro-gates",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         }
       ]
     },
@@ -670,10 +676,10 @@
           "Do not mark iOS device or CloudKit runtime completion unless a device/simulator fixture actually ran."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json",
           "docs/images/screenshot-ios-history-dark.png",
-          "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -684,7 +690,7 @@
         {
           "type": "mini_click",
           "detail": "Mini interaction transcript for ios-widget-extension-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json"
         },
         {
           "type": "screenshot",
@@ -694,12 +700,12 @@
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for ios-widget-extension-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for ios-widget-extension-actions",
-          "path": "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
         },
         {
           "type": "external_boundary",
@@ -709,25 +715,23 @@
     }
   },
   "screenshots": [
-    "outputs/capture-renders/history-smart-clear-render.png",
-    "outputs/capture-renders/settings-general-render.png",
-    "outputs/capture-renders/settings-shortcuts-render.png",
-    "outputs/capture-renders/settings-snippets-render.png",
-    "outputs/capture-renders/settings-storage-render.png",
-    "outputs/capture-renders/settings-sync-render.png",
-    "outputs/capture-renders/settings-about-render.png",
     "docs/images/screenshot-menu.png",
+    "docs/images/appstore-mac-popover.png",
     "docs/images/screenshot-popover.png",
+    "docs/images/product-hunt-gallery-01.png",
+    "docs/images/appstore-mac-settings.png",
     "docs/images/screenshot-settings.png",
     "docs/images/screenshot-shortcuts.png",
     "docs/images/screenshot-snippets.png",
     "docs/images/screenshot-storage.png",
+    "docs/images/product-hunt-gallery-02.png",
+    "docs/images/product-hunt-gallery-03.png",
     "docs/images/screenshot-ios-history-dark.png"
   ],
   "evidence": {
-    "app_version": "2.3.4",
-    "app_build": "2304",
-    "sweep_started_at": "2026-05-13T03:23:48Z",
+    "app_version": "2.3.6",
+    "app_build": "2306",
+    "sweep_started_at": "2026-05-21T19:38:05Z",
     "sweep_mode": "Mini structured customer-surface proof with explicit external-boundary scoping; no destructive user-data mutation.",
     "transcript": [
       "source_guard=status-menu-dock-core-actions ok checks=8",
@@ -742,13 +746,13 @@
       "source_guard=sync-settings-actions ok checks=6",
       "source_guard=onboarding-permission-pro-gates ok checks=8",
       "source_guard=ios-widget-extension-actions ok checks=8",
-      "screenshot_fixtures=outputs/capture-renders/history-smart-clear-render.png, outputs/capture-renders/settings-general-render.png, outputs/capture-renders/settings-shortcuts-render.png, outputs/capture-renders/settings-snippets-render.png, outputs/capture-renders/settings-storage-render.png, outputs/capture-renders/settings-sync-render.png, outputs/capture-renders/settings-about-render.png, docs/images/screenshot-menu.png, docs/images/screenshot-popover.png, docs/images/screenshot-settings.png, docs/images/screenshot-shortcuts.png, docs/images/screenshot-snippets.png, docs/images/screenshot-storage.png, docs/images/screenshot-ios-history-dark.png"
+      "screenshot_fixtures=docs/images/screenshot-menu.png, docs/images/appstore-mac-popover.png, docs/images/screenshot-popover.png, docs/images/product-hunt-gallery-01.png, docs/images/appstore-mac-settings.png, docs/images/screenshot-settings.png, docs/images/screenshot-shortcuts.png, docs/images/screenshot-snippets.png, docs/images/screenshot-storage.png, docs/images/product-hunt-gallery-02.png, docs/images/product-hunt-gallery-03.png, docs/images/screenshot-ios-history-dark.png"
     ],
     "artifacts": {
-      "mini_click": "outputs/customer-ui/sweep-20260513T032348Z/mini-click-transcript.json",
-      "fixture": "outputs/customer-ui/sweep-20260513T032348Z/fixture-state.json",
-      "state_receipt": "outputs/customer-ui/sweep-20260513T032348Z/settings-state-receipt.json",
-      "runtime_log": "outputs/customer-ui/sweep-20260513T032348Z/customer-action-runtime.log"
+      "mini_click": "outputs/customer-ui/sweep-20260521T193805Z/mini-click-transcript.json",
+      "fixture": "outputs/customer-ui/sweep-20260521T193805Z/fixture-state.json",
+      "state_receipt": "outputs/customer-ui/sweep-20260521T193805Z/settings-state-receipt.json",
+      "runtime_log": "outputs/customer-ui/sweep-20260521T193805Z/customer-action-runtime.log"
     },
     "external_boundaries": {
       "capture-screenshot-text-actions": "ScreenCaptureKit picker and Screen Recording permission require a human/system permission surface; this sweep verifies menu, shortcut, permission-copy, service, OCR, and preview fixtures only.",

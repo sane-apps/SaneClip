@@ -88,6 +88,20 @@ class ClipboardManager {
         return false
     }
 
+    nonisolated static func shouldSkipSensitiveTextCapture(_ text: String) -> Bool {
+        SensitiveDataDetector.shared.detect(in: text).contains(.password)
+    }
+
+    nonisolated static let knownPasswordManagerBundleIDs: Set<String> = [
+        "com.1password.1password",
+        "com.agilebits.onepassword",
+        "com.bitwarden.desktop",
+        "com.dashlane.dashlane",
+        "com.lastpass.lastpass",
+        "com.wsigenesis.1Password7",
+        "org.keepassxc.keepassxc"
+    ]
+
     var history: [ClipboardItem] = []
     var pinnedItems: [ClipboardItem] = []
     var pasteStack: [ClipboardItem] = []
@@ -159,12 +173,7 @@ class ClipboardManager {
     ]
 
     // Security: Bundle IDs to ignore (password managers)
-    private let ignoredBundleIDs: Set<String> = [
-        "com.agilebits.onepassword",
-        "com.dashlane.dashlane",
-        "com.lastpass.lastpass",
-        "com.wsigenesis.1Password7"
-    ]
+    private let ignoredBundleIDs = ClipboardManager.knownPasswordManagerBundleIDs
 
     init(startMonitoring: Bool = true, loadPersistedState: Bool = true, persistenceEnabled: Bool = true) {
         self.persistenceEnabled = persistenceEnabled
@@ -558,6 +567,10 @@ class ClipboardManager {
         let processedString = processString(text)
         if !isTextWithinCaptureLimit(processedString) {
             logger.info("Skipped oversized processed clipboard entry (\(processedString.utf8.count) bytes)")
+            return
+        }
+        if SettingsModel.shared.protectPasswords, Self.shouldSkipSensitiveTextCapture(processedString) {
+            logger.info("Skipped password-like clipboard text")
             return
         }
         lastClipboardContent = processedString

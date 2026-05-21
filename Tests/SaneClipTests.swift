@@ -1049,6 +1049,32 @@ struct SaneClipTests {
 
         let pwdEquals = "pwd=supersecret"
         #expect(detector.detect(in: pwdEquals).contains(.password))
+
+        let generatedBrowserExtensionPassword = "F9x!q2Lm#7"
+        #expect(detector.detect(in: generatedBrowserExtensionPassword).contains(.password))
+    }
+
+    @Test("Standalone generated password detection avoids common text false positives")
+    @MainActor
+    func standaloneGeneratedPasswordDetectionAvoidsCommonFalsePositives() {
+        let detector = SensitiveDataDetector.shared
+
+        #expect(!detector.detect(in: "https://example.com/Login?token=Abc123!").contains(.password))
+        #expect(!detector.detect(in: "person+tag@example.com").contains(.password))
+        #expect(!detector.detect(in: "Release 2026 is ready!").contains(.password))
+        #expect(ClipboardManager.shouldSkipSensitiveTextCapture("F9x!q2Lm#7"))
+        #expect(!ClipboardManager.shouldSkipSensitiveTextCapture("Release 2026 is ready!"))
+    }
+
+    @Test("Password manager bundle IDs match built-in exclusion claims")
+    func passwordManagerBundleIDsMatchBuiltInExclusionClaims() {
+        let bundleIDs = ClipboardManager.knownPasswordManagerBundleIDs
+
+        #expect(bundleIDs.contains("com.1password.1password"))
+        #expect(bundleIDs.contains("com.bitwarden.desktop"))
+        #expect(bundleIDs.contains("com.lastpass.lastpass"))
+        #expect(bundleIDs.contains("com.dashlane.dashlane"))
+        #expect(bundleIDs.contains("org.keepassxc.keepassxc"))
     }
 
     @Test("Detects private key blocks")

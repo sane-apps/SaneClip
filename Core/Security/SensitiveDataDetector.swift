@@ -197,7 +197,44 @@ final class SensitiveDataDetector: Sendable {
             return true
         }
 
-        return false
+        return containsStandaloneGeneratedPassword(text)
+    }
+
+    /// Detects a single generated-password token copied from a browser extension.
+    private func containsStandaloneGeneratedPassword(_ text: String) -> Bool {
+        let token = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard token.count >= 8, token.count <= 128 else { return false }
+        guard token.rangeOfCharacter(from: .whitespacesAndNewlines) == nil else { return false }
+
+        let lowercaseToken = token.lowercased()
+        if lowercaseToken.hasPrefix("http://") || lowercaseToken.hasPrefix("https://") {
+            return false
+        }
+        if lowercaseToken.range(of: #"^[a-z][a-z0-9+.-]*://"#, options: .regularExpression) != nil {
+            return false
+        }
+        if containsEmail(token) {
+            return false
+        }
+
+        var hasUppercase = false
+        var hasLowercase = false
+        var hasDigit = false
+        var hasSymbol = false
+
+        for scalar in token.unicodeScalars {
+            if CharacterSet.uppercaseLetters.contains(scalar) {
+                hasUppercase = true
+            } else if CharacterSet.lowercaseLetters.contains(scalar) {
+                hasLowercase = true
+            } else if CharacterSet.decimalDigits.contains(scalar) {
+                hasDigit = true
+            } else {
+                hasSymbol = true
+            }
+        }
+
+        return hasUppercase && hasLowercase && hasDigit && hasSymbol
     }
 
     // MARK: - Private Key Detection

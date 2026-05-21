@@ -153,16 +153,16 @@ class CustomerUIActionSweep
 
   SCREENSHOT_BY_ACTION = {
     'status-menu-dock-core-actions' => 'docs/images/screenshot-menu.png',
-    'history-search-filter-navigation' => 'docs/images/screenshot-popover.png',
+    'history-search-filter-navigation' => 'docs/images/appstore-mac-popover.png',
     'history-item-row-actions' => 'docs/images/screenshot-popover.png',
-    'paste-stack-actions' => 'docs/images/screenshot-popover.png',
-    'capture-screenshot-text-actions' => 'docs/images/screenshot-settings.png',
+    'paste-stack-actions' => 'docs/images/product-hunt-gallery-01.png',
+    'capture-screenshot-text-actions' => 'docs/images/appstore-mac-settings.png',
     'settings-general-security-history-actions' => 'docs/images/screenshot-settings.png',
     'settings-shortcuts-actions' => 'docs/images/screenshot-shortcuts.png',
     'snippets-management-actions' => 'docs/images/screenshot-snippets.png',
     'storage-stats-actions' => 'docs/images/screenshot-storage.png',
-    'sync-settings-actions' => 'docs/images/screenshot-settings.png',
-    'onboarding-permission-pro-gates' => 'docs/images/screenshot-settings.png',
+    'sync-settings-actions' => 'docs/images/product-hunt-gallery-02.png',
+    'onboarding-permission-pro-gates' => 'docs/images/product-hunt-gallery-03.png',
     'ios-widget-extension-actions' => 'docs/images/screenshot-ios-history-dark.png'
   }.freeze
 

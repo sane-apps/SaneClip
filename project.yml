@@ -2,7 +2,7 @@ name: SaneClip
 options:
   bundleIdPrefix: com.saneclip
   deploymentTarget:
-    macOS: 15.0
+    macOS: 14.0
     iOS: 18.0
   xcodeVersion: 16.0
 
@@ -127,7 +127,7 @@ targets:
     platform: macOS
     bundleId: com.saneclip.app
     deploymentTarget:
-      macOS: 15.0
+      macOS: 14.0
     sources:
       - main.swift
       - SaneClipApp.swift
@@ -197,7 +197,7 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
-        MACOSX_DEPLOYMENT_TARGET: 15.0
+        MACOSX_DEPLOYMENT_TARGET: 14.0
         ARCHS: arm64
         VALID_ARCHS: arm64
         CODE_SIGN_STYLE: Manual
@@ -313,7 +313,7 @@ targets:
     platform: macOS
     bundleId: com.saneclip.app
     deploymentTarget:
-      macOS: 15.0
+      macOS: 14.0
     sources:
       - main.swift
       - SaneClipApp.swift
@@ -359,7 +359,7 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
-        MACOSX_DEPLOYMENT_TARGET: 15.0
+        MACOSX_DEPLOYMENT_TARGET: 14.0
         ARCHS: arm64
         VALID_ARCHS: arm64
         CODE_SIGN_STYLE: Manual
@@ -387,7 +387,7 @@ targets:
     platform: macOS
     bundleId: com.saneclip.appTests
     deploymentTarget:
-      macOS: 15.0
+      macOS: 14.0
     testTarget: SaneClip
     sources:
       - Tests
@@ -418,7 +418,7 @@ targets:
     platform: macOS
     bundleId: com.saneclip.app.widgets
     deploymentTarget:
-      macOS: 15.0
+      macOS: 14.0
     sources:
       - Widgets
       - path: Core/Models/WidgetClipboardItem.swift

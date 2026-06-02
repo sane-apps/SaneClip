@@ -57,7 +57,7 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ---
 
-## 🆕 Current macOS Direct Download: v2.3.5
+## 🆕 Current macOS Direct Download: v2.3.6
 
 **Current direct-download release (May 2026)**
 
@@ -65,7 +65,7 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 - ✅ Moves the clipboard-history shortcut to Cmd+Shift+Control+Y and migrates older unreliable Cmd+Shift+V defaults
 - ✅ Restores reliable clipboard item edits across history, pinned items, and paste stack mirrors
 - ✅ Adds an explicit snippet Paste action in Settings for faster manual snippet testing
-- ✅ Keeps the direct download, Homebrew, and hosted release metadata aligned on 2.3.5
+- ✅ Keeps the direct download, Homebrew, and hosted release metadata aligned on 2.3.6
 
 The prior `2.2.13` mobile follow-up restored the color-coded source indicators on iPhone and iPad and improved recovery for older Mac updater installs.
 

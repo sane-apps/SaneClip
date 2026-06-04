@@ -1515,6 +1515,14 @@ struct SaneClipTests {
             contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
             encoding: .utf8
         )
+        let generalSettingsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
+            encoding: .utf8
+        )
+        let generalSettingsActionsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView+Actions.swift"),
+            encoding: .utf8
+        )
         let directSupportSource = try String(
             contentsOf: projectRootURL().appendingPathComponent("DirectDistributionSupport.swift"),
             encoding: .utf8
@@ -1538,15 +1546,15 @@ struct SaneClipTests {
         #expect(!settingsSource.contains("struct CompactToggle"))
         #expect(!settingsSource.contains("struct CompactDivider"))
         #expect(!settingsSource.contains("struct GlassGroupBoxStyle"))
-        #expect(settingsSource.contains("SaneLanguageSettingsRow()"))
-        #expect(settingsSource.contains("SaneClipSettingsCopy.menuBarIconListTitle"))
-        #expect(settingsSource.contains("SaneClipSettingsCopy.removeButtonTitle"))
+        #expect(generalSettingsSource.contains("SaneLanguageSettingsRow()"))
+        #expect(generalSettingsSource.contains("SaneClipSettingsCopy.menuBarIconListTitle"))
+        #expect(generalSettingsSource.contains("SaneClipSettingsCopy.removeButtonTitle"))
         #expect(settingsSource.contains("typealias ClipActionButtonStyle = SaneUI.SaneActionButtonStyle"))
-        #expect(settingsSource.contains(".buttonStyle(ClipActionButtonStyle())"))
-        #expect(settingsSource.contains("ClipActionButtonStyle(prominent: exists, compact: true)"))
-        #expect(settingsSource.contains("Image(nsImage: popupSymbolImage(settings.menuBarIcon))"))
-        #expect(settingsSource.contains("hierarchicalColor: .white"))
-        #expect(settingsSource.contains("symbol.isTemplate = false"))
+        #expect(generalSettingsSource.contains(".buttonStyle(ClipActionButtonStyle())"))
+        #expect(generalSettingsSource.contains("ClipActionButtonStyle(prominent: exists, compact: true)"))
+        #expect(generalSettingsSource.contains("Image(nsImage: popupSymbolImage(settings.menuBarIcon))"))
+        #expect(generalSettingsActionsSource.contains("hierarchicalColor: .white"))
+        #expect(generalSettingsActionsSource.contains("symbol.isTemplate = false"))
         #expect(settingsSource.contains("LicenseSettingsView(licenseService: licenseService, style: .panel)"))
         #expect(settingsSource.contains("SaneAboutView("))
         #expect(!settingsSource.contains("mailto:hi@saneapps.com"))
@@ -1563,7 +1571,11 @@ struct SaneClipTests {
             encoding: .utf8
         )
         let settingsSource = try String(
-            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
+            encoding: .utf8
+        )
+        let shortcutsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/ShortcutsSettingsView.swift"),
             encoding: .utf8
         )
         let captureWorkflowSource = try String(
@@ -1584,8 +1596,8 @@ struct SaneClipTests {
         #expect(appSource.contains("KeyboardShortcuts.onKeyUp(for: .captureText)"))
         #expect(captureActionSource.contains("recognizedTextForScreenshot(result.image, language: ocrLanguage)"))
         #expect(captureActionSource.contains("ocrText: ocrText"))
-        #expect(settingsSource.contains("KeyboardShortcuts.Recorder(for: .captureScreenshot)"))
-        #expect(settingsSource.contains("KeyboardShortcuts.Recorder(for: .captureText)"))
+        #expect(shortcutsSource.contains("KeyboardShortcuts.Recorder(for: .captureScreenshot)"))
+        #expect(shortcutsSource.contains("KeyboardShortcuts.Recorder(for: .captureText)"))
         #expect(settingsSource.contains("SaneClipSettingsCopy.autoOCRScreenshotsLabel"))
         #expect(settingsSource.contains("CaptureOCRLanguage.allCases"))
     }
@@ -1597,14 +1609,18 @@ struct SaneClipTests {
             encoding: .utf8
         )
         let settingsSource = try String(
-            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/ShortcutsSettingsView.swift"),
+            encoding: .utf8
+        )
+        let historyWindowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipAppDelegate+HistoryWindow.swift"),
             encoding: .utf8
         )
 
         #expect(appSource.contains("KeyboardShortcuts.setShortcut(.init(.y, modifiers: [.command, .shift, .control]), for: .showClipboardHistory)"))
         #expect(appSource.contains("migrateHistoryShortcutFromCommandShiftVIfNeeded()"))
-        #expect(appSource.contains("toggleHistoryWindow()"))
-        #expect(appSource.contains("window.title = \"SaneClip History\""))
+        #expect(historyWindowSource.contains("toggleHistoryWindow()"))
+        #expect(historyWindowSource.contains("window.title = \"SaneClip History\""))
         #expect(appSource.contains("historyShortcutReliableDefaultMigration_v234_controlY"))
         #expect(appSource.contains("KeyboardShortcuts.Shortcut(.v, modifiers: [.command, .shift])"))
         #expect(appSource.contains("KeyboardShortcuts.Shortcut(.v, modifiers: [.command, .option])"))
@@ -1716,7 +1732,7 @@ struct SaneClipTests {
             encoding: .utf8
         )
         let settingsSource = try String(
-            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
             encoding: .utf8
         )
 
@@ -1853,7 +1869,7 @@ struct SaneClipTests {
     @Test("History and settings surfaces expose unlimited retention and smart clear")
     func historyAndSettingsExposeUnlimitedAndSmartClear() throws {
         let settingsSource = try String(
-            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
             encoding: .utf8
         )
         let historySource = try String(
@@ -1883,11 +1899,15 @@ struct SaneClipTests {
             encoding: .utf8
         )
         let settingsSource = try String(
-            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsView.swift"),
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/ClipboardRulesSection.swift"),
             encoding: .utf8
         )
         let appSource = try String(
             contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+        let menuSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipAppDelegate+Menus.swift"),
             encoding: .utf8
         )
 
@@ -1916,7 +1936,7 @@ struct SaneClipTests {
         #expect(!historySource.contains("Upgrade to Pro — \\(licenseService?.displayPriceLabel"))
         #expect(settingsSource.contains("Text(\"These settings require SaneClip Pro\")"))
         #expect(!settingsSource.contains("Text(\"Upgrade — \\(licenseService?.displayPriceLabel"))
-        #expect(appSource.contains("NSMenuItem(title: \"Snippets Pro \\u{1F512}\", action: #selector(showSnippetsUpsell), keyEquivalent: \"\")"))
+        #expect(menuSource.contains("NSMenuItem(title: \"Snippets Pro \\u{1F512}\", action: #selector(showSnippetsUpsell), keyEquivalent: \"\")"))
         #expect(appSource.contains("private var captureTextMenuItemTitle: String {"))
         #expect(appSource.contains("licenseService.isPro ? CaptureWorkflow.text.menuTitle : \"Capture Text from Screen Pro 🔒\""))
         #expect(appSource.contains("@objc private func showSnippetsUpsell()"))

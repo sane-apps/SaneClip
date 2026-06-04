@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [2.3.7] - 2026-06-04
 
+Keeps synced Mac clipboard text appearing automatically on iPhone and iPad while the companion app is foregrounded, without showing the local pasteboard save banner for iCloud-synced clips.
+
+---
+
+## [2.3.7] - 2026-06-04
+
 Keeps synced Mac clipboard text appearing on iPhone and iPad automatically while the companion app is foregrounded, without showing the local pasteboard save banner for iCloud-synced clips.
 Improves settings and history-window structure without changing the customer workflow.
 

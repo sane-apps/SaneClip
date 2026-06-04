@@ -32,17 +32,43 @@ struct SaneClipIOSApp: App {
 /// Main content view with tab navigation
 struct ContentView: View {
     @EnvironmentObject var viewModel: ClipboardHistoryViewModel
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var selectedTab = LaunchOptions.initialTabIndex
 
     private var isIPad: Bool { sizeClass == .regular }
 
     var body: some View {
-        if isIPad {
-            iPadLayout
-        } else {
-            iPhoneLayout
+        Group {
+            if isIPad {
+                iPadLayout
+            } else {
+                iPhoneLayout
+            }
         }
+        .task {
+            await startForegroundSync()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                Task { await startForegroundSync() }
+            } else {
+                stopForegroundSync()
+            }
+        }
+    }
+
+    private func startForegroundSync() async {
+        #if ENABLE_SYNC
+            viewModel.beginAutomaticSync()
+            await viewModel.refreshFromSyncIfEnabled()
+        #endif
+    }
+
+    private func stopForegroundSync() {
+        #if ENABLE_SYNC
+            viewModel.endAutomaticSync()
+        #endif
     }
 
     // MARK: - iPad: Custom large tab bar

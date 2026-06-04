@@ -21,13 +21,13 @@ class CustomerUIActionSweep
   ACTION_GUARDS = {
     'status-menu-dock-core-actions' => [
       ['SaneClipApp.swift', 'func applicationDockMenu(_: NSApplication) -> NSMenu?'],
-      ['SaneClipApp.swift', 'buildContextMenu()'],
-      ['SaneClipApp.swift', 'CaptureWorkflow.screenshot.menuTitle'],
+      ['SaneClipAppDelegate+Menus.swift', 'buildContextMenu()'],
+      ['SaneClipAppDelegate+Menus.swift', 'CaptureWorkflow.screenshot.menuTitle'],
       ['SaneClipApp.swift', 'captureTextMenuItemTitle'],
-      ['SaneClipApp.swift', 'addRecentItemsToMenu(menu)'],
-      ['SaneClipApp.swift', 'buildSnippetsSubmenu()'],
-      ['SaneClipApp.swift', 'SaneStandardMenu.addCoreUtilityItems'],
-      ['SaneClipApp.swift', 'About / Report a Bug...']
+      ['SaneClipAppDelegate+Menus.swift', 'addRecentItemsToMenu(menu)'],
+      ['SaneClipAppDelegate+Menus.swift', 'buildSnippetsSubmenu()'],
+      ['SaneClipAppDelegate+Menus.swift', 'SaneStandardMenu.addCoreUtilityItems'],
+      ['SaneClipAppDelegate+Menus.swift', 'About / Report a Bug...']
     ],
     'history-search-filter-navigation' => [
       ['UI/History/ClipboardHistoryView.swift', 'TextField("Search clipboard history...", text: $searchText)'],
@@ -54,7 +54,7 @@ class CustomerUIActionSweep
       ['UI/History/ClipboardHistoryView.swift', 'clipboardManager.movePasteStackItemToTop(id: item.id)'],
       ['UI/History/ClipboardHistoryView.swift', 'clipboardManager.updateItemTitle(id: item.id, title: stackTitleDraft)'],
       ['UI/History/ClipboardHistoryView.swift', 'clipboardManager.undoLastPasteFromStack()'],
-      ['UI/Settings/SettingsView.swift', 'SaneClipSettingsCopy.pasteStackNewestFirstLabel'],
+      ['UI/Settings/GeneralSettingsView.swift', 'SaneClipSettingsCopy.pasteStackNewestFirstLabel'],
       ['Core/ClipboardManager.swift', 'func addToPasteStack']
     ],
     'capture-screenshot-text-actions' => [
@@ -70,24 +70,24 @@ class CustomerUIActionSweep
       ['Tests/SaneClipTests.swift', 'Capture implementation uses ScreenCaptureKit and Vision']
     ],
     'settings-general-security-history-actions' => [
-      ['UI/Settings/SettingsView.swift', 'SaneLoginItemToggle()'],
-      ['UI/Settings/SettingsView.swift', 'SaneDockIconToggle(showDockIcon:'],
-      ['UI/Settings/SettingsView.swift', 'SaneClipSettingsCopy.detectPasswordsLabel'],
-      ['UI/Settings/SettingsView.swift', 'SaneClipSettingsCopy.touchIDLabel'],
-      ['UI/Settings/SettingsView.swift', 'SaneClipSettingsCopy.encryptHistoryLabel'],
-      ['UI/Settings/SettingsView.swift', 'ExcludedAppsInline('],
-      ['UI/Settings/SettingsView.swift', 'SaneSparkleRow('],
-      ['UI/Settings/SettingsView.swift', 'exportHistory()'],
-      ['UI/Settings/SettingsView.swift', 'importHistory()'],
+      ['UI/Settings/GeneralSettingsView.swift', 'SaneLoginItemToggle()'],
+      ['UI/Settings/GeneralSettingsView.swift', 'SaneDockIconToggle(showDockIcon:'],
+      ['UI/Settings/GeneralSettingsView.swift', 'SaneClipSettingsCopy.detectPasswordsLabel'],
+      ['UI/Settings/GeneralSettingsView.swift', 'SaneClipSettingsCopy.touchIDLabel'],
+      ['UI/Settings/GeneralSettingsView.swift', 'SaneClipSettingsCopy.encryptHistoryLabel'],
+      ['UI/Settings/GeneralSettingsView.swift', 'ExcludedAppsInline('],
+      ['UI/Settings/GeneralSettingsView.swift', 'SaneSparkleRow('],
+      ['UI/Settings/GeneralSettingsView+Actions.swift', 'exportHistory()'],
+      ['UI/Settings/GeneralSettingsView+Actions.swift', 'importHistory()'],
       ['Tests/SaneClipTests.swift', 'SettingsView uses shared SaneUI settings chrome']
     ],
     'settings-shortcuts-actions' => [
-      ['UI/Settings/SettingsView.swift', 'KeyboardShortcuts.Recorder(for: .showClipboardHistory)'],
-      ['UI/Settings/SettingsView.swift', 'KeyboardShortcuts.Recorder(for: .pasteAsPlainText)'],
-      ['UI/Settings/SettingsView.swift', 'KeyboardShortcuts.Recorder(for: .pasteFromStack)'],
-      ['UI/Settings/SettingsView.swift', 'KeyboardShortcuts.Recorder(for: .captureScreenshot)'],
-      ['UI/Settings/SettingsView.swift', 'KeyboardShortcuts.Recorder(for: .captureText)'],
-      ['UI/Settings/SettingsView.swift', 'Button("Reset")'],
+      ['UI/Settings/ShortcutsSettingsView.swift', 'KeyboardShortcuts.Recorder(for: .showClipboardHistory)'],
+      ['UI/Settings/ShortcutsSettingsView.swift', 'KeyboardShortcuts.Recorder(for: .pasteAsPlainText)'],
+      ['UI/Settings/ShortcutsSettingsView.swift', 'KeyboardShortcuts.Recorder(for: .pasteFromStack)'],
+      ['UI/Settings/ShortcutsSettingsView.swift', 'KeyboardShortcuts.Recorder(for: .captureScreenshot)'],
+      ['UI/Settings/ShortcutsSettingsView.swift', 'KeyboardShortcuts.Recorder(for: .captureText)'],
+      ['UI/Settings/ShortcutsSettingsView.swift', 'Button("Reset")'],
       ['Tests/SaneClipTests.swift', 'History shortcut default uses reliable Command Shift Control Y shortcut']
     ],
     'snippets-management-actions' => [
@@ -97,7 +97,7 @@ class CustomerUIActionSweep
       ['UI/Settings/SnippetsSettingsView.swift', 'Button("Duplicate")'],
       ['UI/Settings/SnippetsSettingsView.swift', 'SnippetEditorSheet('],
       ['UI/Settings/SnippetsSettingsView.swift', 'promptValuesIfNeeded(for snippet: Snippet)'],
-      ['SaneClipApp.swift', 'NSMenuItem(title: "Snippets Pro']
+      ['SaneClipAppDelegate+Menus.swift', 'NSMenuItem(title: "Snippets Pro']
     ],
     'storage-stats-actions' => [
       ['UI/Settings/StorageStatsView.swift', 'StatCard(title: "Total Items"'],

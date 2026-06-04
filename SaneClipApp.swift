@@ -8,10 +8,10 @@ import SwiftUI
 import LocalAuthentication
 import os.log
 
-private let appLogger = Logger(subsystem: "com.saneclip.app", category: "App")
+let appLogger = Logger(subsystem: "com.saneclip.app", category: "App")
 
 @MainActor
-private func menuBarTemplateImage(named systemName: String) -> NSImage? {
+func menuBarTemplateImage(named systemName: String) -> NSImage? {
     let image = NSImage(systemSymbolName: systemName, accessibilityDescription: "SaneClip")
     image?.isTemplate = true
     return image
@@ -41,14 +41,14 @@ extension KeyboardShortcuts.Name {
 
 @MainActor
 class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
-    private var statusItem: NSStatusItem!
-    private var popover: NSPopover!
-    private var historyWindow: NSWindow?
+    var statusItem: NSStatusItem!
+    var popover: NSPopover!
+    var historyWindow: NSWindow?
     var clipboardManager: ClipboardManager!
     let screenCaptureService = ScreenCaptureService()
     let captureOCRService = CaptureOCRService()
     #if !APP_STORE && !SETAPP
-        private var updateService: UpdateService!
+        var updateService: UpdateService!
     #endif
     /// Track when user last authenticated with Touch ID (grace period)
     private var lastAuthenticationTime: Date?
@@ -161,6 +161,11 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool {
+        showHistoryWindow()
+        return false
+    }
+
     nonisolated static func shouldInitializeSyncOnLaunch(
         hasClipboardManager: Bool,
         syncFeatureCompiled: Bool
@@ -220,7 +225,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         )
     }
 
-    private var captureTextMenuItemTitle: String {
+    var captureTextMenuItemTitle: String {
         licenseService.isPro ? CaptureWorkflow.text.menuTitle : "Capture Text from Screen Pro 🔒"
     }
 
@@ -537,56 +542,56 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc private func clearHistoryFromMenu() {
+    @objc func clearHistoryFromMenu() {
         clipboardManager.clearHistory()
     }
 
-    @objc private func openSettings() {
+    @objc func openSettings() {
         SettingsWindowController.open()
     }
 
-    @objc private func showReleaseNotes() {
+    @objc func showReleaseNotes() {
         SetappIntegration.showReleaseNotes()
     }
 
-    @objc private func openGeneralSettings() {
+    @objc func openGeneralSettings() {
         SettingsWindowController.open(tab: .general)
     }
 
-    @objc private func openShortcutsSettings() {
+    @objc func openShortcutsSettings() {
         SettingsWindowController.open(tab: .shortcuts)
     }
 
-    @objc private func openSnippetsSettings() {
+    @objc func openSnippetsSettings() {
         SettingsWindowController.open(tab: .snippets)
     }
 
     #if ENABLE_SYNC
-        @objc private func openSyncSettings() {
+        @objc func openSyncSettings() {
             SettingsWindowController.open(tab: .sync)
         }
     #endif
 
-    @objc private func openStorageSettings() {
+    @objc func openStorageSettings() {
         SettingsWindowController.open(tab: .storage)
     }
 
-    @objc private func openLicenseSettings() {
+    @objc func openLicenseSettings() {
         SettingsWindowController.open(tab: .license)
     }
 
-    @objc private func openAboutSettings() {
+    @objc func openAboutSettings() {
         SettingsWindowController.open(tab: .about)
     }
 
-    @objc private func requestExcludedAppPicker() {
+    @objc func requestExcludedAppPicker() {
         appLogger.info("Settings command requested excluded app picker")
         SettingsWindowController.schedulePendingAction(.excludedAppPicker)
         SettingsWindowController.open(tab: .general)
         NotificationCenter.default.post(name: .settingsAddExcludedAppRequested, object: nil)
     }
 
-    @objc private func focusHistorySearch() {
+    @objc func focusHistorySearch() {
         if !popover.isShown {
             showHistoryPopover()
         }
@@ -654,380 +659,15 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    private func showPopoverAtButton() {
-        guard let button = statusItem.button else { return }
-        resetHistoryPopoverSize()
-        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-
-        if let popoverWindow = popover.contentViewController?.view.window {
-            popoverWindow.makeKey()
-        }
-    }
-
-    private func showPopoverAtCursor() {
-        guard let button = statusItem.button else { return }
-        resetHistoryPopoverSize()
-
-        // Use the status item as an anchor view, then reposition to cursor.
-        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-        guard let popoverWindow = popover.contentViewController?.view.window else { return }
-
-        let mouse = NSEvent.mouseLocation
-        let size = popoverWindow.frame.size
-        let targetScreen = NSScreen.screens.first(where: { $0.frame.contains(mouse) }) ?? NSScreen.main
-        let visible = targetScreen?.visibleFrame ?? NSScreen.screens.first?.visibleFrame ?? .zero
-
-        // Prefer below cursor; fall back above if needed.
-        var origin = NSPoint(
-            x: mouse.x - (size.width / 2.0),
-            y: mouse.y - size.height - 12
-        )
-        if origin.y < visible.minY {
-            origin.y = mouse.y + 16
-        }
-
-        let minX = visible.minX
-        let maxX = max(visible.minX, visible.maxX - size.width)
-        let minY = visible.minY
-        let maxY = max(visible.minY, visible.maxY - size.height)
-        origin.x = min(max(origin.x, minX), maxX)
-        origin.y = min(max(origin.y, minY), maxY)
-
-        popoverWindow.setFrameOrigin(origin)
-        popoverWindow.makeKey()
-    }
-
-    private func installMainMenu() {
-        let mainMenu = NSMenu()
-
-        let appMenuItem = NSMenuItem()
-        mainMenu.addItem(appMenuItem)
-
-        let appMenu = NSMenu(title: "SaneClip")
-        #if APP_STORE
-            addAppStoreCoreUtilityItems(to: appMenu, settingsKeyEquivalent: ",")
-        #else
-            appMenu.addItem(SaneStandardMenu.aboutAndBugReportItem(target: self, action: #selector(openAboutSettings)))
-            appMenu.addItem(SaneStandardMenu.settingsItem(target: self, action: #selector(openSettings)))
-            appMenu.addItem(SaneStandardMenu.licenseItem(target: self, action: #selector(openLicenseSettings)))
-
-            #if !SETAPP
-                appMenu.addItem(SaneStandardMenu.checkForUpdatesItem(target: self, action: #selector(checkForUpdates)))
-            #endif
-
-            #if SETAPP
-                appMenu.addItem(SaneStandardMenu.whatsNewItem(target: self, action: #selector(showReleaseNotes)))
-            #endif
-        #endif
-
-        appMenu.addItem(NSMenuItem.separator())
-
-        #if APP_STORE
-            addAppStoreQuitItem(to: appMenu)
-        #else
-            appMenu.addItem(SaneStandardMenu.quitItem(appName: "SaneClip", target: NSApplication.shared, action: #selector(NSApplication.terminate(_:))))
-        #endif
-        appMenuItem.submenu = appMenu
-
-        let editMenuItem = NSMenuItem()
-        mainMenu.addItem(editMenuItem)
-
-        let editMenu = NSMenu(title: "Edit")
-        let captureScreenshotItem = NSMenuItem(
-            title: CaptureWorkflow.screenshot.menuTitle,
-            action: #selector(captureScreenshotFromMenu),
-            keyEquivalent: ""
-        )
-        captureScreenshotItem.target = self
-        editMenu.addItem(captureScreenshotItem)
-
-        let captureTextItem = NSMenuItem(
-            title: captureTextMenuItemTitle,
-            action: #selector(captureTextFromMenu),
-            keyEquivalent: ""
-        )
-        captureTextItem.target = self
-        editMenu.addItem(captureTextItem)
-
-        editMenu.addItem(NSMenuItem.separator())
-
-        let searchHistoryItem = NSMenuItem(title: "Search History", action: #selector(focusHistorySearch), keyEquivalent: "f")
-        searchHistoryItem.keyEquivalentModifierMask = [.command]
-        searchHistoryItem.target = self
-        editMenu.addItem(searchHistoryItem)
-
-        let addExcludedAppItem = NSMenuItem(title: "Add Excluded App...", action: #selector(requestExcludedAppPicker), keyEquivalent: "n")
-        addExcludedAppItem.keyEquivalentModifierMask = [.command]
-        addExcludedAppItem.target = self
-        editMenu.addItem(addExcludedAppItem)
-        editMenuItem.submenu = editMenu
-
-        let settingsMenuItem = NSMenuItem()
-        mainMenu.addItem(settingsMenuItem)
-
-        let settingsMenu = NSMenu(title: "Settings")
-        for item in settingsMenuItems() {
-            settingsMenu.addItem(item)
-        }
-        settingsMenuItem.submenu = settingsMenu
-
-        NSApp.mainMenu = mainMenu
-    }
-
-    private func settingsMenuItems() -> [NSMenuItem] {
-        var items: [NSMenuItem] = [
-            settingsMenuItem(title: "General", action: #selector(openGeneralSettings), key: "1"),
-            settingsMenuItem(title: "Shortcuts", action: #selector(openShortcutsSettings), key: "2")
-        ]
-
-        #if ENABLE_SYNC
-            items.append(settingsMenuItem(title: "Sync", action: #selector(openSyncSettings), key: "3"))
-            items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "4"))
-            items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "5"))
-            items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "6"))
-            items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "7"))
-        #else
-            items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "3"))
-            items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "4"))
-            items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "5"))
-            items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "6"))
-        #endif
-
-        return items
-    }
-
-    private func settingsMenuItem(title: String, action: Selector, key: String) -> NSMenuItem {
-        let item = NSMenuItem(title: title, action: action, keyEquivalent: key)
-        item.keyEquivalentModifierMask = [.command]
-        item.target = self
-        return item
-    }
-
-    private func showHistoryPopover() {
-        if SettingsModel.shared.openHistoryAtCursor {
-            showPopoverAtCursor()
-        } else {
-            showPopoverAtButton()
-        }
-    }
-
-    private func historyRootView() -> some View {
-        ClipboardHistoryView(clipboardManager: clipboardManager, licenseService: licenseService)
-            .frame(
-                minWidth: ClipboardHistoryView.popoverWidth,
-                idealWidth: ClipboardHistoryView.popoverWidth,
-                maxWidth: ClipboardHistoryView.popoverWidth,
-                minHeight: ClipboardHistoryView.popoverMinHeight,
-                idealHeight: ClipboardHistoryView.popoverMinHeight,
-                alignment: .top
-            )
-            .preferredColorScheme(.dark)
-    }
-
-    private func toggleHistoryWindow() {
-        if popover.isShown {
-            popover.performClose(nil)
-        }
-
-        if let historyWindow, historyWindow.isVisible {
-            historyWindow.close()
-            return
-        }
-
-        let window = historyWindow ?? NSPanel(
-            contentRect: NSRect(
-                x: 0,
-                y: 0,
-                width: ClipboardHistoryView.popoverWidth,
-                height: ClipboardHistoryView.popoverMinHeight
-            ),
-            styleMask: [.titled, .closable, .fullSizeContentView],
-            backing: .buffered,
-            defer: false
-        )
-        window.title = "SaneClip History"
-        window.contentViewController = NSHostingController(rootView: historyRootView())
-        window.isReleasedWhenClosed = false
-        window.level = .floating
-        window.center()
-        historyWindow = window
-
-        NSApp.activate(ignoringOtherApps: true)
-        window.makeKeyAndOrderFront(nil)
-    }
-
-    private func resetHistoryPopoverSize() {
-        let size = NSSize(
-            width: ClipboardHistoryView.popoverWidth,
-            height: ClipboardHistoryView.popoverMinHeight
-        )
-        popover.contentSize = size
-        popover.contentViewController?.preferredContentSize = size
-    }
-
-    private func showContextMenu() {
-        guard let button = statusItem.button else { return }
-        let menu = buildContextMenu()
-        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.bounds.minY), in: button)
-    }
-
-    private func buildContextMenu() -> NSMenu {
-        let menu = NSMenu()
-
-        let captureScreenshotItem = NSMenuItem(
-            title: CaptureWorkflow.screenshot.menuTitle,
-            action: #selector(captureScreenshotFromMenu),
-            keyEquivalent: ""
-        )
-        captureScreenshotItem.target = self
-        menu.addItem(captureScreenshotItem)
-
-        let captureTextItem = NSMenuItem(
-            title: captureTextMenuItemTitle,
-            action: #selector(captureTextFromMenu),
-            keyEquivalent: ""
-        )
-        captureTextItem.target = self
-        menu.addItem(captureTextItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        let showItem = NSMenuItem(title: "Show History", action: #selector(showPopover), keyEquivalent: "")
-        showItem.target = self
-        menu.addItem(showItem)
-        menu.addItem(NSMenuItem.separator())
-
-        addRecentItemsToMenu(menu)
-        menu.addItem(buildSnippetsSubmenu())
-        menu.addItem(NSMenuItem.separator())
-
-        let clearItem = NSMenuItem(title: "Clear History", action: #selector(clearHistoryFromMenu), keyEquivalent: "")
-        clearItem.target = self
-        menu.addItem(clearItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        #if APP_STORE
-            addAppStoreCoreUtilityItems(to: menu, settingsKeyEquivalent: "")
-            addAppStoreQuitItem(to: menu)
-        #else
-            SaneStandardMenu.addCoreUtilityItems(
-                to: menu,
-                appName: "SaneClip",
-                target: self,
-                settingsAction: #selector(openSettings),
-                licenseAction: #selector(openLicenseSettings),
-                checkForUpdatesAction: directUpdateAction,
-                aboutAndBugReportAction: #selector(openAboutSettings),
-                whatsNewAction: setappWhatsNewAction,
-                quitTarget: NSApplication.shared,
-                quitAction: #selector(NSApplication.terminate(_:)),
-                settingsKeyEquivalent: ""
-            )
-        #endif
-
-        return menu
-    }
-
-    // MARK: - Shared Menu Helpers
-
-    #if APP_STORE
-        private func addAppStoreCoreUtilityItems(to menu: NSMenu, settingsKeyEquivalent: String) {
-            let aboutItem = NSMenuItem(title: "About / Report a Bug...", action: #selector(openAboutSettings), keyEquivalent: "")
-            aboutItem.target = self
-            menu.addItem(aboutItem)
-
-            let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: settingsKeyEquivalent)
-            settingsItem.target = self
-            settingsItem.keyEquivalentModifierMask = settingsKeyEquivalent.isEmpty ? [] : [.command]
-            menu.addItem(settingsItem)
-
-            let licenseItem = NSMenuItem(title: "License...", action: #selector(openLicenseSettings), keyEquivalent: "")
-            licenseItem.target = self
-            menu.addItem(licenseItem)
-        }
-
-        private func addAppStoreQuitItem(to menu: NSMenu) {
-            let quitItem = NSMenuItem(
-                title: "Quit SaneClip",
-                action: #selector(NSApplication.terminate(_:)),
-                keyEquivalent: "q"
-            )
-            quitItem.target = NSApplication.shared
-            menu.addItem(quitItem)
-        }
-    #endif
-
-    private func addRecentItemsToMenu(_ menu: NSMenu) {
-        let recentItems = Array(clipboardManager.history.prefix(5))
-        guard !recentItems.isEmpty else { return }
-        for (index, item) in recentItems.enumerated() {
-            let menuItem = NSMenuItem(
-                title: String(item.preview.prefix(40)) + (item.preview.count > 40 ? "..." : ""),
-                action: #selector(pasteFromMenu(_:)),
-                keyEquivalent: ""
-            )
-            menuItem.tag = index
-            menuItem.target = self
-            menu.addItem(menuItem)
-        }
-        menu.addItem(NSMenuItem.separator())
-    }
-
-    private func buildSnippetsSubmenu() -> NSMenuItem {
-        guard licenseService.isPro else {
-            let snippetsItem = NSMenuItem(title: "Snippets Pro \u{1F512}", action: #selector(showSnippetsUpsell), keyEquivalent: "")
-            snippetsItem.target = self
-            return snippetsItem
-        }
-
-        let snippetsItem = NSMenuItem(title: "Snippets", action: nil, keyEquivalent: "")
-        let snippetsMenu = NSMenu()
-        let sections = SnippetManager.librarySections(for: SnippetManager.shared.snippets)
-        if !sections.isEmpty {
-            let helpItem = NSMenuItem(title: "Paste into the frontmost email or document", action: nil, keyEquivalent: "")
-            helpItem.isEnabled = false
-            snippetsMenu.addItem(helpItem)
-            snippetsMenu.addItem(NSMenuItem.separator())
-
-            for section in sections {
-                let categoryItem = NSMenuItem(title: section.title, action: nil, keyEquivalent: "")
-                let categoryMenu = NSMenu()
-                for snippet in section.snippets {
-                    let snippetMenuItem = NSMenuItem(
-                        title: snippet.name,
-                        action: #selector(pasteSnippetFromMenu(_:)),
-                        keyEquivalent: ""
-                    )
-                    snippetMenuItem.representedObject = snippet.id.uuidString
-                    snippetMenuItem.target = self
-                    categoryMenu.addItem(snippetMenuItem)
-                }
-                categoryItem.submenu = categoryMenu
-                snippetsMenu.addItem(categoryItem)
-            }
-        } else {
-            let emptyItem = NSMenuItem(title: "No snippets", action: nil, keyEquivalent: "")
-            emptyItem.isEnabled = false
-            snippetsMenu.addItem(emptyItem)
-        }
-        snippetsMenu.addItem(NSMenuItem.separator())
-        let settingsItem = NSMenuItem(title: "Open Snippets Settings...", action: #selector(openSnippetsSettingsFromMenu), keyEquivalent: "")
-        settingsItem.target = self
-        snippetsMenu.addItem(settingsItem)
-        snippetsItem.submenu = snippetsMenu
-        return snippetsItem
-    }
-
-    @objc private func showSnippetsUpsell() {
+    @objc func showSnippetsUpsell() {
         ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: licenseService)
     }
 
-    @objc private func openSnippetsSettingsFromMenu() {
+    @objc func openSnippetsSettingsFromMenu() {
         SettingsWindowController.open(tab: .snippets)
     }
 
-    @objc private func showPopover() {
+    @objc func showPopover() {
         // Check if Touch ID is required
         if requiresHistoryAuth {
             // Check if within grace period
@@ -1051,7 +691,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc private func pasteFromMenu(_ sender: NSMenuItem) {
+    @objc func pasteFromMenu(_ sender: NSMenuItem) {
         let index = sender.tag
         guard index < clipboardManager.history.count else { return }
 
@@ -1073,7 +713,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc private func pasteSnippetFromMenu(_ sender: NSMenuItem) {
+    @objc func pasteSnippetFromMenu(_ sender: NSMenuItem) {
         guard let idString = sender.representedObject as? String,
               let id = UUID(uuidString: idString),
               let snippet = SnippetManager.shared.snippets.first(where: { $0.id == id })
@@ -1132,23 +772,4 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         buildContextMenu()
     }
 
-    #if !APP_STORE && !SETAPP
-        private var directUpdateAction: Selector? {
-            #selector(checkForUpdates)
-        }
-
-        @objc private func checkForUpdates() {
-            updateService.checkForUpdates()
-        }
-    #else
-        private var directUpdateAction: Selector? { nil }
-    #endif
-
-    #if SETAPP
-        private var setappWhatsNewAction: Selector? {
-            #selector(showReleaseNotes)
-        }
-    #else
-        private var setappWhatsNewAction: Selector? { nil }
-    #endif
 }

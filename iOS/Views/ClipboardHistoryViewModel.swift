@@ -20,6 +20,8 @@ class ClipboardHistoryViewModel: ObservableObject {
 
     #if ENABLE_SYNC
         private var observationTask: Task<Void, Never>?
+        private var automaticSyncTask: Task<Void, Never>?
+        private static let automaticSyncInterval: Duration = .seconds(8)
     #endif
 
     init() {
@@ -32,6 +34,7 @@ class ClipboardHistoryViewModel: ObservableObject {
     deinit {
         #if ENABLE_SYNC
             observationTask?.cancel()
+            automaticSyncTask?.cancel()
         #endif
     }
 
@@ -79,6 +82,37 @@ class ClipboardHistoryViewModel: ObservableObject {
             if let syncDate = coordinator.lastSyncDate {
                 lastSyncTime = syncDate
             }
+        }
+
+        func beginAutomaticSync() {
+            guard automaticSyncTask == nil else { return }
+
+            automaticSyncTask = Task { [weak self] in
+                await self?.refreshFromSyncIfEnabled()
+
+                while !Task.isCancelled {
+                    do {
+                        try await Task.sleep(for: Self.automaticSyncInterval)
+                    } catch {
+                        break
+                    }
+
+                    await self?.refreshFromSyncIfEnabled()
+                }
+            }
+        }
+
+        func endAutomaticSync() {
+            automaticSyncTask?.cancel()
+            automaticSyncTask = nil
+        }
+
+        func refreshFromSyncIfEnabled() async {
+            let coordinator = SyncCoordinator.shared
+            guard coordinator.isSyncEnabled else { return }
+
+            await coordinator.syncNow()
+            mergeFromSync(coordinator)
         }
     #endif
 
@@ -302,6 +336,13 @@ class ClipboardHistoryViewModel: ObservableObject {
 
     /// Check if the clipboard has new content since last check
     func checkForNewClipboardContent() {
+        #if ENABLE_SYNC
+            if SyncCoordinator.shared.isSyncEnabled {
+                clipboardDetectedText = nil
+                return
+            }
+        #endif
+
         let pasteboard = UIPasteboard.general
         guard pasteboard.changeCount != lastPasteboardChangeCount else { return }
         lastPasteboardChangeCount = pasteboard.changeCount
@@ -399,11 +440,7 @@ class ClipboardHistoryViewModel: ObservableObject {
         loadFromSharedContainer()
 
         #if ENABLE_SYNC
-            let coordinator = SyncCoordinator.shared
-            if coordinator.isSyncEnabled {
-                await coordinator.syncNow()
-            }
-            mergeFromSync(coordinator)
+            await refreshFromSyncIfEnabled()
         #endif
 
         isLoading = false

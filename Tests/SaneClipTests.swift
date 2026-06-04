@@ -554,6 +554,29 @@ struct SaneClipTests {
         #expect(historySource.contains("viewModel.isShowingDemoData && !isScreenshotMode"))
     }
 
+    @Test("iPhone sync refreshes automatically while foregrounded")
+    func iPhoneSyncRefreshesAutomaticallyWhileForegrounded() throws {
+        let repoRoot = projectRootURL()
+        let appSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("iOS/SaneClipIOSApp.swift"),
+            encoding: .utf8
+        )
+        let viewModelSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("iOS/Views/ClipboardHistoryViewModel.swift"),
+            encoding: .utf8
+        )
+
+        #expect(appSource.contains("@Environment(\\.scenePhase)"))
+        #expect(appSource.contains("viewModel.beginAutomaticSync()"))
+        #expect(appSource.contains("await viewModel.refreshFromSyncIfEnabled()"))
+        #expect(appSource.contains("viewModel.endAutomaticSync()"))
+        #expect(viewModelSource.contains("private static let automaticSyncInterval: Duration = .seconds(8)"))
+        #expect(viewModelSource.contains("func beginAutomaticSync()"))
+        #expect(viewModelSource.contains("await coordinator.syncNow()"))
+        #expect(viewModelSource.contains("if SyncCoordinator.shared.isSyncEnabled"))
+        #expect(viewModelSource.contains("clipboardDetectedText = nil"))
+    }
+
     @Test("Sandboxed builds allow user-selected file access for open and save panels")
     func sandboxedBuildsGrantUserSelectedFileAccess() throws {
         let repoRoot = URL(fileURLWithPath: #filePath)
@@ -1942,19 +1965,41 @@ struct SaneClipTests {
             contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
             encoding: .utf8
         )
+        let historyWindowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipAppDelegate+HistoryWindow.swift"),
+            encoding: .utf8
+        )
         let historySource = try String(
             contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardHistoryView.swift"),
             encoding: .utf8
         )
 
-        #expect(appSource.contains("popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)"))
-        #expect(appSource.contains("resetHistoryPopoverSize()"))
-        #expect(appSource.contains("popover.contentViewController?.preferredContentSize = size"))
+        #expect(historyWindowSource.contains("popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)"))
+        #expect(historyWindowSource.contains("resetHistoryPopoverSize()"))
+        #expect(historyWindowSource.contains("popover.contentViewController?.preferredContentSize = size"))
         #expect(historySource.contains("static let popoverWidth: CGFloat = 320"))
         #expect(historySource.contains("static let popoverMinHeight: CGFloat = 500"))
         #expect(!appSource.contains("let buttonRect = button.convert(button.bounds, to: nil)"))
         #expect(!appSource.contains("let screenRect = buttonWindow.convertToScreen(buttonRect)"))
         #expect(!appSource.contains("popoverWindow.setFrameOrigin(newOrigin)"))
+    }
+
+    @Test("Reopening the running app opens the history window")
+    func appReopenOpensHistoryWindow() throws {
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+        let historyWindowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipAppDelegate+HistoryWindow.swift"),
+            encoding: .utf8
+        )
+
+        #expect(appSource.contains("func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool"))
+        #expect(appSource.contains("showHistoryWindow()"))
+        #expect(appSource.contains("return false"))
+        #expect(historyWindowSource.contains("func showHistoryWindow()"))
+        #expect(historyWindowSource.contains("historyWindow.makeKeyAndOrderFront(nil)"))
     }
 
     @Test("Render settings screenshots when requested")

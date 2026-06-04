@@ -193,7 +193,7 @@ appstore:
         Touch ID history lock, AES-GCM history encryption at rest and encrypted sync payloads before upload,
         paste as plain text, smart paste, text transforms, paste stack, snippets, item notes, clipboard rules, and export/import.
       keywords: "clipboard,copy paste,history,snippets,touch id,security,productivity,mac utility"
-      whats_new: "Fixes Capture Text after screen/window picker selection, improves Screen Recording recovery, and moves Show Clipboard History to Cmd+Shift+Control+Y for more reliable shortcut behavior."
+      whats_new: "Keeps synced Mac clipboard text appearing on iPhone and iPad automatically while the companion app is foregrounded, and preserves the refreshed settings/history-window workflow."
       marketing_url: "https://saneclip.com"
     ios:
       subtitle: "Clipboard History + Widgets"
@@ -203,7 +203,7 @@ appstore:
         Browse your recent clips, copy them again in one tap, save new text and links from the Share Sheet, and keep important items pinned across devices.
         Clipboard contents are never sent to SaneApps servers. Pro adds encryption and more advanced workflows, including encrypted sync payloads before upload when History Encryption is enabled.
       keywords: "clipboard,copy paste,history,widgets,icloud,snippets,productivity,notes"
-      whats_new: "Keeps the iPhone and iPad companion aligned with the 2.3.4 privacy, sync, and onboarding release while preserving widgets, source colors, and private iCloud sync."
+      whats_new: "Keeps synced Mac clipboard text appearing automatically while the companion app is foregrounded, without showing the local pasteboard save banner for iCloud-synced clips."
       marketing_url: "https://saneclip.com"
   review_notes: "SaneClip is a freemium App Store app. Basic is free in the App Store build. SaneClip Pro Unlock is an optional one-time non-consumable StoreKit in-app purchase. No external checkout links or license keys are used in the App Store build."
   iap:

@@ -6,7 +6,27 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                                                                        <item>
+                                                                                                <item>
+            <title>2.3.7</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Thu, 04 Jun 2026 00:19:10 -0400</pubDate>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Keeps synced Mac clipboard text appearing automatically on iPhone and iPad while the companion app is foregrounded, without showing the local pasteboard save banner for iCloud-synced clips.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.7.zip"
+                       sparkle:version="2307"
+                       sparkle:shortVersionString="2.3.7"
+                       length="3825199"
+                       type="application/octet-stream"
+                       sparkle:edSignature="150eUUtx4gXWD6ozCH3QCuF3KSGZTNZ39niL+lsQF1KFLOBbQjAeDX9LNQJM18iQ41D+N6TH0ZW4OhaD6QFoAw=="/>
+        </item>
+<item>
             <title>2.3.6</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Thu, 21 May 2026 15:31:56 -0400</pubDate>

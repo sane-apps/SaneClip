@@ -6,8 +6,9 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
-- Current release candidate: `2.3.7` / build `2307`.
-- Current live direct/Lemon Squeezy version before release: `2.3.6`.
+- Current released version: `2.3.7` / build `2307`.
+- Direct channel `2.3.7` is live on R2/appcast/site/Homebrew/email webhook.
+- App Store `2.3.7` is submitted for review on both macOS and iOS.
 - 2026-06-04 `2.3.7` release-candidate proof:
   - iPhone/iPad companion foreground sync now starts from `ContentView` on
     launch/scene activation, refreshes every 8 seconds while foregrounded, and
@@ -25,6 +26,38 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
   - Mini `./scripts/SaneMaster.rb customer_ui_sweep --json` passed with 12
     actions and receipt timestamp `2026-06-04T03:27:08Z` after updating the
     sweep source guards for the new split files.
+- 2026-06-04 `2.3.7` final release/submission proof:
+  - Direct release completed: notarized/stapled Mac zip
+    `SaneClip-2.3.7.zip`, SHA-256
+    `402ce8addf15b0396c9a158c537f521447c69118d955f6d5c8e4f4f56ba96892`,
+    Sparkle signature
+    `150eUUtx4gXWD6ozCH3QCuF3KSGZTNZ39niL+lsQF1KFLOBbQjAeDX9LNQJM18iQ41D+N6TH0ZW4OhaD6QFoAw==`.
+  - Live direct URL verified `HTTP 200`:
+    `https://dist.saneclip.com/updates/SaneClip-2.3.7.zip`, content length
+    `3825199`.
+  - Live appcast verified `2.3.7` with `sparkle:version="2307"`.
+  - Homebrew tap updated to `2.3.7`.
+  - Email webhook Worker updated/deployed for SaneClip bundle/download
+    delivery; webhook tests passed `23/23`.
+  - Final Mini verify passed `154` tests.
+  - Final Mini customer UI sweep passed `12` actions with receipt timestamp
+    `2026-06-04T04:24:52Z`.
+  - Final `appstore_preflight` passed: `ALL CLEAR — ready for App Store
+    submission`.
+  - macOS App Store build `2307` uploaded, processed, attached to ASC version
+    `2.3.7`, and submitted. ASC state:
+    `platform=MAC_OS version=2.3.7 state=WAITING_FOR_REVIEW`,
+    submission ID `f4f13e05-09bd-4e13-a776-4a814802dac9`.
+  - iOS App Store build `2307` uploaded, processed, attached to ASC version
+    `2.3.7`, and submitted. ASC state:
+    `platform=IOS version=2.3.7 state=WAITING_FOR_REVIEW`,
+    submission ID `e2b88dbd-3177-466b-beab-527367c3e6ee`.
+  - IAP price schedule was accidentally created at `$6.99` by the helper
+    default during the first macOS submit attempt, then immediately corrected
+    with `--iap-price-usd 14.99`; both macOS submit-only and iOS submit
+    verified USA `$14.99`.
+  - Final `release_preflight` passed with warnings only: 1 open GitHub issue,
+    3 pending customer emails, and night-release timing.
 - 2026-06-04 settings/window refactor proof pass:
   - Split settings/window ownership without changing behavior:
     `SaneClipAppDelegate+HistoryWindow.swift` now owns history window/popover
@@ -68,13 +101,10 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
   emails now serve `SaneClip-2.3.6.zip`; live signed download snapshot verified
   file/version/domain and SaneClip `release_preflight` passed with warnings
   only.
-- SaneClip `2.3.6` direct channels are live: R2/appcast/site/Homebrew/email
-  Worker were synced during the release run, and Lemon Squeezy hosted files now
-  show exactly one published SaneClip file: `SaneClip-2.3.6.zip`.
-- Mac App Store `2.3.6` was uploaded and submitted on 2026-05-21. ASC build
-  `2306` processed successfully and the macOS version is `WAITING_FOR_REVIEW`.
-- Local repo is clean except the intentionally restored unrelated
-  `.outreach.yml` change from before the release.
+- SaneClip `2.3.7` direct channels are live: R2/appcast/site/Homebrew/email
+  Worker were synced during the release run.
+- Mac App Store and iOS App Store `2.3.7` are both `WAITING_FOR_REVIEW`.
+- Local and Mini repos were clean after submission checks.
 - Open customer/public follow-up: GitHub `#13` should receive a user-approved
   reply saying 2.3.6 improves Protect Passwords for generated passwords copied
   from browser extensions.
@@ -93,6 +123,24 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
   content-rights, export-compliance, and iOS accessibility declaration families.
 - The strict customer UI receipt was refreshed on the Mini and now includes
   screenshot evidence for `snippets-management-actions`.
+- SaneProcess routed release reconcile was fixed in
+  `~/SaneApps/infra/SaneProcess` commit `cb934c4` so Air-origin releases trust
+  the routed Mini workspace context instead of trying to reverse-SSH to
+  `Stephans-MacBook-Air.local`.
+- App Store archive/export from SSH hit `errSecInternalComponent` for widget
+  codesign. Working path was: unlock/grant keychain partition access once, then
+  run short archive/export scripts through `mini-gui-run.sh` so Xcode signs in
+  the Mini GUI session. Avoid long inline `mini-gui-run.sh` commands; use a
+  generated `build/*.sh` script to prevent Terminal command-injection stalls.
+- The first macOS App Store archive made with `CODE_SIGN_STYLE=Automatic` and
+  blank `CODE_SIGN_IDENTITY` dropped sandbox entitlements. Correct archive path
+  is the normal `SaneClip-AppStore` scheme with `Release-AppStore`,
+  `-destination generic/platform=macOS`, and the project-configured
+  entitlements. Verify both app and widget package payloads contain
+  `com.apple.security.app-sandbox` before upload.
+- Apple returned transient `500` errors while reserving macOS screenshot upload
+  slots during the first submit. A separate `--screenshots-only` retry succeeded
+  before the submit-only run.
 
 ## Verification Receipts
 
@@ -123,9 +171,10 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
   `2026-05-21T19:54:33Z`.
 - `appstore_preflight` passed in the routed workspace with one warning only:
   the generated customer UI receipt was locally dirty after the sweep.
-- App Store package export passed, package preflight passed, upload completed,
-  build `2306` processed, screenshots uploaded, metadata synced, IAP readiness
-  passed, and ASC returned `Successfully submitted for review`.
+- App Store package export passed, package preflight passed, uploads completed,
+  build `2307` processed on both macOS and iOS, screenshots uploaded, metadata
+  synced, IAP readiness passed at `$14.99`, and ASC returned
+  `Successfully submitted for review` for both platforms.
 - Lemon Squeezy hosted-file audit at `2026-05-21T20:03:24Z` returned
   `current_actions: []`; SaneBar, SaneClick, SaneClip, SaneHosts, and SaneSales
   all show `In sync`.
@@ -133,7 +182,7 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 ## Next
 
 1. Show exact customer/GitHub reply drafts and wait for approval before posting.
-2. Check GitHub/App Store status later; SaneClip macOS `2.3.6` is submitted but
-   not yet approved.
+2. Check GitHub/App Store status later; SaneClip macOS and iOS `2.3.7` are both
+   submitted but not yet approved.
 3. Leave `.outreach.yml` alone unless the user explicitly asks to handle launch
    calendar/outreach changes.

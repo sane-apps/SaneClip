@@ -29,12 +29,12 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
   passed with zero issues, direct ZIP HTTP 200, appcast propagation verified,
   Homebrew cask verified, email webhook verified, and strict post-release
   checks passed.
-- Known remaining paid-delivery dashboard action: Lemon Squeezy hosted file for
-  SaneClip still reports `SaneClip-2.3.6.zip` while the expected current file is
-  `SaneClip-2.3.9.zip` for variant `1228215`. Canonical tooling and Lemon
-  Squeezy docs show hosted file replacement is a dashboard action, not an API
-  write path. Dashboard:
-  `https://app.lemonsqueezy.com/products/779223`.
+- Lemon Squeezy hosted paid files are in sync as of 2026-06-06 17:57 EDT.
+  Dashboard uploads were updated for SaneBar `2.1.66`, SaneClip `2.3.9`, and
+  SaneHosts `1.1.16`; the live hosted-file tracker reports `Current actions: 0`
+  and the local upload folder reports `stale: 0`, `missing latest: 0`,
+  `unexpected: 0`. Evidence:
+  `outputs/hosted_file_actions_20260606_synced.md`.
 - 2026-06-06 GitHub `#14` / menu-bar visibility fix:
   - Added a Mac setting in General > Appearance: `Show menu bar icon`.
   - The menu bar item visibility updates live via `statusItem.isVisible`; hiding
@@ -99,14 +99,14 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
   - Retried the iOS-only App Store lane: archive succeeded, IPA export
     succeeded, build `2308` processed successfully, screenshots/metadata/IAP
     passed, and iOS version `2.3.8` reached `WAITING_FOR_REVIEW`.
-- 2026-06-06 remaining external action:
-  - Lemon Squeezy hosted file still needs dashboard replacement. Hosted file is
-    `SaneClip-2.3.6.zip`; expected direct artifact is `SaneClip-2.3.9.zip`.
-  - Dashboard: `https://app.lemonsqueezy.com/products/779223`, variant
-    `1228215`. Replace the published hosted file with
-    `SaneClip-2.3.9.zip` from
-    `https://dist.saneclip.com/updates/SaneClip-2.3.9.zip` and confirm only the
-    appcast-matching ZIP remains published.
+- 2026-06-06 Lemon Squeezy hosted-file cleanup:
+  - Updated SaneBar, SaneClip, and SaneHosts paid hosted files in the Lemon
+    Squeezy dashboard using the saved Mini Safari login.
+  - Verified via `./scripts/SaneMaster.rb hosted_file_actions --json-out
+    outputs/hosted_file_actions_20260606_synced.json --evidence-out
+    outputs/hosted_file_actions_20260606_synced.md`.
+  - Final result: `Current actions: 0`; all five direct-download apps in the
+    tracker are `In sync`.
 - 2026-06-06 best-in-class audit / `2.3.8` staging:
   - Market/platform research was refreshed in `.claude/research.md`. Conclusion:
     SaneClip should be positioned as Mac-first automatic capture plus
@@ -136,16 +136,9 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
   - `./scripts/SaneMaster.rb appstore_preflight` passed with warning only:
     30 uncommitted files. ASC version lanes are clear:
     `macos: 2.3.8 clear | ios: 2.3.8 clear`.
-  - Release blocker: hosted-file audit still reports Lemon Squeezy SaneClip
-    paid file as `SaneClip-2.3.6.zip` while the current live direct channel is
-    `2.3.7`. Evidence refreshed at
-    `outputs/hosted_file_actions_evidence.json` on `2026-06-06T18:46:02Z`.
-    The script says file replacement is a dashboard action at
-    `https://app.lemonsqueezy.com/products/779223`, variant `1228215`.
-    Do not call the release "flawless" until this paid-delivery path is updated
-    for the currently live version and then again for `2.3.8` after release, or
-    until the paid hosted-file path is intentionally removed from release
-    criteria.
+  - Historical release blocker resolved on 2026-06-06: Lemon Squeezy hosted
+    paid files were updated after the `2.3.9` release; see the current-state
+    evidence entry above.
 - 2026-06-06 post-audit remediation pass:
   - iPhone/iPad is now consistently framed as a companion, not Mac feature
     parity. Onboarding, empty states, website guides, README, Fastlane metadata,
@@ -182,10 +175,8 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
     (iOS 26.5). Remaining verify warnings are pre-existing:
     `Core/ClipboardManager.swift` parameter count and `Core/Sync/SyncCoordinator.swift`
     file length.
-  - External remaining action: Lemon Squeezy hosted file still needs dashboard
-    replacement from hosted `SaneClip-2.3.6.zip` to R2
-    `https://dist.saneclip.com/updates/SaneClip-2.3.7.zip`; evidence is in
-    `outputs/hosted_file_actions_evidence.json`.
+  - Historical external action resolved on 2026-06-06: Lemon Squeezy hosted
+    files were updated and now pass the hosted-file tracker.
 - 2026-06-04 `2.3.7` release-candidate proof:
   - iPhone/iPad companion foreground sync now starts from `ContentView` on
     launch/scene activation, refreshes every 8 seconds while foregrounded, and

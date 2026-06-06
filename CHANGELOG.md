@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [2.3.9] - 2026-06-06
 
+Restores the visible iPhone clipboard save prompt, improves multi-clip paste saving, adds a Mac menu bar icon visibility setting that preserves app access, and updates Setapp/App Store signing readiness.
+
+---
+
+## [2.3.9] - 2026-06-06
+
 Adds a Mac setting to hide the SaneClip menu bar icon while preserving at least one app entry point, and tightens the Setapp build entitlements by removing unused Apple Events and Sparkle review surface.
 
 ---

@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [2.3.8] - 2026-06-06
 
+Restores the visible iPhone clipboard save prompt, saves every current iOS pasteboard item SaneClip can access, improves image sharing, and aligns automation/privacy support copy with the shipped Mac and iPhone workflows.
+
+---
+
+## [2.3.8] - 2026-06-06
+
 Restores the visible iPhone clipboard save prompt, saves every current pasteboard item iOS exposes, and clarifies that iPhone/iPad use explicit save, Share sheet, Shortcuts, and iCloud companion flows rather than silent background clipboard capture.
 Fixes iOS share extension image availability and keeps synced CloudKit uploads aligned with the History Encryption setting.
 Tightens public automation and privacy copy so customer-facing claims match the shipped URL scheme, App Intents, Shortcuts, and support flows.

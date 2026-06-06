@@ -6,7 +6,27 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                                                                                        <item>
+                                                                                                                <item>
+            <title>2.3.9</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Sat, 06 Jun 2026 16:57:46 -0400</pubDate>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Restores the visible iPhone clipboard save prompt, improves multi-clip paste saving, adds a Mac menu bar icon visibility setting that preserves app access, and updates Setapp/App Store signing readiness.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.9.zip"
+                       sparkle:version="2309"
+                       sparkle:shortVersionString="2.3.9"
+                       length="4803150"
+                       type="application/octet-stream"
+                       sparkle:edSignature="JvEB9G7sbAf+Gug9CVR9fewdZBsoJilEcD3+vhq2htF3DYU44YjmJrbqmDCOO32cYn4uItb8x1ETos8NZPG2Dg=="/>
+        </item>
+<item>
             <title>2.3.8</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Sat, 06 Jun 2026 15:06:53 -0400</pubDate>

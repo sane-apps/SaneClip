@@ -6,13 +6,34 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
-- Current released version: `2.3.7` / build `2307`.
-- Next staged version: `2.3.8` / build `2308` in `project.yml`,
-  regenerated `SaneClip.xcodeproj`, `CHANGELOG.md`, and Fastlane release notes.
-- Direct channel `2.3.7` remains live on R2/appcast/site/Homebrew/email webhook
-  until the `2.3.8` release script runs.
-- App Store `2.3.7` is live/final in App Store Connect. `2.3.8` ASC lanes are
-  clear for both macOS and iOS, but upload/submission has not been run.
+- Current released version: `2.3.8` / build `2308`.
+- Direct Mac channel `2.3.8` is live on R2, Sparkle appcast, website,
+  Homebrew, GitHub release, and email webhook. Verified live URL:
+  `https://dist.saneclip.com/updates/SaneClip-2.3.8.zip`.
+- App Store `2.3.8` is submitted for both platforms. Final preflight on
+  2026-06-06 reported `ALL CLEAR` with ASC lanes:
+  `macos: 2.3.8 (WAITING_FOR_REVIEW) | ios: 2.3.8 (WAITING_FOR_REVIEW)`.
+- 2026-06-06 iOS publish fix:
+  - First `2.3.8` release run submitted macOS successfully, then iOS archive
+    failed because shared `SyncCoordinator.swift` referenced macOS-only
+    `SettingsModel.shared.encryptHistory`.
+  - Fixed by moving sync encryption decision to the shared `encryptHistory`
+    UserDefaults key via `SyncCoordinator.encryptHistoryKey` and adding source
+    regression guards.
+  - Verification passed after the fix: `./scripts/SaneMaster.rb verify` green
+    with `160` tests; fresh customer UI sweep passed with receipt timestamp
+    `2026-06-06T19:19:48Z`.
+  - Retried the iOS-only App Store lane: archive succeeded, IPA export
+    succeeded, build `2308` processed successfully, screenshots/metadata/IAP
+    passed, and iOS version `2.3.8` reached `WAITING_FOR_REVIEW`.
+- 2026-06-06 remaining external action:
+  - Lemon Squeezy hosted file still needs dashboard replacement. Hosted file is
+    `SaneClip-2.3.6.zip`; expected direct artifact is `SaneClip-2.3.8.zip`.
+    Evidence refreshed in `outputs/hosted_file_actions_evidence_final.json`.
+  - Dashboard: `https://app.lemonsqueezy.com/products/779223`, variant
+    `1228215`. Replace the published file with
+    `https://dist.saneclip.com/updates/SaneClip-2.3.8.zip` and confirm only the
+    appcast-matching ZIP remains published.
 - 2026-06-06 best-in-class audit / `2.3.8` staging:
   - Market/platform research was refreshed in `.claude/research.md`. Conclusion:
     SaneClip should be positioned as Mac-first automatic capture plus

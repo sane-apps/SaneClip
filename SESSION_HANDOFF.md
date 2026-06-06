@@ -6,16 +6,33 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
-- Current released version: `2.3.8` / build `2308`.
-- Direct Mac channel `2.3.8` is live on R2, Sparkle appcast, website,
+- Current released version: `2.3.9` / build `2309`.
+- Direct Mac channel `2.3.9` is live on R2, Sparkle appcast, website,
   Homebrew, GitHub release, and email webhook. Verified live URL:
-  `https://dist.saneclip.com/updates/SaneClip-2.3.8.zip`.
-- App Store `2.3.8` is submitted for both platforms. Final preflight on
-  2026-06-06 reported `ALL CLEAR` with ASC lanes:
-  `macos: 2.3.8 (WAITING_FOR_REVIEW) | ios: 2.3.8 (WAITING_FOR_REVIEW)`.
-- Local unreleased version is now `2.3.9` / build `2309` after Setapp review
-  remediation and GitHub issue `#14` implementation. Do not publish using
-  `2.3.8`; Sparkle/Setapp/App Store users need a new visible build.
+  `https://dist.saneclip.com/updates/SaneClip-2.3.9.zip`.
+- App Store `2.3.9` is submitted for both platforms as of
+  2026-06-06 17:07 EDT:
+  `macos: 2.3.9 (WAITING_FOR_REVIEW) | ios: 2.3.9 (WAITING_FOR_REVIEW)`.
+- Setapp `2.3.9` build `2309` is attached to Setapp app `1847`, version
+  `46886`, for review. Uploaded archive:
+  `outputs/SaneClip-Setapp-2.3.9.zip`; SHA256
+  `89149b0da3917d9f007b977a0c9518b5fdebfa73941d8ed1a540417045787d4f`;
+  portal archive URL:
+  `https://store.setapp.com/app/1847/46886/app-1780778500-6a248604359f1.zip`.
+- Release commits pushed: `b412aa6` (2.3.9 fixes), `8d8f1c5` (version tag
+  `v2.3.9`), `6a9e206` (site links), `52d8a22` (release metadata).
+- Full release verification on 2026-06-06 passed:
+  `./scripts/SaneMaster.rb verify` green with `166` tests, customer UI sweep
+  passed, `release_preflight` passed with warnings only, `appstore_preflight`
+  passed with zero issues, direct ZIP HTTP 200, appcast propagation verified,
+  Homebrew cask verified, email webhook verified, and strict post-release
+  checks passed.
+- Known remaining paid-delivery dashboard action: Lemon Squeezy hosted file for
+  SaneClip still reports `SaneClip-2.3.6.zip` while the expected current file is
+  `SaneClip-2.3.9.zip` for variant `1228215`. Canonical tooling and Lemon
+  Squeezy docs show hosted file replacement is a dashboard action, not an API
+  write path. Dashboard:
+  `https://app.lemonsqueezy.com/products/779223`.
 - 2026-06-06 GitHub `#14` / menu-bar visibility fix:
   - Added a Mac setting in General > Appearance: `Show menu bar icon`.
   - The menu bar item visibility updates live via `statusItem.isVisible`; hiding
@@ -52,20 +69,17 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
   - Setapp build script now deletes the unused
     `NSAppleEventsUsageDescription` from the built Info.plist while continuing
     to strip Sparkle framework/direct-store update keys.
-  - Setapp archive is blocked by Apple Developer provisioning, not app code:
-    current profile `SaneClip Setapp Developer ID` is for
-    `com.saneclip.app-setapp` but lacks CloudKit container
-    `iCloud.com.saneclip.app` and `com.apple.developer.icloud-container-environment`.
-    The profile entitlements show empty iCloud container arrays. Do not strip
-    CloudKit from Setapp unless the user explicitly accepts a reduced Setapp
-    feature set.
-  - Fastlane `modify_services` was checked as a possible portal fix, but it
-    requires an Apple Developer username/session for this action; the repo has
-    metadata-only Fastlane config and no usable noninteractive portal session.
-  - Required next step before Setapp upload: enable CloudKit/iCloud container
-    `iCloud.com.saneclip.app` on bundle ID `com.saneclip.app-setapp`, regenerate
-    `SaneClip Setapp Developer ID`, install it on the Mini, then retry
-    `SaneClipSetapp` Release-Setapp archive.
+  - Setapp provisioning was fixed on 2026-06-06 by enabling CloudKit/iCloud
+    container `iCloud.com.saneclip.app` on bundle ID
+    `com.saneclip.app-setapp` in Apple Developer, regenerating Developer ID
+    profile `SaneClip Setapp Developer ID 2309`, and installing it on the Mini.
+  - Setapp archive validation passed: deep signature valid, CloudKit/app-group
+    entitlements present, `setappPublicKey.pem` bundled, 1024/512 icon
+    representations present, forbidden App Store/Sparkle keys stripped, and
+    Sparkle remains weak-linked only.
+  - Setapp upload succeeded through portal fallback because the official CI
+    upload token is not configured. Archive is attached to app `1847`, version
+    `46886`, for review.
   - Draft security response for email #816 was updated to mention SaneClip
     `2.3.9` build `2309` and passed `reconcile`/`verify-facts`; do not send
     until the final release/submission status is accurate and explicit approval
@@ -85,11 +99,11 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
     passed, and iOS version `2.3.8` reached `WAITING_FOR_REVIEW`.
 - 2026-06-06 remaining external action:
   - Lemon Squeezy hosted file still needs dashboard replacement. Hosted file is
-    `SaneClip-2.3.6.zip`; expected direct artifact is `SaneClip-2.3.8.zip`.
-    Evidence refreshed in `outputs/hosted_file_actions_evidence_final.json`.
+    `SaneClip-2.3.6.zip`; expected direct artifact is `SaneClip-2.3.9.zip`.
   - Dashboard: `https://app.lemonsqueezy.com/products/779223`, variant
-    `1228215`. Replace the published file with
-    `https://dist.saneclip.com/updates/SaneClip-2.3.8.zip` and confirm only the
+    `1228215`. Replace the published hosted file with
+    `SaneClip-2.3.9.zip` from
+    `https://dist.saneclip.com/updates/SaneClip-2.3.9.zip` and confirm only the
     appcast-matching ZIP remains published.
 - 2026-06-06 best-in-class audit / `2.3.8` staging:
   - Market/platform research was refreshed in `.claude/research.md`. Conclusion:

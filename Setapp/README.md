@@ -1,4 +1,4 @@
-Place the Setapp-provided `setappPublicKey.pem` in this folder.
+Place the Setapp-provided public key at `Setapp/setappPublicKey.pem`.
 
-The Setapp build script copies `/Users/sj/SaneApps/apps/SaneClip/Setapp/setappPublicKey.pem`
-into the app bundle at build time.
+The Setapp build script copies that file into the app bundle at build time so
+the Setapp SDK can verify subscription receipts.

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.9] - 2026-06-06
+
+Adds a Mac setting to hide the SaneClip menu bar icon while preserving at least one app entry point, and tightens the Setapp build entitlements by removing unused Apple Events and Sparkle review surface.
+
+---
+
 ## [2.3.8] - 2026-06-06
 
 Restores the visible iPhone clipboard save prompt, saves every current iOS pasteboard item SaneClip can access, improves image sharing, and aligns automation/privacy support copy with the shipped Mac and iPhone workflows.

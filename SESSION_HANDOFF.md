@@ -13,6 +13,63 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 - App Store `2.3.8` is submitted for both platforms. Final preflight on
   2026-06-06 reported `ALL CLEAR` with ASC lanes:
   `macos: 2.3.8 (WAITING_FOR_REVIEW) | ios: 2.3.8 (WAITING_FOR_REVIEW)`.
+- Local unreleased version is now `2.3.9` / build `2309` after Setapp review
+  remediation and GitHub issue `#14` implementation. Do not publish using
+  `2.3.8`; Sparkle/Setapp/App Store users need a new visible build.
+- 2026-06-06 GitHub `#14` / menu-bar visibility fix:
+  - Added a Mac setting in General > Appearance: `Show menu bar icon`.
+  - The menu bar item visibility updates live via `statusItem.isVisible`; hiding
+    it closes any open popover.
+  - Entry-point invariant is enforced both ways: hiding the menu bar icon forces
+    Dock visibility on, and hiding Dock while the menu bar icon is hidden forces
+    the menu bar icon back on.
+  - Launch recovery now repairs a bad persisted state where both are false by
+    restoring Dock visibility and writing `showInDock=true` back to defaults.
+  - Verification: `./scripts/SaneMaster.rb verify` passed with `164` tests on
+    2026-06-06 after the invariant fix.
+  - Visual verification: screenshot-enabled `./scripts/SaneMaster.rb verify`
+    passed with `164` tests using the test harness hint file, producing
+    `outputs/visual-qa-20260606-menu-dock/settings-general-render.png`.
+    Inspected render: the new toggle is readable, aligned, and well placed in
+    Appearance above the menu bar icon picker with no visible overlap/clipping.
+  - Customer UI QA was refreshed after the settings change:
+    `ruby scripts/customer_ui_action_sweep.rb --json` passed with transcript
+    `outputs/customer-ui/sweep-20260606T195918Z/customer-action-runtime.log`.
+  - `./scripts/SaneMaster.rb release_preflight` passed after the refreshed UI
+    receipt with warnings only: 12 uncommitted files, UserDefaults/migration
+    change warning, appcast/Homebrew still live at `2.3.8` before publish, 1
+    open GitHub issue, and 6 pending emails.
+- 2026-06-06 Setapp review remediation:
+  - Support triage found Setapp/MacPaw email #816 was not a resolvable duplicate;
+    it needs a substantive security-response reply before #798/#799/#800 can be
+    cleaned up as related no-reply Setapp notifications.
+  - SaneClip Setapp entitlement cleanup is applied for local `2.3.9` build
+    `2309`:
+    removed the unnecessary Apple Events entitlement and old Sparkle
+    `$(PRODUCT_BUNDLE_IDENTIFIER)-spki` / `-spks` mach-lookup placeholders from
+    `SaneClip/SaneClipSetapp.entitlements`, leaving only
+    `com.setapp.ProvisioningService`.
+  - Setapp build script now deletes the unused
+    `NSAppleEventsUsageDescription` from the built Info.plist while continuing
+    to strip Sparkle framework/direct-store update keys.
+  - Setapp archive is blocked by Apple Developer provisioning, not app code:
+    current profile `SaneClip Setapp Developer ID` is for
+    `com.saneclip.app-setapp` but lacks CloudKit container
+    `iCloud.com.saneclip.app` and `com.apple.developer.icloud-container-environment`.
+    The profile entitlements show empty iCloud container arrays. Do not strip
+    CloudKit from Setapp unless the user explicitly accepts a reduced Setapp
+    feature set.
+  - Fastlane `modify_services` was checked as a possible portal fix, but it
+    requires an Apple Developer username/session for this action; the repo has
+    metadata-only Fastlane config and no usable noninteractive portal session.
+  - Required next step before Setapp upload: enable CloudKit/iCloud container
+    `iCloud.com.saneclip.app` on bundle ID `com.saneclip.app-setapp`, regenerate
+    `SaneClip Setapp Developer ID`, install it on the Mini, then retry
+    `SaneClipSetapp` Release-Setapp archive.
+  - Draft security response for email #816 was updated to mention SaneClip
+    `2.3.9` build `2309` and passed `reconcile`/`verify-facts`; do not send
+    until the final release/submission status is accurate and explicit approval
+    is recorded with `check-inbox.sh approve`.
 - 2026-06-06 iOS publish fix:
   - First `2.3.8` release run submitted macOS successfully, then iOS archive
     failed because shared `SyncCoordinator.swift` referenced macOS-only

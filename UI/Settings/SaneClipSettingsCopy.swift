@@ -16,6 +16,11 @@ enum SaneClipSettingsCopy {
         defaultValue: "Menu Bar Icon"
     )
 
+    static let showMenuBarIconLabel = String(
+        localized: "saneclip.settings.appearance.show_menu_bar_icon",
+        defaultValue: "Show menu bar icon"
+    )
+
     static let menuBarIconListTitle = String(
         localized: "saneclip.settings.appearance.menu_bar_icon.list",
         defaultValue: "List"

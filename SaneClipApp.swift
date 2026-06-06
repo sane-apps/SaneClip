@@ -97,6 +97,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     deinit {
         NotificationCenter.default.removeObserver(self, name: .menuBarIconChanged, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .menuBarVisibilityChanged, object: nil)
     }
 
     func applicationDidFinishLaunching(_: Notification) {
@@ -345,12 +346,19 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             // Right-click menu
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
+        statusItem.isVisible = SettingsModel.shared.showMenuBarIcon
 
         // Listen for icon changes
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleMenuBarIconChanged(_:)),
             name: .menuBarIconChanged,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleMenuBarVisibilityChanged(_:)),
+            name: .menuBarVisibilityChanged,
             object: nil
         )
 
@@ -741,6 +749,14 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         guard let iconName = notification.object as? String,
               let button = statusItem.button else { return }
         button.image = menuBarTemplateImage(named: iconName)
+    }
+
+    @objc private func handleMenuBarVisibilityChanged(_ notification: Notification) {
+        guard let isVisible = notification.object as? Bool else { return }
+        statusItem.isVisible = isVisible
+        if !isVisible, popover.isShown {
+            popover.performClose(nil)
+        }
     }
 
     @objc private func handleDismissForPaste() {

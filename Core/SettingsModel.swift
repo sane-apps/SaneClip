@@ -141,6 +141,9 @@ class SettingsModel {
 
     var showInDock: Bool {
         didSet {
+            if !showInDock, !showMenuBarIcon {
+                showMenuBarIcon = true
+            }
             UserDefaults.standard.set(showInDock, forKey: "showInDock")
             applyDockVisibility()
         }
@@ -219,6 +222,16 @@ class SettingsModel {
         didSet {
             UserDefaults.standard.set(menuBarIcon, forKey: "menuBarIcon")
             NotificationCenter.default.post(name: .menuBarIconChanged, object: menuBarIcon)
+        }
+    }
+
+    var showMenuBarIcon: Bool {
+        didSet {
+            if !showMenuBarIcon, !showInDock {
+                showInDock = true
+            }
+            UserDefaults.standard.set(showMenuBarIcon, forKey: "showMenuBarIcon")
+            NotificationCenter.default.post(name: .menuBarVisibilityChanged, object: showMenuBarIcon)
         }
     }
 
@@ -307,6 +320,7 @@ class SettingsModel {
             pasteSound = .off
         }
         menuBarIcon = UserDefaults.standard.object(forKey: "menuBarIcon") as? String ?? "list.clipboard.fill"
+        showMenuBarIcon = UserDefaults.standard.object(forKey: "showMenuBarIcon") as? Bool ?? true
         autoExpireHours = UserDefaults.standard.object(forKey: "autoExpireHours") as? Int ?? 0
         // Basic default must be non-contradictory with Pro gating.
         encryptHistory = UserDefaults.standard.object(forKey: "encryptHistory") as? Bool ?? false
@@ -334,6 +348,10 @@ class SettingsModel {
         }
         if normalizedImageBytes != savedImageBytes {
             UserDefaults.standard.set(normalizedImageBytes, forKey: "maxCaptureImageBytes")
+        }
+        if !showInDock, !showMenuBarIcon {
+            showInDock = true
+            UserDefaults.standard.set(true, forKey: "showInDock")
         }
         applyDockVisibility()
     }
@@ -370,6 +388,7 @@ class SettingsModel {
             "excludedApps": excludedApps,
             "pasteSound": pasteSound.rawValue,
             "menuBarIcon": menuBarIcon,
+            "showMenuBarIcon": showMenuBarIcon,
             "autoExpireHours": autoExpireHours,
             "encryptHistory": encryptHistory,
             "pasteStackReversed": pasteStackReversed,
@@ -432,6 +451,9 @@ class SettingsModel {
         }
         if let value = settings["menuBarIcon"] as? String {
             menuBarIcon = value
+        }
+        if let value = settings["showMenuBarIcon"] as? Bool {
+            showMenuBarIcon = value
         }
         if let value = settings["autoExpireHours"] as? Int {
             autoExpireHours = value

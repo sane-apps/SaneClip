@@ -192,10 +192,10 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.3.8"
-        CURRENT_PROJECT_VERSION: "2308"
-        MARKETING_VERSION: "2.3.8"
-        CURRENT_PROJECT_VERSION: "2308"
+        MARKETING_VERSION: "2.3.9"
+        CURRENT_PROJECT_VERSION: "2309"
+        MARKETING_VERSION: "2.3.9"
+        CURRENT_PROJECT_VERSION: "2309"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -242,8 +242,10 @@ targets:
         Release-Setapp:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app-setapp
           DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_STYLE: Manual
           CODE_SIGN_IDENTITY: "Developer ID Application"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipSetapp.entitlements
+          PROVISIONING_PROFILE_SPECIFIER: "SaneClip Setapp Developer ID 2309"
           OTHER_SWIFT_FLAGS: "-D ENABLE_SYNC -D SETAPP"
     postCompileScripts:
       - script: |
@@ -256,6 +258,35 @@ targets:
         basedOnDependencyAnalysis: false
     postBuildScripts:
       - script: |
+          APP_ICON_SOURCE="${SRCROOT}/Resources/Assets.xcassets/AppIcon.appiconset"
+          APP_ICON_DEST="${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AppIcon.icns"
+          APP_BUNDLE_PATH="${TARGET_BUILD_DIR}/${WRAPPER_NAME}"
+          if [ ! -d "${APP_BUNDLE_PATH}" ]; then
+            APP_BUNDLE_PATH="${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}"
+          fi
+          if [ -d "${APP_ICON_SOURCE}" ] && [ -d "${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}" ]; then
+            TEMP_ICON_ROOT="$(mktemp -d "${DERIVED_FILE_DIR}/SaneClipAppIcon.XXXXXX")"
+            TEMP_ICONSET="${TEMP_ICON_ROOT}/AppIcon.iconset"
+            mkdir -p "${TEMP_ICONSET}"
+            cp "${APP_ICON_SOURCE}/icon_16x16.png" "${TEMP_ICONSET}/icon_16x16.png"
+            cp "${APP_ICON_SOURCE}/icon_16x16@2x.png" "${TEMP_ICONSET}/icon_16x16@2x.png"
+            cp "${APP_ICON_SOURCE}/icon_32x32.png" "${TEMP_ICONSET}/icon_32x32.png"
+            cp "${APP_ICON_SOURCE}/icon_32x32@2x.png" "${TEMP_ICONSET}/icon_32x32@2x.png"
+            cp "${APP_ICON_SOURCE}/icon_128x128.png" "${TEMP_ICONSET}/icon_128x128.png"
+            cp "${APP_ICON_SOURCE}/icon_128x128@2x.png" "${TEMP_ICONSET}/icon_128x128@2x.png"
+            cp "${APP_ICON_SOURCE}/icon_256x256.png" "${TEMP_ICONSET}/icon_256x256.png"
+            cp "${APP_ICON_SOURCE}/icon_256x256@2x.png" "${TEMP_ICONSET}/icon_256x256@2x.png"
+            cp "${APP_ICON_SOURCE}/icon_512x512.png" "${TEMP_ICONSET}/icon_512x512.png"
+            cp "${APP_ICON_SOURCE}/icon_512x512@2x.png" "${TEMP_ICONSET}/icon_512x512@2x.png"
+            iconutil -c icns "${TEMP_ICONSET}" -o "${APP_ICON_DEST}"
+            ICON_WIDTH="$(sips -g pixelWidth "${APP_ICON_DEST}" 2>/dev/null | awk '/pixelWidth:/ { print $2; exit }')"
+            if [ "${ICON_WIDTH:-0}" -lt 512 ]; then
+              echo "error: AppIcon.icns must include at least a 512px representation for Setapp upload"
+              exit 1
+            fi
+            echo "App icon regenerated with ${ICON_WIDTH}px maximum representation"
+          fi
+
           if [ "$CONFIGURATION" == "Release-AppStore" ]; then
             echo "App Store build: stripping Sparkle framework and keys..."
             # Remove Sparkle framework from app bundle
@@ -263,8 +294,9 @@ targets:
             # Strip Sparkle keys from built Info.plist
             /usr/libexec/PlistBuddy -c "Delete :SUFeedURL" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             /usr/libexec/PlistBuddy -c "Delete :SUPublicEDKey" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
-            /usr/libexec/PlistBuddy -c "Delete :SUEnableAutomaticChecks" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
-            /usr/libexec/PlistBuddy -c "Delete :SUEnableSystemProfiling" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+              /usr/libexec/PlistBuddy -c "Delete :SUEnableAutomaticChecks" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+              /usr/libexec/PlistBuddy -c "Delete :SUEnableSystemProfiling" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+              /usr/libexec/PlistBuddy -c "Delete :SUEnableInstallerLauncherService" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             # Strip NSServices (not applicable in sandbox)
             /usr/libexec/PlistBuddy -c "Delete :NSServices" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             # Strip automation-related usage descriptions (not used in App Store build)
@@ -273,8 +305,13 @@ targets:
             # Sparkle can still be strongly linked by SPM; weaken it to prevent launch crashes when framework is stripped.
             WEAKEN_SCRIPT="${SRCROOT}/../../infra/SaneProcess/scripts/weaken_sparkle.rb"
             if [ -f "${WEAKEN_SCRIPT}" ]; then
-              find "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}" -type f -path "*/Contents/MacOS/*" -print0 | \
-                xargs -0 -I{} ruby "${WEAKEN_SCRIPT}" "{}" || exit 1
+              find "${APP_BUNDLE_PATH}" -type f -path "*/Contents/MacOS/*" -exec ruby "${WEAKEN_SCRIPT}" {} \; || exit 1
+              STRONG_SPARKLE_LINKS="$(find "${APP_BUNDLE_PATH}" -type f -path "*/Contents/MacOS/*" -exec sh -c 'otool -L "$1" 2>/dev/null | grep "Sparkle.framework" | grep -v "weak" >/dev/null && printf "%s\n" "$1"' sh {} \;)"
+              if [ -n "${STRONG_SPARKLE_LINKS}" ]; then
+                echo "error: Sparkle.framework is still strongly linked after stripping:"
+                echo "${STRONG_SPARKLE_LINKS}"
+                exit 1
+              fi
             fi
             echo "App Store build: Sparkle, NSServices, and automation-related keys removed"
           elif [ "$CONFIGURATION" == "ProdDebug-Setapp" ] || [ "$CONFIGURATION" == "Release-Setapp" ]; then
@@ -282,9 +319,11 @@ targets:
             rm -rf "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework"
             /usr/libexec/PlistBuddy -c "Delete :SUFeedURL" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             /usr/libexec/PlistBuddy -c "Delete :SUPublicEDKey" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
-            /usr/libexec/PlistBuddy -c "Delete :SUEnableAutomaticChecks" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
-            /usr/libexec/PlistBuddy -c "Delete :SUEnableSystemProfiling" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+              /usr/libexec/PlistBuddy -c "Delete :SUEnableAutomaticChecks" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+              /usr/libexec/PlistBuddy -c "Delete :SUEnableSystemProfiling" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+              /usr/libexec/PlistBuddy -c "Delete :SUEnableInstallerLauncherService" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             /usr/libexec/PlistBuddy -c "Delete :AppStoreProductID" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Delete :NSAppleEventsUsageDescription" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             /usr/libexec/PlistBuddy -c "Delete :MPSupportedArchitectures" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             /usr/libexec/PlistBuddy -c "Add :MPSupportedArchitectures array" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}"
             /usr/libexec/PlistBuddy -c "Add :MPSupportedArchitectures:0 string arm64" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}"
@@ -302,8 +341,13 @@ targets:
             fi
             WEAKEN_SCRIPT="${SRCROOT}/../../infra/SaneProcess/scripts/weaken_sparkle.rb"
             if [ -f "${WEAKEN_SCRIPT}" ]; then
-              find "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}" -type f -path "*/Contents/MacOS/*" -print0 | \
-                xargs -0 -I{} ruby "${WEAKEN_SCRIPT}" "{}" || exit 1
+              find "${APP_BUNDLE_PATH}" -type f -path "*/Contents/MacOS/*" -exec ruby "${WEAKEN_SCRIPT}" {} \; || exit 1
+              STRONG_SPARKLE_LINKS="$(find "${APP_BUNDLE_PATH}" -type f -path "*/Contents/MacOS/*" -exec sh -c 'otool -L "$1" 2>/dev/null | grep "Sparkle.framework" | grep -v "weak" >/dev/null && printf "%s\n" "$1"' sh {} \;)"
+              if [ -n "${STRONG_SPARKLE_LINKS}" ]; then
+                echo "error: Sparkle.framework is still strongly linked after stripping:"
+                echo "${STRONG_SPARKLE_LINKS}"
+                exit 1
+              fi
             fi
             echo "Setapp build: Sparkle removed, Setapp policy applied"
           fi
@@ -358,8 +402,8 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.3.8"
-        CURRENT_PROJECT_VERSION: "2308"
+        MARKETING_VERSION: "2.3.9"
+        CURRENT_PROJECT_VERSION: "2309"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -438,10 +482,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClipWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
-        MARKETING_VERSION: "2.3.8"
-        CURRENT_PROJECT_VERSION: "2308"
-        MARKETING_VERSION: "2.3.8"
-        CURRENT_PROJECT_VERSION: "2308"
+        MARKETING_VERSION: "2.3.9"
+        CURRENT_PROJECT_VERSION: "2309"
+        MARKETING_VERSION: "2.3.9"
+        CURRENT_PROJECT_VERSION: "2309"
         SWIFT_VERSION: 6.0
         CODE_SIGN_STYLE: Manual
         SKIP_INSTALL: YES
@@ -478,8 +522,10 @@ targets:
         Release-Setapp:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app-setapp.widgets
           DEVELOPMENT_TEAM: M78L6FXD48
+          CODE_SIGN_STYLE: Manual
           CODE_SIGN_IDENTITY: "Developer ID Application"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
+          PROVISIONING_PROFILE_SPECIFIER: "SaneClip Setapp Widgets Developer ID"
 
   # iOS App
   SaneClipIOS:
@@ -536,10 +582,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.3.8"
-        CURRENT_PROJECT_VERSION: "2308"
-        MARKETING_VERSION: "2.3.8"
-        CURRENT_PROJECT_VERSION: "2308"
+        MARKETING_VERSION: "2.3.9"
+        CURRENT_PROJECT_VERSION: "2309"
+        MARKETING_VERSION: "2.3.9"
+        CURRENT_PROJECT_VERSION: "2309"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -589,10 +635,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClipIOSWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ioswidgets
-        MARKETING_VERSION: "2.3.8"
-        CURRENT_PROJECT_VERSION: "2308"
-        MARKETING_VERSION: "2.3.8"
-        CURRENT_PROJECT_VERSION: "2308"
+        MARKETING_VERSION: "2.3.9"
+        CURRENT_PROJECT_VERSION: "2309"
+        MARKETING_VERSION: "2.3.9"
+        CURRENT_PROJECT_VERSION: "2309"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"
@@ -647,10 +693,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClipIOSShare
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.share
-        MARKETING_VERSION: "2.3.8"
-        CURRENT_PROJECT_VERSION: "2308"
-        MARKETING_VERSION: "2.3.8"
-        CURRENT_PROJECT_VERSION: "2308"
+        MARKETING_VERSION: "2.3.9"
+        CURRENT_PROJECT_VERSION: "2309"
+        MARKETING_VERSION: "2.3.9"
+        CURRENT_PROJECT_VERSION: "2309"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"

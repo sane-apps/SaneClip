@@ -16,6 +16,7 @@ typealias ClipActionButtonStyle = SaneUI.SaneActionButtonStyle
 
 extension Notification.Name {
     static let menuBarIconChanged = Notification.Name("menuBarIconChanged")
+    static let menuBarVisibilityChanged = Notification.Name("menuBarVisibilityChanged")
     static let historySearchShortcutRequested = Notification.Name("historySearchShortcutRequested")
     static let settingsTabShortcutRequested = Notification.Name("settingsTabShortcutRequested")
     static let settingsAddExcludedAppRequested = Notification.Name("settingsAddExcludedAppRequested")

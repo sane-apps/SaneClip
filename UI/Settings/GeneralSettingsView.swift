@@ -51,21 +51,28 @@ struct GeneralSettingsView: View {
                 SaneLanguageSettingsRow()
 
                 CompactSection(SaneClipSettingsCopy.appearanceSectionTitle) {
-                    CompactRow(SaneClipSettingsCopy.menuBarIconLabel) {
-                        HStack(spacing: 8) {
-                            Image(nsImage: popupSymbolImage(settings.menuBarIcon))
+                    CompactToggle(label: SaneClipSettingsCopy.showMenuBarIconLabel, isOn: Binding(
+                        get: { settings.showMenuBarIcon },
+                        set: { settings.showMenuBarIcon = $0 }
+                    ))
+                    if settings.showMenuBarIcon {
+                        CompactDivider()
+                        CompactRow(SaneClipSettingsCopy.menuBarIconLabel) {
+                            HStack(spacing: 8) {
+                                Image(nsImage: popupSymbolImage(settings.menuBarIcon))
 
-                            Picker("", selection: Binding(
-                                get: { settings.menuBarIcon },
-                                set: { settings.menuBarIcon = $0 }
-                            )) {
-                                Text(SaneClipSettingsCopy.menuBarIconListTitle)
-                                    .tag("list.clipboard.fill")
-                                Text(SaneClipSettingsCopy.menuBarIconMinimalTitle)
-                                    .tag("doc.plaintext")
+                                Picker("", selection: Binding(
+                                    get: { settings.menuBarIcon },
+                                    set: { settings.menuBarIcon = $0 }
+                                )) {
+                                    Text(SaneClipSettingsCopy.menuBarIconListTitle)
+                                        .tag("list.clipboard.fill")
+                                    Text(SaneClipSettingsCopy.menuBarIconMinimalTitle)
+                                        .tag("doc.plaintext")
+                                }
+                                .pickerStyle(.menu)
+                                .frame(width: 104)
                             }
-                            .pickerStyle(.menu)
-                            .frame(width: 104)
                         }
                     }
                     CompactDivider()

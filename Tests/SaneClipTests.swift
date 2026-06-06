@@ -473,6 +473,39 @@ struct SaneClipTests {
         #expect(plist["SUEnableInstallerLauncherService"] as? Bool == true)
     }
 
+    @Test("Setapp and App Store builds strip Sparkle installer launcher service")
+    func nonDirectBuildsStripSparkleInstallerLauncherService() throws {
+        let projectSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("project.yml"),
+            encoding: .utf8
+        )
+
+        #expect(
+            projectSource.components(
+                separatedBy: #"PlistBuddy -c "Delete :SUEnableInstallerLauncherService""#
+            ).count >= 3
+        )
+    }
+
+    @Test("Mac builds regenerate a Setapp-ready app icon")
+    func macBuildRegeneratesSetappReadyAppIcon() throws {
+        let projectSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("project.yml"),
+            encoding: .utf8
+        )
+        let iconCatalog = try String(
+            contentsOf: projectRootURL()
+                .appendingPathComponent("Resources/Assets.xcassets/AppIcon.appiconset/Contents.json"),
+            encoding: .utf8
+        )
+
+        #expect(projectSource.contains("iconutil -c icns"))
+        #expect(projectSource.contains("AppIcon.icns must include at least a 512px representation"))
+        #expect(projectSource.contains("icon_512x512.png"))
+        #expect(projectSource.contains("icon_512x512@2x.png"))
+        #expect(iconCatalog.contains("\"size\" : \"512x512\"") || iconCatalog.contains("\"size\":\"512x512\""))
+    }
+
     @Test("Sandboxed direct build grants Sparkle installer mach lookup exceptions")
     func sparkleInstallerMachLookupExceptionsPresent() throws {
         let repoRoot = URL(fileURLWithPath: #filePath)
@@ -988,6 +1021,84 @@ struct SaneClipTests {
         try settings.importSettings(from: exported)
 
         #expect(settings.openHistoryAtCursor == true)
+    }
+
+    @Test("SettingsModel round-trips menu bar visibility preference")
+    @MainActor
+    func settingsModelMenuBarVisibilityRoundTrip() throws {
+        let settings = SettingsModel.shared
+        let original = settings.showMenuBarIcon
+        let originalDock = settings.showInDock
+        defer {
+            settings.showMenuBarIcon = original
+            settings.showInDock = originalDock
+        }
+
+        let payload: [String: Any] = [
+            "version": 1,
+            "showMenuBarIcon": false,
+        ]
+        settings.showInDock = true
+        settings.showMenuBarIcon = true
+        try settings.importSettings(from: JSONSerialization.data(withJSONObject: payload))
+
+        #expect(settings.showMenuBarIcon == false)
+        #expect(settings.showInDock == true)
+
+        let exported = try #require(
+            try JSONSerialization.jsonObject(with: settings.exportSettings()) as? [String: Any]
+        )
+        #expect(exported["showMenuBarIcon"] as? Bool == false)
+    }
+
+    @Test("SettingsModel prevents hiding both Dock and menu bar entry points")
+    @MainActor
+    func settingsModelKeepsAtLeastOneAppEntryPoint() {
+        let settings = SettingsModel.shared
+        let originalMenu = settings.showMenuBarIcon
+        let originalDock = settings.showInDock
+        defer {
+            settings.showMenuBarIcon = originalMenu
+            settings.showInDock = originalDock
+        }
+
+        settings.showInDock = false
+        settings.showMenuBarIcon = false
+        #expect(settings.showInDock == true)
+        #expect(settings.showMenuBarIcon == false)
+
+        settings.showInDock = false
+        #expect(settings.showInDock == false)
+        #expect(settings.showMenuBarIcon == true)
+    }
+
+    @Test("SettingsModel launch recovery keeps Dock visible when menu icon is hidden")
+    @MainActor
+    func settingsModelLaunchRecoveryKeepsDockVisible() {
+        let defaults = UserDefaults.standard
+        let originalMenu = defaults.object(forKey: "showMenuBarIcon")
+        let originalDock = defaults.object(forKey: "showInDock")
+        defer {
+            if let originalMenu {
+                defaults.set(originalMenu, forKey: "showMenuBarIcon")
+            } else {
+                defaults.removeObject(forKey: "showMenuBarIcon")
+            }
+            if let originalDock {
+                defaults.set(originalDock, forKey: "showInDock")
+            } else {
+                defaults.removeObject(forKey: "showInDock")
+            }
+        }
+
+        defaults.set(false, forKey: "showMenuBarIcon")
+        defaults.set(false, forKey: "showInDock")
+
+        let settings = SettingsModel()
+
+        #expect(settings.showMenuBarIcon == false)
+        #expect(settings.showInDock == true)
+        #expect(defaults.bool(forKey: "showInDock") == true)
     }
 
     @Test("SettingsModel round-trips capture OCR settings")
@@ -2082,6 +2193,29 @@ struct SaneClipTests {
 
         #expect(appSource.contains("image?.isTemplate = true"))
         #expect(appSource.contains("button.image = menuBarTemplateImage(named: iconName)"))
+    }
+
+    @Test("Menu bar icon can be hidden without disabling app reopen history")
+    func menuBarVisibilityToggleKeepsHistoryAccess() throws {
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+        let settingsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
+            encoding: .utf8
+        )
+        let modelSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/SettingsModel.swift"),
+            encoding: .utf8
+        )
+
+        #expect(modelSource.contains("var showMenuBarIcon: Bool"))
+        #expect(settingsSource.contains("SaneClipSettingsCopy.showMenuBarIconLabel"))
+        #expect(appSource.contains("statusItem.isVisible = SettingsModel.shared.showMenuBarIcon"))
+        #expect(appSource.contains("handleMenuBarVisibilityChanged"))
+        #expect(appSource.contains("func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool"))
+        #expect(appSource.contains("showHistoryWindow()"))
     }
 
     @Test("No-keychain fallback stays in SaneClip standard defaults")

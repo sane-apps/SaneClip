@@ -21,6 +21,8 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
   `https://store.setapp.com/app/1847/46886/app-1780778500-6a248604359f1.zip`.
 - Release commits pushed: `b412aa6` (2.3.9 fixes), `8d8f1c5` (version tag
   `v2.3.9`), `6a9e206` (site links), `52d8a22` (release metadata).
+- GitHub issue `sane-apps/SaneClip#14` was commented and closed as shipped in
+  `2.3.9` on 2026-06-06.
 - Full release verification on 2026-06-06 passed:
   `./scripts/SaneMaster.rb verify` green with `166` tests, customer UI sweep
   passed, `release_preflight` passed with warnings only, `appstore_preflight`

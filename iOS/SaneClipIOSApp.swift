@@ -6,8 +6,13 @@ struct SaneClipIOSApp: App {
     @AppStorage("hasCompletedOnboardingIOS") private var hasCompletedOnboarding = false
     private let launchArgs = Set(ProcessInfo.processInfo.arguments)
 
-    private var forceOnboarding: Bool { launchArgs.contains("--force-onboarding") }
-    private var skipOnboarding: Bool { launchArgs.contains("--skip-onboarding") }
+    private var forceOnboarding: Bool {
+        launchArgs.contains("--force-onboarding")
+    }
+
+    private var skipOnboarding: Bool {
+        launchArgs.contains("--skip-onboarding")
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -36,7 +41,9 @@ struct ContentView: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var selectedTab = LaunchOptions.initialTabIndex
 
-    private var isIPad: Bool { sizeClass == .regular }
+    private var isIPad: Bool {
+        sizeClass == .regular
+    }
 
     var body: some View {
         Group {
@@ -148,6 +155,12 @@ enum LaunchOptions {
     static func isScreenshotMode(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         arguments.contains("--screenshot-tab")
     }
+
+    #if DEBUG
+        static func forcePendingClipboardCardPreview(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+            arguments.contains("--force-pending-clipboard-card")
+        }
+    #endif
 
     static var initialTabIndex: Int {
         initialTabIndex(arguments: ProcessInfo.processInfo.arguments)

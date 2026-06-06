@@ -214,7 +214,7 @@
 
             <div class="faq-item">
                 <h3>How do I open my clipboard history?</h3>
-                <p>Press <strong>Cmd+Shift+Control+Y</strong> (default shortcut) or click the SaneClip icon in your menu bar. You can customize this shortcut in Settings > Shortcuts.</p>
+                <p>On Mac, press <strong>Cmd+Shift+Control+Y</strong> (default shortcut) or click the SaneClip icon in your menu bar. You can customize this shortcut in Settings > Shortcuts. On iPhone or iPad, open SaneClip and use the History tab.</p>
             </div>
 
             <div class="faq-item">
@@ -225,6 +225,26 @@
             <div class="faq-item">
                 <h3>Where is my clipboard data stored?</h3>
                 <p>All data is stored locally at <code>~/Library/Application Support/SaneClip/</code> (direct download) or <code>~/Library/Containers/com.saneclip.app/Data/</code> (Mac App Store version). If you turn on iCloud sync, record data is also stored in your private CloudKit container so it can appear on your own devices. If you also enable Pro history encryption, the synced record content is encrypted before upload. SaneClip does not send clipboard history to any third-party server.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Why does iPhone ask me to save copied content?</h3>
+                <p>iOS does not let clipboard managers silently read everything you copy in the background. When SaneClip sees that the current iPhone clipboard changed, it shows a save card so you can explicitly add that current item to history. Mac clips that are already saved can still sync to your iPhone through iCloud.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Can SaneClip save several iPhone copies later?</h3>
+                <p>SaneClip can import every item that iOS still exposes on the current pasteboard, including supported text, links, and images. If you copy one thing, leave SaneClip closed, then copy something else that replaces it, iOS only exposes the latest pasteboard contents. Use the save card, Share sheet, or Shortcuts when you want to keep an iPhone copy.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Why are Mac and iPhone behavior different?</h3>
+                <p>macOS allows SaneClip to monitor clipboard changes while it runs, so Mac history can be automatic. iPhone and iPad require a visible user action for clipboard reads, so SaneClip uses explicit save, Share extension, widgets, and Shortcuts flows instead of pretending background capture is possible.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>How do I save something from another iPhone app?</h3>
+                <p>Open the Share sheet in the source app and choose SaneClip, or copy the item, open SaneClip, and tap the pending clipboard save card in History. The share extension supports common text, link, and image items.</p>
             </div>
 
             <div class="faq-item">
@@ -239,7 +259,7 @@
 
             <div class="faq-item">
                 <h3>How do I export or back up my data?</h3>
-                <p>Go to <strong>Settings > General > Data</strong> to export or import your clipboard history as JSON. You can also export and import your settings from <strong>Settings > General > Backup & Restore</strong>.</p>
+                <p>On Mac, go to <strong>Settings > General > Data</strong> to export or import your clipboard history as JSON. You can also export and import your settings from <strong>Settings > General > Backup & Restore</strong>. On iPhone and iPad, open <strong>Settings > Export Data</strong> or <strong>Settings > Import Data</strong>.</p>
             </div>
 
             <div class="faq-item">
@@ -251,7 +271,7 @@
 
             <h2>System Requirements</h2>
             <ul>
-                <li><strong>macOS 15 (Sequoia)</strong> or later</li>
+                <li><strong>macOS 14 (Sonoma)</strong> or later</li>
                 <li>Apple Silicon (M1 or later)</li>
                 <li>Touch ID recommended for biometric features</li>
             </ul>

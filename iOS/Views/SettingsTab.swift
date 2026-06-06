@@ -6,6 +6,7 @@ struct SettingsTab: View {
     @EnvironmentObject var viewModel: ClipboardHistoryViewModel
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var showResetSyncConfirmation = false
+    @State private var showFeedback = false
 
     private var isIPad: Bool { sizeClass == .regular }
 
@@ -17,7 +18,6 @@ struct SettingsTab: View {
     private var rowIcon: CGFloat { isIPad ? 22 : 16 }
     private var iconFrame: CGFloat { isIPad ? 34 : 24 }
     private var sectionHeader: Font { .system(size: isIPad ? 22 : 13, weight: .semibold) }
-    private var infoTitle: Font { .system(size: isIPad ? 32 : 17, weight: .bold) }
     private var infoBody: Font { .system(size: isIPad ? 24 : 15) }
     private var rowSpacing: CGFloat { isIPad ? 16 : 10 }
     private var rowPadding: CGFloat { isIPad ? 6 : 0 }
@@ -31,9 +31,10 @@ struct SettingsTab: View {
             List {
                 syncSection
                 aboutSection
-                infoSection
+                supportSection
             }
             .listStyle(.grouped)
+            .contentMargins(.bottom, isIPad ? 60 : 104, for: .scrollContent)
             .navigationTitle("Settings")
             .toolbarBackground(.visible, for: .navigationBar)
             #if ENABLE_SYNC
@@ -46,6 +47,9 @@ struct SettingsTab: View {
                     Text("This clears saved sync state on this device and reconnects to iCloud sync. Your local clipboard history stays on this device.")
                 }
             #endif
+            .sheet(isPresented: $showFeedback) {
+                SaneFeedbackView(diagnosticsService: .shared)
+            }
         }
     }
 
@@ -198,18 +202,19 @@ struct SettingsTab: View {
         }
     }
 
-    private var infoSection: some View {
+    private var supportSection: some View {
         Section {
-            VStack(alignment: .leading, spacing: isIPad ? 20 : 8) {
-                Text("SaneClip iOS")
-                    .font(infoTitle)
-                Text("View and copy your clipboard history synced from your Mac. Enable iCloud Sync to keep your clipboard in sync across all your devices.")
-                    .font(infoBody)
-                    .foregroundStyle(.white.opacity(0.9))
+            Link(destination: URL(string: "https://saneclip.com/support")!) {
+                settingsRow(icon: "questionmark.circle", label: "Support")
             }
-            .padding(.vertical, isIPad ? 16 : 4)
+
+            Button {
+                showFeedback = true
+            } label: {
+                settingsRow(icon: "ladybug", label: "Report a Bug")
+            }
         } header: {
-            Text("How It Works")
+            Text("Help")
                 .font(sectionHeader)
                 .foregroundColor(.white)
                 .textCase(nil)

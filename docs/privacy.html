@@ -239,10 +239,10 @@
 
             <h2>1. What SaneClip Collects</h2>
             <p><strong>Short answer:</strong> SaneClip does not send your clipboard contents or other personal content to SaneApps servers.</p>
-            <p>SaneClip stores clipboard history locally by default. Clipboard contents are never sent to SaneApps servers. The app can use the network for optional iCloud sync, optional webhooks, update checks, and privacy-preserving aggregate operational counts such as whether it opened in Basic or Pro, whether an upgrade button was clicked, whether a license was activated, app version, build, and update status. Those counts do not include your clipboard contents, personal files, copied text, copied images, or synced clip data.</p>
+            <p>SaneClip stores clipboard history locally by default. Clipboard contents are never sent to SaneApps servers. The app can use the network for optional iCloud sync, update checks, and privacy-preserving aggregate operational counts such as whether it opened in Basic or Pro, whether an upgrade button was clicked, whether a license was activated, app version, build, and update status. Those counts do not include your clipboard contents, personal files, copied text, copied images, or synced clip data.</p>
 
             <h2>2. How Data Is Stored</h2>
-            <p>Clipboard history is stored <strong>locally on your device</strong> in your Application Support directory by default. Optional iCloud sync and optional webhooks are the only features that intentionally move clipboard content off-device.</p>
+            <p>Clipboard history is stored <strong>locally on your device</strong> in your Application Support directory by default. Optional iCloud sync and explicit export/share actions are the user-controlled paths that intentionally move clipboard content off-device.</p>
 
             <ul>
                 <li><strong>Location:</strong> Your clipboard history is stored in <code>~/Library/Application Support/SaneClip/</code> (direct download) or <code>~/Library/Containers/com.saneclip.app/Data/</code> (Mac App Store version, sandboxed).</li>
@@ -265,26 +265,15 @@
 
             <p><strong>iCloud sync is disabled by default.</strong> You must explicitly enable it in SaneClip settings.</p>
 
-            <h2>4. Webhooks (Optional, User-Configured)</h2>
-            <p>SaneClip supports <strong>optional</strong> webhooks for advanced workflows (e.g., sending clipboard items to automation tools, logging, or integrations).</p>
-
-            <ul>
-                <li>Webhooks are <strong>disabled by default</strong>. You must explicitly configure a webhook URL in settings.</li>
-                <li><strong>You control what data is sent and where it goes.</strong> SaneClip only sends data to the URL you specify.</li>
-                <li>I recommend using HTTPS endpoints and reviewing the privacy policy of any third-party service you integrate with.</li>
-            </ul>
-
-            <div class="highlight">
-                <p><strong>Important:</strong> If you configure a webhook, <strong>you are responsible for ensuring the endpoint respects your privacy.</strong> SaneApps has no control over or visibility into third-party webhook endpoints.</p>
-            </div>
+            <h2>4. Explicit Export And Share Actions</h2>
+            <p>SaneClip can copy, paste, export, or share clipboard items when you choose those actions. Those actions are initiated by you and are separate from background app analytics.</p>
 
             <h2>5. Third Parties</h2>
-            <p>SaneClip does not share, sell, or transmit your clipboard history to SaneApps servers. Clipboard content leaves your device only when you explicitly enable a feature meant to do that, such as iCloud sync or a webhook. There are no advertising SDKs or behavioral ad networks embedded in the app.</p>
+            <p>SaneClip does not share, sell, or transmit your clipboard history to SaneApps servers. Clipboard content leaves your device only when you explicitly enable or initiate a feature meant to do that, such as iCloud sync, export, share, or paste. There are no advertising SDKs or behavioral ad networks embedded in the app.</p>
 
             <p>The only exceptions are:</p>
             <ul>
                 <li><strong>Apple iCloud (if you enable sync)</strong> — governed by Apple's privacy policy.</li>
-                <li><strong>User-configured webhooks (if you enable them)</strong> — governed by the privacy policy of the endpoint you choose.</li>
                 <li><strong>SaneApps distribution service</strong> — Receives privacy-preserving aggregate counts such as Free vs Pro launches, upgrade flow, license activation, app version, build, and update status. These do not include your clipboard contents.</li>
                 <li><strong>Cloudflare Web Analytics (website only)</strong> — The saneclip.com website may use cookie-free aggregate traffic stats, such as page views and referrers. This applies only to the website, not the app's clipboard data.</li>
             </ul>
@@ -315,7 +304,7 @@
             </p>
 
             <div class="highlight" style="margin-top: 48px;">
-                <p><strong>TL;DR:</strong> SaneClip keeps your clipboard history on your device by default. Optional sync uses your own iCloud account, optional webhooks are user-configured, and update checks plus privacy-preserving aggregate operational counts are the main non-content network paths. Your clipboard contents are not sent to SaneApps servers.</p>
+                <p><strong>TL;DR:</strong> SaneClip keeps your clipboard history on your device by default. Optional sync uses your own iCloud account, and update checks plus privacy-preserving aggregate operational counts are the main non-content network paths. Your clipboard contents are not sent to SaneApps servers.</p>
             </div>
         </div>
     </section>

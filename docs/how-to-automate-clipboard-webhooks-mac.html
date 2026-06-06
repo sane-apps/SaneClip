@@ -6,21 +6,21 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How to Automate Your Clipboard with Webhooks on Mac</title>
-    <meta name="description" content="Trigger automations when you copy or paste. Send clipboard events to Zapier, Make, or your own server with HMAC-signed webhooks and URL schemes.">
+    <title>How to Automate Your Clipboard with URL Schemes on Mac</title>
+    <meta name="description" content="Control SaneClip from Shortcuts, Alfred, Raycast, or scripts with URL schemes and App Intents.">
     <link rel="canonical" href="https://saneclip.com/how-to-automate-clipboard-webhooks-mac.html">
     <meta name="theme-color" content="#0099ff">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://saneclip.com/how-to-automate-clipboard-webhooks-mac.html">
-    <meta property="og:title" content="How to Automate Your Clipboard with Webhooks on Mac">
-    <meta property="og:description" content="Trigger automations when you copy or paste with HMAC-signed webhooks and URL schemes.">
+    <meta property="og:title" content="How to Automate Your Clipboard with URL Schemes on Mac">
+    <meta property="og:description" content="Control SaneClip from Shortcuts, Alfred, Raycast, or scripts with URL schemes and App Intents.">
     <meta property="og:image" content="https://saneclip.com/images/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="SaneClip">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="How to Automate Your Clipboard with Webhooks on Mac">
-    <meta name="twitter:description" content="Trigger automations when you copy or paste with HMAC-signed webhooks and URL schemes.">
+    <meta name="twitter:title" content="How to Automate Your Clipboard with URL Schemes on Mac">
+    <meta name="twitter:description" content="Control SaneClip from Shortcuts, Alfred, Raycast, or scripts with URL schemes and App Intents.">
     <meta name="twitter:image" content="https://saneclip.com/images/og-image.png">
     <meta name="twitter:site" content="@saneapps">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -190,8 +190,8 @@
 <body>
     <nav><div class="container"><a href="index.html" class="logo"><img src="images/icon.png"> SaneClip</a><a href="guides.html" style="color: var(--text-secondary); text-decoration: none;">&larr; All Guides</a></div></nav>
     <article class="container">
-        <h1>How to Automate Your Clipboard with Webhooks</h1>
-        <p>Your clipboard is the most-used data transfer mechanism on your Mac, yet it has zero automation support by default. What if copying a tracking number could automatically update a spreadsheet? Or copying an address could trigger a map lookup?</p>
+        <h1>How to Automate Your Clipboard with URL Schemes</h1>
+        <p>Your clipboard is the most-used data transfer mechanism on your Mac, yet it has limited automation support by default. SaneClip exposes URL schemes and App Intents so Shortcuts, Alfred, Raycast, and scripts can open history, search, copy, paste, or clear with confirmation.</p>
         <div class="option-card">
             <h2>Option 1: The Hard Way (Scripts)</h2>
             <ul class="step-list">
@@ -203,9 +203,9 @@
         <div class="option-card winner-card">
             <h2>Option 2: The Sane Way (SaneClip)</h2>
             <ul class="step-list">
-                <li><span class="icon icon-check">&#10003;</span> <div><strong>Webhooks:</strong> Configure an HTTPS endpoint in Settings. SaneClip fires a POST with HMAC-SHA256 signature on copy, paste, or delete events. Built-in retry logic.</div></li>
                 <li><span class="icon icon-check">&#10003;</span> <div><strong>URL Schemes:</strong> Control SaneClip from Shortcuts, Alfred, Raycast, or scripts. <code>saneclip://paste?index=0</code>, <code>saneclip://search?q=keyword</code>, <code>saneclip://copy?text=Hello</code>.</div></li>
                 <li><span class="icon icon-check">&#10003;</span> <div><strong>Siri Shortcuts:</strong> Full App Intents support — "Get clipboard history", "Search clips", "Paste snippet by name". Build entire workflows in Shortcuts.app.</div></li>
+                <li><span class="icon icon-check">&#10003;</span> <div><strong>Safety:</strong> Destructive URL-scheme commands require confirmation, and Touch ID protection applies when history lock is enabled.</div></li>
             </ul>
             <div class="cta-box">
                 <a href="https://go.saneapps.com/buy/saneclip?ref=website" class="btn-large">Automate Your Clipboard - $14.99</a>

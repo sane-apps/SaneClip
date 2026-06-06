@@ -13,7 +13,7 @@ SaneClip is built so your clipboard stays yours. This page explains what stays l
 - Clipboard contents are never sent to SaneApps servers
 - Optional iCloud sync uses your own iCloud account between your own devices, not a SaneApps sync server
 - When History Encryption is enabled, synced clipboard content is encrypted before upload and decrypted only on your devices
-- Optional webhooks send data only if you set them up
+- Explicit export/share actions move clipboard data only when you initiate them
 - The app may send privacy-preserving aggregate operational counts, such as whether it opened in Basic or Pro, whether an upgrade button was clicked, whether a license was activated, app version, build, and update status
 - No account is required
 
@@ -33,7 +33,6 @@ Your clipboard contents are not uploaded to SaneApps servers.
 SaneClip uses the network only when:
 
 - You enable iCloud sync between your own Apple devices
-- You configure a webhook
 - It checks for app updates
 - It sends privacy-preserving aggregate counts, such as Free vs Pro launches, upgrade flow, license activation, app version, build, and update status
 
@@ -81,7 +80,7 @@ You can:
 
 - Clear your history at any time
 - Turn off optional sync
-- Remove webhooks
+- Delete exported files you created outside SaneClip
 - Delete local app data
 
 ## Contact

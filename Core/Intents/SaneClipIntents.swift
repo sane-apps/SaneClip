@@ -1,6 +1,7 @@
 import AppIntents
 import AppKit
 import Foundation
+import LocalAuthentication
 
 // MARK: - Get Clipboard History Intent
 
@@ -20,6 +21,7 @@ struct GetClipboardHistoryIntent: AppIntent {
         guard let clipboardManager = ClipboardManager.shared else {
             return .result(value: [])
         }
+        try await IntentSecurityGate.verifyHistoryAccess()
 
         let source = pinnedOnly ? clipboardManager.pinnedItems : clipboardManager.history
         let texts = source.prefix(limit).compactMap { item -> String? in
@@ -54,6 +56,7 @@ struct PasteClipboardItemIntent: AppIntent {
         guard let clipboardManager = ClipboardManager.shared else {
             throw IntentError.clipboardUnavailable
         }
+        try await IntentSecurityGate.verifyHistoryAccess()
 
         guard index >= 0, index < clipboardManager.history.count else {
             throw IntentError.indexOutOfBounds
@@ -86,6 +89,7 @@ struct SearchClipboardIntent: AppIntent {
         guard let clipboardManager = ClipboardManager.shared else {
             return .result(value: [])
         }
+        try await IntentSecurityGate.verifyHistoryAccess()
 
         let lowercasedQuery = query.lowercased()
         let results = clipboardManager.history
@@ -148,6 +152,7 @@ struct ClearHistoryIntent: AppIntent {
         guard let clipboardManager = ClipboardManager.shared else {
             throw IntentError.clipboardUnavailable
         }
+        try await IntentSecurityGate.verifyHistoryAccess()
 
         clipboardManager.clearHistory()
         return .result()
@@ -169,6 +174,7 @@ struct PasteSnippetIntent: AppIntent {
         guard ClipboardManager.shared?.licenseService?.isPro == true else {
             throw IntentError.proFeatureRequiresPro
         }
+        try await IntentSecurityGate.verifyHistoryAccess()
 
         let snippetManager = SnippetManager.shared
 
@@ -210,6 +216,7 @@ struct ListSnippetsIntent: AppIntent {
         guard ClipboardManager.shared?.licenseService?.isPro == true else {
             throw IntentError.proFeatureRequiresPro
         }
+        try await IntentSecurityGate.verifyHistoryAccess()
 
         let snippetManager = SnippetManager.shared
         let names = snippetManager.snippets.map { $0.name }
@@ -225,6 +232,8 @@ enum IntentError: Error, CustomLocalizedStringResourceConvertible {
     case snippetNotFound
     case proFeatureRequiresPro
     case snippetRequiresPlaceholderValues
+    case authenticationRequired
+    case authenticationFailed
 
     var localizedStringResource: LocalizedStringResource {
         switch self {
@@ -238,6 +247,37 @@ enum IntentError: Error, CustomLocalizedStringResourceConvertible {
             return "This feature requires SaneClip Pro"
         case .snippetRequiresPlaceholderValues:
             return "This snippet needs placeholder values. Paste it from the SaneClip menu instead."
+        case .authenticationRequired:
+            return "Authentication is required to access locked clipboard history"
+        case .authenticationFailed:
+            return "Could not authenticate to access locked clipboard history"
+        }
+    }
+}
+
+private enum IntentSecurityGate {
+    @MainActor
+    static func verifyHistoryAccess() async throws {
+        guard ClipboardManager.shared?.licenseService?.isPro == true,
+              SettingsModel.shared.requireTouchID
+        else {
+            return
+        }
+
+        let context = LAContext()
+        var error: NSError?
+        guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
+            throw IntentError.authenticationRequired
+        }
+
+        do {
+            let authenticated = try await context.evaluatePolicy(
+                .deviceOwnerAuthentication,
+                localizedReason: "Authenticate to use SaneClip clipboard history from Shortcuts."
+            )
+            guard authenticated else { throw IntentError.authenticationFailed }
+        } catch {
+            throw IntentError.authenticationFailed
         }
     }
 }

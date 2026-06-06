@@ -539,8 +539,10 @@ struct SaneClipTests {
 
         #expect(settingsSource.contains("labelColor: Color = .clipBlue"))
         #expect(settingsSource.contains("Link(destination: URL(string: \"https://saneclip.com\")!)"))
+        #expect(settingsSource.contains("https://saneclip.com/support"))
+        #expect(settingsSource.contains("SaneFeedbackView(diagnosticsService: .shared)"))
         #expect(!settingsSource.contains("View Issues"))
-        #expect(!settingsSource.contains("Report a Bug"))
+        #expect(settingsSource.contains("Report a Bug"))
     }
 
     @Test("iPhone screenshot mode keeps history chrome aligned with App Store assets")
@@ -548,10 +550,17 @@ struct SaneClipTests {
         let repoRoot = projectRootURL()
         let historyURL = repoRoot.appendingPathComponent("iOS/Views/HistoryTab.swift")
         let historySource = try String(contentsOf: historyURL, encoding: .utf8)
+        let viewModelSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("iOS/Views/ClipboardHistoryViewModel.swift"),
+            encoding: .utf8
+        )
 
         #expect(historySource.contains(".navigationTitle(\"History\")"))
         #expect(historySource.contains("if !isScreenshotMode"))
         #expect(historySource.contains("viewModel.isShowingDemoData && !isScreenshotMode"))
+        #expect(viewModelSource.contains("if LaunchOptions.isScreenshotMode()"))
+        #expect(viewModelSource.contains("history = []"))
+        #expect(viewModelSource.contains("Normal users should see a truthful empty/setup state"))
     }
 
     @Test("iPhone sync refreshes automatically while foregrounded")
@@ -573,8 +582,153 @@ struct SaneClipTests {
         #expect(viewModelSource.contains("private static let automaticSyncInterval: Duration = .seconds(8)"))
         #expect(viewModelSource.contains("func beginAutomaticSync()"))
         #expect(viewModelSource.contains("await coordinator.syncNow()"))
-        #expect(viewModelSource.contains("if SyncCoordinator.shared.isSyncEnabled"))
-        #expect(viewModelSource.contains("clipboardDetectedText = nil"))
+    }
+
+    @Test("iPhone clipboard import exposes a pending save affordance")
+    func iPhoneClipboardImportShowsPendingAffordance() throws {
+        let repoRoot = projectRootURL()
+        let historySource = try String(
+            contentsOf: repoRoot.appendingPathComponent("iOS/Views/HistoryTab.swift"),
+            encoding: .utf8
+        )
+        let importSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("iOS/Views/ClipboardHistoryViewModel+ClipboardImport.swift"),
+            encoding: .utf8
+        )
+
+        #expect(historySource.contains("pendingClipboardCard"))
+        #expect(historySource.contains("viewModel.hasPendingClipboardContent && !isScreenshotMode"))
+        #expect(historySource.contains("viewModel.pendingClipboardTitle"))
+        #expect(historySource.contains("viewModel.pendingClipboardSubtitle"))
+        #expect(historySource.contains("viewModel.dismissClipboardDetection()"))
+        #expect(historySource.contains("Dismiss clipboard save prompt"))
+        #expect(historySource.contains(".task"))
+        #expect(historySource.contains("viewModel.checkForNewClipboardContent()"))
+        #expect(historySource.contains("forcePendingClipboardCardPreviewIfRequested"))
+        #expect(historySource.contains("Saves the current iPhone clipboard to SaneClip history"))
+        #expect(importSource.contains("pendingClipboardChangeCount"))
+        #expect(importSource.contains("pendingClipboardItemCount = max(1, pasteboard.numberOfItems)"))
+        #expect(importSource.contains("pasteboard.hasStrings || pasteboard.hasURLs || pasteboard.hasImages"))
+        #expect(importSource.contains("LaunchOptions.forcePendingClipboardCardPreview"))
+        #expect(importSource.contains("iCloud Sync stays automatic"))
+        #expect(importSource.contains("Tap only to save the current iPhone clipboard"))
+    }
+
+    @Test("iPhone onboarding describes companion scope instead of Mac Pro feature parity")
+    func iPhoneOnboardingMatchesCompanionScope() throws {
+        let repoRoot = projectRootURL()
+        let onboardingSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("iOS/Views/OnboardingView.swift"),
+            encoding: .utf8
+        )
+
+        #expect(onboardingSource.contains("SaneClip Companion"))
+        #expect(onboardingSource.contains("Mac is the full app"))
+        #expect(onboardingSource.contains("iPhone is the companion"))
+        #expect(onboardingSource.contains("iOS only exposes the current pasteboard"))
+        #expect(onboardingSource.contains("Use the Share sheet"))
+        #expect(!onboardingSource.contains("Choose Your Plan"))
+        #expect(!onboardingSource.contains("Paste Stack + Snippets"))
+        #expect(!onboardingSource.contains("Clipboard Rules + Item Notes"))
+    }
+
+    @Test("iPhone clipboard import saves every current pasteboard item")
+    func iPhoneClipboardImportSavesEveryCurrentPasteboardItem() throws {
+        let repoRoot = projectRootURL()
+        let importSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("iOS/Views/ClipboardHistoryViewModel+ClipboardImport.swift"),
+            encoding: .utf8
+        )
+
+        #expect(importSource.contains("let itemDictionaries = pasteboard.items"))
+        #expect(importSource.contains("for itemDictionary in itemDictionaries"))
+        #expect(importSource.contains("for item in importedItems.reversed()"))
+        #expect(importSource.contains("Set<String>()"))
+        #expect(importSource.contains("Set<Data>()"))
+        #expect(importSource.contains("pasteboard.strings ?? []"))
+        #expect(importSource.contains("pasteboard.urls ?? []"))
+        #expect(importSource.contains("pasteboard.images ?? []"))
+        #expect(!importSource.contains("if items.isEmpty"))
+        #expect(importSource.contains("lastPasteboardChangeCount = pasteboard.changeCount"))
+        #expect(importSource.contains("markCurrentPasteboardChangeHandled()"))
+        #expect(importSource.contains("Task.sleep(for: .milliseconds(50))"))
+    }
+
+    @Test("Companion and automation sources preserve privacy and paste-stack state")
+    func companionAndAutomationSourcesPreservePrivacyAndPasteStackState() throws {
+        let repoRoot = projectRootURL()
+        let importSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("iOS/Views/ClipboardHistoryViewModel+ClipboardImport.swift"),
+            encoding: .utf8
+        )
+        let shareSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("iOSShareExtension/ShareViewController.swift"),
+            encoding: .utf8
+        )
+        let projectSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("project.yml"),
+            encoding: .utf8
+        )
+        let clipboardManagerSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("Core/ClipboardManager.swift"),
+            encoding: .utf8
+        )
+        let viewModelSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("iOS/Views/ClipboardHistoryViewModel.swift"),
+            encoding: .utf8
+        )
+        let urlSchemeSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("Core/URLScheme/URLSchemeHandler.swift"),
+            encoding: .utf8
+        )
+
+        #expect(importSource.contains("containsHighRiskSensitiveData"))
+        #expect(shareSource.contains("containsHighRiskSensitiveData"))
+        #expect(shareSource.contains("group.notify(queue: .main, execute: completion)"))
+        #expect(shareSource.contains("UTType.image.identifier"))
+        #expect(shareSource.contains("addImageToHistory"))
+        #expect(projectSource.contains("NSExtensionActivationSupportsImageWithMaxCount: 1"))
+        #expect(clipboardManagerSource.contains("let item = pasteStack[index]"))
+        #expect(clipboardManagerSource.contains("guard didWrite else { return }"))
+        #expect(clipboardManagerSource.contains("pasteStack.remove(at: currentIndex)"))
+        #expect(clipboardManagerSource.contains("queueItemUpdateForSync(updatedItem)"))
+        #expect(clipboardManagerSource.contains("queueDeletesForSync(removedIDs)"))
+        #expect(viewModelSource.contains("SyncCoordinator.shared.queueDeleteForSync(itemID: item.id)"))
+        #expect(urlSchemeSource.contains("markSelfWriteCompleted(changeCount: pasteboard.changeCount)"))
+        #expect(!urlSchemeSource.contains("isSelfWrite = true"))
+    }
+
+    @Test("Public docs do not advertise hidden webhook UI")
+    func publicDocsDoNotAdvertiseHiddenWebhookUI() throws {
+        let repoRoot = projectRootURL()
+        let checkedPaths = [
+            "README.md",
+            "PRIVACY.md",
+            "docs/privacy.html",
+            "docs/guides.html",
+            "docs/how-to-automate-clipboard-webhooks-mac.html",
+        ]
+
+        for path in checkedPaths {
+            let source = try String(contentsOf: repoRoot.appendingPathComponent(path), encoding: .utf8)
+            #expect(!source.contains("Configure an HTTPS endpoint in Settings"))
+            #expect(!source.contains("Webhooks are <strong>disabled by default</strong>"))
+            #expect(!source.contains("Optional webhooks"))
+            #expect(!source.contains("HMAC-signed HTTP requests"))
+        }
+    }
+
+    @Test("Sync uploads do not hard-code iOS plaintext CloudKit records")
+    func syncUploadsDoNotHardCodeIOSPlaintextCloudKitRecords() throws {
+        let repoRoot = projectRootURL()
+        let syncSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("Core/Sync/SyncCoordinator.swift"),
+            encoding: .utf8
+        )
+
+        #expect(syncSource.contains("shouldEncryptSyncedContent"))
+        #expect(syncSource.contains("SyncDataModel.encode(item, encrypt: Self.shouldEncryptSyncedContent"))
+        #expect(!syncSource.contains("SyncDataModel.encode(item, encrypt: false)"))
     }
 
     @Test("Sandboxed builds allow user-selected file access for open and save panels")
@@ -855,6 +1009,51 @@ struct SaneClipTests {
         #expect(SettingsModel.defaultShowInDock == false)
     }
 
+    @Test("Clipboard history export imports through the same JSON model")
+    @MainActor
+    func clipboardHistoryExportImportRoundTrip() throws {
+        let source = ClipboardManager(startMonitoring: false, loadPersistedState: false, persistenceEnabled: false)
+        let original = ClipboardItem(
+            id: UUID(),
+            content: .text("Export/import regression clip"),
+            timestamp: Date(timeIntervalSince1970: 1_779_206_129),
+            sourceAppBundleID: "com.apple.TextEdit",
+            sourceAppName: "TextEdit",
+            pasteCount: 3,
+            title: "Round Trip",
+            tags: ["backup"],
+            collection: "QA",
+            note: "Must import after export",
+            ocrText: "searchable text"
+        )
+        source.history = [original]
+
+        let data = try #require(source.exportHistory())
+        let decoded = try JSONDecoder().decode([SavedClipboardItem].self, from: data)
+        #expect(decoded.map(\.text) == ["Export/import regression clip"])
+
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("saneclip-history-\(UUID().uuidString).json")
+        try data.write(to: url)
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        let target = ClipboardManager(startMonitoring: false, loadPersistedState: false, persistenceEnabled: false)
+        let importedCount = try target.importHistory(from: url, merge: false)
+
+        #expect(importedCount == 1)
+        let imported = try #require(target.history.first)
+        guard case let .text(importedText) = imported.content else {
+            Issue.record("Expected imported item to be text")
+            return
+        }
+        #expect(importedText == "Export/import regression clip")
+        #expect(imported.title == "Round Trip")
+        #expect(imported.tags == ["backup"])
+        #expect(imported.collection == "QA")
+        #expect(imported.note == "Must import after export")
+        #expect(imported.ocrText == "searchable text")
+    }
+
     @Test("SettingsModel normalizes unsupported capture size values")
     func settingsModelNormalizesCaptureSizes() {
         #expect(SettingsModel.normalizedCaptureTextBytes(64 * 1024) == 64 * 1024)
@@ -1121,6 +1320,14 @@ struct SaneClipTests {
 
         let email = "Contact me at john.doe@example.com for more info"
         #expect(detector.detect(in: email).contains(.email))
+    }
+
+    @Test("High-risk sensitive filter allows ordinary emails but blocks secrets")
+    func highRiskSensitiveFilterExcludesEmailOnlyText() {
+        let detector = SensitiveDataDetector.shared
+
+        #expect(!detector.containsHighRiskSensitiveData(in: "Contact john.doe@example.com"))
+        #expect(detector.containsHighRiskSensitiveData(in: "password: CorrectHorseBatteryStaple!"))
     }
 
     @Test("No false positives on normal text")

@@ -7,8 +7,91 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 ## Current State
 
 - Current released version: `2.3.7` / build `2307`.
-- Direct channel `2.3.7` is live on R2/appcast/site/Homebrew/email webhook.
-- App Store `2.3.7` is submitted for review on both macOS and iOS.
+- Next staged version: `2.3.8` / build `2308` in `project.yml`,
+  regenerated `SaneClip.xcodeproj`, `CHANGELOG.md`, and Fastlane release notes.
+- Direct channel `2.3.7` remains live on R2/appcast/site/Homebrew/email webhook
+  until the `2.3.8` release script runs.
+- App Store `2.3.7` is live/final in App Store Connect. `2.3.8` ASC lanes are
+  clear for both macOS and iOS, but upload/submission has not been run.
+- 2026-06-06 best-in-class audit / `2.3.8` staging:
+  - Market/platform research was refreshed in `.claude/research.md`. Conclusion:
+    SaneClip should be positioned as Mac-first automatic capture plus
+    iPhone/iPad companion flows. Do not promise impossible iOS background
+    clipboard-history parity.
+  - Parallel audit lanes covered website/docs, signing/privacy, support,
+    tooling, and runtime resources. Fixed confirmed blockers: homepage
+    webhook/web-integration overclaim, contradictory "no telemetry" public
+    copy, Mac-only support FAQ for iPhone users, iOS CloudKit upload encryption
+    hard-coded plaintext path, and share-extension image activation metadata.
+  - `project.yml`/`SaneClip.xcodeproj` now declare
+    `NSExtensionActivationSupportsImageWithMaxCount: 1` for the iOS share
+    extension.
+  - Sync upload tests now guard that iOS CloudKit records do not hard-code
+    `encrypt: false`; `SyncDataModel` encrypted CloudKit record round-trip is
+    covered by tests.
+  - Verification passed after the version bump:
+    `./scripts/SaneMaster.rb verify` green with `160` tests.
+  - Customer UI QA refreshed after the version bump:
+    `ruby scripts/customer_ui_action_sweep.rb --json` passed with transcript
+    `outputs/customer-ui/sweep-20260606T184145Z/customer-action-runtime.log`;
+    `./scripts/SaneMaster.rb customer_ui_contract --json --no-exit` passed with
+    receipt timestamp `2026-06-06T18:41:45Z`.
+  - `./scripts/SaneMaster.rb release_preflight` passed with warnings only:
+    30 uncommitted files, appcast/Homebrew still at live `2.3.7` before publish,
+    1 open enhancement issue, and 6 pending emails.
+  - `./scripts/SaneMaster.rb appstore_preflight` passed with warning only:
+    30 uncommitted files. ASC version lanes are clear:
+    `macos: 2.3.8 clear | ios: 2.3.8 clear`.
+  - Release blocker: hosted-file audit still reports Lemon Squeezy SaneClip
+    paid file as `SaneClip-2.3.6.zip` while the current live direct channel is
+    `2.3.7`. Evidence refreshed at
+    `outputs/hosted_file_actions_evidence.json` on `2026-06-06T18:46:02Z`.
+    The script says file replacement is a dashboard action at
+    `https://app.lemonsqueezy.com/products/779223`, variant `1228215`.
+    Do not call the release "flawless" until this paid-delivery path is updated
+    for the currently live version and then again for `2.3.8` after release, or
+    until the paid hosted-file path is intentionally removed from release
+    criteria.
+- 2026-06-06 post-audit remediation pass:
+  - iPhone/iPad is now consistently framed as a companion, not Mac feature
+    parity. Onboarding, empty states, website guides, README, Fastlane metadata,
+    and release notes were updated around current-pasteboard limits, Share
+    sheet import, foreground sync, and Mac-as-full-app boundaries.
+  - The iOS History pending clipboard affordance is visible again and now has
+    explicit save/dismiss actions. Visual verification passed on iPhone 17 Pro
+    simulator for onboarding, History pending-card placement, and Settings Help.
+  - Normal iOS users no longer receive demo history; demo data is restricted to
+    screenshot mode.
+  - Settings now exposes Support and Report a Bug, and the old explanatory
+    Settings footer was removed after visual verification showed tab-bar
+    overlap.
+  - Privacy/security boundaries were tightened: Shortcuts/App Intents respect
+    Touch ID history lock, widget previews are cleared while history lock is
+    enabled, image assets are encrypted when history encryption is enabled, and
+    iOS import/share paths skip high-risk sensitive text while allowing ordinary
+    email/contact text.
+  - Data-loss fixes: history export/import now round-trips through
+    `SavedClipboardItem` with legacy export fallback; Paste Stack consumes only
+    after pasteboard write succeeds; URL scheme copy no longer leaves
+    self-write suppression stuck at `Int.max`; local edit/delete paths now queue
+    supported sync updates/deletes, including iOS companion delete.
+  - Share Extension waits for async item loads before completing and supports
+    text, URL, and image saves through the shared app-group history container.
+  - Public webhook claims were narrowed because webhook delivery is not exposed
+    in Settings/runtime; public docs now advertise supported URL schemes,
+    App Intents, and Shortcuts only.
+  - QA receipt semantics corrected for sync/iOS external boundaries; refreshed
+    customer UI receipt timestamp `2026-06-06T17:43:03Z`; contract passed with
+    no issues.
+  - Verification passed: `./scripts/SaneMaster.rb verify` green with `158`
+    tests; iOS simulator `SaneClipIOS` build/run passed on iPhone 17 Pro
+    (iOS 26.5). Remaining verify warnings are pre-existing:
+    `Core/ClipboardManager.swift` parameter count and `Core/Sync/SyncCoordinator.swift`
+    file length.
+  - External remaining action: Lemon Squeezy hosted file still needs dashboard
+    replacement from hosted `SaneClip-2.3.6.zip` to R2
+    `https://dist.saneclip.com/updates/SaneClip-2.3.7.zip`; evidence is in
+    `outputs/hosted_file_actions_evidence.json`.
 - 2026-06-04 `2.3.7` release-candidate proof:
   - iPhone/iPad companion foreground sync now starts from `ContentView` on
     launch/scene activation, refreshes every 8 seconds while foregrounded, and
@@ -144,6 +227,20 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Verification Receipts
 
+- 2026-06-06 iPhone pending clipboard import fix: History now shows a visible
+  pending clipboard save card in both empty and populated states when iOS
+  reports new local pasteboard content. The save action imports every current
+  `UIPasteboard.items` payload item it can read, dedupes text/images, clears
+  pending state after user action, and suppresses self-write pending prompts
+  after copying an existing clip. Documented the iOS limitation that separate
+  overwritten copy operations cannot be reconstructed once SaneClip reactivates;
+  only the latest/current pasteboard payload can be saved. Visual QA captured
+  the forced DEBUG pending-card state at
+  `outputs/visual-qa-20260606/iphone-pending-clipboard-card.jpg` and verified
+  text fit, placement below the context banner/search area, and no overlap with
+  the list or tab bar. Verification: `./scripts/SaneMaster.rb verify --timeout
+  900` passed with 154 tests on 2026-06-06 after regenerating
+  `SaneClip.xcodeproj`.
 - 2026-06-03 iPhone no-extra-tap sync fix: the iOS companion now starts
   CloudKit foreground sync from `ContentView` on launch/scene activation,
   keeps an 8-second foreground refresh loop in `ClipboardHistoryViewModel`,

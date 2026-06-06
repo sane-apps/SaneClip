@@ -13,10 +13,12 @@ class ClipboardHistoryViewModel: ObservableObject {
     @Published var copiedItemID: UUID?
     @Published var savedItemID: UUID?
     @Published var clipboardDetectedText: String?
+    @Published var pendingClipboardChangeCount = 0
+    @Published var pendingClipboardItemCount = 0
 
     private let userDefaults = UserDefaults(suiteName: "group.com.saneclip.app")
     /// Track the last clipboard change count to detect new content
-    private var lastPasteboardChangeCount: Int = 0
+    var lastPasteboardChangeCount: Int = 0
 
     #if ENABLE_SYNC
         private var observationTask: Task<Void, Never>?
@@ -131,9 +133,15 @@ class ClipboardHistoryViewModel: ObservableObject {
         }
 
         guard let container = WidgetDataContainer.load(),
-              !container.recentItems.isEmpty else {
-            // No synced data yet — load demo data so reviewers can see the app working
-            loadDemoDataIfNeeded()
+              !container.recentItems.isEmpty
+        else {
+            if LaunchOptions.isScreenshotMode() {
+                loadDemoDataIfNeeded()
+            } else {
+                isShowingDemoData = false
+                history = []
+                pinnedItems = []
+            }
             return
         }
 
@@ -167,8 +175,8 @@ class ClipboardHistoryViewModel: ObservableObject {
         lastSyncTime = container.lastUpdated
     }
 
-    /// Provides demo data so reviewers (and new users) can see the app working
-    /// even before the Mac app has synced any clipboard history.
+    /// Provides demo data for App Store screenshots only.
+    /// Normal users should see a truthful empty/setup state, not fake clipboard history.
     private func loadDemoDataIfNeeded() {
         // Only show demo data if there's truly nothing
         guard history.isEmpty else { return }
@@ -237,129 +245,15 @@ class ClipboardHistoryViewModel: ObservableObject {
         ]
     }
 
-    private func clearDemoDataIfNeeded() {
+    func clearDemoDataIfNeeded() {
         guard isShowingDemoData else { return }
         history.removeAll()
         pinnedItems.removeAll()
         isShowingDemoData = false
     }
 
-    // MARK: - Save Clipboard
-
-    /// Save the current iOS clipboard contents to history
-    func saveCurrentClipboard() {
-        let pasteboard = UIPasteboard.general
-
-        if let text = pasteboard.string, !text.isEmpty {
-            saveItem(text: text, sourceApp: "Clipboard")
-        } else if let url = pasteboard.url {
-            saveItem(text: url.absoluteString, sourceApp: "Clipboard")
-        } else if let image = pasteboard.image, let data = image.pngData() {
-            saveImageItem(data: data, width: Int(image.size.width), height: Int(image.size.height))
-        } else {
-            // Nothing on clipboard
-            return
-        }
-
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-    }
-
-    private func saveItem(text: String, sourceApp: String) {
-        clearDemoDataIfNeeded()
-
-        // Don't add duplicates at the top
-        if let first = history.first, first.fullText == text {
-            return
-        }
-
-        let newItem = SharedClipboardItem(
-            id: UUID(),
-            content: .text(text),
-            timestamp: Date(),
-            sourceAppName: sourceApp,
-            pasteCount: 0,
-            deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "ios",
-            deviceName: UIDevice.current.name
-        )
-
-        // Remove existing duplicate if present
-        history.removeAll { $0.fullText == text }
-        history.insert(newItem, at: 0)
-
-        // Clear demo data flag
-        isShowingDemoData = false
-
-        saveToWidgetContainer()
-        savedItemID = newItem.id
-
-        #if ENABLE_SYNC
-            SyncCoordinator.shared.queueItemForSync(newItem)
-        #endif
-
-        Task {
-            try? await Task.sleep(for: .seconds(1.5))
-            if savedItemID == newItem.id {
-                savedItemID = nil
-            }
-        }
-    }
-
-    private func saveImageItem(data: Data, width: Int, height: Int) {
-        clearDemoDataIfNeeded()
-
-        let newItem = SharedClipboardItem(
-            id: UUID(),
-            content: .imageData(data, width: width, height: height),
-            timestamp: Date(),
-            sourceAppName: "Clipboard",
-            pasteCount: 0,
-            deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "ios",
-            deviceName: UIDevice.current.name
-        )
-
-        history.insert(newItem, at: 0)
-        isShowingDemoData = false
-        saveToWidgetContainer()
-        savedItemID = newItem.id
-
-        #if ENABLE_SYNC
-            SyncCoordinator.shared.queueItemForSync(newItem)
-        #endif
-
-        Task {
-            try? await Task.sleep(for: .seconds(1.5))
-            if savedItemID == newItem.id {
-                savedItemID = nil
-            }
-        }
-    }
-
-    /// Check if the clipboard has new content since last check
-    func checkForNewClipboardContent() {
-        #if ENABLE_SYNC
-            if SyncCoordinator.shared.isSyncEnabled {
-                clipboardDetectedText = nil
-                return
-            }
-        #endif
-
-        let pasteboard = UIPasteboard.general
-        guard pasteboard.changeCount != lastPasteboardChangeCount else { return }
-        lastPasteboardChangeCount = pasteboard.changeCount
-
-        // Use hasStrings/hasURLs/hasImages to detect without triggering paste banner
-        if pasteboard.hasStrings || pasteboard.hasURLs || pasteboard.hasImages {
-            clipboardDetectedText = "New clipboard content detected"
-        }
-    }
-
-    /// Dismiss the clipboard detection banner
-    func dismissClipboardDetection() {
-        clipboardDetectedText = nil
-    }
-
     /// Persist history to the App Group shared container
-    private func saveToWidgetContainer() {
+    func saveToWidgetContainer() {
         let widgetItems = history.prefix(50).map { item in
             WidgetClipboardItem(
                 id: item.id,
@@ -415,6 +309,10 @@ class ClipboardHistoryViewModel: ObservableObject {
         history.removeAll { $0.id == item.id }
         pinnedItems.removeAll { $0.id == item.id }
         saveToWidgetContainer()
+
+        #if ENABLE_SYNC
+            SyncCoordinator.shared.queueDeleteForSync(itemID: item.id)
+        #endif
     }
 
     /// Toggle pin status
@@ -457,6 +355,8 @@ class ClipboardHistoryViewModel: ObservableObject {
             }
         }
 
+        markCurrentPasteboardChangeHandled()
+        clearPendingClipboardContent()
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         copiedItemID = item.id
 

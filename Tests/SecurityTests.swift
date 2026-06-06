@@ -1,4 +1,5 @@
 import Foundation
+import CloudKit
 @testable import SaneClip
 import Testing
 
@@ -379,6 +380,24 @@ struct SharedClipboardItemTests {
         } else {
             #expect(Bool(false), "Expected text content after decrypt")
         }
+    }
+
+    @Test("SyncDataModel marks encrypted CloudKit records")
+    func syncDataModelEncryptedRecordRoundTrip() throws {
+        let item = SharedClipboardItem(
+            content: .text("Encrypted CloudKit payload"),
+            deviceId: "test-device",
+            deviceName: "Test Device"
+        )
+
+        let record = try SyncDataModel.encode(item, encrypt: true)
+
+        #expect((record["encrypted"] as? NSNumber)?.intValue == 1)
+        let contentData = try #require(record["content"] as? Data)
+        #expect(HistoryEncryption.isEncrypted(contentData))
+
+        let decoded = try SyncDataModel.decode(record)
+        #expect(decoded.fullText == "Encrypted CloudKit payload")
     }
 }
 

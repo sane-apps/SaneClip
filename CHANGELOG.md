@@ -6,9 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
-## [2.3.7] - 2026-06-04
+## [2.3.8] - 2026-06-06
 
-Keeps synced Mac clipboard text appearing automatically on iPhone and iPad while the companion app is foregrounded, without showing the local pasteboard save banner for iCloud-synced clips.
+Restores the visible iPhone clipboard save prompt, saves every current pasteboard item iOS exposes, and clarifies that iPhone/iPad use explicit save, Share sheet, Shortcuts, and iCloud companion flows rather than silent background clipboard capture.
+Fixes iOS share extension image availability and keeps synced CloudKit uploads aligned with the History Encryption setting.
+Tightens public automation and privacy copy so customer-facing claims match the shipped URL scheme, App Intents, Shortcuts, and support flows.
 
 ---
 

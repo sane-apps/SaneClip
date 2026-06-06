@@ -683,7 +683,9 @@
                     deviceName: deviceName
                 )
 
-                let canUseHistoryEncryption = (manager.licenseService?.isPro == true) && SettingsModel.shared.encryptHistory
+                let canUseHistoryEncryption = Self.shouldEncryptSyncedContent(
+                    isProEligible: manager.licenseService?.isPro == true
+                )
                 return try SyncDataModel.encode(shared, encrypt: canUseHistoryEncryption)
             #else
                 guard let itemID = UUID(uuidString: recordID.recordName),
@@ -691,8 +693,12 @@
                 else {
                     return nil
                 }
-                return try SyncDataModel.encode(item, encrypt: false)
+                return try SyncDataModel.encode(item, encrypt: Self.shouldEncryptSyncedContent(isProEligible: true))
             #endif
+        }
+
+        static func shouldEncryptSyncedContent(isProEligible: Bool) -> Bool {
+            isProEligible && SettingsModel.shared.encryptHistory
         }
 
         // MARK: - Handle Database Changes

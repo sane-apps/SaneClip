@@ -307,10 +307,10 @@ final class URLSchemeHandler {
             message: "An external source wants to replace your clipboard with:\n\n\"\(preview)\""
         ) else { return false }
 
-        ClipboardManager.shared?.isSelfWrite = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
-        pasteboard.setString(text, forType: .string)
+        guard pasteboard.setString(text, forType: .string) else { return false }
+        ClipboardManager.shared?.markSelfWriteCompleted(changeCount: pasteboard.changeCount)
 
         SettingsModel.shared.pasteSound.play()
 

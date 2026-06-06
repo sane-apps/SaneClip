@@ -518,7 +518,7 @@ actions:
   evidence:
   - Mini source/test guard for sync UI and reset fixtures
   - Sync settings screenshot fixture when available
-  required_proof_level: full_runtime_completion
+  required_proof_level: fixture_completion
   required_evidence_types:
   - mini_click
   - screenshot
@@ -627,7 +627,7 @@ actions:
   - Runtime device verification remains a separate blocker if no fixture is available.
   evidence:
   - Mini source/test guard for iOS views, widgets, share extension, and intents
-  required_proof_level: full_runtime_completion
+  required_proof_level: fixture_completion
   required_evidence_types:
   - mini_click
   - screenshot

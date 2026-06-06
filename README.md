@@ -4,7 +4,7 @@
 
 ### The Only Clipboard Manager That Takes Privacy Seriously
 
-**Privacy-first clipboard history · On-device by default · No personal-content upload · Pro adds Touch ID + AES-256 encryption**
+**Privacy-first clipboard history · On-device by default · No personal-content upload · Pro adds Touch ID + local history encryption**
 
 [![GitHub stars](https://img.shields.io/github/stars/sane-apps/SaneClip?style=flat-square)](https://github.com/sane-apps/SaneClip/stargazers)
 [![License: PolyForm Shield](https://img.shields.io/badge/License-PolyForm%20Shield-blue.svg?style=flat-square)](LICENSE)
@@ -47,8 +47,8 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 |------------------|--------------|
 | **🔒 AES-256-GCM Encryption (Pro)** | Encrypts your clipboard history at rest. Even if malware accesses your disk, it can't read your clips. |
 | **🔐 Touch ID History Lock (Pro)** | Locks history behind biometrics. 30-second grace period means no repeated prompts. |
-| **🛡️ Keychain Integration** | All secrets (webhook keys, encryption keys) stored in macOS Keychain — never in JSON files. |
-| **🚫 HTTPS Enforcement** | Webhooks must use HTTPS (localhost exempt for testing). No accidental plaintext transmission. |
+| **🛡️ Keychain Integration** | Local protection keys are stored in macOS Keychain — never in plain JSON files. |
+| **🚫 Automation Confirmation** | Destructive URL-scheme commands require user approval. No silent data loss. |
 | **⚠️ URL Scheme Confirmation** | Destructive commands (copy, paste, clear) require user approval. No silent data loss. |
 | **📵 App Exclusions** | Block 1Password, banking apps, or any sensitive app from clipboard capture entirely. |
 | **🕵️ Sensitive Data Detection** | Automatically flags credit cards, SSNs, API keys, passwords, private keys. |
@@ -82,7 +82,7 @@ The prior `2.2.13` mobile follow-up restored the color-coded source indicators o
 - Free iPhone/iPad companion app with optional private iCloud sync
 - On-device privacy defaults
 
-### Pro adds
+### Pro adds on Mac
 - Unlimited history
 - Touch ID history lock
 - History encryption (AES-256-GCM)
@@ -208,9 +208,9 @@ SaneClip integrates with Shortcuts.app via App Intents:
 - **Paste Snippet** — Paste a saved snippet by name
 - **List Snippets** — Returns all snippet names
 
-### Webhooks
+### Automation Status
 
-Send HTTP notifications when clipboard events occur with HMAC-SHA256 signatures and retry logic.
+SaneClip currently exposes URL schemes, App Intents, and Shortcuts actions. Webhook delivery code is not exposed in the current settings UI, so it is not advertised as an end-user automation path for this release.
 
 ---
 
@@ -218,7 +218,7 @@ Send HTTP notifications when clipboard events occur with HMAC-SHA256 signatures 
 
 SaneClip is **privacy-first**:
 
-- ✅ **On-Device by Default** — Your clipboard history stays on your Mac unless you enable sync or webhooks
+- ✅ **On-Device by Default** — Your clipboard history stays on your Mac unless you enable sync or explicitly export/share it
 - ✅ **Optional iCloud Sync** — Syncs through your own iCloud account, not a SaneApps server
 - ✅ **No Clipboard-Content Upload to SaneApps** — Clipboard contents are not sent to SaneApps servers
 - ✅ **100% Transparent Code** — Verify yourself at [github.com/sane-apps/SaneClip](https://github.com/sane-apps/SaneClip)
@@ -262,7 +262,7 @@ The direct download is the canonical Mac release channel and updates itself auto
 ### Requirements
 
 **macOS App:**
-- macOS 15.0 (Sequoia) or later
+- macOS 14.0 (Sonoma) or later
 - Apple Silicon Mac (M1+)
 
 **iOS Companion App:**
@@ -382,7 +382,7 @@ SaneClip is available in two versions with different capabilities:
 
 ## 📱 iOS Companion App (Free)
 
-Your clipboard history, on your iPhone and iPad. Free with SaneClip for Mac.
+Your Mac clipboard history, on your iPhone and iPad. The iOS app is a free companion for viewing, searching, copying, pinning, sharing into SaneClip, and saving the current iPhone clipboard. The full automation and paste power tools live on Mac.
 
 - **History Tab** — Browse recent clips with source-aware colors, tap-to-copy, and haptic feedback
 - **Pinned Tab** — Quick access to your favorites
@@ -390,7 +390,7 @@ Your clipboard history, on your iPhone and iPad. Free with SaneClip for Mac.
 - **Siri Shortcuts** — "Get recent clips", "Search clips", "Copy last clip" via Shortcuts app
 - **Share Extension** — Save text and URLs to SaneClip from any app's share sheet
 - **iOS Widgets** — Recent and Pinned clips for Home Screen and Lock Screen
-- **iCloud Sync** — Keep your clipboard in sync across all your devices via CKSyncEngine
+- **iCloud Sync** — Keep Mac and iPhone/iPad history in sync through your own iCloud account while the companion app is active
 
 ---
 
@@ -405,7 +405,7 @@ Looking at alternatives? Here's how SaneClip stacks up:
 | **Sensitive Data Detection** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **Password Manager Safety** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **Clipboard Rules** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Webhooks & URL Schemes** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **URL Schemes & Shortcuts** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **Siri Shortcuts & Widgets** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | App Exclusions | ✅ | ✅ | ✅ | ❌ | ❌ |
 | Source App Colors | ✅ | ✅ | ❌ | ✅ | ❌ |

@@ -192,10 +192,10 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.3.7"
-        CURRENT_PROJECT_VERSION: "2307"
-        MARKETING_VERSION: "2.3.7"
-        CURRENT_PROJECT_VERSION: "2307"
+        MARKETING_VERSION: "2.3.8"
+        CURRENT_PROJECT_VERSION: "2308"
+        MARKETING_VERSION: "2.3.8"
+        CURRENT_PROJECT_VERSION: "2308"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -358,8 +358,8 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.3.7"
-        CURRENT_PROJECT_VERSION: "2307"
+        MARKETING_VERSION: "2.3.8"
+        CURRENT_PROJECT_VERSION: "2308"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -438,10 +438,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClipWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
-        MARKETING_VERSION: "2.3.7"
-        CURRENT_PROJECT_VERSION: "2307"
-        MARKETING_VERSION: "2.3.7"
-        CURRENT_PROJECT_VERSION: "2307"
+        MARKETING_VERSION: "2.3.8"
+        CURRENT_PROJECT_VERSION: "2308"
+        MARKETING_VERSION: "2.3.8"
+        CURRENT_PROJECT_VERSION: "2308"
         SWIFT_VERSION: 6.0
         CODE_SIGN_STYLE: Manual
         SKIP_INSTALL: YES
@@ -502,6 +502,7 @@ targets:
           - "**/CLAUDE.md"
       - path: Core/Security/KeychainHelper.swift
       - path: Core/Security/HistoryEncryption.swift
+      - path: Core/Security/SensitiveDataDetector.swift
     dependencies:
       - package: SaneUI
       - target: SaneClipIOSWidgets
@@ -535,10 +536,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.3.7"
-        CURRENT_PROJECT_VERSION: "2307"
-        MARKETING_VERSION: "2.3.7"
-        CURRENT_PROJECT_VERSION: "2307"
+        MARKETING_VERSION: "2.3.8"
+        CURRENT_PROJECT_VERSION: "2308"
+        MARKETING_VERSION: "2.3.8"
+        CURRENT_PROJECT_VERSION: "2308"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -588,10 +589,10 @@ targets:
       base:
         PRODUCT_NAME: SaneClipIOSWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ioswidgets
-        MARKETING_VERSION: "2.3.7"
-        CURRENT_PROJECT_VERSION: "2307"
-        MARKETING_VERSION: "2.3.7"
-        CURRENT_PROJECT_VERSION: "2307"
+        MARKETING_VERSION: "2.3.8"
+        CURRENT_PROJECT_VERSION: "2308"
+        MARKETING_VERSION: "2.3.8"
+        CURRENT_PROJECT_VERSION: "2308"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"
@@ -626,6 +627,7 @@ targets:
     sources:
       - iOSShareExtension
       - path: Core/Models/WidgetClipboardItem.swift
+      - path: Core/Security/SensitiveDataDetector.swift
     info:
       path: iOSShareExtension/Info.plist
       properties:
@@ -638,16 +640,17 @@ targets:
           NSExtensionAttributes:
             NSExtensionActivationRule:
               NSExtensionActivationSupportsText: true
+              NSExtensionActivationSupportsImageWithMaxCount: 1
               NSExtensionActivationSupportsWebURLWithMaxCount: 1
               NSExtensionActivationSupportsWebPageWithMaxCount: 1
     settings:
       base:
         PRODUCT_NAME: SaneClipIOSShare
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.share
-        MARKETING_VERSION: "2.3.7"
-        CURRENT_PROJECT_VERSION: "2307"
-        MARKETING_VERSION: "2.3.7"
-        CURRENT_PROJECT_VERSION: "2307"
+        MARKETING_VERSION: "2.3.8"
+        CURRENT_PROJECT_VERSION: "2308"
+        MARKETING_VERSION: "2.3.8"
+        CURRENT_PROJECT_VERSION: "2308"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"

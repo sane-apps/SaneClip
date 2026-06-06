@@ -66,6 +66,12 @@ final class SensitiveDataDetector: Sendable {
         !detect(in: text).isEmpty
     }
 
+    /// Checks for high-risk secrets that should not be auto-saved by companion entry points.
+    /// Email addresses are intentionally excluded because sharing contact details is a normal clipboard use case.
+    func containsHighRiskSensitiveData(in text: String) -> Bool {
+        detect(in: text).contains { $0 != .email }
+    }
+
     // MARK: - Credit Card Detection
 
     /// Detects credit card numbers using pattern matching and Luhn validation

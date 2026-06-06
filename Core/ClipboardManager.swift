@@ -129,6 +129,10 @@ class ClipboardManager {
         set { selfWriteChangeCount = newValue ? Int.max : 0 }
     }
 
+    func markSelfWriteCompleted(changeCount: Int = NSPasteboard.general.changeCount) {
+        selfWriteChangeCount = changeCount
+    }
+
     /// Whether a paste operation is currently in flight (prevents overlapping Cmd+V simulations)
     private var isPasting = false
     private var suppressPermissionPromptUntil: Date?
@@ -812,22 +816,28 @@ class ClipboardManager {
         }
     }
 
-    func paste(item: ClipboardItem) {
+    @discardableResult
+    func paste(item: ClipboardItem) -> Bool {
         paste(item: item, dismissPopover: true, reopenPopoverAfterPaste: false)
     }
 
-    private func paste(item: ClipboardItem, dismissPopover: Bool, reopenPopoverAfterPaste: Bool) {
+    @discardableResult
+    private func paste(item: ClipboardItem, dismissPopover: Bool, reopenPopoverAfterPaste: Bool) -> Bool {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
 
+        let didWrite: Bool
         switch item.content {
         case let .text(string):
-            pasteboard.setString(string, forType: .string)
+            didWrite = pasteboard.setString(string, forType: .string)
         case let .image(image):
             if let tiffData = image.tiffRepresentation {
-                pasteboard.setData(tiffData, forType: .tiff)
+                didWrite = pasteboard.setData(tiffData, forType: .tiff)
+            } else {
+                didWrite = false
             }
         }
+        guard didWrite else { return false }
         selfWriteChangeCount = pasteboard.changeCount
 
         // Move to front and increment paste count
@@ -842,6 +852,7 @@ class ClipboardManager {
         if dismissPopover {
             dismissAndPaste(reopenPopoverAfterPaste: reopenPopoverAfterPaste)
         }
+        return true
     }
 
     /// Paste most recent item as plain text (for global shortcut)
@@ -851,18 +862,24 @@ class ClipboardManager {
     }
 
     /// Paste item as plain text (strips formatting) — Pro only
-    func pasteAsPlainText(item: ClipboardItem) {
+    @discardableResult
+    func pasteAsPlainText(item: ClipboardItem) -> Bool {
+        pasteAsPlainText(item: item, reopenPopoverAfterPaste: false)
+    }
+
+    @discardableResult
+    private func pasteAsPlainText(item: ClipboardItem, reopenPopoverAfterPaste: Bool) -> Bool {
         guard licenseService?.isPro == true else {
             if let ls = licenseService {
                 ProUpsellWindow.show(feature: ProFeature.plainTextPaste, licenseService: ls)
             }
-            return
+            return false
         }
-        guard case let .text(string) = item.content else { return }
+        guard case let .text(string) = item.content else { return false }
 
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
-        pasteboard.setString(string, forType: .string)
+        guard pasteboard.setString(string, forType: .string) else { return false }
         selfWriteChangeCount = pasteboard.changeCount
 
         // Move to front and increment paste count
@@ -874,27 +891,34 @@ class ClipboardManager {
         }
 
         SettingsModel.shared.pasteSound.play()
-        dismissAndPaste()
+        dismissAndPaste(reopenPopoverAfterPaste: reopenPopoverAfterPaste)
+        return true
     }
 
     /// Smart paste: auto-selects paste behavior based on content type — Pro only
     /// - Code → plain text (preserves indentation, strips rich formatting)
     /// - URL → cleaned URL with tracking params stripped
     /// - Everything else → standard paste
-    func pasteSmartMode(item: ClipboardItem) {
+    @discardableResult
+    func pasteSmartMode(item: ClipboardItem) -> Bool {
+        pasteSmartMode(item: item, reopenPopoverAfterPaste: false)
+    }
+
+    @discardableResult
+    private func pasteSmartMode(item: ClipboardItem, reopenPopoverAfterPaste: Bool) -> Bool {
         guard licenseService?.isPro == true else {
             if let ls = licenseService {
                 ProUpsellWindow.show(feature: ProFeature.smartPaste, licenseService: ls)
             }
-            return
+            return false
         }
         if item.isCode {
-            pasteAsPlainText(item: item)
+            return pasteAsPlainText(item: item, reopenPopoverAfterPaste: reopenPopoverAfterPaste)
         } else if item.isURL, case let .text(urlString) = item.content {
             let cleaned = ClipboardItem.stripTrackingParams(from: urlString)
             let pasteboard = NSPasteboard.general
             pasteboard.clearContents()
-            pasteboard.setString(cleaned, forType: .string)
+            guard pasteboard.setString(cleaned, forType: .string) else { return false }
             selfWriteChangeCount = pasteboard.changeCount
 
             if let index = history.firstIndex(where: { $0.id == item.id }) {
@@ -905,9 +929,10 @@ class ClipboardManager {
             }
 
             SettingsModel.shared.pasteSound.play()
-            dismissAndPaste()
+            dismissAndPaste(reopenPopoverAfterPaste: reopenPopoverAfterPaste)
+            return true
         } else {
-            paste(item: item)
+            return paste(item: item, dismissPopover: true, reopenPopoverAfterPaste: reopenPopoverAfterPaste)
         }
     }
 
@@ -1068,27 +1093,28 @@ class ClipboardManager {
 
     private func pasteFromStack(at index: Int) {
         guard index >= 0, index < pasteStack.count else { return }
-        let item = pasteStack.remove(at: index)
-        lastPastedFromStack = item
-        savePasteStack()
+        let item = pasteStack[index]
+        let remainingCountAfterPaste = pasteStack.count - 1
 
         let shouldReopenAfterPaste = SettingsModel.shared.keepPasteStackOpenBetweenPastes &&
-            (!pasteStack.isEmpty || !SettingsModel.shared.autoClosePasteStackWhenEmpty)
+            (remainingCountAfterPaste > 0 || !SettingsModel.shared.autoClosePasteStackWhenEmpty)
         let mode = resolvedPasteModeForForegroundApp()
+        let didWrite: Bool
         switch mode {
         case .standard:
-            paste(item: item, dismissPopover: true, reopenPopoverAfterPaste: shouldReopenAfterPaste)
+            didWrite = paste(item: item, dismissPopover: true, reopenPopoverAfterPaste: shouldReopenAfterPaste)
         case .plain:
-            pasteAsPlainText(item: item)
-            if shouldReopenAfterPaste {
-                NotificationCenter.default.post(name: .reopenHistoryAfterPaste, object: nil)
-            }
+            didWrite = pasteAsPlainText(item: item, reopenPopoverAfterPaste: shouldReopenAfterPaste)
         case .smart:
-            pasteSmartMode(item: item)
-            if shouldReopenAfterPaste {
-                NotificationCenter.default.post(name: .reopenHistoryAfterPaste, object: nil)
-            }
+            didWrite = pasteSmartMode(item: item, reopenPopoverAfterPaste: shouldReopenAfterPaste)
         }
+
+        guard didWrite else { return }
+        if let currentIndex = pasteStack.firstIndex(where: { $0.id == item.id }) {
+            pasteStack.remove(at: currentIndex)
+        }
+        lastPastedFromStack = item
+        savePasteStack()
     }
 
     func undoLastPasteFromStack() {
@@ -1323,6 +1349,26 @@ class ClipboardManager {
     // MARK: - Sync Support
 
     #if ENABLE_SYNC
+    private func queueItemUpdateForSync(_ item: ClipboardItem) {
+        SyncCoordinator.shared.queueItemForSync(
+            SharedClipboardItem(
+                id: item.id,
+                content: item.sharedContent,
+                timestamp: item.timestamp,
+                sourceAppBundleID: item.sourceAppBundleID,
+                sourceAppName: item.sourceAppName,
+                pasteCount: item.pasteCount,
+                note: item.note
+            )
+        )
+    }
+
+    private func queueDeletesForSync(_ ids: Set<UUID>) {
+        for id in ids {
+            SyncCoordinator.shared.queueDeleteForSync(itemID: id)
+        }
+    }
+
     /// Insert an item received from iCloud sync (no re-sync trigger)
     func insertSyncedItem(_ item: ClipboardItem) {
         // Don't add duplicates
@@ -1407,6 +1453,9 @@ class ClipboardManager {
         lastPastedFromStack = nil
         saveHistory()
         savePasteStack()
+        #if ENABLE_SYNC
+        queueDeletesForSync(removedIDs)
+        #endif
         return removedIDs.count
     }
 
@@ -1431,6 +1480,9 @@ class ClipboardManager {
 
         saveHistory()
         savePasteStack()
+        #if ENABLE_SYNC
+        queueDeletesForSync(ids)
+        #endif
         return ids.count
     }
 
@@ -1555,6 +1607,9 @@ class ClipboardManager {
             }
 
             saveHistory()
+            #if ENABLE_SYNC
+            queueItemUpdateForSync(updatedItem)
+            #endif
             logger.debug("Updated content for item \(id)")
         }
     }
@@ -1629,6 +1684,9 @@ class ClipboardManager {
         }
 
         saveHistory()
+        #if ENABLE_SYNC
+        queueItemUpdateForSync(updatedItem)
+        #endif
         logger.debug("Updated edit-sheet fields for item \(id)")
     }
 
@@ -1656,6 +1714,9 @@ class ClipboardManager {
             }
 
             saveHistory()
+            #if ENABLE_SYNC
+            queueItemUpdateForSync(history[index])
+            #endif
             logger.debug("Updated note for item \(id)")
         }
     }
@@ -1680,6 +1741,9 @@ class ClipboardManager {
                 savePasteStack()
             }
             saveHistory()
+            #if ENABLE_SYNC
+            queueItemUpdateForSync(history[index])
+            #endif
             logger.debug("Updated title for item \(id)")
         }
     }
@@ -1728,6 +1792,9 @@ class ClipboardManager {
                 pinnedItems[pinnedIndex].tags = normalized
             }
             saveHistory()
+            #if ENABLE_SYNC
+            queueItemUpdateForSync(history[index])
+            #endif
             logger.debug("Updated tags for item \(id)")
         }
     }
@@ -1748,6 +1815,9 @@ class ClipboardManager {
                 pinnedItems[pinnedIndex].collection = finalCollection
             }
             saveHistory()
+            #if ENABLE_SYNC
+            queueItemUpdateForSync(history[index])
+            #endif
             logger.debug("Updated collection for item \(id)")
         }
     }
@@ -1801,40 +1871,7 @@ class ClipboardManager {
 
     /// Export history to JSON data
     func exportHistory() -> Data? {
-        let formatter = ISO8601DateFormatter()
-        let pinnedIDs = Set(pinnedItems.map(\.id))
-        let exportItems = history.compactMap { item -> [String: Any]? in
-            var dict: [String: Any] = [
-                "id": item.id.uuidString,
-                "timestamp": formatter.string(from: item.timestamp),
-                "pasteCount": item.pasteCount
-            ]
-
-            if case let .text(string) = item.content {
-                dict["text"] = string
-            } else {
-                // Skip images in export
-                return nil
-            }
-
-            if let bundleID = item.sourceAppBundleID {
-                dict["sourceAppBundleID"] = bundleID
-            }
-            if let appName = item.sourceAppName {
-                dict["sourceAppName"] = appName
-            }
-            if let title = item.title {
-                dict["title"] = title
-            }
-            dict["tags"] = item.tags
-            dict["collection"] = item.collection
-
-            dict["isPinned"] = pinnedIDs.contains(item.id)
-
-            return dict
-        }
-
-        return try? JSONSerialization.data(withJSONObject: exportItems, options: .prettyPrinted)
+        try? JSONEncoder().encode(Self.savedItemsForHistoryExport(history))
     }
 
     /// Static export function for use from Settings (reads from disk)
@@ -1856,36 +1893,43 @@ class ClipboardManager {
             data = decrypted
         }
 
-        guard let items = try? JSONDecoder().decode([SavedClipboardItem].self, from: data) else {
-            return nil
+        guard let items = try? JSONDecoder().decode([SavedClipboardItem].self, from: data) else { return nil }
+        return try? JSONEncoder().encode(items)
+    }
+
+    private nonisolated static func savedItemsForHistoryExport(_ history: [ClipboardItem]) -> [SavedClipboardItem] {
+        history.map { item in
+            switch item.content {
+            case let .text(string):
+                SavedClipboardItem(
+                    id: item.id,
+                    text: string,
+                    timestamp: item.timestamp,
+                    sourceAppBundleID: item.sourceAppBundleID,
+                    sourceAppName: item.sourceAppName,
+                    pasteCount: item.pasteCount,
+                    title: item.title,
+                    tags: item.tags,
+                    collection: item.collection,
+                    note: item.note,
+                    ocrText: item.ocrText
+                )
+            case .image:
+                SavedClipboardItem(
+                    id: item.id,
+                    text: "[Image]",
+                    timestamp: item.timestamp,
+                    sourceAppBundleID: item.sourceAppBundleID,
+                    sourceAppName: item.sourceAppName,
+                    pasteCount: item.pasteCount,
+                    title: item.title,
+                    tags: item.tags,
+                    collection: item.collection,
+                    note: item.note,
+                    ocrText: item.ocrText
+                )
+            }
         }
-
-        let pinnedIDs = Set(UserDefaults.standard.stringArray(forKey: "pinnedItemIDs") ?? [])
-        let formatter = ISO8601DateFormatter()
-
-        let exportItems: [[String: Any]] = items.map { item in
-            var dict: [String: Any] = [
-                "id": item.id.uuidString,
-                "timestamp": formatter.string(from: item.timestamp),
-                "text": item.text,
-                "pasteCount": item.pasteCount,
-                "isPinned": pinnedIDs.contains(item.id.uuidString)
-            ]
-            if let bundleID = item.sourceAppBundleID {
-                dict["sourceAppBundleID"] = bundleID
-            }
-            if let appName = item.sourceAppName {
-                dict["sourceAppName"] = appName
-            }
-            if let title = item.title {
-                dict["title"] = title
-            }
-            dict["tags"] = item.tags
-            dict["collection"] = item.collection
-            return dict
-        }
-
-        return try? JSONSerialization.data(withJSONObject: exportItems, options: .prettyPrinted)
     }
 
     // MARK: - Persistence
@@ -1924,6 +1968,18 @@ class ClipboardManager {
         return bitmap.representation(using: .png, properties: [:])
     }
 
+    private static let encryptedAssetPrefix = Data("SANECLIP-ENC1\n".utf8)
+
+    private func assetDataForWriting(_ data: Data) throws -> Data {
+        guard SettingsModel.shared.encryptHistory else { return data }
+        return try Self.encryptedAssetPrefix + HistoryEncryption.encrypt(data)
+    }
+
+    private func assetDataForReading(_ data: Data) throws -> Data {
+        guard data.starts(with: Self.encryptedAssetPrefix) else { return data }
+        return try HistoryEncryption.decrypt(Data(data.dropFirst(Self.encryptedAssetPrefix.count)))
+    }
+
     private func saveOriginalImageData(image: NSImage, id: UUID) -> String? {
         guard let pngData = pngData(for: image) else {
             logger.warning("Failed to create PNG data for item \(id)")
@@ -1933,7 +1989,8 @@ class ClipboardManager {
         let filename = "\(id.uuidString).png"
         let fileURL = imageDataDirectory.appendingPathComponent(filename)
         do {
-            try pngData.write(to: fileURL, options: .atomic)
+            let data = try assetDataForWriting(pngData)
+            try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
             return filename
         } catch {
             logger.warning("Failed to write image data: \(error.localizedDescription)")
@@ -1975,7 +2032,8 @@ class ClipboardManager {
         let filename = "\(id.uuidString).jpg"
         let fileURL = thumbnailsDirectory.appendingPathComponent(filename)
         do {
-            try jpegData.write(to: fileURL, options: .atomic)
+            let data = try assetDataForWriting(jpegData)
+            try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
             return filename
         } catch {
             logger.warning("Failed to write thumbnail: \(error.localizedDescription)")
@@ -2002,12 +2060,22 @@ class ClipboardManager {
     /// Load a thumbnail image from disk
     private func loadThumbnail(filename: String) -> NSImage? {
         let fileURL = thumbnailsDirectory.appendingPathComponent(filename)
-        return NSImage(contentsOf: fileURL)
+        guard let data = try? Data(contentsOf: fileURL),
+              let decoded = try? assetDataForReading(data)
+        else {
+            return nil
+        }
+        return NSImage(data: decoded)
     }
 
     private func loadOriginalImageData(filename: String) -> NSImage? {
         let fileURL = imageDataDirectory.appendingPathComponent(filename)
-        return NSImage(contentsOf: fileURL)
+        guard let data = try? Data(contentsOf: fileURL),
+              let decoded = try? assetDataForReading(data)
+        else {
+            return nil
+        }
+        return NSImage(data: decoded)
     }
 
     func saveHistory() {
@@ -2086,6 +2154,22 @@ class ClipboardManager {
 
     /// Updates widget data in the shared App Group container
     private func updateWidgetData() {
+        if SettingsModel.shared.requireTouchID {
+            let lockedContainer = WidgetDataContainer(
+                recentItems: [],
+                pinnedItems: [],
+                lastUpdated: Date()
+            )
+            do {
+                try lockedContainer.save()
+                WidgetCenter.shared.reloadAllTimelines()
+                logger.debug("Cleared widget previews while Touch ID history lock is enabled")
+            } catch {
+                logger.warning("Failed to clear locked widget data: \(error.localizedDescription)")
+            }
+            return
+        }
+
         // Convert history items to widget format
         let recentWidgetItems = history.prefix(10).map { item in
             WidgetClipboardItem(
@@ -2267,6 +2351,54 @@ class ClipboardManager {
         }
     }
 
+    private struct LegacyExportedClipboardItem: Decodable {
+        let id: String
+        let timestamp: String
+        let text: String
+        let sourceAppBundleID: String?
+        let sourceAppName: String?
+        let pasteCount: Int?
+        let title: String?
+        let tags: [String]?
+        let collection: String?
+        let note: String?
+
+        func savedItem() -> SavedClipboardItem? {
+            guard let uuid = UUID(uuidString: id),
+                  let date = ISO8601DateFormatter().date(from: timestamp)
+            else {
+                return nil
+            }
+
+            return SavedClipboardItem(
+                id: uuid,
+                text: text,
+                timestamp: date,
+                sourceAppBundleID: sourceAppBundleID,
+                sourceAppName: sourceAppName,
+                pasteCount: pasteCount ?? 0,
+                title: title,
+                tags: tags ?? [],
+                collection: collection ?? "Default",
+                note: note
+            )
+        }
+    }
+
+    private nonisolated static func decodeImportedHistoryItems(from data: Data) -> [SavedClipboardItem]? {
+        let decoder = JSONDecoder()
+        if let items = try? decoder.decode([SavedClipboardItem].self, from: data) {
+            return items
+        }
+
+        guard let legacyItems = try? decoder.decode([LegacyExportedClipboardItem].self, from: data) else {
+            return nil
+        }
+
+        let converted = legacyItems.compactMap { $0.savedItem() }
+        return converted.count == legacyItems.count ? converted : nil
+    }
+
     /// Import history from a JSON file
     /// - Parameters:
     ///   - url: URL to the JSON file
@@ -2279,8 +2411,8 @@ class ClipboardManager {
             throw ImportError.readFailed
         }
 
-        // Try to decode as SavedClipboardItem array
-        guard let items = try? JSONDecoder().decode([SavedClipboardItem].self, from: data) else {
+        // Try to decode as current exports first, then as legacy public exports.
+        guard let items = Self.decodeImportedHistoryItems(from: data) else {
             throw ImportError.decodeFailed
         }
 

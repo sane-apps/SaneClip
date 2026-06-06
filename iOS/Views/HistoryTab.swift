@@ -8,25 +8,33 @@ struct HistoryTab: View {
     @State private var searchText = ""
     @State private var selectedItem: SharedClipboardItem?
 
-    private var isIPad: Bool { sizeClass == .regular }
+    private var isIPad: Bool {
+        sizeClass == .regular
+    }
+
     private let isScreenshotMode = LaunchOptions.isScreenshotMode()
 
     var body: some View {
         NavigationStack {
             Group {
                 if viewModel.history.isEmpty, !viewModel.isLoading {
-                    EmptyStateView(
-                        icon: "doc.on.clipboard",
-                        title: "No Clips Yet",
-                        message: "Tap the + button to save your current clipboard, or use the Share menu from any app.\n\nEnable iCloud Sync to see your Mac clipboard history here too."
-                    )
+                    VStack(spacing: 0) {
+                        if viewModel.hasPendingClipboardContent, !isScreenshotMode {
+                            pendingClipboardCard
+                        }
+                        EmptyStateView(
+                            icon: "doc.on.clipboard",
+                            title: "No Clips Yet",
+                            message: "Turn on iCloud Sync on your Mac to see synced history here.\n\nYou can also tap + to save the current iPhone clipboard or use the Share menu from another app."
+                        )
+                    }
                 } else {
                     VStack(spacing: 0) {
-                        if viewModel.isShowingDemoData && !isScreenshotMode {
+                        if viewModel.isShowingDemoData, !isScreenshotMode {
                             demoBanner
                         }
-                        if viewModel.clipboardDetectedText != nil && !isScreenshotMode {
-                            clipboardDetectedBanner
+                        if viewModel.hasPendingClipboardContent, !isScreenshotMode {
+                            pendingClipboardCard
                         }
                         historyList
                     }
@@ -52,6 +60,12 @@ struct HistoryTab: View {
             }
             .overlay(alignment: .bottom) {
                 toastOverlay
+            }
+            .task {
+                #if DEBUG
+                    viewModel.forcePendingClipboardCardPreviewIfRequested()
+                #endif
+                viewModel.checkForNewClipboardContent()
             }
             .animation(.easeInOut(duration: 0.2), value: viewModel.copiedItemID)
             .animation(.easeInOut(duration: 0.2), value: viewModel.savedItemID)
@@ -89,27 +103,51 @@ struct HistoryTab: View {
         .background(Color.brandNavy)
     }
 
-    private var clipboardDetectedBanner: some View {
-        Button {
-            viewModel.saveCurrentClipboard()
-            viewModel.dismissClipboardDetection()
-        } label: {
-            HStack(spacing: isIPad ? 16 : 8) {
-                Image(systemName: "doc.on.clipboard.fill")
-                    .font(isIPad ? .title : .callout)
-                    .foregroundStyle(.white)
-                Text("New clipboard content — tap to save")
-                    .font(isIPad ? .title2.weight(.medium) : .caption.weight(.medium))
-                    .foregroundStyle(.white)
-                Spacer()
-                Image(systemName: "plus.circle.fill")
-                    .font(isIPad ? .title : .callout)
-                    .foregroundStyle(.white)
+    private var pendingClipboardCard: some View {
+        HStack(spacing: isIPad ? 18 : 10) {
+            Button {
+                viewModel.saveCurrentClipboard()
+            } label: {
+                HStack(spacing: isIPad ? 18 : 10) {
+                    Image(systemName: "doc.on.clipboard.fill")
+                        .font(isIPad ? .largeTitle : .title3)
+                        .foregroundStyle(.white)
+                        .frame(width: isIPad ? 44 : 28)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(viewModel.pendingClipboardTitle)
+                            .font(isIPad ? .title2.weight(.semibold) : .subheadline.weight(.semibold))
+                            .foregroundStyle(.white)
+                        Text(viewModel.pendingClipboardSubtitle)
+                            .font(isIPad ? .body : .caption)
+                            .foregroundStyle(.white.opacity(0.9))
+                            .lineLimit(2)
+                    }
+                    Spacer()
+                    Image(systemName: "plus.circle.fill")
+                        .font(isIPad ? .title : .title3)
+                        .foregroundStyle(.white)
+                }
             }
-            .padding(isIPad ? 28 : 12)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.brandNavy.opacity(0.9))
+            .buttonStyle(.plain)
+            .accessibilityLabel(viewModel.pendingClipboardTitle)
+            .accessibilityHint("Saves the current iPhone clipboard to SaneClip history")
+
+            Button {
+                viewModel.dismissClipboardDetection()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(isIPad ? .title : .title3)
+                    .foregroundStyle(.white)
+                    .frame(width: isIPad ? 44 : 32, height: isIPad ? 44 : 32)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Dismiss clipboard save prompt")
+            .accessibilityHint("Hides this prompt until the iPhone clipboard changes again")
         }
+        .padding(isIPad ? 28 : 14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.clipBlue.opacity(0.95))
     }
 
     private var historyList: some View {
@@ -216,7 +254,9 @@ struct ToastView: View {
     let color: Color
     @Environment(\.horizontalSizeClass) private var sizeClass
 
-    private var isIPad: Bool { sizeClass == .regular }
+    private var isIPad: Bool {
+        sizeClass == .regular
+    }
 
     var body: some View {
         HStack(spacing: isIPad ? 10 : 6) {

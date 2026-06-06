@@ -39,7 +39,7 @@
         "name": "SaneClip",
         "description": "A secure clipboard manager for macOS. Free core workflow with optional Pro upgrade for OCR capture, Touch ID lock, encryption, and advanced paste tools.",
         "applicationCategory": "UtilitiesApplication",
-        "operatingSystem": "macOS 15 Sequoia or later",
+        "operatingSystem": "macOS 14 Sonoma or later",
         "offers": {
             "@type": "Offer",
             "price": "14.99",
@@ -52,7 +52,7 @@
         },
         "downloadUrl": "https://dist.saneclip.com/updates/SaneClip-2.3.7.zip",
         "softwareVersion": "2.3.7",
-        "releaseNotes": "v2.3.4 fixes Capture Text after the macOS screen picker and moves clipboard history to the more reliable Cmd+Shift+Control+Y shortcut.",
+        "releaseNotes": "v2.3.7 keeps synced Mac clipboard text appearing automatically on iPhone and iPad while the companion app is foregrounded.",
         "screenshot": "https://saneclip.com/images/screenshot-popover.png",
         "featureList": [
             "Touch ID Protection",
@@ -1564,7 +1564,7 @@
                 </div>
             </div>
             <p class="animate-in delay-5 hero-pricing-footer" style="color: var(--text-muted); font-size: 0.85rem; margin-top: var(--phi-sm); margin-bottom: 36px;"><code style="background: var(--bg-card); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer;" onclick="copyToClipboard(this)" title="Click to copy">brew install --cask sane-apps/tap/saneclip</code></p>
-            <p class="system-requirements animate-in delay-4" style="color: var(--text-secondary); font-size: 0.9375rem; margin-top: 10px; margin-bottom: 40px;">Requires macOS 15.0 (Sequoia) or later</p>
+            <p class="system-requirements animate-in delay-4" style="color: var(--text-secondary); font-size: 0.9375rem; margin-top: 10px; margin-bottom: 40px;">Requires macOS 14.0 (Sonoma) or later</p>
 
             <!-- Demo Preview - Actual Screenshot -->
             <div class="hero-screenshot-intro animate-in delay-5">
@@ -1582,7 +1582,7 @@
     <section class="ios-companion" id="ios">
         <div class="container">
             <h2 class="section-title">Your Clipboard, on iPhone</h2>
-            <p class="section-subtitle">SaneClip syncs across all your devices via iCloud. Browse, search, and paste your clipboard history right from your pocket.</p>
+            <p class="section-subtitle">SaneClip can sync Mac history through your own iCloud account. Browse, search, and copy synced clips from the iPhone companion while it is active.</p>
             <div class="ios-features">
                 <span>Siri Shortcuts</span>
                 <span>Share Extension</span>
@@ -1591,7 +1591,7 @@
                 <span>Source-Aware Colors</span>
             </div>
             <div class="ios-screenshots">
-                <div class="ios-screenshot-item" onclick="openLightbox('images/screenshot-ios-history-dark.png', 'Clipboard History on iPhone — Source-aware colors and full sync')">
+                <div class="ios-screenshot-item" onclick="openLightbox('images/screenshot-ios-history-dark.png', 'Clipboard History on iPhone — Source-aware colors for synced Mac history')">
                     <img src="images/screenshot-ios-history-dark.png" alt="SaneClip iOS - Clipboard History" loading="lazy">
                     <p>History</p>
                 </div>
@@ -1718,7 +1718,7 @@
                         </svg>
                     </div>
                     <h3>Integrations</h3>
-                    <p><strong>Quick Actions</strong> for Shortcuts. <strong>Web integrations</strong> with secure signatures fire on copy, paste, or delete. Build workflows around your clipboard.</p>
+                    <p><strong>Quick Actions</strong> for Shortcuts. <strong>URL schemes and App Intents</strong> open history, search clips, copy text, and run confirmed clipboard actions from your workflows.</p>
                 </div>
 
                 <!-- Private by Design -->
@@ -1956,7 +1956,7 @@
                         <tr>
                             <td class="feature-name">
                                 <span class="feature-label">Integrations</span>
-                                <span class="feature-desc">Secure web integrations, Shortcuts support</span>
+                                <span class="feature-desc">URL schemes, App Intents, Shortcuts support</span>
                             </td>
                             <td class="highlight-col"><span class="check">&#10003;</span></td>
                             <td><span class="cross">&#10007;</span></td>
@@ -2172,7 +2172,7 @@
                     <div style="color: var(--accent); font-size: 0.9rem; font-weight: 500;">Peter L. (Email)</div>
                 </div>
                 <div class="testimonial-card" style="background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); border-radius: 16px; padding: 24px 28px; border: 1px solid var(--border); text-align: left; min-width: 340px; max-width: 340px; flex-shrink: 0;">
-                    <p style="font-style: italic; color: var(--text-primary); margin-bottom: 16px; font-size: 0.95rem; line-height: 1.6;">"Actually local and no telemetry is the only way to do this."</p>
+                    <p style="font-style: italic; color: var(--text-primary); margin-bottom: 16px; font-size: 0.95rem; line-height: 1.6;">"The privacy-first, local approach is the only way to do this."</p>
                     <div style="color: var(--accent); font-size: 0.9rem; font-weight: 500;">@manuotel (X)</div>
                 </div>
                 <div class="testimonial-card" style="background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); border-radius: 16px; padding: 24px 28px; border: 1px solid var(--border); text-align: left; min-width: 340px; max-width: 340px; flex-shrink: 0;">
@@ -2201,7 +2201,7 @@
                     <div style="color: var(--accent); font-size: 0.9rem; font-weight: 500;">Peter L. (Email)</div>
                 </div>
                 <div class="testimonial-card" style="background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); border-radius: 16px; padding: 24px 28px; border: 1px solid var(--border); text-align: left; min-width: 340px; max-width: 340px; flex-shrink: 0;">
-                    <p style="font-style: italic; color: var(--text-primary); margin-bottom: 16px; font-size: 0.95rem; line-height: 1.6;">"Actually local and no telemetry is the only way to do this."</p>
+                    <p style="font-style: italic; color: var(--text-primary); margin-bottom: 16px; font-size: 0.95rem; line-height: 1.6;">"The privacy-first, local approach is the only way to do this."</p>
                     <div style="color: var(--accent); font-size: 0.9rem; font-weight: 500;">@manuotel (X)</div>
                 </div>
                 <div class="testimonial-card" style="background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); border-radius: 16px; padding: 24px 28px; border: 1px solid var(--border); text-align: left; min-width: 340px; max-width: 340px; flex-shrink: 0;">

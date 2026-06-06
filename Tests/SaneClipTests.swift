@@ -727,9 +727,31 @@ struct SaneClipTests {
         )
 
         #expect(syncSource.contains("shouldEncryptSyncedContent"))
+        #expect(syncSource.contains("encryptHistoryKey"))
         #expect(syncSource.contains("SyncDataModel.encode(item, encrypt: Self.shouldEncryptSyncedContent"))
+        #expect(!syncSource.contains("SettingsModel.shared.encryptHistory"))
         #expect(!syncSource.contains("SyncDataModel.encode(item, encrypt: false)"))
     }
+
+    #if ENABLE_SYNC
+        @Test("Sync encryption decision uses shared preference without macOS-only settings")
+        func syncEncryptionDecisionUsesSharedPreference() throws {
+            let suiteName = "com.saneclip.tests.sync-encryption.\(UUID().uuidString)"
+            let defaults = try #require(UserDefaults(suiteName: suiteName))
+            defer {
+                defaults.removePersistentDomain(forName: suiteName)
+            }
+
+            #expect(!SyncCoordinator.shouldEncryptSyncedContent(isProEligible: true, defaults: defaults))
+
+            defaults.set(true, forKey: SyncCoordinator.encryptHistoryKey)
+            #expect(SyncCoordinator.shouldEncryptSyncedContent(isProEligible: true, defaults: defaults))
+            #expect(!SyncCoordinator.shouldEncryptSyncedContent(isProEligible: false, defaults: defaults))
+
+            defaults.set(false, forKey: SyncCoordinator.encryptHistoryKey)
+            #expect(!SyncCoordinator.shouldEncryptSyncedContent(isProEligible: true, defaults: defaults))
+        }
+    #endif
 
     @Test("Sandboxed builds allow user-selected file access for open and save panels")
     func sandboxedBuildsGrantUserSelectedFileAccess() throws {

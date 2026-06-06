@@ -697,8 +697,13 @@
             #endif
         }
 
-        static func shouldEncryptSyncedContent(isProEligible: Bool) -> Bool {
-            isProEligible && SettingsModel.shared.encryptHistory
+        nonisolated static let encryptHistoryKey = "encryptHistory"
+
+        nonisolated static func shouldEncryptSyncedContent(
+            isProEligible: Bool,
+            defaults: UserDefaults = .standard
+        ) -> Bool {
+            isProEligible && (defaults.object(forKey: encryptHistoryKey) as? Bool ?? false)
         }
 
         // MARK: - Handle Database Changes

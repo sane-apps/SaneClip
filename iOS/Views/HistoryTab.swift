@@ -19,7 +19,7 @@ struct HistoryTab: View {
             Group {
                 if viewModel.history.isEmpty, !viewModel.isLoading {
                     VStack(spacing: 0) {
-                        if viewModel.hasPendingClipboardContent, !isScreenshotMode {
+                        if viewModel.hasPendingClipboardContent && !isScreenshotMode {
                             pendingClipboardCard
                         }
                         EmptyStateView(
@@ -30,10 +30,10 @@ struct HistoryTab: View {
                     }
                 } else {
                     VStack(spacing: 0) {
-                        if viewModel.isShowingDemoData, !isScreenshotMode {
+                        if viewModel.isShowingDemoData && !isScreenshotMode {
                             demoBanner
                         }
-                        if viewModel.hasPendingClipboardContent, !isScreenshotMode {
+                        if viewModel.hasPendingClipboardContent && !isScreenshotMode {
                             pendingClipboardCard
                         }
                         historyList

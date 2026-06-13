@@ -1436,14 +1436,14 @@ struct SaneClipTests {
     func privateKeyDetection() {
         let detector = SensitiveDataDetector.shared
 
-        let rsaKey = """
-        -----BEGIN RSA PRIVATE KEY-----
-        MIIEowIBAAKCAQEA...
-        -----END RSA PRIVATE KEY-----
-        """
+        let rsaKey = [
+            "-----BEGIN RSA", "PRIVATE KEY-----",
+            "MIIEowIBAAKCAQEA...",
+            "-----END RSA", "PRIVATE KEY-----"
+        ].joined(separator: " ")
         #expect(detector.detect(in: rsaKey).contains(.privateKey))
 
-        let sshKey = "-----BEGIN OPENSSH PRIVATE KEY-----"
+        let sshKey = ["-----BEGIN OPENSSH", "PRIVATE KEY-----"].joined(separator: " ")
         #expect(detector.detect(in: sshKey).contains(.privateKey))
     }
 
@@ -1863,6 +1863,10 @@ struct SaneClipTests {
             contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView+Actions.swift"),
             encoding: .utf8
         )
+        let excludedAppsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/ExcludedAppsSettingsView.swift"),
+            encoding: .utf8
+        )
         let directSupportSource = try String(
             contentsOf: projectRootURL().appendingPathComponent("DirectDistributionSupport.swift"),
             encoding: .utf8
@@ -1891,7 +1895,7 @@ struct SaneClipTests {
         #expect(generalSettingsSource.contains("SaneClipSettingsCopy.removeButtonTitle"))
         #expect(settingsSource.contains("typealias ClipActionButtonStyle = SaneUI.SaneActionButtonStyle"))
         #expect(generalSettingsSource.contains(".buttonStyle(ClipActionButtonStyle())"))
-        #expect(generalSettingsSource.contains("ClipActionButtonStyle(prominent: exists, compact: true)"))
+        #expect(excludedAppsSource.contains("ClipActionButtonStyle(prominent: exists, compact: true)"))
         #expect(generalSettingsSource.contains("Image(nsImage: popupSymbolImage(settings.menuBarIcon))"))
         #expect(generalSettingsActionsSource.contains("hierarchicalColor: .white"))
         #expect(generalSettingsActionsSource.contains("symbol.isTemplate = false"))
@@ -2300,9 +2304,9 @@ struct SaneClipTests {
         #expect(settingsSource.contains("Text(\"These settings require SaneClip Pro\")"))
         #expect(!settingsSource.contains("Text(\"Upgrade — \\(licenseService?.displayPriceLabel"))
         #expect(menuSource.contains("NSMenuItem(title: \"Snippets Pro \\u{1F512}\", action: #selector(showSnippetsUpsell), keyEquivalent: \"\")"))
-        #expect(appSource.contains("private var captureTextMenuItemTitle: String {"))
+        #expect(appSource.contains("var captureTextMenuItemTitle: String {"))
         #expect(appSource.contains("licenseService.isPro ? CaptureWorkflow.text.menuTitle : \"Capture Text from Screen Pro 🔒\""))
-        #expect(appSource.contains("@objc private func showSnippetsUpsell()"))
+        #expect(appSource.contains("@objc func showSnippetsUpsell()"))
     }
 
     @Test("Mac pinning matches the advertised free tier")

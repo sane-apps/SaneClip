@@ -6,6 +6,15 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+- 2026-06-13 validation refresh note:
+  - Cross-app SaneProcess validation still marks SaneClip customer UI/project
+    QA proof stale; refresh with `./scripts/SaneMaster.rb customer_ui_sweep
+    --json`, then `./scripts/SaneMaster.rb customer_ui_contract --json
+    --strict-visual --no-exit` on the Mini before treating the current release
+    state as fresh.
+  - The private-key detector fixture now avoids embedding literal PEM header
+    blocks while still exercising the detector path.
+
 - Current released version: `2.3.9` / build `2309`.
 - Direct Mac channel `2.3.9` is live on R2, Sparkle appcast, website,
   Homebrew, GitHub release, and email webhook. Verified live URL:

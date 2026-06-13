@@ -2428,7 +2428,8 @@ class ClipboardManager {
                 title: saved.title,
                 tags: saved.tags,
                 collection: saved.collection,
-                note: saved.note?.isEmpty == true ? nil : saved.note
+                note: saved.note?.isEmpty == true ? nil : saved.note,
+                ocrText: saved.ocrText
             )
         }
 

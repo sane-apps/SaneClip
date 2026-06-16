@@ -506,6 +506,21 @@ struct SaneClipTests {
         #expect(iconCatalog.contains("\"size\" : \"512x512\"") || iconCatalog.contains("\"size\":\"512x512\""))
     }
 
+    @Test("Setapp builds are universal for Intel and Apple silicon review machines")
+    func setappBuildsDeclareUniversalArchitectures() throws {
+        let projectSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("project.yml"),
+            encoding: .utf8
+        )
+
+        #expect(projectSource.contains("ProdDebug-Setapp:"))
+        #expect(projectSource.contains("Release-Setapp:"))
+        #expect(projectSource.contains(#"ARCHS: "$(ARCHS_STANDARD)""#))
+        #expect(projectSource.contains(#"VALID_ARCHS: "arm64 x86_64""#))
+        #expect(projectSource.contains(#"Add :MPSupportedArchitectures:0 string arm64"#))
+        #expect(projectSource.contains(#"Add :MPSupportedArchitectures:1 string x86_64"#))
+    }
+
     @Test("Sandboxed direct build grants Sparkle installer mach lookup exceptions")
     func sparkleInstallerMachLookupExceptionsPresent() throws {
         let repoRoot = URL(fileURLWithPath: #filePath)

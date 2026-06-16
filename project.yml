@@ -222,6 +222,8 @@ targets:
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipSetapp.entitlements
+          ARCHS: "$(ARCHS_STANDARD)"
+          VALID_ARCHS: "arm64 x86_64"
           OTHER_SWIFT_FLAGS: "-D ENABLE_SYNC -D SETAPP"
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
@@ -246,6 +248,8 @@ targets:
           CODE_SIGN_IDENTITY: "Developer ID Application"
           CODE_SIGN_ENTITLEMENTS: SaneClip/SaneClipSetapp.entitlements
           PROVISIONING_PROFILE_SPECIFIER: "SaneClip Setapp Developer ID 2309"
+          ARCHS: "$(ARCHS_STANDARD)"
+          VALID_ARCHS: "arm64 x86_64"
           OTHER_SWIFT_FLAGS: "-D ENABLE_SYNC -D SETAPP"
     postCompileScripts:
       - script: |
@@ -327,6 +331,7 @@ targets:
             /usr/libexec/PlistBuddy -c "Delete :MPSupportedArchitectures" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             /usr/libexec/PlistBuddy -c "Add :MPSupportedArchitectures array" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}"
             /usr/libexec/PlistBuddy -c "Add :MPSupportedArchitectures:0 string arm64" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}"
+            /usr/libexec/PlistBuddy -c "Add :MPSupportedArchitectures:1 string x86_64" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}"
             /usr/libexec/PlistBuddy -c "Delete :NSUpdateSecurityPolicy" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
             /usr/libexec/PlistBuddy -c "Add :NSUpdateSecurityPolicy dict" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}"
             /usr/libexec/PlistBuddy -c "Add :NSUpdateSecurityPolicy:AllowProcesses dict" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}"
@@ -506,6 +511,8 @@ targets:
           DEVELOPMENT_TEAM: M78L6FXD48
           CODE_SIGN_IDENTITY: "Apple Development"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
+          ARCHS: "$(ARCHS_STANDARD)"
+          VALID_ARCHS: "arm64 x86_64"
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
           DEVELOPMENT_TEAM: M78L6FXD48
@@ -526,6 +533,8 @@ targets:
           CODE_SIGN_IDENTITY: "Developer ID Application"
           CODE_SIGN_ENTITLEMENTS: Widgets/SaneClipWidgets.entitlements
           PROVISIONING_PROFILE_SPECIFIER: "SaneClip Setapp Widgets Developer ID"
+          ARCHS: "$(ARCHS_STANDARD)"
+          VALID_ARCHS: "arm64 x86_64"
 
   # iOS App
   SaneClipIOS:

@@ -2,7 +2,7 @@
 
 > [README](README.md) · [ARCHITECTURE](ARCHITECTURE.md) · [DEVELOPMENT](DEVELOPMENT.md) · [PRIVACY](PRIVACY.md) · [SECURITY](SECURITY.md)
 
-Last updated: 2026-05-13
+Last updated: 2026-06-16
 
 ## Purpose
 
@@ -158,7 +158,9 @@ stateDiagram-v2
   - direct Lemon Squeezy business stays in place
   - Setapp using Stripe does not replace the website/direct flow
 - **Known Setapp gotchas**:
-  - current macOS build settings are `arm64` only, so universal readiness must be verified
+  - Setapp packages must stay universal: main app, extensions, and `MPSupportedArchitectures` must include both `arm64` and `x86_64`; `setapp_package` and `setapp_upload --validate-only` enforce this before upload
+  - Setapp packages that sign iCloud/app-group/keychain entitlements must embed a matching `Contents/embedded.provisionprofile`; notarization and `spctl` can pass while LaunchServices still fails with launchd/RBS error 163 if the profile is missing
+  - The final Setapp ZIP must be expanded, quarantined, and opened on the Mini before upload; static signing checks alone are not release proof
   - if the macOS Setapp lane ships widgets or extensions, the extension bundle-ID family must be audited with the Setapp lane instead of assumed to inherit safely
 
 ## Testing Strategy

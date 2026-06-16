@@ -22,12 +22,64 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 - App Store `2.3.9` is submitted for both platforms as of
   2026-06-06 17:07 EDT:
   `macos: 2.3.9 (WAITING_FOR_REVIEW) | ios: 2.3.9 (WAITING_FOR_REVIEW)`.
-- Setapp `2.3.9` build `2309` is attached to Setapp app `1847`, version
-  `46886`, for review. Uploaded archive:
-  `outputs/SaneClip-Setapp-2.3.9.zip`; SHA256
-  `89149b0da3917d9f007b977a0c9518b5fdebfa73941d8ed1a540417045787d4f`;
+- Setapp `2.3.9` build `2309` is **Needs Revision** as of 2026-06-15 email
+  #874. Setapp's reviewer could not open the app; the linked CleanShot shows
+  the normal internet-download warning followed by
+  `The application "SaneClip.app" can't be opened.` The archive involved was:
+  `~/SaneApps/outputs/setapp_review/20260615T133009Z-saneclip-2.3.9-setapp/SaneClip-Setapp-2.3.9.zip`;
+  SHA256
+  `84891bb4e3099ee6825db8f973d0558a39c7942b54abc88b6056edfe73055586`;
   portal archive URL:
-  `https://store.setapp.com/app/1847/46886/app-1780778500-6a248604359f1.zip`.
+  `https://store.setapp.com/app/1847/46886/app-1781530411-6a2fff2b7d19b.zip`.
+  Local reproduction on the Mini from the Setapp-hosted ZIP showed both
+  quarantined and clean copies failing `open -n` with RBS/launchd POSIX error
+  `163`, and direct execution exiting `137`.
+- Root cause for email #874: `setapp_package` archived with
+  `CODE_SIGNING_ALLOWED=NO` and then manually signed, but did not copy
+  `Contents/embedded.provisionprofile` into the app/extension before signing.
+  The app signed iCloud/app-group entitlements and static checks still passed
+  (`codesign`, notarization, stapler, `spctl`, universal slices), but
+  LaunchServices killed the app before it opened. The correct installed main
+  profile is `SaneClip Setapp Developer ID 2309`, UUID
+  `92dd39d1-a8d0-4833-a281-1648679d7240`, and it covers
+  `iCloud.com.saneclip.app`.
+- Active remediation in progress: shared SaneProcess `setapp_package` now
+  embeds matching provisioning profiles before signing and runs a quarantined
+  LaunchServices open proof from the final ZIP; `setapp_upload --validate-only`
+  now rejects signed restricted-entitlement bundles that are missing
+  `Contents/embedded.provisionprofile` or whose embedded profile does not cover
+  the signed bundle/iCloud containers. Regression proof: Mini
+  `ruby scripts/setapp_upload_test.rb` passed `9/9`, and the bad Setapp-hosted
+  ZIP now fails validation with
+  `Setapp archive app signs restricted entitlements but is missing Contents/embedded.provisionprofile`.
+- Verified replacement package built on the Mini:
+  `~/SaneApps/outputs/setapp_review/20260615T230825Z-saneclip-2.3.9-setapp/SaneClip-Setapp-2.3.9.zip`;
+  SHA256
+  `e3e223edeb8eab39345d8c0dcc59debf3ce5240ac8aa5720fb020e6390f56e09`.
+  It embeds main profile `SaneClip Setapp Developer ID 2309`
+  (`92dd39d1-a8d0-4833-a281-1648679d7240`) and widget profile
+  `SaneClip Setapp Widgets Developer ID`
+  (`9f11d50b-2f49-42d0-9dc2-04e448a39534`). Notarization accepted with
+  submission ID `2c886f25-33e3-4067-8814-95cc3e2bd31c`; stapler validation,
+  `spctl`, `setapp_upload --validate-only`, and manual quarantined open proof
+  passed. Manual proof log showed `open_status=0` and a translocated SaneClip
+  process `94955` from the final ZIP, then the probe process was terminated.
+- The verified replacement archive was attached to Setapp app `1847`, version
+  `46886`, and the Mini Safari portal `Submit for review` button was clicked.
+  `./scripts/SaneMaster.rb setapp_status --app SaneClip:1847:46886` now reports
+  `In Review (status 5)` with no action required. New Setapp archive URL:
+  `https://store.setapp.com/app/1847/46886/app-1781565277-6a30875d9c3fb.zip`.
+- 2026-06-16 verification refresh:
+  - Mini `./scripts/SaneMaster.rb verify --timeout 900` passed `172` tests in
+    `34s`, including the Setapp universal-architecture regression test.
+  - Mini `./scripts/SaneMaster.rb setapp_status --app SaneClip:1847:46886 --json`
+    confirmed Setapp status `In Review`, `action_required: false`, with live
+    archive URL
+    `https://store.setapp.com/app/1847/46886/app-1781565277-6a30875d9c3fb.zip`.
+  - The exact live Setapp-hosted archive downloaded from that URL has SHA256
+    `e3e223edeb8eab39345d8c0dcc59debf3ce5240ac8aa5720fb020e6390f56e09` and
+    passed the hardened Mini validator:
+    `ruby ~/SaneApps/infra/SaneProcess/scripts/setapp_upload.rb --validate-only`.
 - Release commits pushed: `b412aa6` (2.3.9 fixes), `8d8f1c5` (version tag
   `v2.3.9`), `6a9e206` (site links), `52d8a22` (release metadata).
 - GitHub issue `sane-apps/SaneClip#14` was commented and closed as shipped in
@@ -95,6 +147,29 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
     `2.3.9` build `2309` and passed `reconcile`/`verify-facts`; do not send
     until the final release/submission status is accurate and explicit approval
     is recorded with `check-inbox.sh approve`.
+- 2026-06-15 Setapp rejection remediation, superseded by email #874:
+  - Email #869 / reviewer note said the app could not be opened. The submitted
+    Setapp ZIP was signed/notarized but the main app executable and plist
+    advertised only `arm64`; the widget extension was already universal.
+  - Fixed Setapp build settings so the app and widget build `x86_64 arm64`, and
+    added `MPSupportedArchitectures = [arm64, x86_64]` to the Setapp plist patch.
+  - Added test coverage in `Tests/SaneClipTests.swift` for the universal Setapp
+    settings, and expanded `setapp_upload.rb --validate-only` to reject archives
+    that are missing Intel or Apple-silicon slices in the app/extension binaries
+    or plist metadata.
+  - Added SaneMaster `setapp_package`, which xcodegen-builds the Setapp archive,
+    signs, notarizes, staples, zips, and runs the Setapp archive validator.
+  - Mini verification passed at that time: `ruby scripts/setapp_upload_test.rb` `7/7`,
+    `./scripts/SaneMaster.rb verify --timeout 900` `172` tests, package build
+    notarized accepted, Gatekeeper accepted, and `setapp_upload --validate-only`
+    passed for the final ZIP.
+  - Later email #874 proved this validation was incomplete: the rebuilt package
+    still failed LaunchServices because the matching provisioning profile was
+    not embedded. Do not treat the old `7/7` validator result as enough Setapp
+    release proof.
+  - Setapp portal fallback attached the fixed archive, Safari confirmed
+    "Your app is in review!", and `./scripts/SaneMaster.rb setapp_status --app
+    SaneClip:1847:46886` reports `In Review (status 5)` with no action required.
 - 2026-06-06 iOS publish fix:
   - First `2.3.8` release run submitted macOS successfully, then iOS archive
     failed because shared `SyncCoordinator.swift` referenced macOS-only

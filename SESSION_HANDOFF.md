@@ -340,14 +340,16 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 - 2026-05-27 09:35 EDT cross-product launch ops reran canonical Mini
   `launch_readiness`; it exited `1`, so no launch, directory, or public-reply
   action was executed. The active blockers are still the `needs_dmca` piracy
-  page, open GitHub issues `#9-#12` needing verified replies or explicit no-go
-  status, App Store/iOS conversion surfaces needing a fresh check, the
+  page, App Store/iOS conversion surfaces needing a fresh check, the
   local-only 30-second video, Mini `release_preflight` carrying `4` warnings,
   and the shared validation report marking SaneClip customer UI proof stale and
   older than 12 hours. The same-day `2026-05-27 10:00 EDT` Clipboard/OCR
   decision slot had not opened yet at decision time, so it stayed pending
   rather than being marked complete early. No new public URL was created in
   this run.
+  2026-06-16 correction: GitHub issues `#9-#12` were rechecked with
+  `gh issue view` and are already closed as of 2026-05-18, so they are not
+  current launch blockers.
 - 2026-05-24 23:21 EDT webhook drift cleanup: sane-email-automation
   `PRODUCT_CONFIG` was updated and deployed so live SaneClip order/download
   emails now serve `SaneClip-2.3.6.zip`; live signed download snapshot verified

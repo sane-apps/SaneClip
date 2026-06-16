@@ -55,7 +55,7 @@ launch_calendar:
     evidence: "Validation and channel checks on 2026-05-23 show 2.3.6 live across appcast, website, webhook, Homebrew, and Lemon hosted files; launch is still blocked by DMCA/support follow-up risk."
   blockers:
     - "Piracy page still marked needs_dmca."
-    - "Open GitHub issues #9-#12 are release:patched-pending and need maintainer/customer replies after verification."
+    - "GitHub issues #9-#12 were rechecked on 2026-06-16 and are already closed as of 2026-05-18."
     - "App Store/iOS metadata and conversion surfaces need a fresh check before large launch traffic."
   scheduled:
     - date: "2026-05-23"
@@ -66,7 +66,7 @@ launch_calendar:
       gate: "No PH/HN/IH launch until DMCA status, support replies, and current release proof are clean."
       success_metric: "Blockers resolved or launch marked no-go with exact reasons."
       last_reviewed: "2026-06-16"
-      result: "On 2026-06-16, canonical Mini `launch_readiness --json` reran from the repo root and returned `ok: false`: the piracy page remains `needs_dmca`, GitHub issues #9-#12 still need verified maintainer/customer replies or explicit no-go status, App Store/iOS metadata and conversion surfaces still need a fresh check, the 30-second video remains local only, the latest `release_preflight` proof is now stale at 12.34 days old with 3 warnings, and the fresh shared validation rerun at 2026-06-16 09:32 EDT still flags stale customer-UI proof. No launch, directory, or public reply action was executed."
+      result: "On 2026-06-16, canonical Mini `launch_readiness --json` reran from the repo root and returned `ok: false`: the piracy page remains `needs_dmca`, App Store/iOS metadata and conversion surfaces still need a fresh check, the 30-second video remains local only, the latest `release_preflight` proof is now stale at 12.34 days old with 3 warnings, and the fresh shared validation rerun at 2026-06-16 09:32 EDT still flags stale customer-UI proof. GitHub issues #9-#12 were rechecked and are already closed as of 2026-05-18. No launch, directory, or public reply action was executed."
     - date: "2026-05-27"
       time: "10:00"
       channel: "Clipboard/OCR launch decision"
@@ -75,7 +75,7 @@ launch_calendar:
       gate: "Fresh Mini verification and exact launch assets required."
       success_metric: "Launch package scheduled or explicit no-go."
       last_reviewed: "2026-06-16"
-      result: "On 2026-06-16, canonical Mini `launch_readiness --json` reran from the repo root and returned `ok: false`: the piracy page remains `needs_dmca`, GitHub issues #9-#12 still need verified replies or explicit no-go status, App Store/iOS metadata and conversion surfaces still need a fresh check, the 30-second video remains local only, the latest `release_preflight` proof is now stale at 12.34 days old with 3 warnings, and the fresh shared validation rerun at 2026-06-16 09:32 EDT still flags stale customer-UI proof. No launch package, directory action, scheduling action, or public reply action was executed."
+      result: "On 2026-06-16, canonical Mini `launch_readiness --json` reran from the repo root and returned `ok: false`: the piracy page remains `needs_dmca`, App Store/iOS metadata and conversion surfaces still need a fresh check, the 30-second video remains local only, the latest `release_preflight` proof is now stale at 12.34 days old with 3 warnings, and the fresh shared validation rerun at 2026-06-16 09:32 EDT still flags stale customer-UI proof. GitHub issues #9-#12 were rechecked and are already closed as of 2026-05-18. No launch package, directory action, scheduling action, or public reply action was executed."
   last_launch_readiness:
     date: "2026-06-16"
     status: "no_go"
@@ -83,7 +83,7 @@ launch_calendar:
     blocker_summary:
       - "Canonical Mini `launch_readiness --json` reran on 2026-06-16 and exited nonzero."
       - "Launch remains red because the piracy page is still marked `needs_dmca`."
-      - "Open GitHub issues #9-#12 still need verified maintainer/customer replies after verification or an explicit no-go status."
+      - "GitHub issues #9-#12 were rechecked on 2026-06-16 and are already closed as of 2026-05-18."
       - "App Store/iOS metadata and conversion surfaces still need a fresh check before larger launch traffic."
       - "The 30-second launch video remains local-only and still needs human approval plus hosting after the cleanup lane is complete."
       - "Mini launch_readiness still sees `release_preflight` passed, but the proof is now 12.34 days old and still carries 3 warnings, so the risk-cleanup gate remains red."
@@ -140,7 +140,7 @@ launch_package:
     rule: "No public launch until DMCA, open support follow-ups, App Store/direct surfaces, video, and Mini proof are clean."
   weak_launch_blockers:
     - "Piracy page still marked needs_dmca."
-    - "Open GitHub issues #9-#12 need verified replies or explicit no-go status."
+    - "GitHub issues #9-#12 are closed; remaining cleanup blockers are DMCA, fresh App Store/direct surface checks, launch video approval/hosting, and Mini proof freshness."
     - "30-second video is local only and still needs human visual approval plus hosting after cleanup."
 
 # Competitor issues we've already responded to

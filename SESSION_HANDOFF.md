@@ -22,8 +22,25 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 - App Store `2.3.9` is submitted for both platforms as of
   2026-06-06 17:07 EDT:
   `macos: 2.3.9 (WAITING_FOR_REVIEW) | ios: 2.3.9 (WAITING_FOR_REVIEW)`.
-- Setapp `2.3.9` build `2309` is **Needs Revision** as of 2026-06-15 email
-  #874. Setapp's reviewer could not open the app; the linked CleanShot shows
+- Setapp `2.3.9` build `2309` is `Released` as of 2026-06-18
+  `15:22:39Z`, with `action_required: false` and no reviewer comment. The
+  current hosted archive
+  `https://store.setapp.com/app/1847/46886/app-1781722157-6a32ec2d05294.zip`
+  passes the final strict SaneProcess Setapp validator: 1024x1024 root PNG,
+  visible pixels `x=100...923,y=100...923`, rounded 824px frame mask, rendered
+  bundle `AppIcon.icns` geometry, universal executable, valid signatures, and
+  restricted-entitlement profile coverage including iCloud services.
+- SaneClip listing media synced from dedicated `docs/images/setapp/` assets
+  through `setapp_media_sync --app SaneClip` on 2026-06-18; the portal verified
+  screenshot IDs `11967...11971` in order and direct `store.setapp.com` images
+  byte-match the local PNGs. The current gallery now leads with actual
+  clipboard history and menu-capture workflows, then Touch ID/privacy settings,
+  snippets, and private storage. Public `https://setapp.com/apps/saneclip`
+  still renders older `177741...` screenshot URLs as of `2026-06-18T15:22Z`, so
+  re-check public propagation before claiming the Setapp page visually fixed.
+- Historical Setapp `2.3.9` build `2309` was **Needs Revision** as of
+  2026-06-15 email #874. Setapp's reviewer could not open the app; the linked
+  CleanShot shows
   the normal internet-download warning followed by
   `The application "SaneClip.app" can't be opened.` The archive involved was:
   `~/SaneApps/outputs/setapp_review/20260615T133009Z-saneclip-2.3.9-setapp/SaneClip-Setapp-2.3.9.zip`;

@@ -147,7 +147,7 @@ stateDiagram-v2
 - **App Store channel**:
   - StoreKit + App Store updates
   - no external licensing path in the App Store build
-- **Planned Setapp channel**:
+- **Setapp channel**:
   - separate `-setapp` bundle ID
   - Setapp entitlement/update path
   - no Sparkle
@@ -161,7 +161,15 @@ stateDiagram-v2
   - Setapp packages must stay universal: main app, extensions, and `MPSupportedArchitectures` must include both `arm64` and `x86_64`; `setapp_package` and `setapp_upload --validate-only` enforce this before upload
   - Setapp packages that sign iCloud/app-group/keychain entitlements must embed a matching `Contents/embedded.provisionprofile`; notarization and `spctl` can pass while LaunchServices still fails with launchd/RBS error 163 if the profile is missing
   - The final Setapp ZIP must be expanded, quarantined, and opened on the Mini before upload; static signing checks alone are not release proof
+  - Setapp final ZIP validation must reject Sparkle framework residue, Lemon
+    Squeezy/license-key/checkout strings, and donation/direct-download copy in
+    the uploaded archive
+  - Setapp listing screenshots are manifest-backed owned-site app-in-use
+    screenshots and must pass 16:10 / 1280x800 validation before upload
   - if the macOS Setapp lane ships widgets or extensions, the extension bundle-ID family must be audited with the Setapp lane instead of assumed to inherit safely
+  - Setapp public release notes must be user-facing. Review-team comments,
+    icon geometry, archive/signing details, and direct-channel licensing/update
+    terms belong in private review comments or email, not in Release notes.
 
 ## Testing Strategy
 

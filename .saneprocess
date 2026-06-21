@@ -272,13 +272,13 @@ setapp:
     screenshot_asset_root: docs/images/setapp
     screenshot_roles:
       - core_workflow_clipboard_history
-      - core_workflow_menu_capture
+      - core_workflow_clipboard_history_hero
       - privacy_touch_id_settings
       - productivity_snippets
       - private_storage
     screenshots:
       - docs/images/setapp/saneclip-setapp-01-clipboard-history.png
-      - docs/images/setapp/saneclip-setapp-02-menu-capture.png
+      - docs/images/setapp/saneclip-setapp-02-clipboard-history-hero.png
       - docs/images/setapp/saneclip-setapp-03-touch-id-privacy-settings.png
       - docs/images/setapp/saneclip-setapp-04-snippets.png
       - docs/images/setapp/saneclip-setapp-05-private-storage.png

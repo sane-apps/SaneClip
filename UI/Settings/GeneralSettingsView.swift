@@ -341,7 +341,7 @@ struct GeneralSettingsView: View {
                                         .font(.system(size: 13, weight: .semibold))
                                         .foregroundStyle(.white)
                                     Text("•")
-                                        .foregroundStyle(.white.opacity(0.7))
+                                        .foregroundStyle(.white)
                                     Text("100 / 500 / Unlimited")
                                         .foregroundStyle(.white)
                                     Image(systemName: "lock.fill")

@@ -50,9 +50,9 @@ launch_calendar:
   classification: "released_but_launch_blocked_until_risk_cleanup"
   rule: "Do not schedule a broad public launch while piracy/DMCA and current release/support proof are unresolved. Use the launch window only after the clipboard/OCR story is clean and verified."
   current_release_state:
-    version: "2.3.6"
+    version: "2.3.10"
     status: "live_or_recent_direct_release"
-    evidence: "Validation and channel checks on 2026-05-23 show 2.3.6 live across appcast, website, webhook, Homebrew, and Lemon hosted files; launch is still blocked by DMCA/support follow-up risk."
+    evidence: "Critical trial rollout check on 2026-06-22 shows 2.3.10 live across appcast, website, webhook, and Homebrew; Lemon hosted-file replacement remains a manual dashboard step."
   blockers:
     - "Piracy page still marked needs_dmca."
     - "GitHub issues #9-#12 were rechecked on 2026-06-16 and are already closed as of 2026-05-18."

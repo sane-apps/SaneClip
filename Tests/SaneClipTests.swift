@@ -562,7 +562,7 @@ struct SaneClipTests {
         let indexSource = try String(contentsOf: indexURL, encoding: .utf8)
 
         #expect(indexSource.contains("href=\"/download\" class=\"mobile-nav-cta\""))
-        #expect(indexSource.contains("href=\"/download\" class=\"pricing-cta pricing-cta-free\""))
+        #expect(indexSource.contains("href=\"/download\" class=\"pricing-cta pricing-cta-pro\""))
         #expect(indexSource.contains("href=\"/download\" class=\"sustainability-option\""))
         #expect(!indexSource.contains("https://dist.saneclip.com/updates/SaneClip-2.2.12.zip\" class=\"pricing-cta pricing-cta-free\""))
     }

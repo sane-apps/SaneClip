@@ -71,5 +71,7 @@
 	<string>https://saneclip.com/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>7Pl/8cwfb2vm4Dm65AByslkMCScLJ9tbGlwGGx81qYU=</string>
+	<key>SaneDistributionChannel</key>
+	<string>direct</string>
 </dict>
 </plist>

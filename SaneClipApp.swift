@@ -69,7 +69,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     #else
         let licenseService = LicenseService(
             appName: "SaneClip",
-            checkoutURL: LicenseService.directCheckoutURL(appSlug: "saneclip")
+            checkoutURL: LicenseService.directCheckoutURL(appSlug: "saneclip"),
+            proTrial: .init(storageKeyPrefix: "saneclip.pro_trial")
         )
     #endif
 
@@ -194,18 +195,35 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             ("lock.shield", "On-device privacy defaults and excluded apps")
         ]
 
-        let onboardingProFeatures: [(icon: String, text: String)] = [
-            ("checkmark", "Everything in Basic, plus:"),
-            ("infinity", "Unlimited clipboard history"),
-            ("textformat.alt", "Paste as plain text, Smart Paste, and text transforms"),
-            ("text.viewfinder", "OCR Capture for text grabs and searchable screenshot sidecars"),
-            ("square.stack.3d.up", "Paste Stack for forms and structured workflows"),
-            ("text.quote", "Snippets with placeholders"),
-            ("tag.fill", "Titles, tags, collections, and item notes"),
-            ("ruler", "Clipboard Rules to auto-clean what you copy"),
-            ("touchid", "Touch ID history lock and history encryption"),
-            ("arrow.up.arrow.down.circle", "Export / import history")
-        ]
+        let onboardingProFeatures: [(icon: String, text: String)] = {
+            #if !APP_STORE && !SETAPP
+                return [
+                    ("checkmark", "Enjoy 14 days of Pro"),
+                    ("infinity", "Unlimited clipboard history"),
+                    ("textformat.alt", "Paste as plain text, Smart Paste, and text transforms"),
+                    ("text.viewfinder", "OCR Capture for text grabs and searchable screenshot sidecars"),
+                    ("square.stack.3d.up", "Paste Stack for forms and structured workflows"),
+                    ("text.quote", "Snippets with placeholders"),
+                    ("tag.fill", "Titles, tags, collections, and item notes"),
+                    ("ruler", "Clipboard Rules to auto-clean what you copy"),
+                    ("touchid", "Touch ID history lock and history encryption"),
+                    ("arrow.up.arrow.down.circle", "Export / import history")
+                ]
+            #else
+                return [
+                    ("checkmark", "Everything in Basic, plus:"),
+                    ("infinity", "Unlimited clipboard history"),
+                    ("textformat.alt", "Paste as plain text, Smart Paste, and text transforms"),
+                    ("text.viewfinder", "OCR Capture for text grabs and searchable screenshot sidecars"),
+                    ("square.stack.3d.up", "Paste Stack for forms and structured workflows"),
+                    ("text.quote", "Snippets with placeholders"),
+                    ("tag.fill", "Titles, tags, collections, and item notes"),
+                    ("ruler", "Clipboard Rules to auto-clean what you copy"),
+                    ("touchid", "Touch ID history lock and history encryption"),
+                    ("arrow.up.arrow.down.circle", "Export / import history")
+                ]
+            #endif
+        }()
 
         WelcomeWindow.show(
             appName: "SaneClip",

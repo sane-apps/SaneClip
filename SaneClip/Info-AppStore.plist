@@ -39,5 +39,7 @@
 	<true/>
 	<key>NSScreenCaptureUsageDescription</key>
 	<string>SaneClip captures screenshots you request so it can save the image and optional OCR text locally in your clipboard history.</string>
+	<key>SaneDistributionChannel</key>
+	<string>appstore</string>
 </dict>
 </plist>

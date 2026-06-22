@@ -979,6 +979,14 @@ struct SaneClipTests {
     @Test("Snippet intents require Pro")
     @MainActor
     func snippetIntentsRequirePro() async {
+        let previousManager = ClipboardManager.shared
+        let basicManager = ClipboardManager(startMonitoring: false, loadPersistedState: false, persistenceEnabled: false)
+        basicManager.licenseService = nil
+        ClipboardManager.shared = basicManager
+        defer {
+            ClipboardManager.shared = previousManager
+        }
+
         let listIntent = ListSnippetsIntent()
         do {
             _ = try await listIntent.perform()

@@ -26,7 +26,7 @@ packages:
     from: 2.6.0
   SaneUI:
     url: https://github.com/sane-apps/SaneUI.git
-    revision: 5a9c02152cfe155e3d6d06c1a489ef426e2250e1
+    revision: 9e98b9f1e93400c5d5fe164b57643513bf7f16c3
 
 settings:
   DEAD_CODE_STRIPPING: YES
@@ -159,6 +159,7 @@ targets:
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         AppStoreProductID: com.saneclip.app.pro.unlock
+        SaneDistributionChannel: direct
         LSUIElement: true
         # Encryption exemption: AES-256-GCM is used solely for local data protection
         # (encrypting clipboard history at rest on the user's device). No encryption is used
@@ -394,6 +395,7 @@ targets:
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         AppStoreProductID: com.saneclip.app.pro.unlock
+        SaneDistributionChannel: appstore
         LSUIElement: true
         ITSAppUsesNonExemptEncryption: false
         LSApplicationCategoryType: "public.app-category.productivity"

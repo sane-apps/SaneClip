@@ -6,7 +6,27 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                                                                                                <item>
+                                                                                                                        <item>
+            <title>2.3.10</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Mon, 22 Jun 2026 13:26:31 -0400</pubDate>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:criticalUpdate/>            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Pro is now free to try for 14 days. Basic remains included after the trial.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.10.zip"
+                       sparkle:version="2310"
+                       sparkle:shortVersionString="2.3.10"
+                       length="4840425"
+                       type="application/octet-stream"
+                       sparkle:edSignature="hmSniN/0hegX16x5YlW7Z99Wsix8W1k8ZVJSKBYiEoI21IcxLee85ESEvLmcJkIAI3OK20S8i/LHKX+lRYZHDQ=="/>
+        </item>
+<item>
             <title>2.3.9</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Sat, 06 Jun 2026 16:57:46 -0400</pubDate>

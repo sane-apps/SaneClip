@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.11] - 2026-06-22
+
+Pro is now free to try for 14 days. Basic remains included after the trial.
+
+---
+
 ## [2.3.10] - 2026-06-22
 
 Pro is now free to try for 14 days. Basic remains included after the trial.

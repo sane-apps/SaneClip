@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.10] - 2026-06-22
+
+Pro is now free to try for 14 days. Basic remains included after the trial.
+
+---
+
 ## [2.3.9] - 2026-06-06
 
 Restores the visible iPhone clipboard save prompt, improves multi-clip paste saving, adds a Mac menu bar icon visibility setting that preserves app access, and updates Setapp/App Store signing readiness.

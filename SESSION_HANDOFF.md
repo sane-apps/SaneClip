@@ -6,6 +6,20 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+- 2026-06-27 keychain prompt-storm audit — SaneClip is NOT affected (no code
+  change needed). The "wants to use your confidential information" prompt storm
+  that hit the non-sandboxed apps (SaneHosts/SaneSync/SaneClick) comes from the
+  legacy login keychain's per-item ACL being bound to the build signature.
+  SaneClip's customer builds — direct `Release`, `Release-AppStore`,
+  `Release-Setapp` — are ALL sandboxed (`app-sandbox=true`), so their keychain
+  items already live in the data-protection keychain and are governed by the
+  app-identifier entitlement, not signature ACLs. (`SaneClipDist.entitlements`
+  is a dead/unused file — no config references it.) Confirmed by the passing
+  test "Startup keychain reads do not trigger authentication UI". Only action
+  taken: aligned the SaneUI pin to `f8e5274` for fleet consistency (commit
+  `96631f7`, supersedes the earlier uncommitted 0133bad→83d8259 bump; no
+  behavior change, no access group passed). Mini verify: 172 tests pass.
+
 - 2026-06-13 validation refresh note:
   - Cross-app SaneProcess validation still marks SaneClip customer UI/project
     QA proof stale; refresh with `./scripts/SaneMaster.rb customer_ui_sweep
@@ -471,3 +485,9 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
    submitted but not yet approved.
 3. Leave `.outreach.yml` alone unless the user explicitly asks to handle launch
    calendar/outreach changes.
+
+## Launch Ops - 2026-06-23
+
+- Cross-product launch ops reran canonical Mini `./scripts/SaneMaster.rb launch_readiness --json` from the SaneClip repo. It stayed red.
+- Launch remains blocked by the active DMCA/piracy lane (`needs_dmca`), pending fresh App Store/iOS metadata + conversion-surface checks, local-only launch video status, and stale proof freshness even though `release_preflight` still passes.
+- Fresh proof state: `release_preflight` is 19.34 days old with 3 warnings, and the shared validation receipt [`/Users/sj/SaneApps/infra/SaneProcess/outputs/validation/2026-06-23.json`](/Users/sj/SaneApps/infra/SaneProcess/outputs/validation/2026-06-23.json) is still `NOT READY FOR RELEASE` with stale SaneClip customer-UI proof plus missing mini-click/fixture/log artifacts. No launch/directory/scheduling/public-reply action ran today.

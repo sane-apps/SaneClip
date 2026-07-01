@@ -15,6 +15,7 @@ A big history + window update:
 - Faster keyboard control: the selection now scrolls into view as you move, with Home/End and Page Up/Down to jump, `P` to pin the selected clip, and `Esc` to clear search/filters or close the window.
 - Layout is solid at every size now — the bottom toolbar and the filter row no longer squash or clip on narrow widths, and clip badges stay visible.
 - Quick-paste (⌘⌃1–9) hints now only show when they're accurate.
+- History rows are now color-coded by source app for *every* app (Mac and iPhone/iPad), not just Apple apps — each source gets its own consistent color instead of everything defaulting to blue.
 
 ---
 

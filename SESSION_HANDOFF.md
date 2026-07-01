@@ -6,6 +6,65 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+- 2026-07-01 Glenn's SaneClip ideas (branch `feature/floating-resizable-history-glenn`,
+  NOT committed, NOT released; bumped to 2.3.12/2312). Implemented all four
+  customer requests from email #983 plus the squashed-footer bug he screenshotted:
+  1. Resizable floating window — `showHistoryWindow()` panel now uses
+     `.resizable` styleMask + `contentMinSize`/`contentMaxSize`
+     (`ClipboardHistoryView.windowMin/Max` = 300×360 … 760×1400); root view
+     stretches with `maxWidth/maxHeight: .infinity`.
+  2. New setting `SettingsModel.useFloatingHistoryWindow` (toggle in
+     ShortcutsSettingsView). `showHistoryPopover()` routes to the floating
+     window when on. (Did NOT add the menu-bar toggle-close branch in
+     `togglePopover` because SaneClipApp.swift is already >800 lines and the
+     size gate blocks edits; window closes via its close button / Cmd-W / the
+     dedicated `toggleHistoryWindow()` shortcut.)
+  3. Remembers position — `setFrameAutosaveName(historyWindowFrameAutosaveName)`
+     + `ensureWindowOnScreen()` re-center guard for lost displays.
+  4. Drag-out — `.onDrag { dragItemProvider() }` on `ClipboardItemRow`
+     (text→NSString, image→NSImage).
+  Footer squash fix: extracted `HistoryFooterView` (status cluster in a
+  horizontal ScrollView, Settings/Smart Clear pinned) + `HistoryPasteStackPanel`
+  to get `ClipboardHistoryView` back under the 800-line owner limit.
+  Verify: build clean, 178 tests pass (Mini; encryption test SecurityTests.swift:397
+  "SyncDataModel marks encrypted CloudKit records" is FLAKY — failed once, passed
+  on re-run, unrelated to this change — pre-existing).
+
+  ADVERSARIAL REVIEW (16-agent workflow) found + FIXED 6 real bugs, rejected 2
+  false alarms (NSImage IS NSItemProviderWriting on macOS 13+; fullSizeContentView
+  title overlap doesn't occur):
+  - [HIGH, FIXED] Paste from floating window failed — `handleDismissForPaste` only
+    closed the popover; synthetic Cmd+V landed on our panel. Now moved to
+    +HistoryWindow.swift and, when the window is visible, does
+    `historyWindow.orderOut(nil); NSApp.hide(nil)` so focus returns to the target
+    app before the paste. `handleReopenHistoryAfterPaste` routes to the window.
+  - [HIGH, FIXED] `.onDrag` on pinned rows broke pinned `.onMove` reorder. Gated to
+    non-pinned rows via `.onDragOut(enabled: !isPinned)`.
+  - [MED, FIXED] Footer scroll hid Merge/Paste/Stack with no affordance. Item count
+    now pinned outside the scroll; only secondary controls scroll, `showsIndicators: true`.
+  - [MED, FIXED] `ensureWindowOnScreen` only recovered fully-off-screen frames.
+    Now clamps origin into `visibleFrame`.
+  - [MED, FIXED] Menu-bar 2nd click didn't close floating window — added close
+    branch to `togglePopover`.
+  - [MED, NOT FIXED — pre-existing/by-design] hotkey opens the window regardless of
+    setting: the floating window predates this change; the hotkey always opened it.
+    Changing it would remove existing behavior. Left as-is.
+
+  VISUAL AUDIT: rendered the real ClipboardHistoryView on the Mini via window-server
+  capture (CGWindowListCreateImage — shows true title bar + correct ScrollView
+  content; cacheDisplay mis-captures horizontal scroll views) across a
+  failure-mode matrix (customer sizes/aspect ratios: 300x360 min … 720x430 wide;
+  free/pro, empty, long text, filters-open, merge-active, stack-open). Receipt +
+  PNGs: `outputs/visual-audit-glenn-20260701/`. Footer squash CONFIRMED FIXED at
+  all widths. NEW PRE-EXISTING FINDING (not in scope): the filter picker row
+  (`if showFilters` in ClipboardHistoryView) uses fixed-width pickers (~440pt) that
+  overflow/clip at the 320pt popover — mitigated by the resizable window; worth a
+  follow-up (wrap in ScrollView or flexible widths).
+
+  PENDING: live-app resize/drag interaction still not driven on-device (static
+  window-server renders only); commit + release decision (owner); reply to
+  email #983 drafted, awaiting owner approval to send.
+
 - 2026-06-27 keychain prompt-storm audit — SaneClip is NOT affected (no code
   change needed). The "wants to use your confidential information" prompt storm
   that hit the non-sandboxed apps (SaneHosts/SaneSync/SaneClick) comes from the

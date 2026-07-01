@@ -9,7 +9,9 @@ import SwiftUI
 
 struct ShortcutsSettingsView: View {
     var licenseService: LicenseService?
-    private var isPro: Bool { licenseService?.isPro == true }
+    private var isPro: Bool {
+        licenseService?.isPro == true
+    }
 
     var body: some View {
         ScrollView {
@@ -45,6 +47,11 @@ struct ShortcutsSettingsView: View {
                     CompactToggle(label: "Open history at mouse cursor", isOn: Binding(
                         get: { SettingsModel.shared.openHistoryAtCursor },
                         set: { SettingsModel.shared.openHistoryAtCursor = $0 }
+                    ))
+                    CompactDivider()
+                    CompactToggle(label: "Open history as a resizable floating window", isOn: Binding(
+                        get: { SettingsModel.shared.useFloatingHistoryWindow },
+                        set: { SettingsModel.shared.useFloatingHistoryWindow = $0 }
                     ))
                     CompactDivider()
                     if isPro {

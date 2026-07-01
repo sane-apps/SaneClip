@@ -252,12 +252,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         #if APP_STORE
             return
         #else
-        let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
-        if AXIsProcessTrustedWithOptions(options) || AXIsProcessTrusted() {
-            return
-        }
+            let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
+            if AXIsProcessTrustedWithOptions(options) || AXIsProcessTrusted() {
+                return
+            }
 
-        SaneSystemSettingsDestination.accessibility.open()
+            SaneSystemSettingsDestination.accessibility.open()
         #endif
     }
 
@@ -660,6 +660,9 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
         if popover.isShown {
             popover.performClose(nil)
+        } else if SettingsModel.shared.useFloatingHistoryWindow,
+                  let historyWindow, historyWindow.isVisible {
+            historyWindow.close() // second menu-bar click closes the floating window
         } else {
             // Check if Touch ID is required
             if requiresHistoryAuth {
@@ -777,20 +780,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc private func handleDismissForPaste() {
-        if popover.isShown {
-            popover.performClose(nil)
-        }
-    }
-
-    @objc private func handleReopenHistoryAfterPaste() {
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 180_000_000)
-            if !popover.isShown {
-                showHistoryPopover()
-            }
-        }
-    }
+    // Paste dismiss/reopen handlers live in SaneClipAppDelegate+HistoryWindow.swift
+    // so they can be floating-window-aware (see handleDismissForPaste there).
 
     // MARK: - URL Scheme Handling
 
@@ -805,5 +796,4 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDockMenu(_: NSApplication) -> NSMenu? {
         buildContextMenu()
     }
-
 }

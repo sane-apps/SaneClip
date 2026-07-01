@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.12] - 2026-07-01
+
+Clipboard history can now open as a free-floating, resizable window (Settings → Shortcuts → "Open history as a resizable floating window") that remembers its last size and screen position between launches. You can also drag clips straight out of the window into other apps, and the bottom toolbar no longer squashes its controls on narrow widths.
+
+---
+
 ## [2.3.11] - 2026-06-22
 
 Pro is now free to try for 14 days. Basic remains included after the trial.

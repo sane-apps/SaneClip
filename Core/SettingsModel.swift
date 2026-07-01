@@ -139,6 +139,14 @@ class SettingsModel {
         }
     }
 
+    /// When enabled, history opens as a resizable, free-floating window (not tethered to the menu bar).
+    /// The window remembers its last size and screen position between launches.
+    var useFloatingHistoryWindow: Bool {
+        didSet {
+            UserDefaults.standard.set(useFloatingHistoryWindow, forKey: "useFloatingHistoryWindow")
+        }
+    }
+
     var showInDock: Bool {
         didSet {
             if !showInDock, !showMenuBarIcon {
@@ -174,7 +182,9 @@ class SettingsModel {
     }
 
     /// Backward-compatible computed property
-    var playSounds: Bool { pasteSound != .off }
+    var playSounds: Bool {
+        pasteSound != .off
+    }
 
     /// Paste stack order: false = FIFO (oldest first), true = LIFO (newest first)
     var pasteStackReversed: Bool {
@@ -306,6 +316,7 @@ class SettingsModel {
             UserDefaults.standard.object(forKey: "maxHistorySize") as? Int ?? 50
         )
         openHistoryAtCursor = UserDefaults.standard.object(forKey: "openHistoryAtCursor") as? Bool ?? false
+        useFloatingHistoryWindow = UserDefaults.standard.object(forKey: "useFloatingHistoryWindow") as? Bool ?? false
         showInDock = UserDefaults.standard.object(forKey: "showInDock") as? Bool ?? Self.defaultShowInDock
         protectPasswords = UserDefaults.standard.object(forKey: "protectPasswords") as? Bool ?? true
         requireTouchID = UserDefaults.standard.object(forKey: "requireTouchID") as? Bool ?? false
@@ -382,6 +393,7 @@ class SettingsModel {
             "version": 1, // For future format versioning
             "maxHistorySize": maxHistorySize,
             "openHistoryAtCursor": openHistoryAtCursor,
+            "useFloatingHistoryWindow": useFloatingHistoryWindow,
             "showInDock": showInDock,
             "protectPasswords": protectPasswords,
             "requireTouchID": requireTouchID,
@@ -430,6 +442,9 @@ class SettingsModel {
         }
         if let value = settings["openHistoryAtCursor"] as? Bool {
             openHistoryAtCursor = value
+        }
+        if let value = settings["useFloatingHistoryWindow"] as? Bool {
+            useFloatingHistoryWindow = value
         }
         if let value = settings["showInDock"] as? Bool {
             showInDock = value

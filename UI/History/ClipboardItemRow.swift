@@ -11,7 +11,10 @@ struct ClipboardItemRow: View {
     var isQueuedForMerge: Bool = false
     var onToggleMergeQueue: (() -> Void)?
 
-    private var isPro: Bool { licenseService?.isPro == true }
+    private var isPro: Bool {
+        licenseService?.isPro == true
+    }
+
     @Environment(\.colorScheme) private var colorScheme
     @State private var isHovering = false
     @State private var showEditSheet = false
@@ -170,12 +173,12 @@ struct ClipboardItemRow: View {
             : Color.black.opacity(0.03)
     }
 
-    // Improved font selection: Monospaced for code
+    /// Improved font selection: Monospaced for code
     private var itemFont: Font {
         item.isCode ? .system(.callout, design: .monospaced) : .system(.callout, weight: .medium)
     }
 
-    // Content-type icon for faster visual scanning
+    /// Content-type icon for faster visual scanning
     @ViewBuilder
     private var contentTypeIcon: some View {
         if case .image = item.content {
@@ -387,6 +390,10 @@ struct ClipboardItemRow: View {
                 .stroke(accentColor.opacity(isSelected ? 0.4 : 0.1), lineWidth: 1)
         )
         .contentShape(Rectangle())
+        // Drag-out is enabled only for non-pinned (Recent) rows. Pinned rows
+        // keep the List's `.onMove` drag-to-reorder — a row-level `.onDrag`
+        // would hijack that gesture and silently break reordering.
+        .onDragOut(enabled: !isPinned) { dragItemProvider() }
         .onTapGesture {
             clipboardManager.paste(item: item)
         }
@@ -633,6 +640,19 @@ struct ClipboardItemRow: View {
         .accessibilityAddTraits(.isButton)
     }
 
+    // MARK: - Drag & Drop
+
+    /// Payload for dragging a clip out of the window into another app
+    /// (Glenn's request #4): plain text drops as text, images drop as images.
+    private func dragItemProvider() -> NSItemProvider {
+        switch item.content {
+        case let .text(string):
+            NSItemProvider(object: string as NSString)
+        case let .image(image):
+            NSItemProvider(object: image)
+        }
+    }
+
     // MARK: - Share Helper
 
     private func shareItem() {
@@ -747,5 +767,20 @@ struct PasteButtonStyle: ButtonStyle {
             .scaleEffect(configuration.isPressed ? 0.85 : 1.0)
             .shadow(color: configuration.isPressed ? accentColor.opacity(0.4) : .clear, radius: 4)
             .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
+    }
+}
+
+// MARK: - Conditional Drag
+
+extension View {
+    /// Applies `.onDrag` only when `enabled`. Used so pinned rows keep the
+    /// List's `.onMove` reorder (a row-level `.onDrag` would preempt it).
+    @ViewBuilder
+    func onDragOut(enabled: Bool, _ provider: @escaping () -> NSItemProvider) -> some View {
+        if enabled {
+            onDrag(provider)
+        } else {
+            self
+        }
     }
 }

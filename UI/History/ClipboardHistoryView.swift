@@ -1,4 +1,3 @@
-// swiftlint:disable file_length
 import SaneUI
 import SwiftUI
 
@@ -73,6 +72,13 @@ struct ClipboardHistoryView: View {
     static let popoverWidth: CGFloat = 320
     static let popoverMinHeight: CGFloat = 500
 
+    /// Bounds for the free-floating, resizable history window (Settings → open as floating window).
+    /// Kept modest so the window stays usable, per Glenn's "not infinite but flexible" request.
+    static let windowMinWidth: CGFloat = 300
+    static let windowMinHeight: CGFloat = 360
+    static let windowMaxWidth: CGFloat = 760
+    static let windowMaxHeight: CGFloat = 1400
+
     enum FocusTarget: Hashable {
         case search
         case list
@@ -82,6 +88,13 @@ struct ClipboardHistoryView: View {
 
     var clipboardManager: ClipboardManager
     var licenseService: LicenseService?
+
+    // Render/preview seams — let tests screenshot specific UI states. Defaults
+    // preserve production behavior (all false/empty).
+    var previewInitialShowFilters = false
+    var previewInitialMergeQueueIDs: Set<UUID> = []
+    var previewInitialShowPasteStackPanel = false
+
     @State private var searchText = ""
     @State private var selectedIndex: Int = 0
     @FocusState private var focusedTarget: FocusTarget?
@@ -103,8 +116,13 @@ struct ClipboardHistoryView: View {
     @State private var stackTitleDraft = ""
     @State private var stackNoteDraft = ""
 
-    private var isPro: Bool { licenseService?.isPro == true }
-    private var isAtFreeLimit: Bool { !isPro && clipboardManager.history.count >= ClipboardManager.freeHistoryCap }
+    private var isPro: Bool {
+        licenseService?.isPro == true
+    }
+
+    private var isAtFreeLimit: Bool {
+        !isPro && clipboardManager.history.count >= ClipboardManager.freeHistoryCap
+    }
 
     /// Check if any filters are active
     var hasActiveFilters: Bool {
@@ -542,287 +560,38 @@ struct ClipboardHistoryView: View {
 
             if isPro, showPasteStackPanel {
                 Divider()
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Paste Stack")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.primary.opacity(0.9))
-                        Spacer()
-                        Toggle("Pause", isOn: Binding(
-                            get: { SettingsModel.shared.pausePasteStackConsumption },
-                            set: { SettingsModel.shared.pausePasteStackConsumption = $0 }
-                        ))
-                        .toggleStyle(.switch)
-                        .labelsHidden()
-                        .help("Pause consuming the stack")
-                        Button("Undo") {
-                            clipboardManager.undoLastPasteFromStack()
-                        }
-                        .buttonStyle(.plain)
-                        .font(.caption)
-                        .disabled(!clipboardManager.canUndoLastStackPaste)
-                        Button("Clear") {
-                            clipboardManager.clearPasteStack()
-                        }
-                        .buttonStyle(.plain)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    }
-
-                    HStack(spacing: 10) {
-                        Toggle("Keep open while consuming", isOn: Binding(
-                            get: { SettingsModel.shared.keepPasteStackOpenBetweenPastes },
-                            set: { SettingsModel.shared.keepPasteStackOpenBetweenPastes = $0 }
-                        ))
-                        .toggleStyle(.checkbox)
-                        Toggle("Auto-close when empty", isOn: Binding(
-                            get: { SettingsModel.shared.autoClosePasteStackWhenEmpty },
-                            set: { SettingsModel.shared.autoClosePasteStackWhenEmpty = $0 }
-                        ))
-                        .toggleStyle(.checkbox)
-                    }
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                    if clipboardManager.pasteStack.isEmpty {
-                        Text("Paste stack is empty.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .padding(.vertical, 8)
-                    } else {
-                        List {
-                            ForEach(Array(clipboardManager.pasteStack.enumerated()), id: \.element.id) { index, item in
-                                VStack(alignment: .leading, spacing: 4) {
-                                    HStack(spacing: 8) {
-                                        Text("#\(index + 1)")
-                                            .font(.system(.caption, design: .monospaced))
-                                            .foregroundStyle(.secondary)
-                                            .frame(width: 24, alignment: .leading)
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(item.title?.isEmpty == false ? item.title! : item.preview)
-                                                .lineLimit(1)
-                                                .font(.subheadline.weight(.medium))
-                                                .foregroundStyle(.primary)
-                                            if let note = item.note, !note.isEmpty {
-                                                Text(note)
-                                                    .lineLimit(1)
-                                                    .font(.caption)
-                                                    .foregroundStyle(.secondary)
-                                            }
-                                        }
-                                        Spacer()
-                                        Button("Paste") {
-                                            clipboardManager.pasteFromStackItem(id: item.id)
-                                        }
-                                        .buttonStyle(.plain)
-                                        .font(.caption)
-                                        Button("Top") {
-                                            clipboardManager.movePasteStackItemToTop(id: item.id)
-                                        }
-                                        .buttonStyle(.plain)
-                                        .font(.caption)
-                                        Button {
-                                            clipboardManager.movePasteStackItemUp(id: item.id)
-                                        } label: {
-                                            Image(systemName: "arrow.up")
-                                        }
-                                        .buttonStyle(.plain)
-                                        .foregroundStyle(.secondary)
-                                        .help("Move up")
-                                        Button {
-                                            clipboardManager.movePasteStackItemDown(id: item.id)
-                                        } label: {
-                                            Image(systemName: "arrow.down")
-                                        }
-                                        .buttonStyle(.plain)
-                                        .foregroundStyle(.secondary)
-                                        .help("Move down")
-                                        Button(editingStackTitleID == item.id ? "Save Title" : "Rename") {
-                                            if editingStackTitleID == item.id {
-                                                clipboardManager.updateItemTitle(id: item.id, title: stackTitleDraft)
-                                                editingStackTitleID = nil
-                                            } else {
-                                                editingStackTitleID = item.id
-                                                stackTitleDraft = item.title ?? ""
-                                            }
-                                        }
-                                        .buttonStyle(.plain)
-                                        .font(.caption)
-                                        Button(editingStackNoteID == item.id ? "Save Note" : "Note") {
-                                            if editingStackNoteID == item.id {
-                                                clipboardManager.updateItemNote(id: item.id, note: stackNoteDraft)
-                                                editingStackNoteID = nil
-                                            } else {
-                                                editingStackNoteID = item.id
-                                                stackNoteDraft = item.note ?? ""
-                                            }
-                                        }
-                                        .buttonStyle(.plain)
-                                        .font(.caption)
-                                        Button {
-                                            clipboardManager.removeFromPasteStack(id: item.id)
-                                        } label: {
-                                            Image(systemName: "xmark.circle")
-                                        }
-                                        .buttonStyle(.plain)
-                                        .foregroundStyle(.secondary)
-                                        .help("Remove from stack")
-                                    }
-
-                                    if editingStackTitleID == item.id {
-                                        TextField("Title", text: $stackTitleDraft)
-                                            .textFieldStyle(.roundedBorder)
-                                    }
-                                    if editingStackNoteID == item.id {
-                                        TextField("Note", text: $stackNoteDraft)
-                                            .textFieldStyle(.roundedBorder)
-                                    }
-                                }
-                            }
-                            .onMove { source, destination in
-                                clipboardManager.movePasteStackItems(from: source, to: destination)
-                            }
-                        }
-                        .frame(height: min(220, CGFloat(max(2, clipboardManager.pasteStack.count)) * 44))
-                        .listStyle(.plain)
-                    }
-                }
-                .padding(8)
-                .background(.background.tertiary)
+                HistoryPasteStackPanel(
+                    clipboardManager: clipboardManager,
+                    editingStackTitleID: $editingStackTitleID,
+                    editingStackNoteID: $editingStackNoteID,
+                    stackTitleDraft: $stackTitleDraft,
+                    stackNoteDraft: $stackNoteDraft
+                )
             }
 
             Divider()
 
-            // Footer
-            HStack {
-                Text("\(clipboardManager.history.count) items")
-                    .font(.subheadline)
-                    .foregroundStyle(.primary.opacity(0.85))
-                    .accessibilityLabel("\(clipboardManager.history.count) clipboard items")
-
-                // Active filter indicator
-                if hasActiveFilters {
-                    Text("(\(allItems.count) shown)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                if !mergeQueueIDs.isEmpty {
-                    Divider()
-                        .frame(height: 14)
-                    HStack(spacing: 4) {
-                        Image(systemName: "link.badge.plus")
-                            .font(.caption)
-                        Text("\(mergeQueueIDs.count)")
-                            .font(.subheadline.monospacedDigit())
-                    }
-                    .foregroundStyle(.teal)
-                    .help("Items queued for merge")
-
-                    Button("Merge") {
-                        mergeQueuedItems()
-                    }
-                    .buttonStyle(.plain)
-                    .font(.subheadline)
-                    .foregroundStyle(.teal)
-                    .disabled(mergeQueueIDs.count < 2)
-
-                    Button("Clear Queue") {
-                        mergeQueueIDs.removeAll()
-                    }
-                    .buttonStyle(.plain)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                }
-
-                // Paste stack indicator
-                if isPro {
-                    Divider()
-                        .frame(height: 14)
-
-                    HStack(spacing: 4) {
-                        Image(systemName: "square.stack.3d.up")
-                            .font(.caption)
-                        Text("\(clipboardManager.pasteStack.count)")
-                            .font(.subheadline.monospacedDigit())
-                    }
-                    .foregroundStyle(.orange)
-                    .help("Items in paste stack")
-
-                    Button(SettingsModel.shared.pausePasteStackConsumption ? "Paused" : "Paste") {
-                        clipboardManager.pasteFromStack()
-                    }
-                    .buttonStyle(.plain)
-                    .font(.subheadline)
-                    .foregroundStyle(.orange)
-                    .disabled(SettingsModel.shared.pausePasteStackConsumption || clipboardManager.pasteStack.isEmpty)
-
-                    Button(showPasteStackPanel ? "Hide" : "Stack") {
-                        withAnimation(.easeInOut(duration: 0.18)) {
-                            showPasteStackPanel.toggle()
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                } else if !isPro {
-                    // Paste Stack teaser for free users
-                    Divider()
-                        .frame(height: 14)
-                    Button {
-                        if let ls = licenseService {
-                            ProUpsellWindow.show(feature: ProFeature.pasteStack, licenseService: ls)
-                        }
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text("Stack")
-                                .font(.system(size: 11, weight: .semibold))
-                            Image(systemName: "lock.fill")
-                                .font(.system(size: 9, weight: .semibold))
-                            Text("Pro")
-                                .font(.system(size: 11, weight: .semibold))
-                        }
-                        .foregroundStyle(.teal)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Unlock Paste Stack with Pro")
-                }
-
-                Spacer()
-
-                Button(
-                    action: { SettingsWindowController.open() },
-                    label: { Image(systemName: "gear") }
-                )
-                .buttonStyle(.plain)
-                .keyboardShortcut(",", modifiers: .command)
-                .focusable()
-                .focused($focusedTarget, equals: .settingsButton)
-                .help("Settings")
-                .accessibilityLabel("Open settings")
-
-                Button {
-                    showSmartClearConfirmation = true
-                } label: {
-                    Label("Smart Clear", systemImage: "sparkles")
-                }
-                .buttonStyle(.plain)
-                .focusable()
-                .focused($focusedTarget, equals: .smartClearButton)
-                .font(.subheadline)
-                .foregroundStyle(Color.clipBlue.opacity(0.95))
-                .help("Bulk-delete disposable clips while keeping pinned, tagged, noted, and non-default collection items.")
-                .accessibilityLabel("Smart clear clipboard history")
-                .accessibilityHint("Opens safe bulk delete options for disposable items only.")
-                .disabled(smartClearPlan.removableCount == 0)
-            }
-            .padding(8)
+            HistoryFooterView(
+                clipboardManager: clipboardManager,
+                licenseService: licenseService,
+                hasActiveFilters: hasActiveFilters,
+                shownCount: allItems.count,
+                smartClearRemovableCount: smartClearPlan.removableCount,
+                mergeQueueIDs: $mergeQueueIDs,
+                showPasteStackPanel: $showPasteStackPanel,
+                showSmartClearConfirmation: $showSmartClearConfirmation,
+                focusedTarget: $focusedTarget,
+                onMerge: mergeQueuedItems
+            )
         }
         .background(historyKeyboardShortcuts)
         .onAppear {
             selectedIndex = 0
             focusedTarget = .list
             loadSavedPresets()
+            if previewInitialShowFilters { showFilters = true }
+            if !previewInitialMergeQueueIDs.isEmpty { mergeQueueIDs = previewInitialMergeQueueIDs }
+            if previewInitialShowPasteStackPanel { showPasteStackPanel = true }
         }
         .onReceive(NotificationCenter.default.publisher(for: .historySearchShortcutRequested)) { _ in
             focusedTarget = .search
@@ -951,7 +720,6 @@ struct ClipboardHistoryView: View {
         selectedTag = allTags.contains(preset.tagFilter) ? preset.tagFilter : "All Tags"
     }
 
-    @ViewBuilder
     private var historyKeyboardShortcuts: some View {
         Button("") {
             focusedTarget = .search
@@ -962,5 +730,3 @@ struct ClipboardHistoryView: View {
         .accessibilityHidden(true)
     }
 }
-
-// swiftlint:enable file_length

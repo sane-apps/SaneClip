@@ -154,6 +154,60 @@ struct HistoryWindowTests {
         #expect(footerSource.contains("private var smartClearButton"))
     }
 
+    @Test("Every clip source gets a stable, distinct color (not just Apple apps)")
+    @MainActor
+    func sourceColorsAreSharedStableAndDistinct() {
+        func rgba(_ color: Color) -> [CGFloat] {
+            let ns = NSColor(color).usingColorSpace(.sRGB) ?? NSColor(color)
+            return [ns.redComponent, ns.greenComponent, ns.blueComponent, ns.alphaComponent]
+        }
+
+        // Case-insensitive + stable across calls.
+        #expect(rgba(SaneClipSourceColor.color(forSourceNamed: "Codex", dark: true))
+            == rgba(SaneClipSourceColor.color(forSourceNamed: "codex", dark: true)))
+
+        // Unmapped third-party apps get DISTINCT colors (the bug: they were all blue).
+        let codex = rgba(SaneClipSourceColor.color(forSourceNamed: "Codex", dark: true))
+        let quicktime = rgba(SaneClipSourceColor.color(forSourceNamed: "QuickTime Player", dark: true))
+        #expect(codex != quicktime)
+        #expect(codex != rgba(Color.clipBlue))
+        #expect(quicktime != rgba(Color.clipBlue))
+
+        // Curated apps keep their hand-tuned color.
+        #expect(rgba(SaneClipSourceColor.color(forSourceNamed: "Messages", dark: true))
+            == rgba(Color(hex: 0x5EC2A0)))
+
+        // nil / empty source → brand blue.
+        #expect(rgba(SaneClipSourceColor.color(forSourceNamed: nil, dark: true)) == rgba(Color.clipBlue))
+        #expect(rgba(SaneClipSourceColor.color(forSourceNamed: "   ", dark: true)) == rgba(Color.clipBlue))
+
+        // Light vs dark differ for the same source.
+        #expect(rgba(SaneClipSourceColor.color(forSourceNamed: "Codex", dark: true))
+            != rgba(SaneClipSourceColor.color(forSourceNamed: "Codex", dark: false)))
+    }
+
+    @Test("Both platforms use the shared SaneClipSourceColor (no duplicated palette)")
+    func sourceColorPaletteIsDeduplicated() throws {
+        let rowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRow.swift"),
+            encoding: .utf8
+        )
+        let cellSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("iOS/Views/ClipboardItemCell.swift"),
+            encoding: .utf8
+        )
+        let shared = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/BrandColors.swift"),
+            encoding: .utf8
+        )
+        #expect(shared.contains("enum SaneClipSourceColor"))
+        #expect(rowSource.contains("SaneClipSourceColor.color(forSourceNamed: item.sourceAppName"))
+        #expect(cellSource.contains("SaneClipSourceColor.color(forSourceNamed: item.sourceAppName"))
+        // The old copy-pasted 13-app switch is gone from the views.
+        #expect(!rowSource.contains("case \"reminders\": return Color(hex: 0x8A9FE4)"))
+        #expect(!cellSource.contains("case \"reminders\": return Color(hex: 0x8A9FE4)"))
+    }
+
     // MARK: - Visual receipts
 
     /// Renders the history view at the narrow (old popover) width and at a
@@ -170,7 +224,7 @@ struct HistoryWindowTests {
         var mergeActive = false
         var showStack = false
 
-        enum Seed { case rich, empty, longText }
+        enum Seed { case rich, empty, longText, colorful }
     }
 
     @MainActor
@@ -197,6 +251,7 @@ struct HistoryWindowTests {
             .init(name: "08-pro-popover-filters-320x620", width: 320, height: 620, pro: true, showFilters: true),
             .init(name: "09-pro-floating-stack-560x680", width: 560, height: 680, pro: true, showStack: true),
             .init(name: "10-free-popover-longtext-320x500", width: 320, height: 500, seed: .longText),
+            .init(name: "11-colorful-sources-440x700", width: 440, height: 700, seed: .colorful),
         ]
 
         let proLicense = makeForcedProLicense()
@@ -242,6 +297,18 @@ struct HistoryWindowTests {
         switch seed {
         case .empty:
             manager.history = []
+            manager.pinnedItems = []
+        case .colorful:
+            // Diverse sources — mix of curated apps and previously-blue
+            // third-party apps — to show every source now gets its own color.
+            let sources = [
+                "Messages", "Brave Browser", "Codex", "Slack", "QuickTime Player",
+                "Visual Studio Code", "Notes", "Arc", "Google Chrome", "Terminal",
+                "Discord", "Figma", "Xcode", "Spotify",
+            ]
+            manager.history = sources.map { name in
+                ClipboardItem(content: .text("Clip from \(name)"), sourceAppName: name)
+            }
             manager.pinnedItems = []
         case .longText:
             let long = String(repeating: "supercalifragilistic-unbreakable-token-", count: 8)

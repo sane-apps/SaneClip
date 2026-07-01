@@ -8,7 +8,10 @@ struct ClipboardItemCell: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.horizontalSizeClass) private var sizeClass
 
-    private var isIPad: Bool { sizeClass == .regular }
+    private var isIPad: Bool {
+        sizeClass == .regular
+    }
+
     private let isScreenshotMode = LaunchOptions.isScreenshotMode()
 
     // MARK: - Source-Aware Colors
@@ -16,43 +19,11 @@ struct ClipboardItemCell: View {
     /// Harmonious muted palette — each hue family is distinct, no two colors clash.
     /// Dark mode: bright/saturated for readability on dark backgrounds.
     /// Light mode: darkened variants for WCAG AA (4.5:1) on light backgrounds.
+    /// Shared with macOS `ClipboardItemRow` via `SaneClipSourceColor`
+    /// (Core/BrandColors.swift): curated colors for well-known apps, a stable
+    /// hashed color for every other source so nothing defaults to plain blue.
     private var sourceColor: Color {
-        guard let source = item.sourceAppName?.lowercased() else { return Color.clipBlue }
-        if colorScheme == .dark {
-            switch source {
-            case "messages": return Color(hex: 0x5EC2A0) // Sage green
-            case "mail": return Color(hex: 0xE8807C) // Soft coral
-            case "safari": return Color(hex: 0x6BADE4) // Sky blue
-            case "notes": return Color(hex: 0xE4C05C) // Warm gold
-            case "maps": return Color(hex: 0x4B9FE8) // Blue
-            case "contacts": return Color(hex: 0xC8ACE4) // Soft lavender (boosted)
-            case "calendar": return Color(hex: 0xD4849A) // Dusty rose
-            case "photos": return Color(hex: 0xE89A3C) // Warm amber (distinct from gold)
-            case "reminders": return Color(hex: 0x8A9FE4) // Periwinkle (boosted)
-            case "terminal": return Color(hex: 0x66E08E) // Lime green
-            case "xcode": return Color(hex: 0x6B7FE8) // Indigo
-            case "finder": return Color(hex: 0x4DD4D4) // Cyan
-            case "slack": return Color(hex: 0xD464CC) // Fuchsia
-            default: return Color.clipBlue
-            }
-        } else {
-            switch source {
-            case "messages": return Color(hex: 0x2E8B6A) // Deep sage
-            case "mail": return Color(hex: 0xC4524E) // Deep coral
-            case "safari": return Color(hex: 0x3A7DB8) // Deep sky
-            case "notes": return Color(hex: 0x9E8528) // Deep gold
-            case "maps": return Color(hex: 0x2D7AC2) // Deep blue
-            case "contacts": return Color(hex: 0x7A5FA8) // Deep lavender
-            case "calendar": return Color(hex: 0xA8566E) // Deep rose
-            case "photos": return Color(hex: 0xB87A22) // Deep amber
-            case "reminders": return Color(hex: 0x4E62A8) // Deep periwinkle
-            case "terminal": return Color(hex: 0x2D8A4E) // Deep lime
-            case "xcode": return Color(hex: 0x4450A8) // Deep indigo
-            case "finder": return Color(hex: 0x2A8FA8) // Deep cyan
-            case "slack": return Color(hex: 0xA03898) // Deep fuchsia
-            default: return Color.clipBlue
-            }
-        }
+        SaneClipSourceColor.color(forSourceNamed: item.sourceAppName, dark: colorScheme == .dark)
     }
 
     /// Bar color: orange for pinned, source color otherwise
@@ -171,7 +142,7 @@ struct ClipboardItemCell: View {
                                 .foregroundColor(accentColor)
                         }
 
-                        if !item.deviceName.isEmpty && !isScreenshotMode {
+                        if !item.deviceName.isEmpty, !isScreenshotMode {
                             Text("·")
                                 .font(isIPad ? .system(size: 18) : .caption)
                                 .foregroundStyle(metadataColor)

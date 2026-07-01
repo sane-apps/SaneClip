@@ -1592,6 +1592,9 @@
                         <ul class="pricing-features">
                             <li>Clipboard history (50 items)</li>
                             <li>Search, source filtering, and pinning</li>
+                            <li>Floating resizable history window</li>
+                            <li>Full keyboard navigation</li>
+                            <li>Drag &amp; drop clips into other apps</li>
                             <li>Standard paste</li>
                             <li>Capture Screenshot into history</li>
                             <li>Free iPhone &amp; iPad companion app with optional private iCloud sync</li>
@@ -1638,7 +1641,7 @@
             <div class="hero-screenshot-intro animate-in delay-5">
                 <p class="hero-screenshot-eyebrow">Live Preview</p>
                 <h2 class="hero-screenshot-title">See SaneClip in action</h2>
-                <p class="hero-screenshot-copy">Search your history, filter by source, pin important clips, and clear clipboard data in one click.</p>
+                <p class="hero-screenshot-copy">Search your history, filter by source, pin important clips — then detach it all into a floating, resizable window and drag clips straight into other apps.</p>
                 <p class="hero-screenshot-note">Real screenshot from SaneClip on macOS.</p>
             </div>
             <div class="hero-screenshot animate-in delay-5">
@@ -1750,7 +1753,7 @@
                 </div>
 
                 <!-- Source-Aware Colors -->
-                <div class="feature-card">
+                <a href="#" onclick="openLightbox('images/screenshot-floating-colorful.png', 'Source App Tracking — Every app gets its own color, not just Apple apps'); return false" class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="13.5" cy="6.5" r="0.5"></circle>
@@ -1761,7 +1764,7 @@
                         </svg>
                     </div>
                     <h3>Source App Tracking</h3>
-                    <p>Every clip shows <strong>which app it came from</strong> with unique color coding. Scan your history visually — no reading required.</p>
+                    <p>Every clip shows <strong>which app it came from</strong> — and every app gets its own color, <strong>not just Apple apps</strong>. Scan your history visually — no reading required.</p>
                 </div>
 
                 <!-- Clipboard Rules -->
@@ -1773,6 +1776,32 @@
                     </div>
                     <h3>Clipboard Rules</h3>
                     <p><strong>Auto-strip tracking params</strong> from URLs (utm_*, fbclid). Auto-trim whitespace, normalize line endings, clean duplicate spaces. Copies arrive clean.</p>
+                </div>
+
+                <!-- Floating History Window -->
+                <a href="#" onclick="openLightbox('images/screenshot-floating-wide.png', 'Floating History Window — Detach, resize, and keep it wherever you work'); return false" class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                            <path d="M3 9h18"></path>
+                            <path d="M16 15l3 3m0-3l-3 3" stroke-width="1.5"></path>
+                        </svg>
+                    </div>
+                    <h3>Floating History Window</h3>
+                    <p><strong>Detach your history from the menu bar</strong> into a floating window. Resize it from compact strip to command center — it remembers its size and position between sessions.</p>
+                </a>
+
+                <!-- Drag & Drop Out -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="12" height="12" rx="2"></rect>
+                            <path d="M15 9h6m0 0l-3-3m3 3l-3 3"></path>
+                            <path d="M9 15v6"></path>
+                        </svg>
+                    </div>
+                    <h3>Drag &amp; Drop Out</h3>
+                    <p><strong>Drag any clip straight out of your history</strong> into Mail, Notes, Pages — any app. Text lands as text, images as images. No copy-switch-paste dance.</p>
                 </div>
 
                 <!-- === ROW 3: UNIQUE TO SANECLIP === -->
@@ -1834,7 +1863,7 @@
                         </svg>
                     </div>
                     <h3>Lightning Shortcuts</h3>
-                    <p><strong>&#8984;Shift+V</strong> opens history at your menu bar icon or mouse cursor (your choice). <strong>&#8984;1-9</strong> pastes instantly. Vim-style navigation. No mouse needed.</p>
+                    <p><strong>&#8984;Shift+V</strong> opens history at your menu bar icon or mouse cursor (your choice). <strong>&#8984;1-9</strong> pastes instantly. Inside the window: <strong>arrows, Home/End, PageUp/Down, P to pin, Return to paste</strong>. Vim-style navigation. No mouse needed.</p>
                 </a>
 
                 <!-- Pin Items & Snippets -->

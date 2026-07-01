@@ -65,6 +65,33 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
   window-server renders only); commit + release decision (owner); reply to
   email #983 drafted, awaiting owner approval to send.
 
+- 2026-07-01 (cont.) KILLER UPDATE shipped on same branch (commits 2d811e9 →
+  ce023e3 → 6ba9e9c; NOT pushed/merged; still 2.3.12). Ran a 7-analyst UX audit
+  workflow (71 findings → ranked roadmap), implemented the low-risk high-impact
+  set: ScrollViewReader auto-scroll of the selection; Home/End/PageUp/PageDown;
+  `P` to pin selected; `Esc` clears search→filters→closes floating window; moved
+  the floating-window toggle to General→Appearance (discoverability); filter row
+  extracted to HistoryFilterBar with horizontal scroll (fixes the 320pt clip);
+  drag-out grip affordance on hover; relaxed row metadata clamp; honest ⌘⌃N
+  hints (only shown when accurate). Key handlers live in
+  HistoryListKeyboardShortcuts (ViewModifier) — needed to keep the SwiftUI body
+  under the type-check budget (a long inline .onKeyPress chain timed out). A
+  second adversarial review caught + FIXED: (a) P-pin lost the selection (now
+  re-anchors selectedIndex by id), (b) collection badge could wrap (re-added
+  .lineLimit(1)). 179 tests pass on Mini; matrix re-rendered + inspected.
+  DEFERRED (needs live focus testing, not shipped): type-ahead catch-all (j/k
+  conflict) + auto-focus-search. PROPOSE-TO-OWNER bigger bets from the audit:
+  always-on-top pin, drag-IN capture, content-aware quick actions, multi-select
+  batch, per-display frame memory.
+
+- 2026-07-01 Mini Dock "3 SaneClip icons" report — diagnosed as ghost runtime
+  Dock tiles from dev build/test/kill cycles (+ ~94 stale LaunchServices records
+  for deleted paths); only 2 real bundles on disk (/Applications + 1 DerivedData),
+  NOT pinned, NOT a duplicate install, NOT a shipping-app bug. Cleared with
+  `killall Dock` on the Mini. `lsregister -kill` is removed in current macOS.
+  See memory [[saneclip-mini-dock-ghost-icons]]. Proposed prevention (owner):
+  graceful quit + `killall Dock` in the Mini test/cleanup flow (SaneProcess).
+
 - 2026-06-27 keychain prompt-storm audit — SaneClip is NOT affected (no code
   change needed). The "wants to use your confidential information" prompt storm
   that hit the non-sandboxed apps (SaneHosts/SaneSync/SaneClick) comes from the

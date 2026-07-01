@@ -46,6 +46,10 @@ struct HistoryTab: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var searchText = ""
     @State private var selectedItem: SharedClipboardItem?
+    // Hardware-keyboard navigation state (iPad Magic Keyboard etc.).
+    @State private var selectedItemID: UUID?
+    @FocusState private var searchFocused: Bool
+    @FocusState private var listFocused: Bool
 
     private var isIPad: Bool {
         sizeClass == .regular
@@ -190,20 +194,95 @@ struct HistoryTab: View {
     }
 
     private var historyList: some View {
-        List {
-            ForEach(viewModel.filteredHistory(searchText)) { item in
-                historyRow(item)
+        ScrollViewReader { proxy in
+            List {
+                ForEach(viewModel.filteredHistory(searchText)) { item in
+                    historyRow(item)
+                        .id(item.id)
+                }
+            }
+            .listStyle(.plain)
+            .searchable(text: $searchText, prompt: "Search clips")
+            .searchFocused($searchFocused)
+            .focusable()
+            .focused($listFocused)
+            .modifier(HistoryKeyboardShortcuts(
+                canHandle: { !searchFocused },
+                move: { moveSelection(by: $0) },
+                jumpToTop: { selectEdge(first: true) },
+                jumpToBottom: { selectEdge(first: false) },
+                togglePin: { togglePinSelected() },
+                copySelected: { copySelected() },
+                focusSearch: { searchFocused = true },
+                escape: { handleEscape() }
+            ))
+            .onAppear { listFocused = true }
+            .onChange(of: searchFocused) { _, focused in
+                // Hand focus back to the list when search dismisses so arrows
+                // keep working without a tap.
+                if !focused { listFocused = true }
+            }
+            .onChange(of: selectedItemID) { _, id in
+                guard let id else { return }
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    proxy.scrollTo(id, anchor: .center)
+                }
             }
         }
-        .listStyle(.plain)
-        .searchable(text: $searchText, prompt: "Search clips")
+    }
+
+    // MARK: - Hardware-keyboard selection
+
+    private var navItems: [SharedClipboardItem] {
+        viewModel.filteredHistory(searchText)
+    }
+
+    private func moveSelection(by offset: Int) {
+        let items = navItems
+        guard !items.isEmpty else { return }
+        let next: Int = if let current = items.firstIndex(where: { $0.id == selectedItemID }) {
+            min(max(current + offset, 0), items.count - 1)
+        } else {
+            offset >= 0 ? 0 : items.count - 1
+        }
+        selectedItemID = items[next].id
+    }
+
+    private func selectEdge(first: Bool) {
+        guard let item = first ? navItems.first : navItems.last else { return }
+        selectedItemID = item.id
+    }
+
+    /// Selection is re-anchored by id, so pinning keeps your place (Mac parity).
+    private func togglePinSelected() {
+        guard let item = navItems.first(where: { $0.id == selectedItemID }) else { return }
+        viewModel.togglePin(item)
+    }
+
+    private func copySelected() {
+        guard let item = navItems.first(where: { $0.id == selectedItemID }) else { return }
+        viewModel.copyToClipboard(item)
+    }
+
+    /// Esc peels back one layer at a time: search text, then selection.
+    private func handleEscape() -> KeyPress.Result {
+        if !searchText.isEmpty {
+            searchText = ""
+            return .handled
+        }
+        if selectedItemID != nil {
+            selectedItemID = nil
+            return .handled
+        }
+        return .ignored
     }
 
     private func historyRow(_ item: SharedClipboardItem) -> some View {
         ClipboardItemCell(
             item: item,
             isPinned: viewModel.isPinned(item),
-            isCopied: viewModel.copiedItemID == item.id
+            isCopied: viewModel.copiedItemID == item.id,
+            isSelected: selectedItemID == item.id
         )
         .listRowInsets(EdgeInsets(
             top: isIPad ? 10 : 4,

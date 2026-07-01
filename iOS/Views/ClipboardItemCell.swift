@@ -5,6 +5,7 @@ struct ClipboardItemCell: View {
     let item: SharedClipboardItem
     var isPinned: Bool = false
     var isCopied: Bool = false
+    var isSelected: Bool = false
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.horizontalSizeClass) private var sizeClass
 
@@ -39,6 +40,9 @@ struct ClipboardItemCell: View {
     private var cardBackground: Color {
         if isCopied {
             return accentColor.opacity(0.12)
+        }
+        if isSelected {
+            return accentColor.opacity(0.08)
         }
         return colorScheme == .dark
             ? Color.white.opacity(0.06)
@@ -171,14 +175,17 @@ struct ClipboardItemCell: View {
                 .strokeBorder(
                     isCopied
                         ? accentColor.opacity(0.3)
+                        : isSelected
+                        ? accentColor.opacity(0.55)
                         : (colorScheme == .dark
                             ? Color.white.opacity(0.08)
                             : Color.black.opacity(0.06)),
-                    lineWidth: isCopied ? 1 : 0.5
+                    lineWidth: isCopied || isSelected ? 1.5 : 0.5
                 )
         )
         .contentShape(Rectangle())
         .animation(.easeInOut(duration: 0.15), value: isCopied)
+        .animation(.easeInOut(duration: 0.12), value: isSelected)
     }
 }
 

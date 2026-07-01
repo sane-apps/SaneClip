@@ -140,6 +140,7 @@
 		CEE1670CAECAAE56000EBBF1 /* DirectDistributionSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DBD4FED60D446DFDA669D6A /* DirectDistributionSupport.swift */; };
 		CF0A85FFE2FF9B1F42F35E7D /* HistoryPasteStackPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818608D0CE3AC25CF3561EAB /* HistoryPasteStackPanel.swift */; };
 		D0121F4D70D88480A053611D /* SensitiveDataDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6448822D405CC78AFFF787 /* SensitiveDataDetector.swift */; };
+		D08E5779CC9C776D42D6236E /* HistoryKeyboardShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614C3CE85336EBFCEFD675CE /* HistoryKeyboardShortcuts.swift */; };
 		D2BCCA95C9F03029E989222D /* SensitiveDataDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6448822D405CC78AFFF787 /* SensitiveDataDetector.swift */; };
 		D43CFBAE93357055AB6E3423 /* SaneClipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B639CB4375AE4479924B74 /* SaneClipTests.swift */; };
 		D6D28F5DADCF52B51B3B7770 /* GeneralSettingsView+Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB894F7117EDE997F02E9A1 /* GeneralSettingsView+Actions.swift */; };
@@ -290,6 +291,7 @@
 		592FBED989BC40A70F0B5060 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		5ECEE64E98BCC2FC7D58874A /* SaneClipIOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipIOSApp.swift; sourceTree = "<group>"; };
 		61392CF56C24077C8FD681EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		614C3CE85336EBFCEFD675CE /* HistoryKeyboardShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryKeyboardShortcuts.swift; sourceTree = "<group>"; };
 		62E89830225CCA642CD2D752 /* SaneClipIOSWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SaneClipIOSWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		64578021E526032605A2A68D /* SetappIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetappIntegration.swift; sourceTree = "<group>"; };
 		6785DC91231845BA4B10499F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -423,6 +425,7 @@
 				37E748D426976BE5B909D7C5 /* ClipboardHistoryViewModel+ClipboardImport.swift */,
 				35354A7D3201B61455110B3F /* ClipboardItemCell.swift */,
 				AA6709551974949109A6A239 /* EmptyStateView.swift */,
+				614C3CE85336EBFCEFD675CE /* HistoryKeyboardShortcuts.swift */,
 				CE95B8CE57324347C7B10C45 /* HistoryTab.swift */,
 				9E776995068A491A32269B2E /* OnboardingView.swift */,
 				18ED2363F109AC56BCE47BE7 /* PinnedTab.swift */,
@@ -1005,6 +1008,7 @@
 				DD741ED4E799B3DE999D2A65 /* EmptyStateView.swift in Sources */,
 				4BBBBA9D613C81A9CBEF0B0A /* GetRecentClipsIntent.swift in Sources */,
 				CEBF533F549AFC2E4D6AE9CE /* HistoryEncryption.swift in Sources */,
+				D08E5779CC9C776D42D6236E /* HistoryKeyboardShortcuts.swift in Sources */,
 				1A782BC1D0E5F568F0612625 /* HistoryTab.swift in Sources */,
 				4B2B8214AB250D15350054F9 /* KeychainHelper.swift in Sources */,
 				DCCB437A7D9404CB8330057C /* OnboardingView.swift in Sources */,

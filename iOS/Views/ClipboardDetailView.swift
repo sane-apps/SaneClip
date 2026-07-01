@@ -9,7 +9,9 @@ struct ClipboardDetailView: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var showCopied = false
 
-    private var isIPad: Bool { sizeClass == .regular }
+    private var isIPad: Bool {
+        sizeClass == .regular
+    }
 
     var body: some View {
         NavigationStack {
@@ -29,7 +31,8 @@ struct ClipboardDetailView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Done") { dismiss() }
                 }
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItemGroup(placement: .primaryAction) {
+                    ClipShareLink(item: item)
                     Button {
                         viewModel.copyToClipboard(item)
                         showCopied = true

@@ -1,4 +1,43 @@
 import SwiftUI
+import UIKit
+
+/// Drag-out payload for history/pinned rows: text drops as plain text, images
+/// drop as images (UIImage conforms to NSItemProviderWriting). Mirrors the Mac
+/// ClipboardItemRow.dragItemProvider so clips drag into other apps in Split
+/// View / Slide Over the same way they drag out of the Mac history window.
+enum ClipDragPayload {
+    static func itemProvider(for item: SharedClipboardItem) -> NSItemProvider {
+        switch item.content {
+        case let .text(string):
+            return NSItemProvider(object: string as NSString)
+        case let .imageData(data, _, _):
+            guard let image = UIImage(data: data) else { return NSItemProvider() }
+            return NSItemProvider(object: image)
+        }
+    }
+}
+
+/// Share affordance for a clip row: text shares as plain text, images share
+/// as images. Used by the History and Pinned context menus and the detail view.
+struct ClipShareLink: View {
+    let item: SharedClipboardItem
+
+    var body: some View {
+        if let text = item.fullText {
+            ShareLink(item: text) {
+                Label("Share", systemImage: "square.and.arrow.up")
+            }
+        } else if case let .imageData(data, _, _) = item.content,
+                  let uiImage = UIImage(data: data) {
+            ShareLink(
+                item: Image(uiImage: uiImage),
+                preview: SharePreview("Image", image: Image(uiImage: uiImage))
+            ) {
+                Label("Share", systemImage: "square.and.arrow.up")
+            }
+        }
+    }
+}
 
 /// History tab showing recent clipboard items
 struct HistoryTab: View {
@@ -19,7 +58,7 @@ struct HistoryTab: View {
             Group {
                 if viewModel.history.isEmpty, !viewModel.isLoading {
                     VStack(spacing: 0) {
-                        if viewModel.hasPendingClipboardContent && !isScreenshotMode {
+                        if viewModel.hasPendingClipboardContent, !isScreenshotMode {
                             pendingClipboardCard
                         }
                         EmptyStateView(
@@ -30,10 +69,10 @@ struct HistoryTab: View {
                     }
                 } else {
                     VStack(spacing: 0) {
-                        if viewModel.isShowingDemoData && !isScreenshotMode {
+                        if viewModel.isShowingDemoData, !isScreenshotMode {
                             demoBanner
                         }
-                        if viewModel.hasPendingClipboardContent && !isScreenshotMode {
+                        if viewModel.hasPendingClipboardContent, !isScreenshotMode {
                             pendingClipboardCard
                         }
                         historyList
@@ -174,6 +213,12 @@ struct HistoryTab: View {
         ))
         .listRowSeparator(.hidden)
         .contentShape(Rectangle())
+        // Unconditional drag-out: unlike the Mac list there is no .onMove
+        // reorder on iOS, so no pinned-row gating is needed. If reorder is
+        // ever added, re-add the Mac's onDragOut(enabled: !isPinned) gate.
+        .onDrag {
+            ClipDragPayload.itemProvider(for: item)
+        }
         .onTapGesture {
             viewModel.copyToClipboard(item)
         }
@@ -196,6 +241,7 @@ struct HistoryTab: View {
             } label: {
                 Label("Details", systemImage: "info.circle")
             }
+            ClipShareLink(item: item)
             Divider()
             Button(role: .destructive) {
                 viewModel.deleteItem(item)

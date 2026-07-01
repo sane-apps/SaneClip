@@ -61,6 +61,47 @@ struct HistoryWindowTests {
         #expect(settingsSource.contains("Open history as a resizable floating window"))
     }
 
+    @Test("Touch ID history lock gates the hotkey and Dock-reopen paths")
+    func historyAuthGateBehavior() {
+        let now = Date()
+
+        // Lock off → always allowed, no prompt.
+        #expect(SaneClipAppDelegate.historyAuthSatisfied(
+            requiresAuth: false, lastAuth: nil, gracePeriod: 30, now: now
+        ))
+        // Lock on, never authenticated → must prompt.
+        #expect(!SaneClipAppDelegate.historyAuthSatisfied(
+            requiresAuth: true, lastAuth: nil, gracePeriod: 30, now: now
+        ))
+        // Lock on, authenticated 10s ago (inside 30s grace) → allowed.
+        #expect(SaneClipAppDelegate.historyAuthSatisfied(
+            requiresAuth: true, lastAuth: now.addingTimeInterval(-10), gracePeriod: 30, now: now
+        ))
+        // Lock on, grace expired → must prompt again.
+        #expect(!SaneClipAppDelegate.historyAuthSatisfied(
+            requiresAuth: true, lastAuth: now.addingTimeInterval(-31), gracePeriod: 30, now: now
+        ))
+    }
+
+    @Test("Hotkey toggle and Dock reopen route through the Touch ID auth gate")
+    func historyEntryPointsUseAuthGate() throws {
+        let historyWindowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipAppDelegate+HistoryWindow.swift"),
+            encoding: .utf8
+        )
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+
+        // toggleHistoryWindow (⌘⇧⌃Y hotkey) must not open the window directly.
+        #expect(historyWindowSource.contains("withHistoryAuth { [weak self] in self?.showHistoryWindow() }"))
+        // Dock/Finder reopen must go through the same gate.
+        #expect(appSource.contains("withHistoryAuth { [weak self] in self?.showHistoryWindow() }"))
+        // The gate delegates its decision to the tested pure function.
+        #expect(historyWindowSource.contains("historyAuthSatisfied("))
+    }
+
     @Test("Paste from the floating window hands focus back before the synthetic paste")
     func floatingWindowPasteReturnsFocus() throws {
         let historyWindowSource = try String(

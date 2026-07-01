@@ -35,6 +35,44 @@ extension SaneClipAppDelegate {
             .preferredColorScheme(.dark)
     }
 
+    /// Pure gate decision so the Touch ID lock logic is testable: returns true
+    /// when history may open WITHOUT prompting (lock off, or still inside the
+    /// grace window after a successful authentication).
+    nonisolated static func historyAuthSatisfied(
+        requiresAuth: Bool,
+        lastAuth: Date?,
+        gracePeriod: TimeInterval,
+        now: Date = Date()
+    ) -> Bool {
+        guard requiresAuth else { return true }
+        guard let lastAuth else { return false }
+        return now.timeIntervalSince(lastAuth) < gracePeriod
+    }
+
+    /// Runs `action` behind the same Touch ID gate as the menu-bar popover
+    /// path (requiresHistoryAuth + grace period). The ⌘⇧⌃Y hotkey and
+    /// Dock-reopen paths previously skipped authentication entirely, so a
+    /// locked history could be opened without Touch ID.
+    func withHistoryAuth(_ action: @escaping @MainActor () -> Void) {
+        if Self.historyAuthSatisfied(
+            requiresAuth: requiresHistoryAuth,
+            lastAuth: lastAuthenticationTime,
+            gracePeriod: authGracePeriod
+        ) {
+            action()
+            return
+        }
+        authenticateWithBiometrics { [weak self] success in
+            guard success else { return }
+            Task { @MainActor in
+                self?.lastAuthenticationTime = Date()
+                // Small delay to let the Touch ID dialog fully dismiss.
+                try? await Task.sleep(nanoseconds: 150_000_000)
+                action()
+            }
+        }
+    }
+
     func toggleHistoryWindow() {
         if popover.isShown {
             popover.performClose(nil)
@@ -45,7 +83,7 @@ extension SaneClipAppDelegate {
             return
         }
 
-        showHistoryWindow()
+        withHistoryAuth { [weak self] in self?.showHistoryWindow() }
     }
 
     /// Hides the history UI before a paste is synthesized. For the floating

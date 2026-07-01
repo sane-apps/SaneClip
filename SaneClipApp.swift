@@ -51,8 +51,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         var updateService: UpdateService!
     #endif
     /// Track when user last authenticated with Touch ID (grace period)
-    private var lastAuthenticationTime: Date?
-    private let authGracePeriod: TimeInterval = 30.0 // seconds - stays unlocked for 30s
+    var lastAuthenticationTime: Date? // internal: +HistoryWindow auth gate reads/writes
+    let authGracePeriod: TimeInterval = 30.0 // seconds - stays unlocked for 30s
 
     // MARK: - License
 
@@ -78,7 +78,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     private let welcomeResumePageKey = "welcomeResumePage"
     private let historyShortcutReliableDefaultMigrationKey = "historyShortcutReliableDefaultMigration_v234_controlY"
     private let permissionsWelcomePage = 5
-    private var requiresHistoryAuth: Bool {
+    var requiresHistoryAuth: Bool { // internal: +HistoryWindow auth gate
         licenseService.isPro && SettingsModel.shared.requireTouchID
     }
 
@@ -164,7 +164,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool {
-        showHistoryWindow()
+        withHistoryAuth { [weak self] in self?.showHistoryWindow() }
         return false
     }
 
@@ -628,7 +628,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Biometric Authentication
 
-    private func authenticateWithBiometrics(completion: @escaping @Sendable (Bool) -> Void) {
+    func authenticateWithBiometrics(completion: @escaping @Sendable (Bool) -> Void) {
         let context = LAContext()
         var error: NSError?
 

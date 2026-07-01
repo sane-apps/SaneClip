@@ -12,10 +12,22 @@ private final class MockKeychainService: KeychainServiceProtocol, @unchecked Sen
     private var bools: [String: Bool] = [:]
     private var strings: [String: String] = [:]
 
-    func bool(forKey key: String) throws -> Bool? { bools[key] }
-    func set(_ value: Bool, forKey key: String) throws { bools[key] = value }
-    func string(forKey key: String) throws -> String? { strings[key] }
-    func set(_ value: String, forKey key: String) throws { strings[key] = value }
+    func bool(forKey key: String) throws -> Bool? {
+        bools[key]
+    }
+
+    func set(_ value: Bool, forKey key: String) throws {
+        bools[key] = value
+    }
+
+    func string(forKey key: String) throws -> String? {
+        strings[key]
+    }
+
+    func set(_ value: String, forKey key: String) throws {
+        strings[key] = value
+    }
+
     func delete(_ key: String) throws {
         bools.removeValue(forKey: key)
         strings.removeValue(forKey: key)
@@ -154,8 +166,8 @@ struct SaneClipTests {
         let oldItem = try JSONDecoder().decode(SavedClipboardItem.self, from: Data(oldJSON.utf8))
         #expect(oldItem.ocrText == nil)
 
-        let saved = SavedClipboardItem(
-            id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!,
+        let saved = try SavedClipboardItem(
+            id: #require(UUID(uuidString: "22222222-2222-2222-2222-222222222222")),
             text: "[Image]",
             timestamp: Date(timeIntervalSinceReferenceDate: 42),
             sourceAppName: "Screen Capture",
@@ -605,7 +617,7 @@ struct SaneClipTests {
 
         #expect(historySource.contains(".navigationTitle(\"History\")"))
         #expect(historySource.contains("if !isScreenshotMode"))
-        #expect(historySource.contains("viewModel.isShowingDemoData && !isScreenshotMode"))
+        #expect(historySource.contains("viewModel.isShowingDemoData, !isScreenshotMode"))
         #expect(viewModelSource.contains("if LaunchOptions.isScreenshotMode()"))
         #expect(viewModelSource.contains("history = []"))
         #expect(viewModelSource.contains("Normal users should see a truthful empty/setup state"))
@@ -645,7 +657,7 @@ struct SaneClipTests {
         )
 
         #expect(historySource.contains("pendingClipboardCard"))
-        #expect(historySource.contains("viewModel.hasPendingClipboardContent && !isScreenshotMode"))
+        #expect(historySource.contains("viewModel.hasPendingClipboardContent, !isScreenshotMode"))
         #expect(historySource.contains("viewModel.pendingClipboardTitle"))
         #expect(historySource.contains("viewModel.pendingClipboardSubtitle"))
         #expect(historySource.contains("viewModel.dismissClipboardDetection()"))
@@ -1462,7 +1474,7 @@ struct SaneClipTests {
         let rsaKey = [
             "-----BEGIN RSA", "PRIVATE KEY-----",
             "MIIEowIBAAKCAQEA...",
-            "-----END RSA", "PRIVATE KEY-----"
+            "-----END RSA", "PRIVATE KEY-----",
         ].joined(separator: " ")
         #expect(detector.detect(in: rsaKey).contains(.privateKey))
 
@@ -1520,8 +1532,8 @@ struct SaneClipTests {
 
     @Test("SharedClipboardItem text round-trips through stored iOS persistence")
     func sharedClipboardItemStoredTextRoundTrip() throws {
-        let item = SharedClipboardItem(
-            id: UUID(uuidString: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")!,
+        let item = try SharedClipboardItem(
+            id: #require(UUID(uuidString: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")),
             content: .text("This is a long piece of text that should stay intact across relaunches."),
             timestamp: Date(timeIntervalSince1970: 1_700_000_000),
             sourceAppBundleID: "com.apple.MobileSMS",
@@ -1563,9 +1575,9 @@ struct SaneClipTests {
     }
 
     @Test("SyncCoordinator seeds existing history records when sync starts fresh")
-    func syncCoordinatorInitialRecordSeeding() {
-        let first = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
-        let second = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
+    func syncCoordinatorInitialRecordSeeding() throws {
+        let first = try #require(UUID(uuidString: "11111111-1111-1111-1111-111111111111"))
+        let second = try #require(UUID(uuidString: "22222222-2222-2222-2222-222222222222"))
 
         let recordNames = SyncCoordinator.initialRecordNamesToSeed(
             historyIDs: [first, second],
@@ -1704,9 +1716,9 @@ struct SaneClipTests {
     }
 
     @Test("SyncCoordinator does not re-seed already pending history records")
-    func syncCoordinatorSkipsPendingRecordSeeds() {
-        let first = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
-        let second = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
+    func syncCoordinatorSkipsPendingRecordSeeds() throws {
+        let first = try #require(UUID(uuidString: "11111111-1111-1111-1111-111111111111"))
+        let second = try #require(UUID(uuidString: "22222222-2222-2222-2222-222222222222"))
 
         let recordNames = SyncCoordinator.initialRecordNamesToSeed(
             historyIDs: [first, second],
@@ -1717,13 +1729,13 @@ struct SaneClipTests {
     }
 
     @Test("SyncCoordinator keeps full local items when filtering seed candidates")
-    func syncCoordinatorFiltersInitialLocalSeedItems() {
-        let first = SharedClipboardItem(
-            id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
+    func syncCoordinatorFiltersInitialLocalSeedItems() throws {
+        let first = try SharedClipboardItem(
+            id: #require(UUID(uuidString: "11111111-1111-1111-1111-111111111111")),
             content: .text("first")
         )
-        let second = SharedClipboardItem(
-            id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!,
+        let second = try SharedClipboardItem(
+            id: #require(UUID(uuidString: "22222222-2222-2222-2222-222222222222")),
             content: .text("second")
         )
 
@@ -2447,9 +2459,9 @@ struct SaneClipTests {
         try previewHistoryKeychain.set("test-license-key", forKey: "license_key")
         try previewHistoryKeychain.set(recentValidation, forKey: "last_validation")
         try previewHistoryKeychain.set("pro@example.com", forKey: "license_email")
-        let previewHistoryLicenseService = LicenseService(
+        let previewHistoryLicenseService = try LicenseService(
             appName: "SaneClip",
-            purchaseBackend: .direct(checkoutURL: URL(string: "https://saneclip.com")!),
+            purchaseBackend: .direct(checkoutURL: #require(URL(string: "https://saneclip.com"))),
             keychain: previewHistoryKeychain
         )
         previewHistoryLicenseService.checkCachedLicense()

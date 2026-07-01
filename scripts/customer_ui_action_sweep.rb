@@ -29,12 +29,16 @@ class CustomerUIActionSweep
       ['SaneClipAppDelegate+Menus.swift', 'SaneStandardMenu.addCoreUtilityItems'],
       ['SaneClipAppDelegate+Menus.swift', 'About / Report a Bug...']
     ],
+    # 2.3.12 refactor: filter bar, keyboard shortcuts, footer, and paste-stack
+    # panel were extracted from ClipboardHistoryView into their own files
+    # (HistoryFilterBar / HistoryListKeyboardShortcuts / HistoryFooterView /
+    # HistoryPasteStackPanel) to satisfy the size gate.
     'history-search-filter-navigation' => [
       ['UI/History/ClipboardHistoryView.swift', 'TextField("Search clipboard history...", text: $searchText)'],
-      ['UI/History/ClipboardHistoryView.swift', 'Picker("Date", selection: $dateFilter)'],
-      ['UI/History/ClipboardHistoryView.swift', 'Picker("Type", selection: $contentTypeFilter)'],
-      ['UI/History/ClipboardHistoryView.swift', 'Button("Save Current")'],
-      ['UI/History/ClipboardHistoryView.swift', 'onKeyPress(.downArrow)'],
+      ['UI/History/HistoryFilterBar.swift', 'Picker("Date", selection: $dateFilter)'],
+      ['UI/History/HistoryFilterBar.swift', 'Picker("Type", selection: $contentTypeFilter)'],
+      ['UI/History/HistoryFilterBar.swift', 'Button("Save Current")'],
+      ['UI/History/HistoryListKeyboardShortcuts.swift', 'onKeyPress(.downArrow)'],
       ['UI/History/ClipboardHistoryView.swift', 'pasteSelectedItem()'],
       ['Tests/SaneClipTests.swift', 'HistoryShortcutGate.shouldHandleListShortcuts']
     ],
@@ -49,11 +53,11 @@ class CustomerUIActionSweep
       ['Tests/SaneClipTests.swift', 'Basic mode can pin and unpin items on Mac']
     ],
     'paste-stack-actions' => [
-      ['UI/History/ClipboardHistoryView.swift', 'Text("Paste Stack")'],
-      ['UI/History/ClipboardHistoryView.swift', 'clipboardManager.pasteFromStack()'],
-      ['UI/History/ClipboardHistoryView.swift', 'clipboardManager.movePasteStackItemToTop(id: item.id)'],
-      ['UI/History/ClipboardHistoryView.swift', 'clipboardManager.updateItemTitle(id: item.id, title: stackTitleDraft)'],
-      ['UI/History/ClipboardHistoryView.swift', 'clipboardManager.undoLastPasteFromStack()'],
+      ['UI/History/HistoryPasteStackPanel.swift', 'Text("Paste Stack")'],
+      ['UI/History/HistoryFooterView.swift', 'clipboardManager.pasteFromStack()'],
+      ['UI/History/HistoryPasteStackPanel.swift', 'clipboardManager.movePasteStackItemToTop(id: item.id)'],
+      ['UI/History/HistoryPasteStackPanel.swift', 'clipboardManager.updateItemTitle(id: item.id, title: stackTitleDraft)'],
+      ['UI/History/HistoryPasteStackPanel.swift', 'clipboardManager.undoLastPasteFromStack()'],
       ['UI/Settings/GeneralSettingsView.swift', 'SaneClipSettingsCopy.pasteStackNewestFirstLabel'],
       ['Core/ClipboardManager.swift', 'func addToPasteStack']
     ],

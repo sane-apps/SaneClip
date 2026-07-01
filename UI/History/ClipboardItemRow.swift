@@ -318,12 +318,15 @@ struct ClipboardItemRow: View {
                             }
                             Text(item.stats)
                                 .font(.caption)
+                                .lineLimit(1)
                         }
                         .foregroundStyle(.primary.opacity(0.7))
 
                         // Time ago
                         Text(item.timeAgo)
                             .font(.caption)
+                            .lineLimit(1)
+                            .fixedSize()
                             .foregroundStyle(.primary.opacity(0.5))
 
                         // Paste count badge
@@ -339,6 +342,15 @@ struct ClipboardItemRow: View {
                         }
 
                         Spacer()
+
+                        // Drag-out affordance: signals Recent rows can be
+                        // dragged into other apps (pinned rows reorder instead).
+                        if isHovering, !isPinned {
+                            Image(systemName: "line.3.horizontal")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary.opacity(0.6))
+                                .help("Drag to another app")
+                        }
 
                         if let hint = shortcutHint {
                             Text(hint)
@@ -371,7 +383,6 @@ struct ClipboardItemRow: View {
                                 .clipShape(Capsule())
                         }
                     }
-                    .lineLimit(1)
                 }
 
                 Spacer(minLength: 4)

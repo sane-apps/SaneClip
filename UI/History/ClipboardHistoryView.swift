@@ -331,197 +331,27 @@ struct ClipboardHistoryView: View {
 
             // Expandable filter row
             if showFilters {
-                HStack(spacing: 12) {
-                    // Date filter
-                    Picker("Date", selection: $dateFilter) {
-                        ForEach(DateFilter.allCases, id: \.self) { filter in
-                            Text(filter.rawValue).tag(filter)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
-                    .frame(width: 110)
-
-                    // Content type filter
-                    Picker("Type", selection: $contentTypeFilter) {
-                        ForEach(ContentTypeFilter.allCases, id: \.self) { filter in
-                            Text(filter.rawValue).tag(filter)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
-                    .frame(width: 80)
-
-                    Picker("Collection", selection: $selectedCollection) {
-                        ForEach(allCollections, id: \.self) { collection in
-                            Text(collection).tag(collection)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
-                    .frame(width: 130)
-
-                    Picker("Tag", selection: $selectedTag) {
-                        ForEach(allTags, id: \.self) { tag in
-                            Text(tag).tag(tag)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
-                    .frame(width: 120)
-
-                    if !savedPresets.isEmpty {
-                        Menu("Saved") {
-                            ForEach(savedPresets) { preset in
-                                Button(preset.name) {
-                                    applyPreset(preset)
-                                }
-                            }
-                            Divider()
-                            Button("Clear Saved Presets") {
-                                savedPresets = []
-                                persistSavedPresets()
-                            }
-                        }
-                        .menuStyle(.borderlessButton)
-                    }
-
-                    Spacer()
-
-                    Button("Save Current") {
-                        presetName = ""
-                        showSavePresetSheet = true
-                    }
-                    .buttonStyle(.plain)
-                    .font(.caption)
-                    .foregroundStyle(Color.clipBlue)
-
-                    // Clear filters button
-                    if hasActiveFilters {
-                        Button("Clear Filters") {
-                            withAnimation {
-                                dateFilter = .all
-                                contentTypeFilter = .all
-                                selectedCollection = "All Collections"
-                                selectedTag = "All Tags"
-                            }
-                        }
-                        .buttonStyle(.plain)
-                        .font(.caption)
-                        .foregroundStyle(Color.clipBlue)
-                    }
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 6)
-                .background(.background.tertiary)
-                .transition(.move(edge: .top).combined(with: .opacity))
+                HistoryFilterBar(
+                    dateFilter: $dateFilter,
+                    contentTypeFilter: $contentTypeFilter,
+                    selectedCollection: $selectedCollection,
+                    selectedTag: $selectedTag,
+                    savedPresets: $savedPresets,
+                    showSavePresetSheet: $showSavePresetSheet,
+                    presetName: $presetName,
+                    allCollections: allCollections,
+                    allTags: allTags,
+                    hasActiveFilters: hasActiveFilters,
+                    onApplyPreset: applyPreset,
+                    onPersistPresets: persistSavedPresets,
+                    onClearFilters: clearFilters
+                )
             }
 
             Divider()
 
             // History list
-            if filteredHistory.isEmpty, filteredPinned.isEmpty {
-                let title = hasActiveFilters
-                    ? "No Matches"
-                    : (searchText.isEmpty ? "No Clipboard History" : "No Results")
-                let icon = hasActiveFilters
-                    ? "line.3.horizontal.decrease.circle"
-                    : (searchText.isEmpty ? "clipboard" : "magnifyingglass")
-                let desc = hasActiveFilters
-                    ? "Try different filter settings"
-                    : (searchText.isEmpty ? "Copy something to see it here" : "Try a different search")
-                ContentUnavailableView(title, systemImage: icon, description: Text(desc))
-            } else {
-                List {
-                    // Pinned section (drag to reorder)
-                    if !filteredPinned.isEmpty {
-                        Section("Pinned") {
-                            ForEach(Array(filteredPinned.enumerated()), id: \.element.id) { index, item in
-                                ClipboardItemRow(
-                                    item: item,
-                                    isPinned: true,
-                                    clipboardManager: clipboardManager,
-                                    licenseService: licenseService,
-                                    isSelected: index == selectedIndex,
-                                    isQueuedForMerge: mergeQueueIDs.contains(item.id),
-                                    onToggleMergeQueue: { toggleMergeQueue(id: item.id) }
-                                )
-                            }
-                            .onMove { source, destination in
-                                clipboardManager.movePinnedItems(from: source, to: destination)
-                            }
-                        }
-                    }
-
-                    // Recent section
-                    Section(filteredPinned.isEmpty ? "" : "Recent") {
-                        ForEach(Array(filteredHistory.enumerated()), id: \.element.id) { index, item in
-                            let globalIndex = filteredPinned.count + index
-                            ClipboardItemRow(
-                                item: item,
-                                isPinned: false,
-                                clipboardManager: clipboardManager,
-                                licenseService: licenseService,
-                                shortcutHint: index < 9 ? "⌘⌃\(index + 1)" : nil,
-                                isSelected: globalIndex == selectedIndex,
-                                isQueuedForMerge: mergeQueueIDs.contains(item.id),
-                                onToggleMergeQueue: { toggleMergeQueue(id: item.id) }
-                            )
-                        }
-                    }
-                }
-                .listStyle(.plain)
-                .focused($focusedTarget, equals: .list)
-                .onKeyPress(.downArrow) {
-                    guard shouldHandleListShortcuts() else { return .ignored }
-                    moveSelection(by: 1)
-                    return .handled
-                }
-                .onKeyPress(.upArrow) {
-                    guard shouldHandleListShortcuts() else { return .ignored }
-                    moveSelection(by: -1)
-                    return .handled
-                }
-                .onKeyPress(characters: CharacterSet(charactersIn: "jJ")) { _ in
-                    guard shouldHandleListShortcuts() else { return .ignored }
-                    moveSelection(by: 1)
-                    return .handled
-                }
-                .onKeyPress(characters: CharacterSet(charactersIn: "kK")) { _ in
-                    guard shouldHandleListShortcuts() else { return .ignored }
-                    moveSelection(by: -1)
-                    return .handled
-                }
-                .onKeyPress(characters: CharacterSet(charactersIn: "12345")) { keyPress in
-                    guard shouldHandleListShortcuts() else { return .ignored }
-                    switch keyPress.characters {
-                    case "1": contentTypeFilter = .all
-                    case "2": contentTypeFilter = .text
-                    case "3": contentTypeFilter = .url
-                    case "4": contentTypeFilter = .code
-                    case "5": contentTypeFilter = .image
-                    default: break
-                    }
-                    return .handled
-                }
-                .onKeyPress(.return) {
-                    guard shouldHandleListShortcuts() else { return .ignored }
-                    pasteSelectedItem()
-                    return .handled
-                }
-                .onKeyPress(characters: CharacterSet(charactersIn: "/")) { _ in
-                    let keyWindow = NSApp.keyWindow
-                    guard HistoryShortcutGate.shouldFocusSearch(firstResponder: keyWindow?.firstResponder) else {
-                        return .ignored
-                    }
-                    focusedTarget = .search
-                    return .handled
-                }
-                .onDeleteCommand {
-                    guard shouldHandleListShortcuts() else { return }
-                    deleteSelectedItem()
-                }
-            }
+            historyList
 
             // Free-tier limit banner — shown when history is at cap
             if isAtFreeLimit {
@@ -647,6 +477,100 @@ struct ClipboardHistoryView: View {
         }
     }
 
+    /// Extracted from `body` so the view and the list each type-check on their
+    /// own (a long modifier chain inline with the rest of body times out).
+    @ViewBuilder
+    private var historyList: some View {
+        if filteredHistory.isEmpty, filteredPinned.isEmpty {
+            let title = hasActiveFilters
+                ? "No Matches"
+                : (searchText.isEmpty ? "No Clipboard History" : "No Results")
+            let icon = hasActiveFilters
+                ? "line.3.horizontal.decrease.circle"
+                : (searchText.isEmpty ? "clipboard" : "magnifyingglass")
+            let desc = hasActiveFilters
+                ? "Try different filter settings"
+                : (searchText.isEmpty ? "Copy something to see it here" : "Try a different search")
+            ContentUnavailableView(title, systemImage: icon, description: Text(desc))
+        } else {
+            ScrollViewReader { proxy in
+                List {
+                    if !filteredPinned.isEmpty {
+                        Section("Pinned") {
+                            ForEach(Array(filteredPinned.enumerated()), id: \.element.id) { index, item in
+                                ClipboardItemRow(
+                                    item: item,
+                                    isPinned: true,
+                                    clipboardManager: clipboardManager,
+                                    licenseService: licenseService,
+                                    isSelected: index == selectedIndex,
+                                    isQueuedForMerge: mergeQueueIDs.contains(item.id),
+                                    onToggleMergeQueue: { toggleMergeQueue(id: item.id) }
+                                )
+                            }
+                            .onMove { source, destination in
+                                clipboardManager.movePinnedItems(from: source, to: destination)
+                            }
+                        }
+                    }
+
+                    Section(filteredPinned.isEmpty ? "" : "Recent") {
+                        ForEach(Array(filteredHistory.enumerated()), id: \.element.id) { index, item in
+                            let globalIndex = filteredPinned.count + index
+                            ClipboardItemRow(
+                                item: item,
+                                isPinned: false,
+                                clipboardManager: clipboardManager,
+                                licenseService: licenseService,
+                                shortcutHint: quickPasteHint(for: index),
+                                isSelected: globalIndex == selectedIndex,
+                                isQueuedForMerge: mergeQueueIDs.contains(item.id),
+                                onToggleMergeQueue: { toggleMergeQueue(id: item.id) }
+                            )
+                        }
+                    }
+                }
+                .listStyle(.plain)
+                .focused($focusedTarget, equals: .list)
+                .onChange(of: selectedIndex) { _, newIndex in
+                    guard newIndex >= 0, newIndex < allItems.count else { return }
+                    withAnimation(.easeOut(duration: 0.12)) {
+                        proxy.scrollTo(allItems[newIndex].id, anchor: .center)
+                    }
+                }
+                .modifier(HistoryListKeyboardShortcuts(
+                    canHandle: shouldHandleListShortcuts,
+                    move: moveSelection,
+                    jumpToTop: { selectedIndex = 0 },
+                    jumpToBottom: { selectedIndex = max(0, allItems.count - 1) },
+                    selectContentFilter: applyContentTypeShortcut,
+                    togglePin: togglePinSelected,
+                    paste: pasteSelectedItem,
+                    focusSearch: focusSearchFromList,
+                    escape: handleEscape,
+                    delete: deleteSelectedItem
+                ))
+            }
+        }
+    }
+
+    private func applyContentTypeShortcut(_ characters: String) {
+        switch characters {
+        case "1": contentTypeFilter = .all
+        case "2": contentTypeFilter = .text
+        case "3": contentTypeFilter = .url
+        case "4": contentTypeFilter = .code
+        case "5": contentTypeFilter = .image
+        default: break
+        }
+    }
+
+    private func focusSearchFromList() {
+        let keyWindow = NSApp.keyWindow
+        guard HistoryShortcutGate.shouldFocusSearch(firstResponder: keyWindow?.firstResponder) else { return }
+        focusedTarget = .search
+    }
+
     private func moveSelection(by offset: Int) {
         let itemCount = allItems.count
         guard itemCount > 0 else { return }
@@ -665,6 +589,47 @@ struct ClipboardHistoryView: View {
         clipboardManager.delete(item: item)
         let nextCount = max(0, allItems.count - 1)
         selectedIndex = min(selectedIndex, max(0, nextCount - 1))
+    }
+
+    private func togglePinSelected() {
+        guard selectedIndex >= 0, selectedIndex < allItems.count else { return }
+        clipboardManager.togglePin(item: allItems[selectedIndex])
+    }
+
+    /// The ⌘⌃N quick-paste shortcuts paste `history[N]` (raw). Only advertise the
+    /// hint when the visible Recent order actually matches that — i.e. no pinned
+    /// items and no active search/filter — so the badge never lies.
+    private func quickPasteHint(for index: Int) -> String? {
+        guard index < 9, clipboardManager.pinnedItems.isEmpty, !hasScopedView else { return nil }
+        return "⌘⌃\(index + 1)"
+    }
+
+    private func clearFilters() {
+        withAnimation {
+            dateFilter = .all
+            contentTypeFilter = .all
+            selectedCollection = "All Collections"
+            selectedTag = "All Tags"
+        }
+    }
+
+    /// Escape: peel back state, then dismiss. Clears search, then filters, then
+    /// closes the floating window (the popover dismisses itself on Escape).
+    private func handleEscape() -> KeyPress.Result {
+        if !searchText.isEmpty {
+            searchText = ""
+            return .handled
+        }
+        if hasActiveFilters {
+            clearFilters()
+            return .handled
+        }
+        if SettingsModel.shared.useFloatingHistoryWindow,
+           let window = NSApp.keyWindow, window.title == "SaneClip History" {
+            window.close()
+            return .handled
+        }
+        return .ignored
     }
 
     private func toggleMergeQueue(id: UUID) {

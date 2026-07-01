@@ -8,7 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [2.3.12] - 2026-07-01
 
-Clipboard history can now open as a free-floating, resizable window (Settings → Shortcuts → "Open history as a resizable floating window") that remembers its last size and screen position between launches. You can also drag clips straight out of the window into other apps, and the bottom toolbar no longer squashes its controls on narrow widths.
+A big history + window update:
+
+- Clipboard history can now open as a free-floating, resizable window (Settings → General → Appearance → "Open history as a resizable floating window") that remembers its last size and screen position between launches.
+- Drag clips straight out of the window into other apps (a subtle handle appears on hover); pinned items keep drag-to-reorder.
+- Faster keyboard control: the selection now scrolls into view as you move, with Home/End and Page Up/Down to jump, `P` to pin the selected clip, and `Esc` to clear search/filters or close the window.
+- Layout is solid at every size now — the bottom toolbar and the filter row no longer squash or clip on narrow widths, and clip badges stay visible.
+- Quick-paste (⌘⌃1–9) hints now only show when they're accurate.
 
 ---
 

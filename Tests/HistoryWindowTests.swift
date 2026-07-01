@@ -24,7 +24,7 @@ struct HistoryWindowTests {
 
         let payload: [String: Any] = [
             "version": 1,
-            "useFloatingHistoryWindow": true
+            "useFloatingHistoryWindow": true,
         ]
         let exported = try JSONSerialization.data(withJSONObject: payload)
 
@@ -41,7 +41,7 @@ struct HistoryWindowTests {
             encoding: .utf8
         )
         let settingsSource = try String(
-            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/ShortcutsSettingsView.swift"),
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
             encoding: .utf8
         )
 
@@ -57,7 +57,7 @@ struct HistoryWindowTests {
         // Off-screen guard clamps the restored origin into the visible frame
         // (not just recover fully off-screen frames).
         #expect(historyWindowSource.contains("min(max(frame.origin.x"))
-        // Setting is user-exposed.
+        // Setting is user-exposed (now in General → Appearance).
         #expect(settingsSource.contains("Open history as a resizable floating window"))
     }
 
@@ -79,6 +79,51 @@ struct HistoryWindowTests {
         #expect(historyWindowSource.contains("func handleReopenHistoryAfterPaste()"))
         // A second menu-bar click closes the floating window.
         #expect(appSource.contains("historyWindow.close() // second menu-bar click closes the floating window"))
+    }
+
+    @Test("Killer update: keyboard nav, honest quick-paste hint, and discoverability wiring")
+    func killerUpdateUXWiring() throws {
+        let historyView = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardHistoryView.swift"),
+            encoding: .utf8
+        )
+        let filterBar = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/HistoryFilterBar.swift"),
+            encoding: .utf8
+        )
+        let generalSettings = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
+            encoding: .utf8
+        )
+        let rowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRow.swift"),
+            encoding: .utf8
+        )
+        let keyboardSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/HistoryListKeyboardShortcuts.swift"),
+            encoding: .utf8
+        )
+
+        // Auto-scroll selection into view.
+        #expect(historyView.contains("ScrollViewReader { proxy in"))
+        #expect(historyView.contains("proxy.scrollTo(allItems[newIndex].id, anchor: .center)"))
+        // Extra keyboard navigation (bundled in the shortcuts modifier).
+        #expect(keyboardSource.contains(".onKeyPress(.home)"))
+        #expect(keyboardSource.contains(".onKeyPress(.end)"))
+        #expect(keyboardSource.contains(".onKeyPress(.pageUp)"))
+        #expect(keyboardSource.contains(".onKeyPress(.pageDown)"))
+        #expect(keyboardSource.contains(".onKeyPress(.escape)"))
+        #expect(historyView.contains("func togglePinSelected()"))
+        #expect(historyView.contains(".modifier(HistoryListKeyboardShortcuts("))
+        // Honest quick-paste hint (no lie when pinned/filtered).
+        #expect(historyView.contains("func quickPasteHint(for index: Int) -> String?"))
+        #expect(historyView.contains("shortcutHint: quickPasteHint(for: index)"))
+        // Filter row scrolls instead of clipping.
+        #expect(filterBar.contains("ScrollView(.horizontal, showsIndicators: false)"))
+        // Floating-window toggle is discoverable in General settings.
+        #expect(generalSettings.contains("Open history as a resizable floating window"))
+        // Drag-out affordance on hover for non-pinned rows.
+        #expect(rowSource.contains("Drag to another app"))
     }
 
     @Test("Clip rows drag out only when not pinned so pinned reorder survives")
@@ -151,7 +196,7 @@ struct HistoryWindowTests {
             .init(name: "07-empty-floating-420x560", width: 420, height: 560, seed: .empty),
             .init(name: "08-pro-popover-filters-320x620", width: 320, height: 620, pro: true, showFilters: true),
             .init(name: "09-pro-floating-stack-560x680", width: 560, height: 680, pro: true, showStack: true),
-            .init(name: "10-free-popover-longtext-320x500", width: 320, height: 500, seed: .longText)
+            .init(name: "10-free-popover-longtext-320x500", width: 320, height: 500, seed: .longText),
         ]
 
         let proLicense = makeForcedProLicense()
@@ -202,7 +247,7 @@ struct HistoryWindowTests {
             let long = String(repeating: "supercalifragilistic-unbreakable-token-", count: 8)
             manager.history = [
                 ClipboardItem(content: .text(long), sourceAppName: "Safari"),
-                ClipboardItem(content: .text("Short normal clip"), sourceAppName: "Notes")
+                ClipboardItem(content: .text("Short normal clip"), sourceAppName: "Notes"),
             ]
             manager.pinnedItems = []
         case .rich:
@@ -221,7 +266,7 @@ struct HistoryWindowTests {
                 ClipboardItem(content: .text("func floatingWindow() { /* resizable */ }"), sourceAppName: "Xcode"),
                 ClipboardItem(content: .text("Customer quote worth saving"), sourceAppName: "Messages", note: "Testimonial"),
                 ClipboardItem(content: .text("Temporary build number 2312"), sourceAppName: "Terminal"),
-                pinned
+                pinned,
             ]
             manager.pinnedItems = [pinned]
         }
@@ -244,7 +289,8 @@ struct HistoryWindowTests {
 
     private func screenshotDir() -> String? {
         if let env = ProcessInfo.processInfo.environment["SANECLIP_SCREENSHOT_DIR"]?
-            .trimmingCharacters(in: .whitespacesAndNewlines), !env.isEmpty {
+            .trimmingCharacters(in: .whitespacesAndNewlines), !env.isEmpty
+        {
             return env
         }
         let hint = URL(fileURLWithPath: "/tmp/saneclip_screenshot_dir.txt")
@@ -311,7 +357,8 @@ struct HistoryWindowTests {
                CGWindowID(window.windowNumber),
                [.boundsIgnoreFraming, .bestResolution]
            ),
-           cgImage.width > 1, cgImage.height > 1 {
+           cgImage.width > 1, cgImage.height > 1
+        {
             let rep = NSBitmapImageRep(cgImage: cgImage)
             if let png = rep.representation(using: .png, properties: [:]) {
                 try png.write(to: url, options: .atomic)

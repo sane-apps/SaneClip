@@ -14,14 +14,17 @@ struct GeneralSettingsView: View {
     @State private var appPresetBundleID = ""
     @State private var appPresetMode: PasteMode = .standard
     #if !APP_STORE && !SETAPP
-    @State private var autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
-    @State private var updateCheckFrequency = UpdateService.shared.updateCheckFrequency
+        @State private var autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
+        @State private var updateCheckFrequency = UpdateService.shared.updateCheckFrequency
     #else
-    @State private var autoCheckUpdates = false
+        @State private var autoCheckUpdates = false
     #endif
     @State var isAuthenticating = false
 
-    private var isPro: Bool { licenseService?.isPro == true }
+    private var isPro: Bool {
+        licenseService?.isPro == true
+    }
+
     private var historySizeChoices: [Int] {
         let currentChoice = SettingsModel.normalizedMaxHistorySize(settings.maxHistorySize)
         let allChoices = Set(SettingsModel.proHistorySizeChoices + [currentChoice])
@@ -75,6 +78,11 @@ struct GeneralSettingsView: View {
                             }
                         }
                     }
+                    CompactDivider()
+                    CompactToggle(label: "Open history as a resizable floating window", isOn: Binding(
+                        get: { settings.useFloatingHistoryWindow },
+                        set: { settings.useFloatingHistoryWindow = $0 }
+                    ))
                     CompactDivider()
                     CompactRow(SaneClipSettingsCopy.pasteSoundLabel) {
                         HStack(spacing: 8) {
@@ -283,37 +291,37 @@ struct GeneralSettingsView: View {
                 }
 
                 #if !APP_STORE && !SETAPP
-                CompactSection(SaneClipSettingsCopy.softwareUpdatesSectionTitle) {
-                    SaneSparkleRow(
-                        automaticallyChecks: Binding(
-                            get: { autoCheckUpdates },
-                            set: { newValue in
-                                autoCheckUpdates = newValue
-                                UpdateService.shared.automaticallyChecksForUpdates = newValue
-                            }
-                        ),
-                        checkFrequency: Binding(
-                            get: { updateCheckFrequency },
-                            set: { newValue in
-                                updateCheckFrequency = newValue
-                                UpdateService.shared.updateCheckFrequency = newValue
-                            }
-                        ),
-                        labels: .init(
-                            automaticCheckLabel: SaneClipSettingsCopy.updateAutomaticallyLabel,
-                            automaticCheckHelp: SaneClipSettingsCopy.updateAutomaticallyHelp,
-                            checkFrequencyLabel: SaneClipSettingsCopy.updateFrequencyLabel,
-                            checkFrequencyHelp: SaneClipSettingsCopy.updateFrequencyHelp,
-                            actionsLabel: SaneClipSettingsCopy.updatesActionsLabel,
-                            checkingLabel: SaneClipSettingsCopy.checkingButtonTitle,
-                            checkNowLabel: SaneClipSettingsCopy.checkNowButtonTitle,
-                            checkNowHelp: SaneClipSettingsCopy.checkNowHelp,
-                            dailyTitle: String(localized: "saneclip.settings.updates.daily", defaultValue: "Daily"),
-                            weeklyTitle: String(localized: "saneclip.settings.updates.weekly", defaultValue: "Weekly")
-                        ),
-                        onCheckNow: { UpdateService.shared.checkForUpdates() }
-                    )
-                }
+                    CompactSection(SaneClipSettingsCopy.softwareUpdatesSectionTitle) {
+                        SaneSparkleRow(
+                            automaticallyChecks: Binding(
+                                get: { autoCheckUpdates },
+                                set: { newValue in
+                                    autoCheckUpdates = newValue
+                                    UpdateService.shared.automaticallyChecksForUpdates = newValue
+                                }
+                            ),
+                            checkFrequency: Binding(
+                                get: { updateCheckFrequency },
+                                set: { newValue in
+                                    updateCheckFrequency = newValue
+                                    UpdateService.shared.updateCheckFrequency = newValue
+                                }
+                            ),
+                            labels: .init(
+                                automaticCheckLabel: SaneClipSettingsCopy.updateAutomaticallyLabel,
+                                automaticCheckHelp: SaneClipSettingsCopy.updateAutomaticallyHelp,
+                                checkFrequencyLabel: SaneClipSettingsCopy.updateFrequencyLabel,
+                                checkFrequencyHelp: SaneClipSettingsCopy.updateFrequencyHelp,
+                                actionsLabel: SaneClipSettingsCopy.updatesActionsLabel,
+                                checkingLabel: SaneClipSettingsCopy.checkingButtonTitle,
+                                checkNowLabel: SaneClipSettingsCopy.checkNowButtonTitle,
+                                checkNowHelp: SaneClipSettingsCopy.checkNowHelp,
+                                dailyTitle: String(localized: "saneclip.settings.updates.daily", defaultValue: "Daily"),
+                                weeklyTitle: String(localized: "saneclip.settings.updates.weekly", defaultValue: "Weekly")
+                            ),
+                            onCheckNow: { UpdateService.shared.checkForUpdates() }
+                        )
+                    }
                 #endif
 
                 CompactSection(SaneClipSettingsCopy.historySectionTitle) {
@@ -539,8 +547,8 @@ struct GeneralSettingsView: View {
         }
         .onAppear {
             #if !APP_STORE && !SETAPP
-            autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
-            updateCheckFrequency = UpdateService.shared.updateCheckFrequency
+                autoCheckUpdates = UpdateService.shared.automaticallyChecksForUpdates
+                updateCheckFrequency = UpdateService.shared.updateCheckFrequency
             #endif
             refreshPermissionState()
         }

@@ -49,11 +49,6 @@ struct ShortcutsSettingsView: View {
                         set: { SettingsModel.shared.openHistoryAtCursor = $0 }
                     ))
                     CompactDivider()
-                    CompactToggle(label: "Open history as a resizable floating window", isOn: Binding(
-                        get: { SettingsModel.shared.useFloatingHistoryWindow },
-                        set: { SettingsModel.shared.useFloatingHistoryWindow = $0 }
-                    ))
-                    CompactDivider()
                     if isPro {
                         CompactRow("Paste as Plain Text") {
                             KeyboardShortcuts.Recorder(for: .pasteAsPlainText)

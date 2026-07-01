@@ -6,6 +6,39 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+- 2026-07-01 (evening) 2.3.12 STATE UPDATE — supersedes the "NOT committed" note
+  below:
+  - Killer update MERGED to `origin/main` (pure ff, `2d811e9…23795a7` + ledger
+    `c2abbb7`); branch also on origin. Mini repo reset clean to origin/main
+    (zero unique bytes — hash-proven before reset). NOT released yet.
+  - Fresh proof: SaneMaster verify on Mini 181 tests green ×3 (17:36, 18:17,
+    18:5x EDT); corrected visual receipt at
+    `outputs/visual-audit-saneclip-2312/receipt.json` — IMPORTANT: original
+    receipt mapped 3 permission dialogs as feature shots; corrected mapping =
+    window render + arrow-nav auto-scroll + Esc close visually proven
+    (nav0/nav2/nav-esc.png), P-pin/Return/toggle-reopen unit-tested only.
+    Auto-paste (synthetic Cmd-V) still needs one human keypress or restored
+    Apple Development cert on the Mini (re-sign drops TCC grant).
+  - WEBSITE 2.3.12 marketing on `origin/main` (`0cbc465`, `e6be5f1`): new
+    Floating History Window + Drag & Drop Out feature cards (lightboxes =
+    render-matrix assets `screenshot-floating-wide/colorful.png`), every-app
+    colors copy, in-window keyboard nav in Lightning Shortcuts + keyboard
+    guide, Basic pricing bullets. Playwright-render verified (caught + fixed
+    an unclosed `<a>` that collapsed the grid). NOT deployed — rides
+    `release.sh` at release; schema versions/appcast/download link + hero
+    screenshot replacement still bump at release time.
+  - iOS companion upgrades on branch `feature/ios-companion-upgrades`
+    (`90e868c`, `70ab0d6`, `abfe00f`, pushed): drag-out (History+Pinned),
+    ClipShareLink everywhere, Pinned Unpin/Delete parity fix, iPad hardware
+    keyboard nav (HistoryKeyboardShortcuts.swift + selection ring +
+    auto-scroll). Mac suite green each push. Sim verification in progress:
+    Mini iOS 26.5 platform re-downloaded (machine_cleanup wipes sim runtimes
+    AND devices — recreate iPhone 17 Pro Max / iPad Pro 13-inch (M5) via
+    simctl before capture_appstore_screenshots.sh). Drag + keyboard need a
+    human pass on real iPad before "done".
+  - Ship 2.3.12: pending `/ship` clearance + release_preflight (owner said go
+    once use-testing is clean; auto-paste caveat documented above). Glenn
+    reply: owner drafts it personally, AFTER release.
 - 2026-07-01 Glenn's SaneClip ideas (branch `feature/floating-resizable-history-glenn`,
   NOT committed, NOT released; bumped to 2.3.12/2312). Implemented all four
   customer requests from email #983 plus the squashed-footer bug he screenshotted:

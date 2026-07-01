@@ -376,6 +376,7 @@ struct ClipboardItemRow: View {
                         if item.collection != "Default" {
                             Text(item.collection)
                                 .font(.system(size: 10, weight: .medium))
+                                .lineLimit(1)
                                 .foregroundStyle(.white.opacity(0.85))
                                 .padding(.horizontal, 5)
                                 .padding(.vertical, 2)

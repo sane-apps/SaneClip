@@ -593,7 +593,15 @@ struct ClipboardHistoryView: View {
 
     private func togglePinSelected() {
         guard selectedIndex >= 0, selectedIndex < allItems.count else { return }
-        clipboardManager.togglePin(item: allItems[selectedIndex])
+        // Pinning moves the item between sections, so re-anchor the selection to
+        // the same item by id (keeps the highlight — and auto-scroll — on it).
+        let item = allItems[selectedIndex]
+        clipboardManager.togglePin(item: item)
+        if let newIndex = allItems.firstIndex(where: { $0.id == item.id }) {
+            selectedIndex = newIndex
+        } else {
+            selectedIndex = min(selectedIndex, max(0, allItems.count - 1))
+        }
     }
 
     /// The ⌘⌃N quick-paste shortcuts paste `history[N]` (raw). Only advertise the

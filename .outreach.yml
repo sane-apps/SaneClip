@@ -65,8 +65,8 @@ launch_calendar:
       action: "Run DMCA workflow for active crack page, recheck open patched-pending issues, verify current direct/App Store surface, and decide whether SaneClip can support a launch."
       gate: "No PH/HN/IH launch until DMCA status, support replies, and current release proof are clean."
       success_metric: "Blockers resolved or launch marked no-go with exact reasons."
-      last_reviewed: "2026-06-22"
-      result: "On 2026-06-22, canonical Mini `launch_readiness --json` reran from the repo root and returned `ok: false`: the piracy page remains `needs_dmca`, GitHub issues #9-#12 were rechecked on 2026-06-16 and are already closed as of 2026-05-18, App Store/iOS metadata and conversion surfaces still need a fresh check, the 30-second video remains local only, the latest `release_preflight` proof is now stale at 18.34 days old with 3 warnings, and the fresh 2026-06-22 portfolio validation report still flags stale SaneClip customer-UI proof plus missing transcript/fixture/log artifacts. No launch, directory, or public reply action was executed."
+      last_reviewed: "2026-06-28"
+      result: "On 2026-06-28, canonical Mini `launch_readiness --json` reran from the repo root and returned `ok: false`: the piracy page remains `needs_dmca`, GitHub issues #9-#12 were rechecked on 2026-06-16 and are already closed as of 2026-05-18, App Store/iOS metadata and conversion surfaces still need a fresh check, the 30-second video remains local only and still needs human approval plus hosting, the latest `release_preflight` proof is now stale at 24.35 days old with 3 warnings, and the shared 2026-06-28 validation receipt still flags stale SaneClip customer-UI proof plus missing transcript/fixture/log artifacts. No launch, directory, or public reply action was executed."
     - date: "2026-05-27"
       time: "10:00"
       channel: "Clipboard/OCR launch decision"
@@ -74,23 +74,23 @@ launch_calendar:
       action: "If cleanup passed, prepare a privacy-first SaneClip launch package around encrypted clipboard history + OCR capture; otherwise keep monitoring only."
       gate: "Fresh Mini verification and exact launch assets required."
       success_metric: "Launch package scheduled or explicit no-go."
-      last_reviewed: "2026-06-22"
-      result: "On 2026-06-22, canonical Mini `launch_readiness --json` reran from the repo root and returned `ok: false`: the piracy page remains `needs_dmca`, GitHub issues #9-#12 were rechecked on 2026-06-16 and are already closed as of 2026-05-18, App Store/iOS metadata and conversion surfaces still need a fresh check, the 30-second video remains local only, the latest `release_preflight` proof is now stale at 18.34 days old with 3 warnings, and the fresh 2026-06-22 portfolio validation report still flags stale SaneClip customer-UI proof plus missing transcript/fixture/log artifacts. No launch package, directory action, scheduling action, or public reply action was executed."
+      last_reviewed: "2026-06-28"
+      result: "On 2026-06-28, canonical Mini `launch_readiness --json` reran from the repo root and returned `ok: false`: the piracy page remains `needs_dmca`, GitHub issues #9-#12 were rechecked on 2026-06-16 and are already closed as of 2026-05-18, App Store/iOS metadata and conversion surfaces still need a fresh check, the 30-second video remains local only and still needs human approval plus hosting, the latest `release_preflight` proof is now stale at 24.35 days old with 3 warnings, and the shared 2026-06-28 validation receipt still flags stale SaneClip customer-UI proof plus missing transcript/fixture/log artifacts. No launch package, directory action, scheduling action, or public reply action was executed."
   last_launch_readiness:
-    date: "2026-06-22"
+    date: "2026-06-28"
     status: "no_go"
     launch_readiness_exit: 1
     blocker_summary:
-      - "Canonical Mini `launch_readiness --json` reran on 2026-06-22 and exited nonzero."
+      - "Canonical Mini `launch_readiness --json` reran on 2026-06-28 and exited nonzero."
       - "Launch remains red because the piracy page is still marked `needs_dmca`."
       - "GitHub issues #9-#12 remain closed as of 2026-05-18, so they are no longer the active blocker family."
       - "App Store/iOS metadata and conversion surfaces still need a fresh check before larger launch traffic."
       - "The 30-second launch video remains local-only and still needs human approval plus hosting after the cleanup lane is complete."
-      - "Mini launch_readiness still sees `release_preflight` passed, but the proof is now 18.34 days old and still carries 3 warnings, so the risk-cleanup gate remains red."
-      - "The fresh 2026-06-22 portfolio validation report still returned `NOT READY FOR RELEASE`, including stale customer-UI proof plus missing transcript/fixture/log artifacts for SaneClip."
+      - "Mini launch_readiness still sees `release_preflight` passed, but the proof is now 24.35 days old and still carries 3 warnings, so the risk-cleanup gate remains red."
+      - "The shared validation receipt at `/Users/sj/SaneApps/infra/SaneProcess/outputs/validation/2026-06-28.json` still returned `NOT READY FOR RELEASE`, including stale customer-UI proof plus missing transcript/fixture/log artifacts for SaneClip."
       - "The overdue 2026-05-23 and 2026-05-27 slots remain blocked by the same cleanup and proof gates."
-      - "No launch, directory, scheduling, or public reply action ran on 2026-06-22."
-    next_date: "2026-06-29"
+      - "No launch, directory, scheduling, or public reply action ran on 2026-06-28."
+    next_date: "2026-07-05"
 
 public_posting_policy:
   approval_required: true

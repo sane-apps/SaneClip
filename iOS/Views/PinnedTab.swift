@@ -7,7 +7,9 @@ struct PinnedTab: View {
     @State private var searchText = ""
     @State private var selectedItem: SharedClipboardItem?
 
-    private var isIPad: Bool { sizeClass == .regular }
+    private var isIPad: Bool {
+        sizeClass == .regular
+    }
 
     var body: some View {
         NavigationStack {
@@ -70,6 +72,10 @@ struct PinnedTab: View {
         ))
         .listRowSeparator(.hidden)
         .contentShape(Rectangle())
+        // Unconditional drag-out (no .onMove reorder on iOS; see HistoryTab).
+        .onDrag {
+            ClipDragPayload.itemProvider(for: item)
+        }
         .onTapGesture {
             viewModel.copyToClipboard(item)
         }
@@ -80,9 +86,21 @@ struct PinnedTab: View {
                 Label("Copy", systemImage: "doc.on.doc")
             }
             Button {
+                viewModel.togglePin(item)
+            } label: {
+                Label("Unpin", systemImage: "pin.slash")
+            }
+            Button {
                 selectedItem = item
             } label: {
                 Label("Details", systemImage: "info.circle")
+            }
+            ClipShareLink(item: item)
+            Divider()
+            Button(role: .destructive) {
+                viewModel.deleteItem(item)
+            } label: {
+                Label("Delete", systemImage: "trash")
             }
         }
         .swipeActions(edge: .trailing) {

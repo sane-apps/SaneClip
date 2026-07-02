@@ -6,6 +6,28 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+- 2026-07-01 ~20:00 EDT — **2.3.12 SHIPPED (direct channel)**; supersedes the
+  "NOT committed, NOT released" note below. Verified live: appcast top entry
+  2.3.12/2312, dist ZIP HTTP 200, website deployed with the new feature cards
+  AND corrected shortcuts (⌘⇧⌃Y / ⌘⌃1-9 — the ship audit caught 4 surfaces
+  advertising the retired ⌘⇧V). Ship pipeline: preflight PASS after fresh
+  customer-UI sweeps, 15-perspective docs audit (2 criticals found + fixed
+  same hour: hotkey copy, and a Touch ID gate bypass on the hotkey/Dock-reopen
+  paths — fixed 24e3903 with a pure tested gate), critic consciously skipped
+  per owner (3 prior adversarial passes), HMAC clearance written, released
+  FROM THE MINI (release.sh must run there: ASC_AUTH_KEY_PATH, Developer ID
+  cert, and notary profile are Mini-local — an Air run fails on the ASC key
+  path). Release metadata commits on main (6f4f7ae, 09123b7).
+  Routing root-cause fixed in SaneProcess (8e80a65): non-release routed
+  commands now run in scratch workspaces so canonical Mini repos stay clean —
+  ends the dirty-peer release blocks and auto-reconcile stash era.
+  OPEN: (1) owner uploads staged Mini ~/Desktop/LemonSqueezy-Uploads/
+  SaneClip-2.3.12.zip to LS variant 1228215, then reruns
+  `release.sh --version 2.3.12 --post-release-checks-only`; (2) Glenn reply —
+  owner drafts personally; (3) hero screenshot replacement + human
+  iPad-drag/keyboard/auto-paste pass tracked as tasks; (4) iOS companion
+  upgrades on `feature/ios-companion-upgrades` (91b3e81) for the App Store
+  lane, sim-verified, NOT in this release.
 - 2026-07-01 Glenn's SaneClip ideas (branch `feature/floating-resizable-history-glenn`,
   NOT committed, NOT released; bumped to 2.3.12/2312). Implemented all four
   customer requests from email #983 plus the squashed-footer bug he screenshotted:

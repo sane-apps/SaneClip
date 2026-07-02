@@ -6,7 +6,27 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                                                                                                                <item>
+                                                                                                                                        <item>
+            <title>2.3.12</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Wed, 01 Jul 2026 20:02:26 -0400</pubDate>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Your clipboard history can now live in a floating, resizable window that remembers its size and position. Drag clips straight into other apps. Drive everything from the keyboard: arrows, Home/End, P to pin, Return to paste. Every source app gets its own color — not just Apple apps. Plus a fixed footer at narrow sizes, and Touch ID now also guards the history hotkey and Dock reopen.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.12.zip"
+                       sparkle:version="2312"
+                       sparkle:shortVersionString="2.3.12"
+                       length="5059119"
+                       type="application/octet-stream"
+                       sparkle:edSignature="A6wIsv2UgaydGoGtO+xaGc6MwuHok3A+3LQur3gB41ymnStLeNXDl98BLcIR+oMq2Trjxd3MdS5oQdqJif9EAA=="/>
+        </item>
+<item>
             <title>2.3.11</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Mon, 22 Jun 2026 14:48:23 -0400</pubDate>

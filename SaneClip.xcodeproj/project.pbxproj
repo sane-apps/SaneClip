@@ -2726,7 +2726,7 @@
 			repositoryURL = "https://github.com/sane-apps/SaneUI.git";
 			requirement = {
 				kind = revision;
-				revision = e5fdfd976eca56c06b93607dc12807068cd19ac9;
+				revision = 777f0cd34b8265083db3a5436cfbddaeafa694d3;
 			};
 		};
 		9B9B0D09FDAE079B73A7A0CB /* XCRemoteSwiftPackageReference "Sparkle" */ = {

@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.13] - 2026-07-02
+
+Keeps merge queue controls readable at narrow widths.
+Keeps Edit Text Save and Cancel buttons visible while editing long clips.
+Makes Clipboard Rules switches update visibly as soon as they are clicked.
+Improves the Pro floating history window so it stays gated correctly and closes when you click outside it.
+
+---
+
 ## [2.3.12] - 2026-07-01
 
 A big history + window update:

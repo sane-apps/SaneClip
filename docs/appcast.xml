@@ -6,7 +6,30 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                                                                                                                        <item>
+                                                                                                                                                <item>
+            <title>2.3.13</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Thu, 02 Jul 2026 10:01:15 -0400</pubDate>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Keeps merge queue controls readable at narrow widths.</li>
+                <li>Keeps Edit Text Save and Cancel buttons visible while editing long clips.</li>
+                <li>Makes Clipboard Rules switches update visibly as soon as they are clicked.</li>
+                <li>Improves the Pro floating history window so it stays gated correctly and closes when you click outside it.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.13.zip"
+                       sparkle:version="2313"
+                       sparkle:shortVersionString="2.3.13"
+                       length="5070142"
+                       type="application/octet-stream"
+                       sparkle:edSignature="SFFb2SLbRE/MA+EhJnJde/AwepmnjKpEBeaLpK9sJ1ZFc8KuNkA9zKfzVZ/XtG5R0Z7xhoVOmArnwBOvstulBg=="/>
+        </item>
+<item>
             <title>2.3.12</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Wed, 01 Jul 2026 20:02:26 -0400</pubDate>

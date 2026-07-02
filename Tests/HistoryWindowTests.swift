@@ -24,7 +24,7 @@ struct HistoryWindowTests {
 
         let payload: [String: Any] = [
             "version": 1,
-            "useFloatingHistoryWindow": true,
+            "useFloatingHistoryWindow": true
         ]
         let exported = try JSONSerialization.data(withJSONObject: payload)
 
@@ -59,6 +59,28 @@ struct HistoryWindowTests {
         #expect(historyWindowSource.contains("min(max(frame.origin.x"))
         // Setting is user-exposed (now in General → Appearance).
         #expect(settingsSource.contains("Open history as a resizable floating window"))
+    }
+
+    @Test("Sparkle check frequency resolves and normalizes intervals")
+    func sparkleCheckFrequencyBehavior() {
+        #expect(SaneSparkleCheckFrequency.resolve(updateCheckInterval: 60 * 60 * 24) == .daily)
+        #expect(SaneSparkleCheckFrequency.resolve(updateCheckInterval: 60 * 60 * 24 * 7) == .weekly)
+        #expect(SaneSparkleCheckFrequency.normalizedInterval(from: 60 * 60 * 6) == SaneSparkleCheckFrequency.daily.interval)
+    }
+
+    @Test("Sparkle settings UI stays channel-gated out of Setapp and App Store builds")
+    func sparkleRowIsChannelGated() throws {
+        // The Setapp archive scanner hard-fails on the SaneSparkleRow symbol,
+        // so the app-local component must be compiled out for those channels
+        // (a shared-library version reaches every consumer binary — that is
+        // why it is app-local; see UI/Settings/SaneSparkleRow.swift header).
+        let rowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SaneSparkleRow.swift"),
+            encoding: .utf8
+        )
+        #expect(rowSource.hasPrefix("// Direct-distribution ONLY"))
+        #expect(rowSource.contains("#if !APP_STORE && !SETAPP"))
+        #expect(rowSource.contains("struct SaneSparkleRow"))
     }
 
     @Test("Touch ID history lock gates the hotkey and Dock-reopen paths")
@@ -292,7 +314,7 @@ struct HistoryWindowTests {
             .init(name: "08-pro-popover-filters-320x620", width: 320, height: 620, pro: true, showFilters: true),
             .init(name: "09-pro-floating-stack-560x680", width: 560, height: 680, pro: true, showStack: true),
             .init(name: "10-free-popover-longtext-320x500", width: 320, height: 500, seed: .longText),
-            .init(name: "11-colorful-sources-440x700", width: 440, height: 700, seed: .colorful),
+            .init(name: "11-colorful-sources-440x700", width: 440, height: 700, seed: .colorful)
         ]
 
         let proLicense = makeForcedProLicense()
@@ -345,7 +367,7 @@ struct HistoryWindowTests {
             let sources = [
                 "Messages", "Brave Browser", "Codex", "Slack", "QuickTime Player",
                 "Visual Studio Code", "Notes", "Arc", "Google Chrome", "Terminal",
-                "Discord", "Figma", "Xcode", "Spotify",
+                "Discord", "Figma", "Xcode", "Spotify"
             ]
             manager.history = sources.map { name in
                 ClipboardItem(content: .text("Clip from \(name)"), sourceAppName: name)
@@ -355,7 +377,7 @@ struct HistoryWindowTests {
             let long = String(repeating: "supercalifragilistic-unbreakable-token-", count: 8)
             manager.history = [
                 ClipboardItem(content: .text(long), sourceAppName: "Safari"),
-                ClipboardItem(content: .text("Short normal clip"), sourceAppName: "Notes"),
+                ClipboardItem(content: .text("Short normal clip"), sourceAppName: "Notes")
             ]
             manager.pinnedItems = []
         case .rich:
@@ -374,7 +396,7 @@ struct HistoryWindowTests {
                 ClipboardItem(content: .text("func floatingWindow() { /* resizable */ }"), sourceAppName: "Xcode"),
                 ClipboardItem(content: .text("Customer quote worth saving"), sourceAppName: "Messages", note: "Testimonial"),
                 ClipboardItem(content: .text("Temporary build number 2312"), sourceAppName: "Terminal"),
-                pinned,
+                pinned
             ]
             manager.pinnedItems = [pinned]
         }
@@ -397,8 +419,7 @@ struct HistoryWindowTests {
 
     private func screenshotDir() -> String? {
         if let env = ProcessInfo.processInfo.environment["SANECLIP_SCREENSHOT_DIR"]?
-            .trimmingCharacters(in: .whitespacesAndNewlines), !env.isEmpty
-        {
+            .trimmingCharacters(in: .whitespacesAndNewlines), !env.isEmpty {
             return env
         }
         let hint = URL(fileURLWithPath: "/tmp/saneclip_screenshot_dir.txt")
@@ -465,8 +486,7 @@ struct HistoryWindowTests {
                CGWindowID(window.windowNumber),
                [.boundsIgnoreFraming, .bestResolution]
            ),
-           cgImage.width > 1, cgImage.height > 1
-        {
+           cgImage.width > 1, cgImage.height > 1 {
             let rep = NSBitmapImageRep(cgImage: cgImage)
             if let png = rep.representation(using: .png, properties: [:]) {
                 try png.write(to: url, options: .atomic)

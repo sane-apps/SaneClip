@@ -3,8 +3,7 @@ import Foundation
 
 /// AES-GCM encryption for clipboard history at rest.
 /// Key is auto-generated on first use and stored in Keychain.
-struct HistoryEncryption: Sendable {
-
+enum HistoryEncryption {
     /// Encrypts plaintext data using AES-GCM.
     /// Returns combined nonce + ciphertext + tag.
     static func encrypt(_ plaintext: Data) throws -> Data {
@@ -23,14 +22,26 @@ struct HistoryEncryption: Sendable {
         return try AES.GCM.open(sealedBox, using: key)
     }
 
-    /// Heuristic: encrypted data never starts with `[` or `{` (JSON markers).
-    /// AES-GCM nonce is 12 random bytes, so the probability of a false positive is negligible.
+    /// Distinguishes AES-GCM blobs from plaintext JSON payloads.
+    ///
+    /// Fast path: the AES-GCM combined format starts with a 12-byte random
+    /// nonce, so a first byte outside the JSON start set means encrypted.
+    /// BUT the nonce's first byte is uniform random — ~2.3% (6/256) of real
+    /// ciphertexts start with a JSON-looking byte, so the old first-byte-only
+    /// check misjudged ~1 in 43 encrypted records as plaintext (and made the
+    /// sync round-trip test flaky). For that ambiguous slice we confirm by
+    /// attempting a full JSON parse: random ciphertext passing a complete
+    /// JSON parse is genuinely negligible, and plaintext records are always
+    /// JSONEncoder output, which parses.
     static func isEncrypted(_ data: Data) -> Bool {
         guard let firstByte = data.first else { return false }
         // JSON arrays start with 0x5B `[`, objects with 0x7B `{`
         // Whitespace before JSON: 0x20 (space), 0x09 (tab), 0x0A (LF), 0x0D (CR)
         let jsonStartBytes: Set<UInt8> = [0x5B, 0x7B, 0x20, 0x09, 0x0A, 0x0D]
-        return !jsonStartBytes.contains(firstByte)
+        guard jsonStartBytes.contains(firstByte) else { return true }
+
+        // Ambiguous first byte: encrypted only if it is NOT actually JSON.
+        return (try? JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed])) == nil
     }
 
     // MARK: - Key Management
@@ -67,9 +78,9 @@ struct HistoryEncryption: Sendable {
 
         var errorDescription: String? {
             switch self {
-            case .sealFailed: return "Failed to encrypt data"
-            case .keyAccessRequiresUserApproval: return "SaneClip needs permission to access the existing history encryption key"
-            case .keyStoreFailed: return "Failed to store encryption key in Keychain"
+            case .sealFailed: "Failed to encrypt data"
+            case .keyAccessRequiresUserApproval: "SaneClip needs permission to access the existing history encryption key"
+            case .keyStoreFailed: "Failed to store encryption key in Keychain"
             }
         }
     }

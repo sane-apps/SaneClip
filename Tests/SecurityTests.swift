@@ -1,5 +1,5 @@
-import Foundation
 import CloudKit
+import Foundation
 @testable import SaneClip
 import Testing
 
@@ -7,97 +7,97 @@ import Testing
 
 struct URLSchemeSecurityTests {
     @Test("URL scheme parses copy command")
-    func parseCommandCopy() {
-        let url = URL(string: "saneclip://copy?text=Hello%20World")!
+    func parseCommandCopy() throws {
+        let url = try #require(URL(string: "saneclip://copy?text=Hello%20World"))
         let command = URLSchemeHandler.parseCommand(url)
         #expect(command == .copy(text: "Hello World"))
     }
 
     @Test("URL scheme parses paste command")
-    func parseCommandPaste() {
-        let url = URL(string: "saneclip://paste?index=3")!
+    func parseCommandPaste() throws {
+        let url = try #require(URL(string: "saneclip://paste?index=3"))
         let command = URLSchemeHandler.parseCommand(url)
         #expect(command == .paste(index: 3))
     }
 
     @Test("URL scheme parses paste item alias as 1-based index")
-    func parseCommandPasteItemAlias() {
-        let url = URL(string: "saneclip://paste?item=2")!
+    func parseCommandPasteItemAlias() throws {
+        let url = try #require(URL(string: "saneclip://paste?item=2"))
         let command = URLSchemeHandler.parseCommand(url)
         #expect(command == .paste(index: 1))
     }
 
     @Test("URL scheme parses search command")
-    func parseCommandSearch() {
-        let url = URL(string: "saneclip://search?q=hello")!
+    func parseCommandSearch() throws {
+        let url = try #require(URL(string: "saneclip://search?q=hello"))
         let command = URLSchemeHandler.parseCommand(url)
         #expect(command == .search(query: "hello"))
     }
 
     @Test("URL scheme parses search query alias")
-    func parseCommandSearchAlias() {
-        let url = URL(string: "saneclip://search?query=hello")!
+    func parseCommandSearchAlias() throws {
+        let url = try #require(URL(string: "saneclip://search?query=hello"))
         let command = URLSchemeHandler.parseCommand(url)
         #expect(command == .search(query: "hello"))
     }
 
     @Test("URL scheme parses snippet command")
-    func parseCommandSnippet() {
-        let url = URL(string: "saneclip://snippet?name=Email%20Sig")!
+    func parseCommandSnippet() throws {
+        let url = try #require(URL(string: "saneclip://snippet?name=Email%20Sig"))
         let command = URLSchemeHandler.parseCommand(url)
         #expect(command == .snippet(name: "Email Sig", values: [:]))
     }
 
     @Test("URL scheme parses snippet alias")
-    func parseCommandSnippetAlias() {
-        let url = URL(string: "saneclip://snippet?snippet=Daily%20Standup")!
+    func parseCommandSnippetAlias() throws {
+        let url = try #require(URL(string: "saneclip://snippet?snippet=Daily%20Standup"))
         let command = URLSchemeHandler.parseCommand(url)
         #expect(command == .snippet(name: "Daily Standup", values: [:]))
     }
 
     @Test("URL scheme parses copy value alias")
-    func parseCommandCopyAlias() {
-        let url = URL(string: "saneclip://copy?value=Hello%20Alias")!
+    func parseCommandCopyAlias() throws {
+        let url = try #require(URL(string: "saneclip://copy?value=Hello%20Alias"))
         let command = URLSchemeHandler.parseCommand(url)
         #expect(command == .copy(text: "Hello Alias"))
     }
 
     @Test("URL scheme parses clear command")
-    func parseCommandClear() {
-        let url = URL(string: "saneclip://clear")!
+    func parseCommandClear() throws {
+        let url = try #require(URL(string: "saneclip://clear"))
         let command = URLSchemeHandler.parseCommand(url)
         #expect(command == .clear)
     }
 
     @Test("URL scheme parses export command")
-    func parseCommandExport() {
-        let url = URL(string: "saneclip://export")!
+    func parseCommandExport() throws {
+        let url = try #require(URL(string: "saneclip://export"))
         let command = URLSchemeHandler.parseCommand(url)
         #expect(command == .export)
     }
 
     @Test("URL scheme parses history command")
-    func parseCommandHistory() {
-        let url = URL(string: "saneclip://history")!
+    func parseCommandHistory() throws {
+        let url = try #require(URL(string: "saneclip://history"))
         let command = URLSchemeHandler.parseCommand(url)
         #expect(command == .history)
     }
 
     @Test("URL scheme returns nil for invalid URLs")
-    func parseCommandInvalid() {
-        let badScheme = URL(string: "https://copy?text=hello")!
+    func parseCommandInvalid() throws {
+        let badScheme = try #require(URL(string: "https://copy?text=hello"))
         #expect(URLSchemeHandler.parseCommand(badScheme) == nil)
 
-        let noHost = URL(string: "saneclip:///")!
+        let noHost = try #require(URL(string: "saneclip:///"))
         #expect(URLSchemeHandler.parseCommand(noHost) == nil)
 
-        let unknownCommand = URL(string: "saneclip://delete?id=123")!
+        let unknownCommand = try #require(URL(string: "saneclip://delete?id=123"))
         #expect(URLSchemeHandler.parseCommand(unknownCommand) == nil)
 
-        let missingParam = URL(string: "saneclip://copy")!
+        let missingParam = try #require(URL(string: "saneclip://copy"))
         #expect(URLSchemeHandler.parseCommand(missingParam) == nil)
 
-        let negativeIndex = URL(string: "saneclip://paste?index=-1")!
+        let negativeIndex = try #require(URL(string: "saneclip://paste?index=-1"))
         #expect(URLSchemeHandler.parseCommand(negativeIndex) == nil)
     }
 
@@ -121,38 +121,38 @@ struct URLSchemeSecurityTests {
 
 struct WebhookSecurityTests {
     @Test("Webhook rejects plain HTTP endpoints")
-    func webhookRejectsHTTP() {
-        let httpURL = URL(string: "http://api.example.com/webhook")!
+    func webhookRejectsHTTP() throws {
+        let httpURL = try #require(URL(string: "http://api.example.com/webhook"))
         #expect(WebhookService.isSecureEndpoint(httpURL) == false)
     }
 
     @Test("Webhook accepts HTTPS endpoints")
-    func webhookAcceptsHTTPS() {
-        let httpsURL = URL(string: "https://api.example.com/webhook")!
+    func webhookAcceptsHTTPS() throws {
+        let httpsURL = try #require(URL(string: "https://api.example.com/webhook"))
         #expect(WebhookService.isSecureEndpoint(httpsURL) == true)
     }
 
     @Test("Webhook allows HTTP localhost for development")
-    func webhookAllowsLocalhostHTTP() {
-        let localhost = URL(string: "http://localhost:8080/hook")!
+    func webhookAllowsLocalhostHTTP() throws {
+        let localhost = try #require(URL(string: "http://localhost:8080/hook"))
         #expect(WebhookService.isSecureEndpoint(localhost) == true)
 
-        let ip4Loopback = URL(string: "http://127.0.0.1:3000/hook")!
+        let ip4Loopback = try #require(URL(string: "http://127.0.0.1:3000/hook"))
         #expect(WebhookService.isSecureEndpoint(ip4Loopback) == true)
 
-        let ip6Loopback = URL(string: "http://[::1]:3000/hook")!
+        let ip6Loopback = try #require(URL(string: "http://[::1]:3000/hook"))
         #expect(WebhookService.isSecureEndpoint(ip6Loopback) == true)
     }
 
     @Test("Webhook rejects file:// scheme")
-    func webhookRejectsFileScheme() {
-        let fileURL = URL(string: "file:///etc/passwd")!
+    func webhookRejectsFileScheme() throws {
+        let fileURL = try #require(URL(string: "file:///etc/passwd"))
         #expect(WebhookService.isSecureEndpoint(fileURL) == false)
     }
 
     @Test("Webhook rejects custom schemes")
-    func webhookRejectsCustomScheme() {
-        let customURL = URL(string: "ftp://example.com/hook")!
+    func webhookRejectsCustomScheme() throws {
+        let customURL = try #require(URL(string: "ftp://example.com/hook"))
         #expect(WebhookService.isSecureEndpoint(customURL) == false)
     }
 }
@@ -435,6 +435,27 @@ struct EncryptionTests {
         // Random bytes (simulating encrypted data)
         let encrypted = Data([0xA0, 0xB1, 0xC2, 0xD3, 0xE4])
         #expect(HistoryEncryption.isEncrypted(encrypted) == true)
+    }
+
+    @Test("Encrypted detection survives JSON-looking nonce first bytes")
+    func encryptedDetectionHandlesAmbiguousFirstBytes() {
+        // The AES-GCM nonce's first byte is uniform random, so ~2.3% (6/256)
+        // of real ciphertexts start with a JSON-ish byte. The old first-byte-
+        // only check misjudged those as plaintext — a ~1-in-43 production
+        // misclassification that also made the sync round-trip test flaky.
+        // Fixed (deterministic) ciphertext-shaped blobs, one per ambiguous
+        // first byte; the 0x00 tail can never be valid JSON.
+        let ambiguousFirstBytes: [UInt8] = [0x5B, 0x7B, 0x20, 0x09, 0x0A, 0x0D]
+        let ciphertextTail: [UInt8] = [0x00, 0xFF, 0x8C, 0x1D, 0xB7, 0x42, 0x00, 0x9E]
+        for firstByte in ambiguousFirstBytes {
+            let blob = Data([firstByte] + ciphertextTail)
+            #expect(HistoryEncryption.isEncrypted(blob), "first byte 0x\(String(firstByte, radix: 16)) must still read as encrypted")
+        }
+
+        // Plaintext with leading whitespace (the other side of the ambiguity)
+        // must still be recognized as NOT encrypted.
+        let paddedPlaintext = Data("  {\"key\":\"value\"}".utf8)
+        #expect(HistoryEncryption.isEncrypted(paddedPlaintext) == false)
     }
 
     @Test("Empty data is not considered encrypted")

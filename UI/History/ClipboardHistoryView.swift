@@ -31,13 +31,26 @@ enum ContentTypeFilter: String, CaseIterable, Codable {
 
 enum HistoryShortcutGate {
     static func shouldHandleListShortcuts(hasAttachedSheet: Bool, firstResponder: NSResponder?) -> Bool {
-        guard !hasAttachedSheet else { return false }
-        guard !(firstResponder is NSTextView), !(firstResponder is NSTextField) else { return false }
-        return true
+        shouldHandleListShortcuts(
+            hasAttachedSheet: hasAttachedSheet,
+            firstResponderIsTextInput: isTextInputResponder(firstResponder)
+        )
+    }
+
+    static func shouldHandleListShortcuts(hasAttachedSheet: Bool, firstResponderIsTextInput: Bool) -> Bool {
+        !hasAttachedSheet && !firstResponderIsTextInput
     }
 
     static func shouldFocusSearch(firstResponder: NSResponder?) -> Bool {
-        !(firstResponder is NSTextView) && !(firstResponder is NSTextField)
+        shouldFocusSearch(firstResponderIsTextInput: isTextInputResponder(firstResponder))
+    }
+
+    static func shouldFocusSearch(firstResponderIsTextInput: Bool) -> Bool {
+        !firstResponderIsTextInput
+    }
+
+    private static func isTextInputResponder(_ firstResponder: NSResponder?) -> Bool {
+        (firstResponder is NSTextView) || (firstResponder is NSTextField)
     }
 }
 

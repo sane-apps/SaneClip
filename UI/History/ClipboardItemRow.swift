@@ -312,7 +312,7 @@ struct ClipboardItemRow: View {
 
                         // Drag-out affordance: signals Recent rows can be
                         // dragged into other apps (pinned rows reorder instead).
-                        if isHovering, !isPinned {
+                        if isHovering, isPro, !isPinned {
                             Image(systemName: "line.3.horizontal")
                                 .font(.caption2)
                                 .foregroundStyle(.secondary.opacity(0.6))
@@ -372,7 +372,7 @@ struct ClipboardItemRow: View {
         // Drag-out is enabled only for non-pinned (Recent) rows. Pinned rows
         // keep the List's `.onMove` drag-to-reorder — a row-level `.onDrag`
         // would hijack that gesture and silently break reordering.
-        .onDragOut(enabled: !isPinned) { dragItemProvider() }
+        .onDragOut(enabled: isPro && !isPinned) { dragItemProvider() }
         .onTapGesture {
             clipboardManager.paste(item: item)
         }
@@ -664,69 +664,102 @@ struct EditClipboardItemSheet: View {
     let onCancel: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
-            Text(isImageItem ? "Edit Note" : "Edit Clipboard Item")
-                .font(.headline)
+        VStack(spacing: 0) {
+            editSheetTitle
+                .padding([.horizontal, .top], 20)
+                .padding(.bottom, 14)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Title (optional)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextField("Display title", text: $title)
-                    .textFieldStyle(.roundedBorder)
+            Divider()
+
+            ScrollView(.vertical, showsIndicators: true) {
+                editSheetForm
+                    .padding(20)
             }
+            .frame(minHeight: isImageItem ? 160 : 260)
 
-            if !isImageItem {
-                TextEditor(text: $text)
-                    .font(.system(.body, design: .monospaced))
-                    .frame(minWidth: 400, minHeight: 200)
-                    .border(Color.secondary.opacity(0.3), width: 1)
-            }
+            Divider()
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Collection")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextField("Default", text: $collection)
-                    .textFieldStyle(.roundedBorder)
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Tags (comma-separated)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextField("work, urgent, client", text: $tags)
-                    .textFieldStyle(.roundedBorder)
-            }
-
-            // Note section
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Note (optional)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextEditor(text: $note)
-                    .font(.system(.body))
-                    .frame(minHeight: 60, maxHeight: 80)
-                    .border(Color.secondary.opacity(0.3), width: 1)
-            }
-
-            HStack {
-                Button("Cancel") {
-                    onCancel()
-                }
-                .keyboardShortcut(.cancelAction)
-
-                Spacer()
-
-                Button("Save") {
-                    onSave()
-                }
-                .keyboardShortcut(.defaultAction)
-                .disabled(!isImageItem && text.isEmpty)
-            }
+            editSheetFooter
+                .padding(20)
         }
-        .padding()
-        .frame(minWidth: 450, minHeight: isImageItem ? 300 : 420)
+        .frame(
+            minWidth: ClipboardHistoryView.windowMinWidth,
+            idealWidth: max(ClipboardHistoryView.popoverWidth, 520),
+            maxWidth: .infinity,
+            minHeight: isImageItem ? 300 : 420,
+            idealHeight: isImageItem ? 420 : 640,
+            maxHeight: .infinity
+        )
+    }
+
+    private var editSheetTitle: some View {
+        Text(isImageItem ? "Edit Note" : "Edit Clipboard Item")
+            .font(.headline)
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var editSheetForm: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            labeledTextField("Title (optional)", placeholder: "Display title", text: $title)
+            if !isImageItem {
+                labeledTextEditor(
+                    "Clipboard Text",
+                    text: $text,
+                    font: .system(.body, design: .monospaced),
+                    minHeight: 220
+                )
+            }
+            labeledTextField("Collection", placeholder: "Default", text: $collection)
+            labeledTextField("Tags (comma-separated)", placeholder: "work, urgent, client", text: $tags)
+            labeledTextEditor("Note (optional)", text: $note, font: .system(.body), minHeight: 72)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var editSheetFooter: some View {
+        HStack {
+            Button { onCancel() } label: {
+                Text("Cancel").frame(minWidth: 64)
+            }
+            .keyboardShortcut(.cancelAction)
+            .buttonStyle(ClipActionButtonStyle(compact: true))
+
+            Spacer()
+
+            Button { onSave() } label: {
+                Text("Save").frame(minWidth: 64)
+            }
+            .keyboardShortcut(.defaultAction)
+            .buttonStyle(ClipActionButtonStyle(prominent: true, compact: true))
+            .disabled(!isImageItem && text.isEmpty)
+        }
+    }
+
+    private func labeledTextField(_ label: String, placeholder: String, text: Binding<String>) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            fieldLabel(label)
+            TextField(placeholder, text: text)
+                .textFieldStyle(.roundedBorder)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func labeledTextEditor(_ label: String, text: Binding<String>, font: Font, minHeight: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            fieldLabel(label)
+            TextEditor(text: text)
+                .font(font)
+                .frame(minHeight: minHeight)
+                .border(Color.white.opacity(0.28), width: 1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func fieldLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.caption)
+            .foregroundStyle(.white.opacity(0.9))
     }
 }
 

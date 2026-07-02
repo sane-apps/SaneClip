@@ -866,6 +866,7 @@
 				};
 			};
 			buildConfigurationList = 1ED66BE7F3F13093DC0EDB23 /* Build configuration list for PBXProject "SaneClip" */;
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -881,7 +882,6 @@
 				9B9B0D09FDAE079B73A7A0CB /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 4526C796D072235F7CAE5FCD /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -2726,7 +2726,7 @@
 			repositoryURL = "https://github.com/sane-apps/SaneUI.git";
 			requirement = {
 				kind = revision;
-				revision = 777f0cd34b8265083db3a5436cfbddaeafa694d3;
+				revision = db137877711e55b158e58d1c9edccfa2d148206d;
 			};
 		};
 		9B9B0D09FDAE079B73A7A0CB /* XCRemoteSwiftPackageReference "Sparkle" */ = {

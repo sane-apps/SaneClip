@@ -9,7 +9,7 @@ extension SaneClipAppDelegate {
     func showHistoryPopover() {
         // When the user prefers a free-floating window, route every history
         // trigger to it instead of the menu-bar-anchored popover.
-        if SettingsModel.shared.useFloatingHistoryWindow {
+        if SettingsModel.shared.useFloatingHistoryWindow, licenseService.isPro {
             showHistoryWindow()
             return
         }
@@ -79,10 +79,15 @@ extension SaneClipAppDelegate {
         }
 
         if let historyWindow, historyWindow.isVisible {
+            removeHistoryWindowOutsideClickMonitor()
             historyWindow.close()
             return
         }
 
+        guard licenseService.isPro else {
+            withHistoryAuth { [weak self] in self?.showHistoryPopover() }
+            return
+        }
         withHistoryAuth { [weak self] in self?.showHistoryWindow() }
     }
 
@@ -94,6 +99,7 @@ extension SaneClipAppDelegate {
         if popover.isShown {
             popover.performClose(nil)
         } else if let historyWindow, historyWindow.isVisible {
+            removeHistoryWindowOutsideClickMonitor()
             historyWindow.orderOut(nil)
             NSApp.hide(nil)
         }
@@ -105,7 +111,7 @@ extension SaneClipAppDelegate {
     @objc func handleReopenHistoryAfterPaste() {
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 180_000_000)
-            if SettingsModel.shared.useFloatingHistoryWindow {
+            if SettingsModel.shared.useFloatingHistoryWindow, licenseService.isPro {
                 showHistoryWindow()
             } else if !popover.isShown {
                 showHistoryPopover()
@@ -121,6 +127,7 @@ extension SaneClipAppDelegate {
         if let historyWindow, historyWindow.isVisible {
             NSApp.activate(ignoringOtherApps: true)
             historyWindow.makeKeyAndOrderFront(nil)
+            installHistoryWindowOutsideClickMonitor()
             return
         }
 
@@ -129,6 +136,123 @@ extension SaneClipAppDelegate {
 
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
+        installHistoryWindowOutsideClickMonitor()
+    }
+
+    func installHistoryWindowOutsideClickMonitor() {
+        removeHistoryWindowOutsideClickMonitor()
+
+        historyWindowOutsideClickMonitor = NSEvent.addGlobalMonitorForEvents(
+            matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]
+        ) { [weak self] _ in
+            DispatchQueue.main.async { [weak self] in
+                self?.handleHistoryWindowOutsideMouseDown(at: NSEvent.mouseLocation)
+            }
+        }
+        historyWindowOutsideClickLocalMonitor = NSEvent.addLocalMonitorForEvents(
+            matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]
+        ) { [weak self] event in
+            DispatchQueue.main.async { [weak self] in
+                let screenPoint = event.window?.convertPoint(toScreen: event.locationInWindow)
+                    ?? NSEvent.mouseLocation
+                self?.handleHistoryWindowOutsideMouseDown(at: screenPoint)
+            }
+            return event
+        }
+        historyWindowResignActiveObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didResignActiveNotification,
+            object: NSApp,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.closeHistoryWindowFromOutsideInteraction()
+            }
+        }
+        historyWindowOutsideClickTimer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                guard let self, self.historyWindow?.isVisible == true else { return }
+                if !NSApp.isActive {
+                    self.closeHistoryWindowFromOutsideInteraction()
+                }
+            }
+        }
+        installHistoryWindowOutsideClickEventTap()
+    }
+
+    func removeHistoryWindowOutsideClickMonitor() {
+        if let historyWindowOutsideClickMonitor {
+            NSEvent.removeMonitor(historyWindowOutsideClickMonitor)
+            self.historyWindowOutsideClickMonitor = nil
+        }
+        if let historyWindowOutsideClickLocalMonitor {
+            NSEvent.removeMonitor(historyWindowOutsideClickLocalMonitor)
+            self.historyWindowOutsideClickLocalMonitor = nil
+        }
+        if let historyWindowResignActiveObserver {
+            NotificationCenter.default.removeObserver(historyWindowResignActiveObserver)
+            self.historyWindowResignActiveObserver = nil
+        }
+        historyWindowOutsideClickTimer?.invalidate()
+        historyWindowOutsideClickTimer = nil
+        if let historyWindowOutsideClickRunLoopSource {
+            CFRunLoopRemoveSource(CFRunLoopGetMain(), historyWindowOutsideClickRunLoopSource, .commonModes)
+            self.historyWindowOutsideClickRunLoopSource = nil
+        }
+        if let historyWindowOutsideClickEventTap {
+            CFMachPortInvalidate(historyWindowOutsideClickEventTap)
+            self.historyWindowOutsideClickEventTap = nil
+        }
+    }
+
+    private func installHistoryWindowOutsideClickEventTap() {
+        let mask = (1 << CGEventType.leftMouseDown.rawValue)
+            | (1 << CGEventType.rightMouseDown.rawValue)
+            | (1 << CGEventType.otherMouseDown.rawValue)
+        let userInfo = Unmanaged.passUnretained(self).toOpaque()
+        guard let tap = CGEvent.tapCreate(
+            tap: .cgSessionEventTap,
+            place: .headInsertEventTap,
+            options: .listenOnly,
+            eventsOfInterest: CGEventMask(mask),
+            callback: { _, _, event, userInfo in
+                guard let userInfo else { return Unmanaged.passUnretained(event) }
+                let delegate = Unmanaged<SaneClipAppDelegate>.fromOpaque(userInfo).takeUnretainedValue()
+                let point = event.location
+                Task { @MainActor in
+                    delegate.handleHistoryWindowOutsideMouseDown(at: point)
+                }
+                return Unmanaged.passUnretained(event)
+            },
+            userInfo: userInfo
+        ) else {
+            return
+        }
+
+        historyWindowOutsideClickEventTap = tap
+        let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
+        historyWindowOutsideClickRunLoopSource = source
+        CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
+        CGEvent.tapEnable(tap: tap, enable: true)
+    }
+
+    private func handleHistoryWindowOutsideMouseDown(at point: NSPoint) {
+        guard let historyWindow, historyWindow.isVisible else {
+            removeHistoryWindowOutsideClickMonitor()
+            return
+        }
+        guard !historyWindow.frame.contains(point) else { return }
+        closeHistoryWindowFromOutsideInteraction()
+    }
+
+    private func closeHistoryWindowFromOutsideInteraction() {
+        guard let historyWindow, historyWindow.isVisible else {
+            removeHistoryWindowOutsideClickMonitor()
+            return
+        }
+        historyWindow.orderOut(nil)
+        historyWindow.close()
+        self.historyWindow = nil
+        removeHistoryWindowOutsideClickMonitor()
     }
 
     /// Builds the resizable floating history panel. Adds `.resizable` to the
@@ -151,7 +275,9 @@ extension SaneClipAppDelegate {
         window.isReleasedWhenClosed = false
         window.level = .floating
         window.isFloatingPanel = true
-        window.hidesOnDeactivate = false
+        // Match popover dismissal: once the user clicks another app/desktop
+        // without pasting, the floating history window gets out of the way.
+        window.hidesOnDeactivate = true
         window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
 
         // Keep resizing "flexible but not infinite".
@@ -246,5 +372,9 @@ extension SaneClipAppDelegate {
         )
         popover.contentSize = size
         popover.contentViewController?.preferredContentSize = size
+    }
+
+    func applicationDidResignActive(_: Notification) {
+        closeHistoryWindowFromOutsideInteraction()
     }
 }

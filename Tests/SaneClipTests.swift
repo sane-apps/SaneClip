@@ -373,10 +373,8 @@ struct SaneClipTests {
     }
 
     @Test("History shortcuts stay disabled while text input is active")
-    @MainActor
     func historyShortcutGateBlocksForTextInput() {
-        #expect(!HistoryShortcutGate.shouldHandleListShortcuts(hasAttachedSheet: false, firstResponder: NSTextView()))
-        #expect(!HistoryShortcutGate.shouldHandleListShortcuts(hasAttachedSheet: false, firstResponder: NSTextField()))
+        #expect(!HistoryShortcutGate.shouldHandleListShortcuts(hasAttachedSheet: false, firstResponderIsTextInput: true))
     }
 
     @Test("History shortcuts stay enabled for list navigation")
@@ -385,11 +383,9 @@ struct SaneClipTests {
     }
 
     @Test("Slash only redirects focus to search when text input is inactive")
-    @MainActor
     func historyShortcutSearchFocusGate() {
         #expect(HistoryShortcutGate.shouldFocusSearch(firstResponder: nil))
-        #expect(!HistoryShortcutGate.shouldFocusSearch(firstResponder: NSTextView()))
-        #expect(!HistoryShortcutGate.shouldFocusSearch(firstResponder: NSTextField()))
+        #expect(!HistoryShortcutGate.shouldFocusSearch(firstResponderIsTextInput: true))
     }
 
     @Test("Manual update fallback only triggers for actionable Sparkle failures")
@@ -497,6 +493,37 @@ struct SaneClipTests {
                 separatedBy: #"PlistBuddy -c "Delete :SUEnableInstallerLauncherService""#
             ).count >= 3
         )
+    }
+
+    @Test("SaneUI resolves from the published package so release source builds are portable")
+    func saneUIUsesPublishedRemotePackage() throws {
+        let repoRoot = projectRootURL()
+        let projectSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("project.yml"),
+            encoding: .utf8
+        )
+        let xcodeProjectSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("SaneClip.xcodeproj/project.pbxproj"),
+            encoding: .utf8
+        )
+        let resolvedPackages = try String(
+            contentsOf: repoRoot.appendingPathComponent(
+                "SaneClip.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+            ),
+            encoding: .utf8
+        )
+
+        let saneUIRevision = "db137877711e55b158e58d1c9edccfa2d148206d"
+        #expect(projectSource.contains("url: https://github.com/sane-apps/SaneUI.git"))
+        #expect(projectSource.contains("revision: \(saneUIRevision)"))
+        #expect(!projectSource.contains("path: ../../infra/SaneUI"))
+        #expect(xcodeProjectSource.contains("XCRemoteSwiftPackageReference \"SaneUI\""))
+        #expect(xcodeProjectSource.contains("repositoryURL = \"https://github.com/sane-apps/SaneUI.git\";"))
+        #expect(xcodeProjectSource.contains("revision = \(saneUIRevision);"))
+        #expect(!xcodeProjectSource.contains("XCLocalSwiftPackageReference \"../../infra/SaneUI\""))
+        #expect(resolvedPackages.contains("\"identity\" : \"saneui\""))
+        #expect(resolvedPackages.contains("\"location\" : \"https://github.com/sane-apps/SaneUI.git\""))
+        #expect(resolvedPackages.contains("\"revision\" : \"\(saneUIRevision)\""))
     }
 
     @Test("Mac builds regenerate a Setapp-ready app icon")
@@ -2171,6 +2198,8 @@ struct SaneClipTests {
 
         #expect(readmeSource.contains("Capture Screenshot into history"))
         #expect(readmeSource.contains("OCR Capture for text grabs and searchable screenshot sidecars"))
+        #expect(readmeSource.contains("Resizable floating history window with remembered position"))
+        #expect(readmeSource.contains("Drag clips out to other apps"))
         #expect(readmeSource.contains("Free iPhone/iPad companion app with optional private iCloud sync"))
         #expect(readmeSource.contains("History encryption (AES-256-GCM)"))
         #expect(readmeSource.contains("AES-256-GCM Encryption | ✅ Pro | ✅ Pro |"))
@@ -2254,7 +2283,7 @@ struct SaneClipTests {
         #expect(appSource.contains("statusItem.isVisible = SettingsModel.shared.showMenuBarIcon"))
         #expect(appSource.contains("handleMenuBarVisibilityChanged"))
         #expect(appSource.contains("func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool"))
-        #expect(appSource.contains("showHistoryWindow()"))
+        #expect(appSource.contains("showHistoryPopover()"))
     }
 
     @Test("No-keychain fallback stays in SaneClip standard defaults")
@@ -2406,8 +2435,8 @@ struct SaneClipTests {
         #expect(!appSource.contains("popoverWindow.setFrameOrigin(newOrigin)"))
     }
 
-    @Test("Reopening the running app opens the history window")
-    func appReopenOpensHistoryWindow() throws {
+    @Test("Reopening the running app opens history through the licensed route")
+    func appReopenOpensHistoryThroughLicensedRoute() throws {
         let appSource = try String(
             contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
             encoding: .utf8
@@ -2418,7 +2447,7 @@ struct SaneClipTests {
         )
 
         #expect(appSource.contains("func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool"))
-        #expect(appSource.contains("showHistoryWindow()"))
+        #expect(appSource.contains("showHistoryPopover()"))
         #expect(appSource.contains("return false"))
         #expect(historyWindowSource.contains("func showHistoryWindow()"))
         #expect(historyWindowSource.contains("historyWindow.makeKeyAndOrderFront(nil)"))
@@ -2673,6 +2702,163 @@ struct SaneClipTests {
         #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent("history-smart-clear-render.png").path))
     }
 
+    @Test("Render Glenn thread 994 proof screenshots when requested")
+    @MainActor
+    func renderGlenn994ProofScreenshots() throws {
+        guard let rawOutputDir = screenshotOutputDirectory()
+        else {
+            return
+        }
+
+        let outputDir = URL(
+            fileURLWithPath: NSString(string: rawOutputDir).expandingTildeInPath,
+            isDirectory: true
+        )
+        try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
+        let proLicense = try makePreviewProLicense()
+        let settings = SettingsModel.shared
+        let originalFloatingWindowSetting = settings.useFloatingHistoryWindow
+        defer { settings.useFloatingHistoryWindow = originalFloatingWindowSetting }
+
+        try withClipboardManagerState { manager in
+            let first = ClipboardItem(content: .text("Plain text 1 from Glenn's merge queue proof"), sourceAppName: "Safari")
+            let second = ClipboardItem(content: .text("Plain text 2 queued for merge"), sourceAppName: "Notes")
+            let third = ClipboardItem(content: .text("Plain text 3 kept visible below the queue controls"), sourceAppName: "Xcode")
+            manager.history = [first, second, third]
+            manager.pasteStack = [first, second]
+            let mergeIDs = Set([first.id, second.id])
+
+            try renderPNG(
+                ClipboardHistoryView(
+                    clipboardManager: manager,
+                    licenseService: nil,
+                    previewInitialMergeQueueIDs: mergeIDs
+                )
+                .preferredColorScheme(.dark)
+                .frame(width: 320, height: 500),
+                size: CGSize(width: 320, height: 500),
+                to: outputDir.appendingPathComponent("glenn-994-basic-bug1-merge-queue-footer-fixed.png")
+            )
+
+            try renderPNG(
+                ClipboardHistoryView(
+                    clipboardManager: manager,
+                    licenseService: nil,
+                    previewInitialMergeQueueIDs: []
+                )
+                .preferredColorScheme(.dark)
+                .frame(width: 320, height: 500),
+                size: CGSize(width: 320, height: 500),
+                to: outputDir.appendingPathComponent("glenn-994-basic-bug1a-clear-queue-footer-fixed.png")
+            )
+
+            try renderPNG(
+                ClipboardHistoryView(
+                    clipboardManager: manager,
+                    licenseService: proLicense,
+                    previewInitialMergeQueueIDs: mergeIDs
+                )
+                .preferredColorScheme(.dark)
+                .frame(width: 320, height: 500),
+                size: CGSize(width: 320, height: 500),
+                to: outputDir.appendingPathComponent("glenn-994-bug1-merge-queue-footer-fixed.png")
+            )
+
+            try renderPNG(
+                ClipboardHistoryView(
+                    clipboardManager: manager,
+                    licenseService: proLicense,
+                    previewInitialMergeQueueIDs: []
+                )
+                .preferredColorScheme(.dark)
+                .frame(width: 320, height: 500),
+                size: CGSize(width: 320, height: 500),
+                to: outputDir.appendingPathComponent("glenn-994-bug1a-clear-queue-footer-fixed.png")
+            )
+        }
+
+        let longClip = String(repeating: "Edited clipboard item content stays scrollable while Save and Cancel remain visible. ", count: 10)
+        try renderPNG(
+            EditClipboardItemSheet(
+                title: .constant("Support clip"),
+                text: .constant(longClip),
+                tags: .constant("support, glenn"),
+                collection: .constant("Review"),
+                note: .constant("Buttons must stay visible at the old failing sheet height."),
+                onSave: {},
+                onCancel: {}
+            )
+            .preferredColorScheme(.dark)
+            .frame(width: 450, height: 420),
+            size: CGSize(width: 450, height: 420),
+            to: outputDir.appendingPathComponent("glenn-994-bug2-edit-sheet-buttons-visible.png")
+        )
+
+        let rules = ClipboardRulesManager.shared
+        let originalRules = (
+            rules.stripTrackingParams,
+            rules.autoTrimWhitespace,
+            rules.normalizeLineEndings,
+            rules.removeDuplicateSpaces,
+            rules.lowercaseURLs
+        )
+        defer {
+            rules.stripTrackingParams = originalRules.0
+            rules.autoTrimWhitespace = originalRules.1
+            rules.normalizeLineEndings = originalRules.2
+            rules.removeDuplicateSpaces = originalRules.3
+            rules.lowercaseURLs = originalRules.4
+        }
+
+        rules.stripTrackingParams = false
+        rules.autoTrimWhitespace = false
+        rules.normalizeLineEndings = false
+        rules.removeDuplicateSpaces = false
+        rules.lowercaseURLs = false
+        try renderPNG(
+            glennRulesProofView(license: proLicense),
+            size: CGSize(width: 540, height: 520),
+            to: outputDir.appendingPathComponent("glenn-994-bug3-rules-before-toggle.png")
+        )
+
+        rules.stripTrackingParams = true
+        rules.autoTrimWhitespace = true
+        try renderPNG(
+            glennRulesProofView(license: proLicense),
+            size: CGSize(width: 540, height: 520),
+            to: outputDir.appendingPathComponent("glenn-994-bug3-rules-after-toggle.png")
+        )
+
+        settings.useFloatingHistoryWindow = false
+        try renderPNG(
+            glennFloatingWindowSettingsProofView(license: nil),
+            size: CGSize(width: 640, height: 620),
+            to: outputDir.appendingPathComponent("glenn-994-basic-floating-window-pro-gated.png")
+        )
+
+        settings.useFloatingHistoryWindow = true
+        try renderPNG(
+            glennFloatingWindowSettingsProofView(license: proLicense),
+            size: CGSize(width: 640, height: 620),
+            to: outputDir.appendingPathComponent("glenn-994-pro-floating-window-toggle.png")
+        )
+
+        let requiredScreenshots = [
+            "glenn-994-basic-bug1-merge-queue-footer-fixed.png",
+            "glenn-994-basic-bug1a-clear-queue-footer-fixed.png",
+            "glenn-994-bug1-merge-queue-footer-fixed.png",
+            "glenn-994-bug1a-clear-queue-footer-fixed.png",
+            "glenn-994-bug2-edit-sheet-buttons-visible.png",
+            "glenn-994-bug3-rules-before-toggle.png",
+            "glenn-994-bug3-rules-after-toggle.png",
+            "glenn-994-basic-floating-window-pro-gated.png",
+            "glenn-994-pro-floating-window-toggle.png"
+        ]
+        for filename in requiredScreenshots {
+            #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent(filename).path))
+        }
+    }
+
     @Test("SettingsModel round-trips excluded apps through fresh initialization")
     @MainActor
     func settingsModelExcludedAppsRoundTrip() {
@@ -2717,6 +2903,54 @@ struct SaneClipTests {
 
         try png.write(to: url, options: .atomic)
         window.orderOut(nil)
+    }
+
+    @MainActor
+    private func makePreviewProLicense() throws -> LicenseService {
+        let keychain = MockKeychainService()
+        let recentValidation = ISO8601DateFormatter().string(from: Date().addingTimeInterval(-300))
+        try keychain.set("test-license-key", forKey: "license_key")
+        try keychain.set(recentValidation, forKey: "last_validation")
+        try keychain.set("pro@example.com", forKey: "license_email")
+        let service = try LicenseService(
+            appName: "SaneClip",
+            purchaseBackend: .direct(checkoutURL: #require(URL(string: "https://saneclip.com"))),
+            keychain: keychain
+        )
+        service.checkCachedLicense()
+        return service
+    }
+
+    @MainActor
+    private func glennRulesProofView(license: LicenseService) -> some View {
+        ZStack {
+            renderBackdrop.opacity(0.3)
+                .ignoresSafeArea()
+            VStack(alignment: .leading, spacing: 0) {
+                ClipboardRulesSection(licenseService: license)
+                    .frame(maxWidth: 460, alignment: .leading)
+                Spacer(minLength: 0)
+            }
+            .padding(24)
+        }
+        .preferredColorScheme(.dark)
+        .frame(width: 540, height: 520)
+    }
+
+    @MainActor
+    private func glennFloatingWindowSettingsProofView(license: LicenseService?) -> some View {
+        ZStack {
+            renderBackdrop.opacity(0.3)
+                .ignoresSafeArea()
+            VStack(alignment: .leading, spacing: 0) {
+                GeneralSettingsView(licenseService: license)
+                    .frame(maxWidth: 560, alignment: .leading)
+                Spacer(minLength: 0)
+            }
+            .padding(24)
+        }
+        .preferredColorScheme(.dark)
+        .frame(width: 640, height: 620)
     }
 
     private func screenshotOutputDirectory() -> String? {

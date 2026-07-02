@@ -57,15 +57,16 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ---
 
-## 🆕 Current macOS Direct Download: v2.3.7
+## 🆕 Current macOS Direct Download: v2.3.13
 
-**Current direct-download release (June 2026)**
+**Current direct-download release (July 2026)**
 
-- ✅ Keeps synced Mac clipboard text appearing on iPhone and iPad automatically while the companion app is foregrounded
-- ✅ Avoids showing the local pasteboard save banner for iCloud-synced clips
-- ✅ Cleans up settings and history-window internals without changing the customer workflow
+- ✅ Keeps merge queue controls readable at narrow widths
+- ✅ Keeps Edit Text Save and Cancel buttons visible while editing long clips
+- ✅ Makes Clipboard Rules switches update visibly as soon as they are clicked
+- ✅ Improves the Pro floating history window so it stays gated correctly and closes when you click outside it
 
-The prior `2.2.13` mobile follow-up restored the color-coded source indicators on iPhone and iPad and improved recovery for older Mac updater installs.
+The prior `2.3.12` mobile follow-up kept synced Mac clipboard text appearing on iPhone and iPad automatically while the companion app is foregrounded.
 
 ---
 
@@ -90,6 +91,8 @@ The prior `2.2.13` mobile follow-up restored the color-coded source indicators o
 - Smart paste + plain text paste
 - Text transforms
 - Paste stack (FIFO/LIFO)
+- Resizable floating history window with remembered position
+- Drag clips out to other apps
 - Snippets with placeholders
 - Titles, tags, collections, and item notes
 - Clipboard rules

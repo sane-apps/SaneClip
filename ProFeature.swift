@@ -16,6 +16,7 @@ enum ProFeature: String, ProFeatureDescribing, CaseIterable {
     case encryption = "History Encryption"
     case exportImport = "Export / Import"
     case unlimitedHistory = "Unlimited History"
+    case floatingHistoryWindow = "Resizable History Window"
 
     var id: String { rawValue }
     var featureName: String { rawValue }
@@ -48,6 +49,8 @@ enum ProFeature: String, ProFeatureDescribing, CaseIterable {
             "Back up your clipboard history to JSON and restore it anytime — even on a new Mac."
         case .unlimitedHistory:
             "Free tier stores your last 50 clips. Pro removes the cap — keep your entire clipboard history."
+        case .floatingHistoryWindow:
+            "Open history in a resizable floating window that remembers its size and position."
         }
     }
 
@@ -79,6 +82,8 @@ enum ProFeature: String, ProFeatureDescribing, CaseIterable {
             "arrow.up.arrow.down.circle"
         case .unlimitedHistory:
             "infinity"
+        case .floatingHistoryWindow:
+            "macwindow"
         }
     }
 }

@@ -38,12 +38,14 @@ extension KeyboardShortcuts.Name {
 }
 
 // MARK: - AppDelegate
-
 @MainActor
 class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
     var popover: NSPopover!
-    var historyWindow: NSWindow?
+    var historyWindow: NSWindow?, historyWindowOutsideClickMonitor: Any?, historyWindowOutsideClickLocalMonitor: Any?
+    var historyWindowResignActiveObserver: NSObjectProtocol?
+    var historyWindowOutsideClickTimer: Timer?
+    var historyWindowOutsideClickEventTap: CFMachPort?, historyWindowOutsideClickRunLoopSource: CFRunLoopSource?
     var clipboardManager: ClipboardManager!
     let screenCaptureService = ScreenCaptureService()
     let captureOCRService = CaptureOCRService()
@@ -55,7 +57,6 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     let authGracePeriod: TimeInterval = 30.0 // seconds - stays unlocked for 30s
 
     // MARK: - License
-
     #if APP_STORE
         let licenseService = LicenseService(
             appName: "SaneClip",
@@ -164,7 +165,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool {
-        withHistoryAuth { [weak self] in self?.showHistoryWindow() }
+        withHistoryAuth { [weak self] in self?.showHistoryPopover() }
         return false
     }
 
@@ -661,7 +662,9 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         if popover.isShown {
             popover.performClose(nil)
         } else if SettingsModel.shared.useFloatingHistoryWindow,
+                  licenseService.isPro,
                   let historyWindow, historyWindow.isVisible {
+            removeHistoryWindowOutsideClickMonitor()
             historyWindow.close() // second menu-bar click closes the floating window
         } else {
             // Check if Touch ID is required
@@ -779,9 +782,6 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             popover.performClose(nil)
         }
     }
-
-    // Paste dismiss/reopen handlers live in SaneClipAppDelegate+HistoryWindow.swift
-    // so they can be floating-window-aware (see handleDismissForPaste there).
 
     // MARK: - URL Scheme Handling
 

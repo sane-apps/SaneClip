@@ -79,10 +79,18 @@ struct GeneralSettingsView: View {
                         }
                     }
                     CompactDivider()
-                    CompactToggle(label: "Open history as a resizable floating window", isOn: Binding(
-                        get: { settings.useFloatingHistoryWindow },
-                        set: { settings.useFloatingHistoryWindow = $0 }
-                    ))
+                    if isPro {
+                        CompactToggle(label: "Open history as a resizable floating window", isOn: Binding(
+                            get: { settings.useFloatingHistoryWindow },
+                            set: { settings.useFloatingHistoryWindow = $0 }
+                        ))
+                    } else {
+                        ProLockedRow(
+                            label: "Open history as a resizable floating window",
+                            feature: .floatingHistoryWindow,
+                            licenseService: licenseService
+                        )
+                    }
                     CompactDivider()
                     CompactRow(SaneClipSettingsCopy.pasteSoundLabel) {
                         HStack(spacing: 8) {

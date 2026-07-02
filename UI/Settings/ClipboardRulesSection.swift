@@ -9,7 +9,12 @@ import SwiftUI
 
 struct ClipboardRulesSection: View {
     var licenseService: LicenseService?
-    @State private var rules = ClipboardRulesManager.shared
+    private let rules = ClipboardRulesManager.shared
+    @State private var stripTrackingParams = ClipboardRulesManager.shared.stripTrackingParams
+    @State private var autoTrimWhitespace = ClipboardRulesManager.shared.autoTrimWhitespace
+    @State private var normalizeLineEndings = ClipboardRulesManager.shared.normalizeLineEndings
+    @State private var removeDuplicateSpaces = ClipboardRulesManager.shared.removeDuplicateSpaces
+    @State private var lowercaseURLs = ClipboardRulesManager.shared.lowercaseURLs
 
     private var isPro: Bool { licenseService?.isPro == true }
 
@@ -23,8 +28,11 @@ struct ClipboardRulesSection: View {
                 CompactToggle(
                     label: "Strip URL tracking parameters",
                     isOn: Binding(
-                        get: { rules.stripTrackingParams },
-                        set: { rules.stripTrackingParams = $0 }
+                        get: { stripTrackingParams },
+                        set: { newValue in
+                            stripTrackingParams = newValue
+                            rules.stripTrackingParams = newValue
+                        }
                     )
                 )
                 .help("Remove utm_*, fbclid, and other tracking params from URLs")
@@ -38,8 +46,11 @@ struct ClipboardRulesSection: View {
                 CompactToggle(
                     label: "Auto-trim whitespace",
                     isOn: Binding(
-                        get: { rules.autoTrimWhitespace },
-                        set: { rules.autoTrimWhitespace = $0 }
+                        get: { autoTrimWhitespace },
+                        set: { newValue in
+                            autoTrimWhitespace = newValue
+                            rules.autoTrimWhitespace = newValue
+                        }
                     )
                 )
                 .help("Remove leading/trailing spaces from copied text")
@@ -53,8 +64,11 @@ struct ClipboardRulesSection: View {
                 CompactToggle(
                     label: "Normalize line endings",
                     isOn: Binding(
-                        get: { rules.normalizeLineEndings },
-                        set: { rules.normalizeLineEndings = $0 }
+                        get: { normalizeLineEndings },
+                        set: { newValue in
+                            normalizeLineEndings = newValue
+                            rules.normalizeLineEndings = newValue
+                        }
                     )
                 )
                 .help("Convert Windows (CRLF) to Unix (LF) line endings")
@@ -68,8 +82,11 @@ struct ClipboardRulesSection: View {
                 CompactToggle(
                     label: "Remove duplicate spaces",
                     isOn: Binding(
-                        get: { rules.removeDuplicateSpaces },
-                        set: { rules.removeDuplicateSpaces = $0 }
+                        get: { removeDuplicateSpaces },
+                        set: { newValue in
+                            removeDuplicateSpaces = newValue
+                            rules.removeDuplicateSpaces = newValue
+                        }
                     )
                 )
                 .help("Collapse multiple consecutive spaces into one")
@@ -83,8 +100,11 @@ struct ClipboardRulesSection: View {
                 CompactToggle(
                     label: "Lowercase URL hosts",
                     isOn: Binding(
-                        get: { rules.lowercaseURLs },
-                        set: { rules.lowercaseURLs = $0 }
+                        get: { lowercaseURLs },
+                        set: { newValue in
+                            lowercaseURLs = newValue
+                            rules.lowercaseURLs = newValue
+                        }
                     )
                 )
                 .help("Convert URL hostnames to lowercase")
@@ -92,6 +112,15 @@ struct ClipboardRulesSection: View {
                 ProLockedRow(label: "Lowercase URL hosts", feature: .clipboardRules, licenseService: licenseService)
             }
         }
+        .onAppear(perform: syncRuleState)
+    }
+
+    private func syncRuleState() {
+        stripTrackingParams = rules.stripTrackingParams
+        autoTrimWhitespace = rules.autoTrimWhitespace
+        normalizeLineEndings = rules.normalizeLineEndings
+        removeDuplicateSpaces = rules.removeDuplicateSpaces
+        lowercaseURLs = rules.lowercaseURLs
     }
 }
 

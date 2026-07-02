@@ -6,6 +6,29 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+- 2026-07-02 Glenn #994 bugfix pass is implemented and Mini-verified:
+  - Fixed Glenn's reported merge/footer overlap, edit sheet clipped Save/Cancel
+    buttons, Clipboard Rules toggle redraw lag, and floating history outside-click
+    close behavior.
+  - Basic and Pro were both covered. New floating history and drag-out behavior
+    are Pro-gated in UI and runtime; Basic shows locked rows and falls back to
+    popover history.
+  - SaneClip release builds now pin the published SaneUI commit
+    `db137877711e55b158e58d1c9edccfa2d148206d` so shared license/keychain
+    automation fixes reach signed SaneClip builds without relying on a local
+    monorepo package path.
+  - Signed Pro proof used canonical `/Applications/SaneClip.app`, bundle id
+    `com.saneclip.app`, Developer ID `M78L6FXD48`, Pro fallback
+    `test-pro`, and `useFloatingHistoryWindow=1`.
+  - Final visual receipt:
+    `outputs/visual-audit-glenn-994/receipt.json` (validated true through
+    `SaneVisualReceipt`). Final outside-click pair:
+    `live/codex-shot-2026-07-02_02-29-06.png` and
+    `live/codex-shot-2026-07-02_02-29-32.png`.
+  - Verification: `./scripts/SaneMaster.rb verify --timeout 900
+    --no-grant-permissions` passed 189 tests; `sane_test.rb SaneClip
+    --pro-mode --no-logs` built, staged, signed, and launched the canonical app;
+    duplicate check found only `/Applications/SaneClip.app`.
 - 2026-07-01 ~20:00 EDT — **2.3.12 SHIPPED (direct channel)**; supersedes the
   "NOT committed, NOT released" note below. Verified live: appcast top entry
   2.3.12/2312, dist ZIP HTTP 200, website deployed with the new feature cards

@@ -42,6 +42,7 @@ Real failures from past sessions. Don't repeat them.
 | **Deleted "unused" file** | Periphery said unused, but ServiceContainer needed it | Grep before delete |
 | **Wrong bundle ID** | Used `.dev` in release context, broke signing | Check bundle ID table below |
 | **tccutil on wrong ID** | Reset permissions for production bundle | NEVER reset `.app` bundle |
+| **Generic screenshots accepted as proof** | Glenn's exact screenshots showed footer, edit-sheet, and toggle bugs, but the first pass leaned on unrelated/generic visual proof and missed two states. | For each customer screenshot, render or capture the same state after the fix; save claim-mapped screenshots and add a targeted regression test per claim. |
 
 **The #1 differentiator**: Skimming this SOP = 5/10 sessions. Internalizing it = 8+/10.
 

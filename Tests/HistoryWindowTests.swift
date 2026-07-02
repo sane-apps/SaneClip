@@ -49,23 +49,51 @@ struct HistoryWindowTests {
         #expect(historyWindowSource.contains(".resizable"))
         #expect(historyWindowSource.contains("contentMinSize"))
         #expect(historyWindowSource.contains("contentMaxSize"))
+        // Outside click/desktop click behaves like the popover and hides the panel.
+        #expect(historyWindowSource.contains("window.hidesOnDeactivate = true"))
+        #expect(historyWindowSource.contains("NSEvent.addGlobalMonitorForEvents"))
+        #expect(historyWindowSource.contains("NSEvent.addLocalMonitorForEvents"))
+        #expect(historyWindowSource.contains("historyWindowOutsideClickLocalMonitor"))
+        #expect(historyWindowSource.contains("NSApplication.didResignActiveNotification"))
+        #expect(historyWindowSource.contains("historyWindowResignActiveObserver"))
+        #expect(historyWindowSource.contains("historyWindowOutsideClickTimer"))
+        #expect(historyWindowSource.contains("Timer.scheduledTimer(withTimeInterval: 0.15"))
+        #expect(historyWindowSource.contains("if !NSApp.isActive"))
+        #expect(historyWindowSource.contains("historyWindowOutsideClickTimer?.invalidate()"))
+        #expect(historyWindowSource.contains("CGEvent.tapCreate"))
+        #expect(historyWindowSource.contains("CGEvent.tapEnable"))
+        #expect(historyWindowSource.contains("historyWindowOutsideClickEventTap"))
+        #expect(historyWindowSource.contains("historyWindowOutsideClickRunLoopSource"))
+        #expect(historyWindowSource.contains("closeHistoryWindowFromOutsideInteraction"))
+        #expect(historyWindowSource.contains("historyWindow.orderOut(nil)"))
+        #expect(historyWindowSource.contains("self.historyWindow = nil"))
+        #expect(!historyWindowSource.contains("historyWindowOutsideClickOverlay"))
+        #expect(!historyWindowSource.contains("HistoryWindowOutsideClickView"))
+        #expect(historyWindowSource.contains("handleHistoryWindowOutsideMouseDown"))
+        #expect(historyWindowSource.contains("NSEvent.removeMonitor"))
+        #expect(historyWindowSource.contains("func applicationDidResignActive"))
         // Remembers last size + position across launches.
         #expect(historyWindowSource.contains("setFrameAutosaveName(Self.historyWindowFrameAutosaveName)"))
         #expect(historyWindowSource.contains("ensureWindowOnScreen"))
-        // Menu-bar trigger routes to the floating window when the setting is on.
-        #expect(historyWindowSource.contains("if SettingsModel.shared.useFloatingHistoryWindow"))
+        // Menu-bar trigger routes to the floating window only when the Pro
+        // setting is on; Basic falls back to the normal popover route.
+        #expect(historyWindowSource.contains("if SettingsModel.shared.useFloatingHistoryWindow, licenseService.isPro"))
         // Off-screen guard clamps the restored origin into the visible frame
         // (not just recover fully off-screen frames).
         #expect(historyWindowSource.contains("min(max(frame.origin.x"))
-        // Setting is user-exposed (now in General → Appearance).
+        // Setting is user-exposed, but Pro-gated in Basic.
         #expect(settingsSource.contains("Open history as a resizable floating window"))
+        #expect(settingsSource.contains("feature: .floatingHistoryWindow"))
     }
 
     @Test("Sparkle check frequency resolves and normalizes intervals")
     func sparkleCheckFrequencyBehavior() {
-        #expect(SaneSparkleCheckFrequency.resolve(updateCheckInterval: 60 * 60 * 24) == .daily)
-        #expect(SaneSparkleCheckFrequency.resolve(updateCheckInterval: 60 * 60 * 24 * 7) == .weekly)
-        #expect(SaneSparkleCheckFrequency.normalizedInterval(from: 60 * 60 * 6) == SaneSparkleCheckFrequency.daily.interval)
+        #expect(SaneClip.SaneSparkleCheckFrequency.resolve(updateCheckInterval: 60 * 60 * 24) == .daily)
+        #expect(SaneClip.SaneSparkleCheckFrequency.resolve(updateCheckInterval: 60 * 60 * 24 * 7) == .weekly)
+        #expect(
+            SaneClip.SaneSparkleCheckFrequency.normalizedInterval(from: 60 * 60 * 6) ==
+                SaneClip.SaneSparkleCheckFrequency.daily.interval
+        )
     }
 
     @Test("Sparkle settings UI stays channel-gated out of Setapp and App Store builds")
@@ -116,10 +144,12 @@ struct HistoryWindowTests {
             encoding: .utf8
         )
 
-        // toggleHistoryWindow (⌘⇧⌃Y hotkey) must not open the window directly.
+        // toggleHistoryWindow (⌘⇧⌃Y hotkey) must not open the Pro window directly in Basic.
+        #expect(historyWindowSource.contains("guard licenseService.isPro else"))
+        #expect(historyWindowSource.contains("withHistoryAuth { [weak self] in self?.showHistoryPopover() }"))
         #expect(historyWindowSource.contains("withHistoryAuth { [weak self] in self?.showHistoryWindow() }"))
         // Dock/Finder reopen must go through the same gate.
-        #expect(appSource.contains("withHistoryAuth { [weak self] in self?.showHistoryWindow() }"))
+        #expect(appSource.contains("withHistoryAuth { [weak self] in self?.showHistoryPopover() }"))
         // The gate delegates its decision to the tested pure function.
         #expect(historyWindowSource.contains("historyAuthSatisfied("))
     }
@@ -195,8 +225,8 @@ struct HistoryWindowTests {
             contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRow.swift"),
             encoding: .utf8
         )
-        // Drag-out is gated to non-pinned rows; pinned rows keep List `.onMove`.
-        #expect(rowSource.contains(".onDragOut(enabled: !isPinned) { dragItemProvider() }"))
+        // Drag-out is Pro-gated and still disabled for pinned rows so they keep List `.onMove`.
+        #expect(rowSource.contains(".onDragOut(enabled: isPro && !isPinned) { dragItemProvider() }"))
         #expect(rowSource.contains("func onDragOut(enabled: Bool"))
         #expect(rowSource.contains("func dragItemProvider() -> NSItemProvider"))
     }
@@ -215,6 +245,35 @@ struct HistoryWindowTests {
         #expect(footerSource.contains("ScrollView(.horizontal, showsIndicators: true)"))
         #expect(footerSource.contains("private var settingsButton"))
         #expect(footerSource.contains("private var smartClearButton"))
+    }
+
+    @Test("Glenn regressions pin edit footer and redraw Clipboard Rules toggles immediately")
+    func glennEditAndClipboardRulesRegressionsAreCovered() throws {
+        let rowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRow.swift"),
+            encoding: .utf8
+        )
+        let rulesSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/ClipboardRulesSection.swift"),
+            encoding: .utf8
+        )
+
+        // Edit sheet: fields scroll vertically, footer stays outside the
+        // scroll body, and the old fixed-width text editor is gone.
+        #expect(rowSource.contains("ScrollView(.vertical, showsIndicators: true)"))
+        #expect(rowSource.contains("private var editSheetFooter"))
+        #expect(rowSource.contains("minHeight: isImageItem ? 300 : 420"))
+        #expect(rowSource.contains(".buttonStyle(ClipActionButtonStyle(compact: true))"))
+        #expect(rowSource.contains(".buttonStyle(ClipActionButtonStyle(prominent: true, compact: true))"))
+        #expect(!rowSource.contains(".frame(minWidth: 400, minHeight: 200)"))
+
+        // Clipboard Rules: visible switch state changes first, then the shared
+        // UserDefaults-backed rules manager is updated. Direct computed
+        // property bindings do not reliably invalidate SwiftUI rows.
+        #expect(rulesSource.contains("@State private var stripTrackingParams"))
+        #expect(rulesSource.contains("stripTrackingParams = newValue"))
+        #expect(rulesSource.contains("rules.stripTrackingParams = newValue"))
+        #expect(rulesSource.contains(".onAppear(perform: syncRuleState)"))
     }
 
     @Test("Every clip source gets a stable, distinct color (not just Apple apps)")

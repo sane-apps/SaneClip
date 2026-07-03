@@ -44,6 +44,7 @@
 		37F29CD598C72F5AC2A699BD /* SaneClipWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 09C2D5E2943BC51ED6D88512 /* SaneClipWidgets.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		392DEE59BBEB7849AB8A4F03 /* SaneClipAppDelegate+HistoryWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F2507243C102C6D705BC02 /* SaneClipAppDelegate+HistoryWindow.swift */; };
 		395E2ED5B65C14C2DEFCBC21 /* HistoryListKeyboardShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EAA037C53A58CAB8C3CC5F6 /* HistoryListKeyboardShortcuts.swift */; };
+		3E055D6E0E799F4074DD1AA8 /* SaneClipAppDelegate+SingleInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9F2B0E332431DA2CA11720 /* SaneClipAppDelegate+SingleInstance.swift */; };
 		3E30328E30A861550080AE6D /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7120D46FF8B86B71EAB5508 /* ShareViewController.swift */; };
 		3EF2F8F390E9B433A6DA76B7 /* ProFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8607149CD7305298C711068F /* ProFeature.swift */; };
 		40193D9A8C368063B2311EFD /* SaneClipSettingsCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C603FFD30732501E2A3640 /* SaneClipSettingsCopy.swift */; };
@@ -158,6 +159,7 @@
 		DD741ED4E799B3DE999D2A65 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6709551974949109A6A239 /* EmptyStateView.swift */; };
 		DE0D1479DE595F1FA651F71F /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
 		DFC8A7437D713D82B5224D1E /* HistoryEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82FA89438430FB80B145A7C5 /* HistoryEncryption.swift */; };
+		E06196B33A21D85F9F1E1E77 /* SaneClipAppDelegate+SingleInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9F2B0E332431DA2CA11720 /* SaneClipAppDelegate+SingleInstance.swift */; };
 		E1F118A7B4867A2E6F26A819 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1808F717600EB63D59B347DB /* SyncCoordinator.swift */; };
 		E429379D80B77779F626ACAE /* Snippet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25007B56789ED465BA3544BA /* Snippet.swift */; };
 		E4BBDD04577B7398507E9597 /* ClipboardItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35354A7D3201B61455110B3F /* ClipboardItemCell.swift */; };
@@ -339,6 +341,7 @@
 		B74750429D17786620EF008E /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		B84FF9114238C97C3AA6182A /* SaneClipIOSWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipIOSWidgets.entitlements; sourceTree = "<group>"; };
 		B94CC9C6F7E02316FEE7E6C4 /* ClipboardRulesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardRulesManager.swift; sourceTree = "<group>"; };
+		BC9F2B0E332431DA2CA11720 /* SaneClipAppDelegate+SingleInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SaneClipAppDelegate+SingleInstance.swift"; sourceTree = "<group>"; };
 		BE7465DE4D6ABC7FA43FECC8 /* StorageStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageStatsView.swift; sourceTree = "<group>"; };
 		C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetClipboardItem.swift; sourceTree = "<group>"; };
 		CE95B8CE57324347C7B10C45 /* HistoryTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTab.swift; sourceTree = "<group>"; };
@@ -480,6 +483,7 @@
 				8FFF4DCFB95C5B26D00A640F /* SaneClipApp.swift */,
 				70F2507243C102C6D705BC02 /* SaneClipAppDelegate+HistoryWindow.swift */,
 				122CA02DCD5F4E29C0FFF748 /* SaneClipAppDelegate+Menus.swift */,
+				BC9F2B0E332431DA2CA11720 /* SaneClipAppDelegate+SingleInstance.swift */,
 				2A07E3A1A776FE6A78310D7A /* Core */,
 				E2FA8B6080FA528017F8B223 /* iOS */,
 				D04310DD70513FD880B08F56 /* iOSShareExtension */,
@@ -1068,6 +1072,7 @@
 				392DEE59BBEB7849AB8A4F03 /* SaneClipAppDelegate+HistoryWindow.swift in Sources */,
 				0C2CEBB417A79D79D2194FF7 /* SaneClipAppDelegate+Menus.swift in Sources */,
 				5CDCB79E9D4672C86165AF05 /* SaneClipAppDelegate+Services.swift in Sources */,
+				E06196B33A21D85F9F1E1E77 /* SaneClipAppDelegate+SingleInstance.swift in Sources */,
 				859F847595C08FF8676DE3CA /* SaneClipIntents.swift in Sources */,
 				16EC6DFFCD225AF8FDFAF128 /* SaneClipSettingsCopy.swift in Sources */,
 				D4E9DFE6FB4F3711F85625DF /* SaneSparkleRow.swift in Sources */,
@@ -1140,6 +1145,7 @@
 				8EFD5FCC46BE89BC18EB2987 /* SaneClipAppDelegate+HistoryWindow.swift in Sources */,
 				42833E1A9AA1EAFD7F6BB8ED /* SaneClipAppDelegate+Menus.swift in Sources */,
 				AD5435192E9F19337B39DF95 /* SaneClipAppDelegate+Services.swift in Sources */,
+				3E055D6E0E799F4074DD1AA8 /* SaneClipAppDelegate+SingleInstance.swift in Sources */,
 				95711D419E5C0F66ED022198 /* SaneClipIntents.swift in Sources */,
 				40193D9A8C368063B2311EFD /* SaneClipSettingsCopy.swift in Sources */,
 				52F87E14516262CA52AF5EB9 /* SaneSparkleRow.swift in Sources */,

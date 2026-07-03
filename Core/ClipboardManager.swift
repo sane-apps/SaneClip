@@ -1119,10 +1119,11 @@ class ClipboardManager {
         isRecordingStack = on
     }
 
-    /// Called from the capture path for genuine external copies (self-writes
-    /// are already suppressed upstream), so a paste from the stack never feeds
-    /// itself back in.
-    private func recordCapturedItemToStackIfNeeded(_ item: ClipboardItem) {
+    /// Called from the capture path (`addItem`) for genuine external copies —
+    /// self-writes are already suppressed upstream in `checkClipboard` before
+    /// `addItem` runs, so a paste from the stack never feeds itself back in.
+    /// Internal (not private) so the recording behavior can be tested directly.
+    func recordCapturedItemToStackIfNeeded(_ item: ClipboardItem) {
         guard isRecordingStack, licenseService?.isPro == true else { return }
         appendToPasteStack(item)
         savePasteStack()
@@ -2377,17 +2378,32 @@ class ClipboardManager {
         return Self.historyLimit(maxHistorySize: maxHistorySize, isPro: isPro)
     }
 
-    private func enforceHistoryLimitIfNeeded(saveAfterTrim: Bool = true) {
+    /// Internal (not private) so the paste-stack trim-protection can be tested.
+    func enforceHistoryLimitIfNeeded(saveAfterTrim: Bool = true) {
         guard let effectiveMax = effectiveHistoryLimit(), history.count > effectiveMax else { return }
 
-        let removed = history.suffix(from: effectiveMax)
-        for item in removed {
+        // Items queued in the paste stack (including ones recorded by build-by-
+        // copying) must outlive normal history churn — the stack is a durable
+        // ordered collection, and it is persisted by id, so evicting its
+        // backing history item (and, for images, deleting its assets) would
+        // silently empty the stack on the next launch. Protect them from the
+        // trim exactly like pinned items, capped by the stack's own limit.
+        let protectedIDs = Set(pasteStack.map(\.id))
+
+        let kept = Array(history.prefix(effectiveMax))
+        let keptIDs = Set(kept.map(\.id))
+        let overflow = history.suffix(from: effectiveMax)
+
+        for item in overflow where !protectedIDs.contains(item.id) {
             if case .image = item.content {
                 deleteImageAssets(id: item.id)
             }
         }
 
-        history = Array(history.prefix(effectiveMax))
+        // Keep the prefix plus any protected items that fell past the limit
+        // (bounded by ClipboardManager.pasteStackCap).
+        let rescued = overflow.filter { protectedIDs.contains($0.id) && !keptIDs.contains($0.id) }
+        history = kept + rescued
         pinnedItems = pinnedItems.filter { pinned in
             history.contains { $0.id == pinned.id }
         }

@@ -388,6 +388,40 @@ struct SaneClipTests {
         #expect(!HistoryShortcutGate.shouldFocusSearch(firstResponderIsTextInput: true))
     }
 
+    @Test("Single-instance guard uses a pid tiebreak so exactly one instance survives")
+    func singleInstanceGuardLogic() {
+        // Only instance running → never quit (no false positive that would stop
+        // the app from launching at all).
+        #expect(SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: 100, otherPIDs: []) == false)
+
+        // A pre-existing instance always has a lower pid → the new launch quits.
+        #expect(SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: 500, otherPIDs: [100]) == true)
+        // We hold the lowest pid → we are the canonical instance, we stay.
+        #expect(SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: 100, otherPIDs: [500]) == false)
+
+        // The mutual-suicide race: two copies launched at the same instant each
+        // see the other. Exactly ONE (the lowest pid) survives — never both
+        // quit, never both stay.
+        let a: Int32 = 100, b: Int32 = 200
+        let aQuits = SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: a, otherPIDs: [b])
+        let bQuits = SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: b, otherPIDs: [a])
+        #expect(aQuits == false)
+        #expect(bQuits == true)
+        #expect(aQuits != bQuits) // exactly one survivor
+
+        // Three-way race: only the single lowest pid survives.
+        #expect(SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: 10, otherPIDs: [20, 30]) == false)
+        #expect(SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: 20, otherPIDs: [10, 30]) == true)
+        #expect(SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: 30, otherPIDs: [10, 20]) == true)
+
+        // The XCTest host is a separate executable, not a peer app instance.
+        #expect(SaneClipAppDelegate.isRunningUnderTestHost(
+            environment: ["XCTestConfigurationFilePath": "/tmp/x.xctestconfiguration"]
+        ))
+        #expect(SaneClipAppDelegate.isRunningUnderTestHost(environment: ["XCTestSessionIdentifier": "abc"]))
+        #expect(!SaneClipAppDelegate.isRunningUnderTestHost(environment: [:]))
+    }
+
     @Test("Manual update fallback only triggers for actionable Sparkle failures")
     func manualUpdateFallbackGate() {
         let installError = NSError(domain: SUSparkleErrorDomain, code: Int(SparkleErrorCode.installation.rawValue))

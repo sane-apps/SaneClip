@@ -133,6 +133,7 @@ targets:
       - SaneClipApp.swift
       - SaneClipAppDelegate+HistoryWindow.swift
       - SaneClipAppDelegate+Menus.swift
+      - SaneClipAppDelegate+SingleInstance.swift
       - ProFeature.swift
       - DirectDistributionSupport.swift
       - path: Core
@@ -371,6 +372,7 @@ targets:
       - SaneClipApp.swift
       - SaneClipAppDelegate+HistoryWindow.swift
       - SaneClipAppDelegate+Menus.swift
+      - SaneClipAppDelegate+SingleInstance.swift
       - ProFeature.swift
       - DirectDistributionSupport.swift
       - path: Core

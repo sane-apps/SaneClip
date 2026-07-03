@@ -65,6 +65,20 @@ extension SaneClipAppDelegate {
         addExcludedAppItem.keyEquivalentModifierMask = [.command]
         addExcludedAppItem.target = self
         editMenu.addItem(addExcludedAppItem)
+
+        editMenu.addItem(NSMenuItem.separator())
+
+        // Build-by-copying entry point that works even when the stack panel is
+        // closed and empty. Checkmark reflects the current mode via
+        // validateMenuItem(_:).
+        let recordStackItem = NSMenuItem(
+            title: "Record Copies to Paste Stack",
+            action: #selector(toggleStackRecordingFromMenu),
+            keyEquivalent: "r"
+        )
+        recordStackItem.keyEquivalentModifierMask = [.command, .shift]
+        recordStackItem.target = self
+        editMenu.addItem(recordStackItem)
         editMenuItem.submenu = editMenu
 
         let settingsMenuItem = NSMenuItem()
@@ -269,7 +283,9 @@ extension SaneClipAppDelegate {
             updateService.checkForUpdates()
         }
     #else
-        private var directUpdateAction: Selector? { nil }
+        private var directUpdateAction: Selector? {
+            nil
+        }
     #endif
 
     #if SETAPP
@@ -277,6 +293,20 @@ extension SaneClipAppDelegate {
             #selector(showReleaseNotes)
         }
     #else
-        private var setappWhatsNewAction: Selector? { nil }
+        private var setappWhatsNewAction: Selector? {
+            nil
+        }
     #endif
+
+    @objc func toggleStackRecordingFromMenu() {
+        clipboardManager.setStackRecording(!clipboardManager.isRecordingStack)
+    }
+
+    /// Reflects the current recording mode as a checkmark on the menu item.
+    @objc func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        if menuItem.action == #selector(toggleStackRecordingFromMenu) {
+            menuItem.state = clipboardManager.isRecordingStack ? .on : .off
+        }
+        return true
+    }
 }

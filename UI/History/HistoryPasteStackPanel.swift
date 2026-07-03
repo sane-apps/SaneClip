@@ -19,6 +19,23 @@ struct HistoryPasteStackPanel: View {
                 Text("Paste Stack")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.primary.opacity(0.9))
+
+                // Build-by-copying: while on, every copy is appended to the
+                // stack. Uses the stack's own violet so the color still means
+                // "paste stack"; the filled dot carries the on/off state.
+                Button {
+                    clipboardManager.setStackRecording(!clipboardManager.isRecordingStack)
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: clipboardManager.isRecordingStack ? "record.circle.fill" : "record.circle")
+                        Text(clipboardManager.isRecordingStack ? "Recording copies" : "Record copies")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(clipboardManager.isRecordingStack ? Color.stackViolet : .secondary)
+                }
+                .buttonStyle(.plain)
+                .help("Automatically add every copy to the stack, in order")
+
                 Spacer()
                 Toggle("Pause", isOn: Binding(
                     get: { SettingsModel.shared.pausePasteStackConsumption },
@@ -57,9 +74,12 @@ struct HistoryPasteStackPanel: View {
             .foregroundStyle(.secondary)
 
             if clipboardManager.pasteStack.isEmpty {
-                Text("Paste stack is empty.")
+                Text(clipboardManager.isRecordingStack
+                    ? "Recording — the next things you copy land here, in order."
+                    : "Paste stack is empty. Turn on \u{201C}Record copies\u{201D} to build one as you copy, or use \u{201C}Add to Paste Stack\u{201D} on any clip.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
                     .padding(.vertical, 8)
             } else {
                 List {

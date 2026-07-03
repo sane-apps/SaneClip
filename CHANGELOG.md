@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [2.3.14] - Unreleased
 
+- The Pro Paste Stack can now build itself as you copy: turn on "Record copies" (in the stack panel, or Edit ▸ Record Copies to Paste Stack / ⌘⇧R) and everything you copy is added to the stack in order, ready to paste back one after another. It stays a fully editable, reorderable list, and is capped so it can't grow forever.
 - History rows now show which app each clip came from, right next to when it was copied ("Safari · 2m ago"), instead of leading with a word and character count. The count is still there on hover.
 - The Pro floating history window now opens a live preview beside the list when it's wide enough: the full clip plus its source app, type, when it was captured, how often it's been pasted, and its collection, tags, and note — with Paste, Plain Text, and Pin right there.
 - The empty history window now keeps the search field at the top instead of floating it into the middle.

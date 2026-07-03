@@ -58,7 +58,7 @@ struct HistoryFooterView: View {
     /// on — queued items, or the panel already open — never as an empty "0"
     /// chip claiming a whole footer row in the common just-opened state.
     private var showsPasteStackCluster: Bool {
-        isPro && (!clipboardManager.pasteStack.isEmpty || showPasteStackPanel)
+        isPro && (!clipboardManager.pasteStack.isEmpty || showPasteStackPanel || clipboardManager.isRecordingStack)
     }
 
     private var showsPasteStackUpsell: Bool {
@@ -144,8 +144,12 @@ struct HistoryFooterView: View {
             pasteStackLeadingDivider
 
             HStack(spacing: 4) {
-                Image(systemName: "square.stack.3d.up")
+                // Recording indicator: while build-by-copying is on, the stack
+                // icon becomes a filled record dot so it's visible even with
+                // the panel closed. Stays violet — recording is a stack action.
+                Image(systemName: clipboardManager.isRecordingStack ? "record.circle.fill" : "square.stack.3d.up")
                     .font(.caption)
+                    .help(clipboardManager.isRecordingStack ? "Recording copies to the stack" : "Items in paste stack")
                 Text("\(clipboardManager.pasteStack.count)")
                     .font(.subheadline.monospacedDigit())
             }

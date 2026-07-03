@@ -536,8 +536,48 @@ struct HistoryWindowTests {
         var showFilters = false
         var mergeActive = false
         var showStack = false
+        var recording = false
 
         enum Seed { case rich, empty, longText, colorful }
+    }
+
+    @Test("Paste-stack recording is opt-in, Pro-gated, and stays within the cap")
+    @MainActor
+    func pasteStackRecordingBehavior() {
+        let manager = ClipboardManager(
+            startMonitoring: false,
+            loadPersistedState: false,
+            persistenceEnabled: false
+        )
+
+        // Off by default — normal copying is untouched until the user opts in.
+        #expect(manager.isRecordingStack == false)
+
+        // Basic users can't turn it on.
+        manager.licenseService = nil
+        manager.setStackRecording(true)
+        #expect(manager.isRecordingStack == false)
+
+        // Pro can.
+        manager.licenseService = makeForcedProLicense()
+        manager.setStackRecording(true)
+        #expect(manager.isRecordingStack == true)
+        manager.setStackRecording(false)
+        #expect(manager.isRecordingStack == false)
+
+        // The stack never grows past the cap, oldest-first.
+        for index in 0 ..< (ClipboardManager.pasteStackCap + 12) {
+            manager.addToPasteStack(ClipboardItem(content: .text("clip \(index)")))
+        }
+        #expect(manager.pasteStack.count == ClipboardManager.pasteStackCap)
+        #expect(manager.pasteStack.first?.preview.contains("clip 12") == true)
+
+        // The capture path feeds recording through the shared append.
+        let managerSource = try? String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/ClipboardManager.swift"),
+            encoding: .utf8
+        )
+        #expect(managerSource?.contains("recordCapturedItemToStackIfNeeded(item)") == true)
     }
 
     @MainActor
@@ -564,13 +604,15 @@ struct HistoryWindowTests {
             .init(name: "08-pro-popover-filters-320x620", width: 320, height: 620, pro: true, showFilters: true),
             .init(name: "09-pro-floating-stack-560x680", width: 560, height: 680, pro: true, showStack: true),
             .init(name: "10-free-popover-longtext-320x500", width: 320, height: 500, seed: .longText),
-            .init(name: "11-colorful-sources-440x700", width: 440, height: 700, seed: .colorful)
+            .init(name: "11-colorful-sources-440x700", width: 440, height: 700, seed: .colorful),
+            .init(name: "12-pro-floating-recording-560x680", width: 560, height: 680, pro: true, showStack: true, recording: true)
         ]
 
         let proLicense = makeForcedProLicense()
 
         for scenario in scenarios {
             let manager = makeManager(seed: scenario.seed, withStack: scenario.showStack)
+            manager.isRecordingStack = scenario.recording
             let mergeIDs: Set<UUID> = scenario.mergeActive
                 ? Set(manager.history.prefix(2).map(\.id))
                 : []

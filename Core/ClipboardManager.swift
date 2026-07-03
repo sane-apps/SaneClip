@@ -6,10 +6,10 @@ import SaneUI
 import SwiftUI
 import UniformTypeIdentifiers
 #if !APP_STORE
-@preconcurrency import ApplicationServices
+    @preconcurrency import ApplicationServices
 #endif
 #if APP_STORE
-import UserNotifications
+    import UserNotifications
 #endif
 import WidgetKit
 
@@ -20,11 +20,11 @@ class ClipboardManager {
     static var shared: ClipboardManager!
 
     #if !APP_STORE
-    nonisolated static let accessibilityAlertTitle = "Auto-Paste Needs Access"
-    nonisolated static let accessibilityAlertMessage = "Clip copied. Enable Accessibility for one-key paste.\nAlready enabled? Quit and reopen."
-    nonisolated static let accessibilityOpenButtonTitle = "Open Access"
-    nonisolated static let accessibilityRetryButtonTitle = "Retry"
-    nonisolated static let accessibilityManualButtonTitle = "Manual"
+        nonisolated static let accessibilityAlertTitle = "Auto-Paste Needs Access"
+        nonisolated static let accessibilityAlertMessage = "Clip copied. Enable Accessibility for one-key paste.\nAlready enabled? Quit and reopen."
+        nonisolated static let accessibilityOpenButtonTitle = "Open Access"
+        nonisolated static let accessibilityRetryButtonTitle = "Retry"
+        nonisolated static let accessibilityManualButtonTitle = "Manual"
     #endif
 
     /// Free tier history cap — Pro users get unlimited.
@@ -53,7 +53,9 @@ class ClipboardManager {
         let protectedCount: Int
         let removableIDs: Set<UUID>
 
-        var removableCount: Int { removableIDs.count }
+        var removableCount: Int {
+            removableIDs.count
+        }
     }
 
     nonisolated static func usesUnlimitedHistory(maxHistorySize: Int, isPro: Bool) -> Bool {
@@ -105,8 +107,22 @@ class ClipboardManager {
     var history: [ClipboardItem] = []
     var pinnedItems: [ClipboardItem] = []
     var pasteStack: [ClipboardItem] = []
-    var isPasteStackMode: Bool { !pasteStack.isEmpty }
-    var canUndoLastStackPaste: Bool { lastPastedFromStack != nil }
+    var isPasteStackMode: Bool {
+        !pasteStack.isEmpty
+    }
+
+    var canUndoLastStackPaste: Bool {
+        lastPastedFromStack != nil
+    }
+
+    /// When on, every new copy is automatically appended to the paste stack
+    /// (build-by-copying). A transient, opt-in mode — off by default and never
+    /// persisted, so normal copying is unaffected until the user turns it on.
+    var isRecordingStack: Bool = false
+
+    /// Upper bound on the paste stack so build-by-copying can't grow without
+    /// limit; the oldest queued item drops off once the cap is reached.
+    static let pasteStackCap = 50
     private var lastChangeCount: Int = 0
     private var lastPastedFromStack: ClipboardItem?
 
@@ -142,7 +158,10 @@ class ClipboardManager {
     private var timer: Timer?
     private var ignoreNextCapture = false
     private var capturePausedUntil: Date?
-    private var maxHistorySize: Int { SettingsModel.shared.maxHistorySize }
+    private var maxHistorySize: Int {
+        SettingsModel.shared.maxHistorySize
+    }
+
     private let persistenceEnabled: Bool
     private let logger = Logger(subsystem: "com.saneclip.app", category: "ClipboardManager")
 
@@ -383,9 +402,9 @@ class ClipboardManager {
         for rtfType in rtfTypes {
             if let rtfData = item.data(forType: rtfType),
                let attributed = try? NSAttributedString(
-                data: rtfData,
-                options: [.documentType: NSAttributedString.DocumentType.rtf],
-                documentAttributes: nil
+                   data: rtfData,
+                   options: [.documentType: NSAttributedString.DocumentType.rtf],
+                   documentAttributes: nil
                ),
                let normalized = normalizedNonEmptyText(attributed.string) {
                 return normalized
@@ -395,12 +414,12 @@ class ClipboardManager {
         for htmlType in htmlTypes {
             if let htmlData = item.data(forType: htmlType),
                let attributed = try? NSAttributedString(
-                data: htmlData,
-                options: [
-                    .documentType: NSAttributedString.DocumentType.html,
-                    .characterEncoding: String.Encoding.utf8.rawValue
-                ],
-                documentAttributes: nil
+                   data: htmlData,
+                   options: [
+                       .documentType: NSAttributedString.DocumentType.html,
+                       .characterEncoding: String.Encoding.utf8.rawValue
+                   ],
+                   documentAttributes: nil
                ),
                let normalized = normalizedNonEmptyText(attributed.string) {
                 return normalized
@@ -465,12 +484,12 @@ class ClipboardManager {
         let wrapped = "<span>\(fragment)</span>"
         guard let data = wrapped.data(using: .utf8),
               let attributed = try? NSAttributedString(
-                data: data,
-                options: [
-                    .documentType: NSAttributedString.DocumentType.html,
-                    .characterEncoding: String.Encoding.utf8.rawValue
-                ],
-                documentAttributes: nil
+                  data: data,
+                  options: [
+                      .documentType: NSAttributedString.DocumentType.html,
+                      .characterEncoding: String.Encoding.utf8.rawValue
+                  ],
+                  documentAttributes: nil
               )
         else {
             return fragment
@@ -621,8 +640,8 @@ class ClipboardManager {
 
         if let pasteboardItems = pasteboard.pasteboardItems,
            let preferredText = Self.preferredTextForCapture(
-            from: pasteboardItems,
-            sourceAppBundleID: sourceAppBundleID
+               from: pasteboardItems,
+               sourceAppBundleID: sourceAppBundleID
            ) {
             addTextClipboardItem(
                 preferredText,
@@ -784,23 +803,27 @@ class ClipboardManager {
         // Add to front
         history.insert(item, at: 0)
 
+        // Build-by-copying: while recording, this genuine external copy also
+        // joins the paste stack in order.
+        recordCapturedItemToStackIfNeeded(item)
+
         // Trim to current tier limit, cleaning up thumbnails for removed items.
         enforceHistoryLimitIfNeeded(saveAfterTrim: false)
         saveHistory()
         logFirstValueActionIfNeeded()
 
         #if ENABLE_SYNC
-        // Queue the new item for iCloud sync
-        let shared = SharedClipboardItem(
-            id: item.id,
-            content: item.sharedContent,
-            timestamp: item.timestamp,
-            sourceAppBundleID: item.sourceAppBundleID,
-            sourceAppName: item.sourceAppName,
-            pasteCount: item.pasteCount,
-            note: item.note
-        )
-        SyncCoordinator.shared.queueItemForSync(shared)
+            // Queue the new item for iCloud sync
+            let shared = SharedClipboardItem(
+                id: item.id,
+                content: item.sharedContent,
+                timestamp: item.timestamp,
+                sourceAppBundleID: item.sourceAppBundleID,
+                sourceAppName: item.sourceAppName,
+                pasteCount: item.pasteCount,
+                note: item.note
+            )
+            SyncCoordinator.shared.queueItemForSync(shared)
         #endif
 
         let currentCount = history.count
@@ -835,15 +858,14 @@ class ClipboardManager {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
 
-        let didWrite: Bool
-        switch item.content {
+        let didWrite: Bool = switch item.content {
         case let .text(string):
-            didWrite = pasteboard.setString(string, forType: .string)
+            pasteboard.setString(string, forType: .string)
         case let .image(image):
             if let tiffData = image.tiffRepresentation {
-                didWrite = pasteboard.setData(tiffData, forType: .tiff)
+                pasteboard.setData(tiffData, forType: .tiff)
             } else {
-                didWrite = false
+                false
             }
         }
         guard didWrite else { return false }
@@ -1066,11 +1088,43 @@ class ClipboardManager {
             }
             return
         }
+        appendToPasteStack(item)
+        SettingsModel.shared.pasteSound.play()
+        savePasteStack()
+    }
+
+    /// Shared queue-append: honor the collapse-duplicates setting and the cap.
+    /// Used by both the manual "Add to Paste Stack" action and the recording
+    /// hook so they never diverge.
+    private func appendToPasteStack(_ item: ClipboardItem) {
         if SettingsModel.shared.collapseDuplicatePasteStackItems {
             pasteStack.removeAll { $0.contentHash == item.contentHash }
         }
         pasteStack.append(item)
-        SettingsModel.shared.pasteSound.play()
+        if pasteStack.count > Self.pasteStackCap {
+            pasteStack.removeFirst(pasteStack.count - Self.pasteStackCap)
+        }
+    }
+
+    /// Turn build-by-copying on/off. Pro-gated; enabling shows the upsell for
+    /// Basic users instead of silently doing nothing.
+    func setStackRecording(_ on: Bool) {
+        guard licenseService?.isPro == true else {
+            if on, let ls = licenseService {
+                ProUpsellWindow.show(feature: ProFeature.pasteStack, licenseService: ls)
+            }
+            isRecordingStack = false
+            return
+        }
+        isRecordingStack = on
+    }
+
+    /// Called from the capture path for genuine external copies (self-writes
+    /// are already suppressed upstream), so a paste from the stack never feeds
+    /// itself back in.
+    private func recordCapturedItemToStackIfNeeded(_ item: ClipboardItem) {
+        guard isRecordingStack, licenseService?.isPro == true else { return }
+        appendToPasteStack(item)
         savePasteStack()
     }
 
@@ -1108,14 +1162,13 @@ class ClipboardManager {
         let shouldReopenAfterPaste = SettingsModel.shared.keepPasteStackOpenBetweenPastes &&
             (remainingCountAfterPaste > 0 || !SettingsModel.shared.autoClosePasteStackWhenEmpty)
         let mode = resolvedPasteModeForForegroundApp()
-        let didWrite: Bool
-        switch mode {
+        let didWrite: Bool = switch mode {
         case .standard:
-            didWrite = paste(item: item, dismissPopover: true, reopenPopoverAfterPaste: shouldReopenAfterPaste)
+            paste(item: item, dismissPopover: true, reopenPopoverAfterPaste: shouldReopenAfterPaste)
         case .plain:
-            didWrite = pasteAsPlainText(item: item, reopenPopoverAfterPaste: shouldReopenAfterPaste)
+            pasteAsPlainText(item: item, reopenPopoverAfterPaste: shouldReopenAfterPaste)
         case .smart:
-            didWrite = pasteSmartMode(item: item, reopenPopoverAfterPaste: shouldReopenAfterPaste)
+            pasteSmartMode(item: item, reopenPopoverAfterPaste: shouldReopenAfterPaste)
         }
 
         guard didWrite else { return }
@@ -1188,154 +1241,154 @@ class ClipboardManager {
         isPasting = true
         NotificationCenter.default.post(name: .dismissForPaste, object: nil)
         #if APP_STORE
-        showCopiedNotification()
-        if reopenPopoverAfterPaste {
-            NotificationCenter.default.post(name: .reopenHistoryAfterPaste, object: nil)
-        }
-        isPasting = false
-        #else
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(300))
-            self.simulatePaste()
+            showCopiedNotification()
             if reopenPopoverAfterPaste {
                 NotificationCenter.default.post(name: .reopenHistoryAfterPaste, object: nil)
             }
-            self.isPasting = false
-        }
+            isPasting = false
+        #else
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(300))
+                self.simulatePaste()
+                if reopenPopoverAfterPaste {
+                    NotificationCenter.default.post(name: .reopenHistoryAfterPaste, object: nil)
+                }
+                self.isPasting = false
+            }
         #endif
     }
 
     #if APP_STORE
-    /// Show a brief "Copied to clipboard" notification for App Store builds
-    /// where paste simulation (CGEvent) is not available in the sandbox.
-    private func showCopiedNotification() {
-        logger.debug("App Store mode: copied to clipboard, user must paste manually")
-        // Request notification permission on first use, then deliver
-        let center = UNUserNotificationCenter.current()
-        center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
-            guard granted else { return }
-            let content = UNMutableNotificationContent()
-            content.title = "Copied to Clipboard"
-            content.body = "Press \u{2318}V to paste"
-            let request = UNNotificationRequest(
-                identifier: "com.saneclip.copied.\(UUID().uuidString)",
-                content: content,
-                trigger: nil
-            )
-            center.add(request)
+        /// Show a brief "Copied to clipboard" notification for App Store builds
+        /// where paste simulation (CGEvent) is not available in the sandbox.
+        private func showCopiedNotification() {
+            logger.debug("App Store mode: copied to clipboard, user must paste manually")
+            // Request notification permission on first use, then deliver
+            let center = UNUserNotificationCenter.current()
+            center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
+                guard granted else { return }
+                let content = UNMutableNotificationContent()
+                content.title = "Copied to Clipboard"
+                content.body = "Press \u{2318}V to paste"
+                let request = UNNotificationRequest(
+                    identifier: "com.saneclip.copied.\(UUID().uuidString)",
+                    content: content,
+                    trigger: nil
+                )
+                center.add(request)
+            }
         }
-    }
     #else
-    /// Whether accessibility permission alert is currently showing (prevents duplicates)
-    private var isShowingPermissionAlert = false
+        /// Whether accessibility permission alert is currently showing (prevents duplicates)
+        private var isShowingPermissionAlert = false
 
-    @discardableResult
-    func triggerPasteFromExternalRequest() -> Bool {
-        simulatePaste()
-    }
+        @discardableResult
+        func triggerPasteFromExternalRequest() -> Bool {
+            simulatePaste()
+        }
 
-    @discardableResult
-    private func simulatePaste() -> Bool {
-        guard isAccessibilityTrusted() else {
-            logger.error("Accessibility permission not granted — paste blocked")
-            guard !isShowingPermissionAlert else { return false }
-            guard Self.shouldShowAccessibilityPrompt(
-                now: Date(),
-                suppressedUntil: suppressPermissionPromptUntil
-            ) else {
-                logger.debug("Accessibility alert suppressed after manual fallback")
+        @discardableResult
+        private func simulatePaste() -> Bool {
+            guard isAccessibilityTrusted() else {
+                logger.error("Accessibility permission not granted — paste blocked")
+                guard !isShowingPermissionAlert else { return false }
+                guard Self.shouldShowAccessibilityPrompt(
+                    now: Date(),
+                    suppressedUntil: suppressPermissionPromptUntil
+                ) else {
+                    logger.debug("Accessibility alert suppressed after manual fallback")
+                    return false
+                }
+                isShowingPermissionAlert = true
+                // Dispatch to escape the async Task context — runModal() needs its own run loop
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    let action = showAccessibilityAlert()
+                    handleAccessibilityAlertAction(action)
+                    isShowingPermissionAlert = false
+                }
                 return false
             }
-            isShowingPermissionAlert = true
-            // Dispatch to escape the async Task context — runModal() needs its own run loop
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                let action = self.showAccessibilityAlert()
-                self.handleAccessibilityAlertAction(action)
-                self.isShowingPermissionAlert = false
+
+            guard let source = CGEventSource(stateID: .hidSystemState) else {
+                logger.error("Failed to create CGEventSource for paste simulation")
+                return false
             }
-            return false
-        }
 
-        guard let source = CGEventSource(stateID: .hidSystemState) else {
-            logger.error("Failed to create CGEventSource for paste simulation")
-            return false
-        }
-
-        guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
-              let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false)
-        else {
-            logger.error("Failed to create CGEvent for paste simulation")
-            return false
-        }
-
-        keyDown.flags = .maskCommand
-        keyUp.flags = .maskCommand
-
-        keyDown.post(tap: .cghidEventTap)
-        keyUp.post(tap: .cghidEventTap)
-        return true
-    }
-
-    private enum AccessibilityAlertAction {
-        case openAccess
-        case retry
-        case manual
-    }
-
-    nonisolated static func shouldShowAccessibilityPrompt(now: Date, suppressedUntil: Date?) -> Bool {
-        guard let suppressedUntil else { return true }
-        return now >= suppressedUntil
-    }
-
-    private func isAccessibilityTrusted(promptSystemIfMissing: Bool = false) -> Bool {
-        if promptSystemIfMissing {
-            let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
-            return AXIsProcessTrustedWithOptions(options)
-        }
-        return AXIsProcessTrusted()
-    }
-
-    private func openAccessibilitySettings() {
-        SaneSystemSettingsDestination.accessibility.open()
-    }
-
-    private func handleAccessibilityAlertAction(_ action: AccessibilityAlertAction) {
-        switch action {
-        case .openAccess:
-            suppressPermissionPromptUntil = Date().addingTimeInterval(10)
-            openAccessibilitySettings()
-        case .retry:
-            if isAccessibilityTrusted(promptSystemIfMissing: true) || isAccessibilityTrusted() {
-                _ = simulatePaste()
-            } else {
-                suppressPermissionPromptUntil = Date().addingTimeInterval(5)
+            guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
+                  let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false)
+            else {
+                logger.error("Failed to create CGEvent for paste simulation")
+                return false
             }
-        case .manual:
-            suppressPermissionPromptUntil = Date().addingTimeInterval(permissionPromptCooldown)
-        }
-    }
 
-    /// Show a standalone NSAlert for accessibility permission.
-    /// Works even when the panel isn't visible (e.g. quick-paste hotkeys).
-    private func showAccessibilityAlert() -> AccessibilityAlertAction {
-        let alert = NSAlert()
-        alert.messageText = Self.accessibilityAlertTitle
-        alert.informativeText = Self.accessibilityAlertMessage
-        alert.addButton(withTitle: Self.accessibilityOpenButtonTitle)
-        alert.addButton(withTitle: Self.accessibilityRetryButtonTitle)
-        alert.addButton(withTitle: Self.accessibilityManualButtonTitle)
-        alert.alertStyle = .warning
+            keyDown.flags = .maskCommand
+            keyUp.flags = .maskCommand
 
-        switch alert.runModal() {
-        case .alertFirstButtonReturn:
-            return .openAccess
-        case .alertSecondButtonReturn:
-            return .retry
-        default:
-            return .manual
+            keyDown.post(tap: .cghidEventTap)
+            keyUp.post(tap: .cghidEventTap)
+            return true
         }
-    }
+
+        private enum AccessibilityAlertAction {
+            case openAccess
+            case retry
+            case manual
+        }
+
+        nonisolated static func shouldShowAccessibilityPrompt(now: Date, suppressedUntil: Date?) -> Bool {
+            guard let suppressedUntil else { return true }
+            return now >= suppressedUntil
+        }
+
+        private func isAccessibilityTrusted(promptSystemIfMissing: Bool = false) -> Bool {
+            if promptSystemIfMissing {
+                let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
+                return AXIsProcessTrustedWithOptions(options)
+            }
+            return AXIsProcessTrusted()
+        }
+
+        private func openAccessibilitySettings() {
+            SaneSystemSettingsDestination.accessibility.open()
+        }
+
+        private func handleAccessibilityAlertAction(_ action: AccessibilityAlertAction) {
+            switch action {
+            case .openAccess:
+                suppressPermissionPromptUntil = Date().addingTimeInterval(10)
+                openAccessibilitySettings()
+            case .retry:
+                if isAccessibilityTrusted(promptSystemIfMissing: true) || isAccessibilityTrusted() {
+                    _ = simulatePaste()
+                } else {
+                    suppressPermissionPromptUntil = Date().addingTimeInterval(5)
+                }
+            case .manual:
+                suppressPermissionPromptUntil = Date().addingTimeInterval(permissionPromptCooldown)
+            }
+        }
+
+        /// Show a standalone NSAlert for accessibility permission.
+        /// Works even when the panel isn't visible (e.g. quick-paste hotkeys).
+        private func showAccessibilityAlert() -> AccessibilityAlertAction {
+            let alert = NSAlert()
+            alert.messageText = Self.accessibilityAlertTitle
+            alert.informativeText = Self.accessibilityAlertMessage
+            alert.addButton(withTitle: Self.accessibilityOpenButtonTitle)
+            alert.addButton(withTitle: Self.accessibilityRetryButtonTitle)
+            alert.addButton(withTitle: Self.accessibilityManualButtonTitle)
+            alert.alertStyle = .warning
+
+            switch alert.runModal() {
+            case .alertFirstButtonReturn:
+                return .openAccess
+            case .alertSecondButtonReturn:
+                return .retry
+            default:
+                return .manual
+            }
+        }
     #endif
 
     func delete(item: ClipboardItem) {
@@ -1351,67 +1404,67 @@ class ClipboardManager {
         savePasteStack()
 
         #if ENABLE_SYNC
-        SyncCoordinator.shared.queueDeleteForSync(itemID: item.id)
+            SyncCoordinator.shared.queueDeleteForSync(itemID: item.id)
         #endif
     }
 
     // MARK: - Sync Support
 
     #if ENABLE_SYNC
-    private func queueItemUpdateForSync(_ item: ClipboardItem) {
-        SyncCoordinator.shared.queueItemForSync(
-            SharedClipboardItem(
-                id: item.id,
-                content: item.sharedContent,
-                timestamp: item.timestamp,
-                sourceAppBundleID: item.sourceAppBundleID,
-                sourceAppName: item.sourceAppName,
-                pasteCount: item.pasteCount,
-                note: item.note
+        private func queueItemUpdateForSync(_ item: ClipboardItem) {
+            SyncCoordinator.shared.queueItemForSync(
+                SharedClipboardItem(
+                    id: item.id,
+                    content: item.sharedContent,
+                    timestamp: item.timestamp,
+                    sourceAppBundleID: item.sourceAppBundleID,
+                    sourceAppName: item.sourceAppName,
+                    pasteCount: item.pasteCount,
+                    note: item.note
+                )
             )
-        )
-    }
-
-    private func queueDeletesForSync(_ ids: Set<UUID>) {
-        for id in ids {
-            SyncCoordinator.shared.queueDeleteForSync(itemID: id)
         }
-    }
 
-    /// Insert an item received from iCloud sync (no re-sync trigger)
-    func insertSyncedItem(_ item: ClipboardItem) {
-        // Don't add duplicates
-        guard !history.contains(where: { $0.id == item.id }) else { return }
-        history.insert(item, at: 0)
-
-        // Trim to max size, cleaning up thumbnails for removed items
-        let syncLimit = effectiveHistoryLimit() ?? (maxHistorySize > 0 ? maxHistorySize : nil)
-        if let syncLimit, history.count > syncLimit {
-            let removed = history.suffix(from: syncLimit)
-            for removedItem in removed {
-                if case .image = removedItem.content {
-                    deleteImageAssets(id: removedItem.id)
-                }
+        private func queueDeletesForSync(_ ids: Set<UUID>) {
+            for id in ids {
+                SyncCoordinator.shared.queueDeleteForSync(itemID: id)
             }
-            history = Array(history.prefix(syncLimit))
         }
 
-        saveHistory()
-        logger.debug("Inserted synced item: \(item.id)")
-    }
+        /// Insert an item received from iCloud sync (no re-sync trigger)
+        func insertSyncedItem(_ item: ClipboardItem) {
+            // Don't add duplicates
+            guard !history.contains(where: { $0.id == item.id }) else { return }
+            history.insert(item, at: 0)
 
-    /// Delete an item received from iCloud sync (no re-sync trigger)
-    func deleteSyncedItem(_ itemID: UUID) {
-        // Clean up thumbnail if it's an image item
-        if let item = history.first(where: { $0.id == itemID }),
-           case .image = item.content {
-            deleteImageAssets(id: itemID)
+            // Trim to max size, cleaning up thumbnails for removed items
+            let syncLimit = effectiveHistoryLimit() ?? (maxHistorySize > 0 ? maxHistorySize : nil)
+            if let syncLimit, history.count > syncLimit {
+                let removed = history.suffix(from: syncLimit)
+                for removedItem in removed {
+                    if case .image = removedItem.content {
+                        deleteImageAssets(id: removedItem.id)
+                    }
+                }
+                history = Array(history.prefix(syncLimit))
+            }
+
+            saveHistory()
+            logger.debug("Inserted synced item: \(item.id)")
         }
-        history.removeAll { $0.id == itemID }
-        pinnedItems.removeAll { $0.id == itemID }
-        saveHistory()
-        logger.debug("Deleted synced item: \(itemID)")
-    }
+
+        /// Delete an item received from iCloud sync (no re-sync trigger)
+        func deleteSyncedItem(_ itemID: UUID) {
+            // Clean up thumbnail if it's an image item
+            if let item = history.first(where: { $0.id == itemID }),
+               case .image = item.content {
+                deleteImageAssets(id: itemID)
+            }
+            history.removeAll { $0.id == itemID }
+            pinnedItems.removeAll { $0.id == itemID }
+            saveHistory()
+            logger.debug("Deleted synced item: \(itemID)")
+        }
     #endif
 
     func smartClearPlan(matching ids: Set<UUID>? = nil) -> HistoryClearPlan {
@@ -1463,7 +1516,7 @@ class ClipboardManager {
         saveHistory()
         savePasteStack()
         #if ENABLE_SYNC
-        queueDeletesForSync(removedIDs)
+            queueDeletesForSync(removedIDs)
         #endif
         return removedIDs.count
     }
@@ -1490,7 +1543,7 @@ class ClipboardManager {
         saveHistory()
         savePasteStack()
         #if ENABLE_SYNC
-        queueDeletesForSync(ids)
+            queueDeletesForSync(ids)
         #endif
         return ids.count
     }
@@ -1526,9 +1579,9 @@ class ClipboardManager {
 
         SettingsModel.shared.pasteSound.play()
         #if APP_STORE
-        if notifyUser {
-            showCopiedNotification()
-        }
+            if notifyUser {
+                showCopiedNotification()
+            }
         #endif
 
         logger.debug("Copied item to clipboard (no paste)")
@@ -1545,9 +1598,9 @@ class ClipboardManager {
 
         SettingsModel.shared.pasteSound.play()
         #if APP_STORE
-        if notifyUser {
-            showCopiedNotification()
-        }
+            if notifyUser {
+                showCopiedNotification()
+            }
         #endif
 
         logger.debug("Copied OCR text to clipboard (no paste)")
@@ -1617,7 +1670,7 @@ class ClipboardManager {
 
             saveHistory()
             #if ENABLE_SYNC
-            queueItemUpdateForSync(updatedItem)
+                queueItemUpdateForSync(updatedItem)
             #endif
             logger.debug("Updated content for item \(id)")
         }
@@ -1694,7 +1747,7 @@ class ClipboardManager {
 
         saveHistory()
         #if ENABLE_SYNC
-        queueItemUpdateForSync(updatedItem)
+            queueItemUpdateForSync(updatedItem)
         #endif
         logger.debug("Updated edit-sheet fields for item \(id)")
     }
@@ -1724,7 +1777,7 @@ class ClipboardManager {
 
             saveHistory()
             #if ENABLE_SYNC
-            queueItemUpdateForSync(history[index])
+                queueItemUpdateForSync(history[index])
             #endif
             logger.debug("Updated note for item \(id)")
         }
@@ -1751,7 +1804,7 @@ class ClipboardManager {
             }
             saveHistory()
             #if ENABLE_SYNC
-            queueItemUpdateForSync(history[index])
+                queueItemUpdateForSync(history[index])
             #endif
             logger.debug("Updated title for item \(id)")
         }
@@ -1764,7 +1817,7 @@ class ClipboardManager {
 
     private func savePasteStack() {
         guard persistenceEnabled else { return }
-        let ids = pasteStack.map { $0.id.uuidString }
+        let ids = pasteStack.map(\.id.uuidString)
         UserDefaults.standard.set(ids, forKey: "pasteStackIDs")
     }
 
@@ -1802,7 +1855,7 @@ class ClipboardManager {
             }
             saveHistory()
             #if ENABLE_SYNC
-            queueItemUpdateForSync(history[index])
+                queueItemUpdateForSync(history[index])
             #endif
             logger.debug("Updated tags for item \(id)")
         }
@@ -1825,7 +1878,7 @@ class ClipboardManager {
             }
             saveHistory()
             #if ENABLE_SYNC
-            queueItemUpdateForSync(history[index])
+                queueItemUpdateForSync(history[index])
             #endif
             logger.debug("Updated collection for item \(id)")
         }

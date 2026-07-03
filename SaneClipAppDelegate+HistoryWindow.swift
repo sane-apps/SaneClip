@@ -106,15 +106,18 @@ extension SaneClipAppDelegate {
         withHistoryAuth { [weak self] in self?.showHistoryWindow() }
     }
 
-    /// Hides the history UI before a paste is synthesized so the synthetic
-    /// Cmd+V lands in the target app. The floating panel is non-activating, so
-    /// SaneClip is never frontmost — ordering the panel out is enough; we do
-    /// NOT hide the whole app (that would flash it away from the user's view
-    /// and, on the keep-open path, force a re-activation that steals focus).
+    /// Gets the history UI out of the way of a synthesized paste. The floating
+    /// panel is non-activating, so SaneClip is never frontmost and the synthetic
+    /// Cmd+V lands in the target app WHETHER OR NOT the panel is visible.
+    /// Therefore, with keep-open ON we leave the window exactly where it is —
+    /// no `orderOut`, no later reopen — which removes the ~480ms hide-then-
+    /// reappear "flicker" the window used to do on every paste. Without keep-open
+    /// (or for the menu-bar popover) we still dismiss so it gets out of the way.
     @objc func handleDismissForPaste() {
         if popover.isShown {
             popover.performClose(nil)
         } else if let historyWindow, historyWindow.isVisible {
+            if SettingsModel.shared.keepPasteStackOpenBetweenPastes { return }
             removeHistoryWindowOutsideClickMonitor()
             historyWindow.orderOut(nil)
         }
@@ -124,6 +127,10 @@ extension SaneClipAppDelegate {
     /// (e.g. paste-stack "keep open while consuming"). Routes to the window or
     /// the popover to match the user's chosen presentation.
     @objc func handleReopenHistoryAfterPaste() {
+        // If keep-open kept the floating window visible (the non-activating panel
+        // never had to hide for the paste), there is nothing to reopen — a
+        // makeKeyAndOrderFront here would just re-flash the window.
+        if let historyWindow, historyWindow.isVisible { return }
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 180_000_000)
             if SettingsModel.shared.useFloatingHistoryWindow, licenseService.isPro {

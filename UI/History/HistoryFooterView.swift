@@ -26,19 +26,28 @@ struct HistoryFooterView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 0) {
+            // Contextual controls (merge queue, paste stack) rise in a band
+            // ABOVE the persistent bar, so the anchors below never move as
+            // they come and go.
+            if showsSecondaryControls {
+                secondaryControls
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                Divider()
+            }
+
+            // Persistent anchor bar — item count pinned bottom-left, the fixed
+            // actions pinned bottom-right. Same place every time, whatever else
+            // is going on above it.
             HStack(spacing: 8) {
                 itemCountLabel
                 Spacer(minLength: 8)
                 settingsButton
                 smartClearButton
             }
-
-            if showsSecondaryControls {
-                secondaryControls
-            }
+            .padding(8)
         }
-        .padding(8)
     }
 
     private var showsSecondaryControls: Bool {

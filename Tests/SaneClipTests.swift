@@ -398,6 +398,12 @@ struct SaneClipTests {
         #expect(!UpdateService.shouldOfferManualDownloadFallback(for: noUpdateError, updateCheck: .updates))
         #expect(!UpdateService.shouldOfferManualDownloadFallback(for: installError, updateCheck: .updatesInBackground))
         #expect(!UpdateService.shouldOfferManualDownloadFallback(for: otherDomainError, updateCheck: .updates))
+
+        // "You're up to date" is a routine result, not a failure — it must be
+        // recognized so it's logged quietly instead of as an error.
+        #expect(UpdateService.isRoutineNoUpdate(noUpdateError))
+        #expect(!UpdateService.isRoutineNoUpdate(installError))
+        #expect(!UpdateService.isRoutineNoUpdate(otherDomainError))
     }
 
     @Test("Sparkle updater stays disabled for XCTest host runs")
@@ -437,7 +443,7 @@ struct SaneClipTests {
         #expect(urls.map(\.path) == [
             "/tmp/saneclip-home/Library/Caches/com.saneclip.app/org.sparkle-project.Sparkle/Launcher",
             "/tmp/saneclip-home/Library/Caches/com.saneclip.app/org.sparkle-project.Sparkle/Installation",
-            "/tmp/saneclip-home/Library/Caches/com.saneclip.app/org.sparkle-project.Sparkle/PersistentDownloads",
+            "/tmp/saneclip-home/Library/Caches/com.saneclip.app/org.sparkle-project.Sparkle/PersistentDownloads"
         ])
     }
 
@@ -793,7 +799,7 @@ struct SaneClipTests {
             "PRIVACY.md",
             "docs/privacy.html",
             "docs/guides.html",
-            "docs/how-to-automate-clipboard-webhooks-mac.html",
+            "docs/how-to-automate-clipboard-webhooks-mac.html"
         ]
 
         for path in checkedPaths {
@@ -1075,7 +1081,7 @@ struct SaneClipTests {
 
         let payload: [String: Any] = [
             "version": 1,
-            "openHistoryAtCursor": true,
+            "openHistoryAtCursor": true
         ]
         let exported = try JSONSerialization.data(withJSONObject: payload)
 
@@ -1098,7 +1104,7 @@ struct SaneClipTests {
 
         let payload: [String: Any] = [
             "version": 1,
-            "showMenuBarIcon": false,
+            "showMenuBarIcon": false
         ]
         settings.showInDock = true
         settings.showMenuBarIcon = true
@@ -1177,7 +1183,7 @@ struct SaneClipTests {
         let payload: [String: Any] = [
             "version": 1,
             "autoOCRCapturedScreenshots": false,
-            "captureOCRLanguage": CaptureOCRLanguage.spanish.rawValue,
+            "captureOCRLanguage": CaptureOCRLanguage.spanish.rawValue
         ]
         settings.autoOCRCapturedScreenshots = true
         settings.captureOCRLanguage = .automatic
@@ -1193,7 +1199,7 @@ struct SaneClipTests {
         #expect(exported["captureOCRLanguage"] as? String == CaptureOCRLanguage.spanish.rawValue)
 
         let legacyPayload: [String: Any] = [
-            "captureOCRLanguage": CaptureOCRLanguage.englishUS.displayName,
+            "captureOCRLanguage": CaptureOCRLanguage.englishUS.displayName
         ]
         try settings.importSettings(from: JSONSerialization.data(withJSONObject: legacyPayload))
         #expect(settings.captureOCRLanguage == .englishUS)
@@ -1501,7 +1507,7 @@ struct SaneClipTests {
         let rsaKey = [
             "-----BEGIN RSA", "PRIVATE KEY-----",
             "MIIEowIBAAKCAQEA...",
-            "-----END RSA", "PRIVATE KEY-----",
+            "-----END RSA", "PRIVATE KEY-----"
         ].joined(separator: " ")
         #expect(detector.detect(in: rsaKey).contains(.privateKey))
 
@@ -1828,7 +1834,7 @@ struct SaneClipTests {
         let pendingIDs = SyncCoordinator.pendingSaveRecordIDs(
             from: [
                 .saveRecord(saveID),
-                .deleteRecord(deleteID),
+                .deleteRecord(deleteID)
             ]
         )
 
@@ -1862,7 +1868,7 @@ struct SaneClipTests {
 
         let plist: [String: Any] = [
             "CFBundleIdentifier": "com.example.fake",
-            "CFBundleName": "Fake",
+            "CFBundleName": "Fake"
         ]
         let plistData = try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
         try plistData.write(to: plistURL)
@@ -2225,7 +2231,7 @@ struct SaneClipTests {
             "UI/Settings/SettingsView.swift",
             "UI/Settings/SnippetsSettingsView.swift",
             "UI/Settings/StorageStatsView.swift",
-            "Core/Sync/SyncSettingsView.swift",
+            "Core/Sync/SyncSettingsView.swift"
         ]
         let disallowedSubstrings = [
             ".font(.caption)",
@@ -2234,7 +2240,7 @@ struct SaneClipTests {
             ".foregroundStyle(.tertiary)",
             ".font(.system(size: 9)",
             ".font(.system(size: 10)",
-            ".font(.system(size: 11)",
+            ".font(.system(size: 11)"
         ]
 
         for relativePath in settingsFiles {
@@ -2584,7 +2590,7 @@ struct SaneClipTests {
                 name: "KeyboardShortcuts",
                 url: "https://github.com/sindresorhus/KeyboardShortcuts",
                 text: "MIT License"
-            ),
+            )
         ]
         try renderPNG(
             ZStack {
@@ -2956,15 +2962,13 @@ struct SaneClipTests {
     private func screenshotOutputDirectory() -> String? {
         if let rawOutputDir = ProcessInfo.processInfo.environment["SANECLIP_SCREENSHOT_DIR"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
-            !rawOutputDir.isEmpty
-        {
+            !rawOutputDir.isEmpty {
             return rawOutputDir
         }
 
         if let hintedOutputDir = try? String(contentsOf: screenshotOutputHintFile, encoding: .utf8)
             .trimmingCharacters(in: .whitespacesAndNewlines),
-            !hintedOutputDir.isEmpty
-        {
+            !hintedOutputDir.isEmpty {
             return hintedOutputDir
         }
 

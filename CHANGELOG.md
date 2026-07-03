@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - The Pro floating history window now opens a live preview beside the list when it's wide enough: the full clip plus its source app, type, when it was captured, how often it's been pasted, and its collection, tags, and note — with Paste, Plain Text, and Pin right there.
 - The empty history window now keeps the search field at the top instead of floating it into the middle.
 - Colors in the history window now follow one consistent meaning each: blue for actions, amber for pinned, green for pasted, yellow for Pro, teal for merge, and violet for the paste stack — so a color always tells you the same thing.
+- The bottom of the history window is now a fixed bar — item count on the left, Settings and Smart Clear on the right, always in the same place — with merge and paste-stack controls appearing in a band just above it only when you're using them.
+- Routine "you're up to date" update checks no longer show up as errors in diagnostics.
 - The bottom toolbar collapses to a single clean row when there's nothing queued, instead of showing an empty paste-stack chip.
 - Moves the merge queue and paste stack controls to their own footer row, so the horizontal scrollbar can no longer cover `Clear Queue` at narrow widths.
 - Fixes the Pro floating history window closing when you click its own title bar, search field, filter, or pause controls; only clicks truly outside the window close it now.

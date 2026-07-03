@@ -359,6 +359,14 @@ struct HistoryWindowTests {
         #expect(footerSource.contains("private var showsSecondaryControls"))
         #expect(footerSource.contains("private var settingsButton"))
         #expect(footerSource.contains("private var smartClearButton"))
+        // The second row must never open with an orphaned divider: the merge
+        // group is extracted without a leading divider, and the paste-stack
+        // group's divider only appears when the merge group precedes it.
+        #expect(footerSource.contains("private var mergeControls"))
+        #expect(footerSource.contains("private var pasteStackLeadingDivider"))
+        // The only vertical divider left in the footer lives inside the
+        // conditional leading-divider helper — no group hard-codes its own.
+        #expect(footerSource.components(separatedBy: "Divider().frame(height: 14)").count == 2)
     }
 
     @Test("History paste honors the keep-open pin without changing URL-scheme paste")

@@ -67,40 +67,58 @@ struct HistoryFooterView: View {
     // MARK: - Secondary controls (second row at narrow widths)
 
     private var secondaryControls: some View {
+        // Dividers only ever separate the merge and paste-stack groups; the
+        // row must never open with an orphaned divider hanging at its left
+        // edge, so each group carries its own leading divider only when
+        // something precedes it.
         HStack(spacing: 8) {
             if !mergeQueueIDs.isEmpty {
-                Divider().frame(height: 14)
-                HStack(spacing: 4) {
-                    Image(systemName: "link.badge.plus")
-                        .font(.caption)
-                    Text("\(mergeQueueIDs.count)")
-                        .font(.subheadline.monospacedDigit())
-                }
-                .foregroundStyle(.teal)
-                .help("Items queued for merge")
-
-                Button("Merge") { onMerge() }
-                    .buttonStyle(.plain)
-                    .font(.subheadline)
-                    .foregroundStyle(.teal)
-                    .fixedSize()
-                    .disabled(mergeQueueIDs.count < 2)
-
-                Button("Clear Queue") { mergeQueueIDs.removeAll() }
-                    .buttonStyle(.plain)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .fixedSize()
+                mergeControls
             }
 
             pasteStackControls
         }
     }
 
+    private var mergeControls: some View {
+        HStack(spacing: 8) {
+            HStack(spacing: 4) {
+                Image(systemName: "link.badge.plus")
+                    .font(.caption)
+                Text("\(mergeQueueIDs.count)")
+                    .font(.subheadline.monospacedDigit())
+            }
+            .foregroundStyle(.teal)
+            .help("Items queued for merge")
+
+            Button("Merge") { onMerge() }
+                .buttonStyle(.plain)
+                .font(.subheadline)
+                .foregroundStyle(.teal)
+                .fixedSize()
+                .disabled(mergeQueueIDs.count < 2)
+
+            Button("Clear Queue") { mergeQueueIDs.removeAll() }
+                .buttonStyle(.plain)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize()
+        }
+    }
+
+    /// Leading divider appears only when the merge group precedes this one.
+    private var pasteStackLeadingDivider: some View {
+        Group {
+            if !mergeQueueIDs.isEmpty {
+                Divider().frame(height: 14)
+            }
+        }
+    }
+
     @ViewBuilder
     private var pasteStackControls: some View {
         if isPro {
-            Divider().frame(height: 14)
+            pasteStackLeadingDivider
 
             HStack(spacing: 4) {
                 Image(systemName: "square.stack.3d.up")
@@ -130,7 +148,7 @@ struct HistoryFooterView: View {
             .foregroundStyle(.secondary)
             .fixedSize()
         } else {
-            Divider().frame(height: 14)
+            pasteStackLeadingDivider
             Button {
                 if let ls = licenseService {
                     ProUpsellWindow.show(feature: ProFeature.pasteStack, licenseService: ls)

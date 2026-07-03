@@ -267,36 +267,52 @@ struct ClipboardItemRow: View {
                         .padding(.leading, 20)
                     }
 
-                    // Metadata line - fixed columns for alignment
-                    HStack(spacing: 12) { // Increased spacing
-                        // Source app icon
+                    // Metadata line — lead with the strongest recognition
+                    // cues (which app it came from, and when), the way people
+                    // actually pick a clip. The word/char count is demoted to
+                    // hover; full detail lives in the preview pane.
+                    HStack(spacing: 6) {
+                        // Source app: icon + name. The name was previously only
+                        // a tooltip, so a clip's origin was invisible unless you
+                        // had learned the source-color rail.
                         if let icon = item.sourceAppIcon {
                             Image(nsImage: icon)
                                 .resizable()
-                                .frame(width: 16, height: 16)
-                                .help(item.sourceAppName ?? "Unknown app")
+                                .frame(width: 14, height: 14)
                         }
-
-                        // Stats with icons
-                        HStack(spacing: 4) {
-                            if case .image = item.content {
-                                Image(systemName: "photo")
-                                    .font(.caption2)
-                            }
-                            Text(item.stats)
+                        if let appName = item.sourceAppName, !appName.isEmpty {
+                            Text(appName)
                                 .font(.caption)
                                 .lineLimit(1)
+                                .fixedSize()
+                                .foregroundStyle(.primary.opacity(0.72))
+                            Text("·")
+                                .font(.caption)
+                                .foregroundStyle(.secondary.opacity(0.5))
+                        } else if case .image = item.content {
+                            Image(systemName: "photo")
+                                .font(.caption2)
+                                .foregroundStyle(.primary.opacity(0.55))
                         }
-                        .foregroundStyle(.primary.opacity(0.7))
 
-                        // Time ago
+                        // When
                         Text(item.timeAgo)
                             .font(.caption)
                             .lineLimit(1)
                             .fixedSize()
                             .foregroundStyle(.primary.opacity(0.5))
 
-                        // Paste count badge
+                        // Word/char count — demoted, revealed on hover only.
+                        if isHovering {
+                            Text("· \(item.stats)")
+                                .font(.caption2)
+                                .lineLimit(1)
+                                .fixedSize()
+                                .foregroundStyle(.secondary.opacity(0.55))
+                        }
+
+                        // Paste count badge (kept — a genuine recognition
+                        // signal: "the one I keep reaching for").
                         if item.pasteCount > 0 {
                             HStack(spacing: 2) {
                                 Image(systemName: "doc.on.doc")

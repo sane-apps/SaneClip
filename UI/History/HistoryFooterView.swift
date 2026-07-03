@@ -42,7 +42,18 @@ struct HistoryFooterView: View {
     }
 
     private var showsSecondaryControls: Bool {
-        !mergeQueueIDs.isEmpty || isPro || licenseService != nil
+        !mergeQueueIDs.isEmpty || showsPasteStackCluster || showsPasteStackUpsell
+    }
+
+    /// The Pro paste-stack cluster appears only when it has something to act
+    /// on — queued items, or the panel already open — never as an empty "0"
+    /// chip claiming a whole footer row in the common just-opened state.
+    private var showsPasteStackCluster: Bool {
+        isPro && (!clipboardManager.pasteStack.isEmpty || showPasteStackPanel)
+    }
+
+    private var showsPasteStackUpsell: Bool {
+        !isPro && licenseService != nil
     }
 
     private var itemCountLabel: some View {
@@ -76,7 +87,11 @@ struct HistoryFooterView: View {
                 mergeControls
             }
 
-            pasteStackControls
+            if showsPasteStackCluster {
+                pasteStackCluster
+            } else if showsPasteStackUpsell {
+                pasteStackUpsell
+            }
         }
     }
 
@@ -115,9 +130,8 @@ struct HistoryFooterView: View {
         }
     }
 
-    @ViewBuilder
-    private var pasteStackControls: some View {
-        if isPro {
+    private var pasteStackCluster: some View {
+        HStack(spacing: 8) {
             pasteStackLeadingDivider
 
             HStack(spacing: 4) {
@@ -147,7 +161,11 @@ struct HistoryFooterView: View {
             .font(.subheadline)
             .foregroundStyle(.secondary)
             .fixedSize()
-        } else {
+        }
+    }
+
+    private var pasteStackUpsell: some View {
+        HStack(spacing: 8) {
             pasteStackLeadingDivider
             Button {
                 if let ls = licenseService {

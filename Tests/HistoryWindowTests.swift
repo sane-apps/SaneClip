@@ -367,6 +367,15 @@ struct HistoryWindowTests {
         // The only vertical divider left in the footer lives inside the
         // conditional leading-divider helper — no group hard-codes its own.
         #expect(footerSource.components(separatedBy: "Divider().frame(height: 14)").count == 2)
+        // The Pro paste-stack cluster is gated on having something to act on,
+        // so the empty "0" chip never claims a footer row in the common
+        // just-opened state; the whole second row collapses when idle.
+        #expect(footerSource.contains("private var showsPasteStackCluster"))
+        #expect(footerSource.contains("!clipboardManager.pasteStack.isEmpty || showPasteStackPanel"))
+        #expect(footerSource.contains("private var pasteStackCluster"))
+        #expect(footerSource.contains("private var pasteStackUpsell"))
+        // The second row is no longer shown just because the user is Pro.
+        #expect(!footerSource.contains("!mergeQueueIDs.isEmpty || isPro || licenseService != nil"))
     }
 
     @Test("History paste honors the keep-open pin without changing URL-scheme paste")

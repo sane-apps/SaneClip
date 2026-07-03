@@ -517,7 +517,12 @@ struct ClipboardHistoryView: View {
             let desc = hasActiveFilters
                 ? "Try different filter settings"
                 : (searchText.isEmpty ? "Copy something to see it here" : "Try a different search")
+            // Fill the space between the pinned search bar and footer so the
+            // empty message centers there — otherwise the non-greedy
+            // ContentUnavailableView lets the whole stack collapse and get
+            // centered, floating the search bar into the middle of the window.
             ContentUnavailableView(title, systemImage: icon, description: Text(desc))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             ScrollViewReader { proxy in
                 List {

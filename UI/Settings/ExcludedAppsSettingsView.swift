@@ -17,7 +17,9 @@ struct ExcludedAppsInline: View {
     private struct AppPreset: Identifiable {
         let label: String
         let bundleID: String
-        var id: String { bundleID }
+        var id: String {
+            bundleID
+        }
     }
 
     enum KeyboardTarget: Hashable {
@@ -145,7 +147,7 @@ struct ExcludedAppsInline: View {
 
                 Image(systemName: exists ? "checkmark.circle.fill" : "plus.circle")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(exists ? .green : .white)
+                    .foregroundStyle(exists ? Color.semanticSuccess : .white)
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -185,8 +187,8 @@ struct ExcludedAppsInline: View {
     nonisolated static func selectedBundleID(fromSelectedAppURL url: URL) -> String? {
         guard url.pathExtension == "app" else { return nil }
         guard let bundleID = Bundle(url: url)?.bundleIdentifier?
-                .trimmingCharacters(in: .whitespacesAndNewlines),
-              !bundleID.isEmpty
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+            !bundleID.isEmpty
         else { return nil }
         return bundleID
     }
@@ -287,14 +289,13 @@ struct ExcludedAppsInline: View {
     private func moveHeaderFocus(step: Int) {
         let headerTargets: [KeyboardTarget] = [.addButton] + Self.presets.map { .preset($0.bundleID) }
 
-        let currentTarget: KeyboardTarget
-        switch focusedKeyboardTarget {
+        let currentTarget: KeyboardTarget = switch focusedKeyboardTarget {
         case .some(.addButton):
-            currentTarget = .addButton
+            .addButton
         case let .some(.preset(bundleID)):
-            currentTarget = .preset(bundleID)
+            .preset(bundleID)
         default:
-            currentTarget = .addButton
+            .addButton
         }
 
         guard let currentIndex = headerTargets.firstIndex(of: currentTarget) else {

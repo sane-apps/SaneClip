@@ -49,8 +49,10 @@ struct HistoryWindowTests {
         #expect(historyWindowSource.contains(".resizable"))
         #expect(historyWindowSource.contains("contentMinSize"))
         #expect(historyWindowSource.contains("contentMaxSize"))
-        // Outside click/desktop click behaves like the popover and hides the panel.
-        #expect(historyWindowSource.contains("window.hidesOnDeactivate = true"))
+        // Non-activating panel: dismissal is driven by the explicit outside-
+        // click monitors, not app deactivation (which may never fire for a
+        // panel that never activates the app), so hidesOnDeactivate is off.
+        #expect(historyWindowSource.contains("window.hidesOnDeactivate = false"))
         #expect(historyWindowSource.contains("NSEvent.addGlobalMonitorForEvents"))
         #expect(historyWindowSource.contains("NSEvent.addLocalMonitorForEvents"))
         #expect(historyWindowSource.contains("historyWindowOutsideClickLocalMonitor"))
@@ -267,7 +269,7 @@ struct HistoryWindowTests {
         #expect(historyWindowSource.contains("historyAuthSatisfied("))
     }
 
-    @Test("Paste from the floating window hands focus back before the synthetic paste")
+    @Test("Floating history is a non-activating panel: paste lands in the target app without a focus steal")
     func floatingWindowPasteReturnsFocus() throws {
         let historyWindowSource = try String(
             contentsOf: projectRootURL().appendingPathComponent("SaneClipAppDelegate+HistoryWindow.swift"),
@@ -277,10 +279,17 @@ struct HistoryWindowTests {
             contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
             encoding: .utf8
         )
-        // The dismiss handler hides the app so the synthesized Cmd+V lands on the
-        // target app, not our floating panel.
+        // The panel is non-activating (Spotlight-style): it floats over the
+        // current app without making SaneClip frontmost.
+        #expect(historyWindowSource.contains(".nonactivatingPanel"))
+        // The dismiss handler just orders the panel out; because we are never
+        // frontmost, the synthetic Cmd+V lands in the target app. It must NOT
+        // hide the whole app any more, and showing must NOT activate SaneClip
+        // — either would steal focus on the keep-open reopen.
         #expect(historyWindowSource.contains("func handleDismissForPaste()"))
-        #expect(historyWindowSource.contains("NSApp.hide(nil)"))
+        #expect(historyWindowSource.contains("historyWindow.orderOut(nil)"))
+        #expect(!historyWindowSource.contains("NSApp.hide(nil)"))
+        #expect(!historyWindowSource.contains("NSApp.activate(ignoringOtherApps: true)"))
         // Reopen-after-paste routes to the window when floating.
         #expect(historyWindowSource.contains("func handleReopenHistoryAfterPaste()"))
         // A second menu-bar click closes the floating window.

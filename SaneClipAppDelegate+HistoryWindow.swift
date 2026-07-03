@@ -106,17 +106,17 @@ extension SaneClipAppDelegate {
         withHistoryAuth { [weak self] in self?.showHistoryWindow() }
     }
 
-    /// Hides the history UI before a paste is synthesized. For the floating
-    /// window we must hide the *app* (not just the panel): showing the window
-    /// activated SaneClip, so a bare `orderOut` would leave SaneClip frontmost
-    /// and the synthetic Cmd+V would land on us instead of the target app.
+    /// Hides the history UI before a paste is synthesized so the synthetic
+    /// Cmd+V lands in the target app. The floating panel is non-activating, so
+    /// SaneClip is never frontmost — ordering the panel out is enough; we do
+    /// NOT hide the whole app (that would flash it away from the user's view
+    /// and, on the keep-open path, force a re-activation that steals focus).
     @objc func handleDismissForPaste() {
         if popover.isShown {
             popover.performClose(nil)
         } else if let historyWindow, historyWindow.isVisible {
             removeHistoryWindowOutsideClickMonitor()
             historyWindow.orderOut(nil)
-            NSApp.hide(nil)
         }
     }
 
@@ -139,8 +139,11 @@ extension SaneClipAppDelegate {
             popover.performClose(nil)
         }
 
+        // A non-activating panel becomes key (so the search field is typeable)
+        // without activating SaneClip, so it appears over your current app
+        // like Spotlight — no app switch, and nothing to steal focus back on
+        // the keep-open reopen.
         if let historyWindow, historyWindow.isVisible {
-            NSApp.activate(ignoringOtherApps: true)
             historyWindow.makeKeyAndOrderFront(nil)
             installHistoryWindowOutsideClickMonitor()
             return
@@ -149,7 +152,6 @@ extension SaneClipAppDelegate {
         let window = historyWindow ?? makeHistoryWindow()
         historyWindow = window
 
-        NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
         installHistoryWindowOutsideClickMonitor()
     }
@@ -263,7 +265,7 @@ extension SaneClipAppDelegate {
                 width: ClipboardHistoryView.popoverWidth,
                 height: ClipboardHistoryView.popoverMinHeight
             ),
-            styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
+            styleMask: [.titled, .closable, .resizable, .fullSizeContentView, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
@@ -272,9 +274,13 @@ extension SaneClipAppDelegate {
         window.isReleasedWhenClosed = false
         window.level = .floating
         window.isFloatingPanel = true
-        // Match popover dismissal: once the user clicks another app/desktop
-        // without pasting, the floating history window gets out of the way.
-        window.hidesOnDeactivate = true
+        // Non-activating: the panel floats over whatever app you're in (like
+        // Spotlight) without making SaneClip frontmost, so a paste lands in
+        // that app and the keep-open pin never yanks focus back to us.
+        // Dismissal is driven by the explicit outside-click monitors, not by
+        // app deactivation (which may never fire for a panel that never
+        // activates the app).
+        window.hidesOnDeactivate = false
         window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
 
         // Keep resizing "flexible but not infinite".

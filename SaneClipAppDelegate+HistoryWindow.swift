@@ -159,6 +159,17 @@ extension SaneClipAppDelegate {
     func installHistoryWindowOutsideClickMonitor() {
         removeHistoryWindowOutsideClickMonitor()
 
+        // Dismissal for the non-activating floating panel is driven SOLELY by
+        // explicit mouse-downs run through the geometry classifier: a click
+        // inside the window frame (toolbar, search, filter, pause) never closes
+        // it; a click anywhere outside does. We deliberately do NOT close on app
+        // deactivation. A `.nonactivatingPanel` means SaneClip is usually NOT
+        // the active app while the panel is up (it floats over your current app
+        // like Spotlight), so a `didResignActive` / `!NSApp.isActive` rule would
+        // tear the window down the instant it opened — and again on every focus
+        // change mid-use — which was Glenn's "clicking the toolbar closes the
+        // window" bug. The global monitor still catches clicks into other apps,
+        // so outside-click dismissal keeps working without the deactivation path.
         historyWindowOutsideClickMonitor = NSEvent.addGlobalMonitorForEvents(
             matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]
         ) { [weak self] _ in
@@ -176,23 +187,6 @@ extension SaneClipAppDelegate {
             }
             return event
         }
-        historyWindowResignActiveObserver = NotificationCenter.default.addObserver(
-            forName: NSApplication.didResignActiveNotification,
-            object: NSApp,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor in
-                self?.closeHistoryWindowFromOutsideInteraction()
-            }
-        }
-        historyWindowOutsideClickTimer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                guard let self, self.historyWindow?.isVisible == true else { return }
-                if !NSApp.isActive {
-                    self.closeHistoryWindowFromOutsideInteraction()
-                }
-            }
-        }
     }
 
     func removeHistoryWindowOutsideClickMonitor() {
@@ -204,12 +198,6 @@ extension SaneClipAppDelegate {
             NSEvent.removeMonitor(historyWindowOutsideClickLocalMonitor)
             self.historyWindowOutsideClickLocalMonitor = nil
         }
-        if let historyWindowResignActiveObserver {
-            NotificationCenter.default.removeObserver(historyWindowResignActiveObserver)
-            self.historyWindowResignActiveObserver = nil
-        }
-        historyWindowOutsideClickTimer?.invalidate()
-        historyWindowOutsideClickTimer = nil
     }
 
     private func handleHistoryWindowOutsideMouseDown(at point: NSPoint) {
@@ -241,8 +229,7 @@ extension SaneClipAppDelegate {
             return
         }
         // Never destroy the window while a sheet is attached — that would
-        // throw away an in-progress edit. Covers the deactivation paths too
-        // (resign-active observer, activity timer, app delegate).
+        // throw away an in-progress edit.
         guard historyWindow.attachedSheet == nil else { return }
         guard historyWindow.isVisible else {
             removeHistoryWindowOutsideClickMonitor()
@@ -375,9 +362,5 @@ extension SaneClipAppDelegate {
         )
         popover.contentSize = size
         popover.contentViewController?.preferredContentSize = size
-    }
-
-    func applicationDidResignActive(_: Notification) {
-        closeHistoryWindowFromOutsideInteraction()
     }
 }

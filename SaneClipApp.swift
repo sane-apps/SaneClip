@@ -38,13 +38,12 @@ extension KeyboardShortcuts.Name {
 }
 
 // MARK: - AppDelegate
+
 @MainActor
 class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
     var popover: NSPopover!
     var historyWindow: NSWindow?, historyWindowOutsideClickMonitor: Any?, historyWindowOutsideClickLocalMonitor: Any?
-    var historyWindowResignActiveObserver: NSObjectProtocol?
-    var historyWindowOutsideClickTimer: Timer?
     var clipboardManager: ClipboardManager!
     let screenCaptureService = ScreenCaptureService()
     let captureOCRService = CaptureOCRService()
@@ -56,6 +55,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     let authGracePeriod: TimeInterval = 30.0 // seconds - stays unlocked for 30s
 
     // MARK: - License
+
     #if APP_STORE
         let licenseService = LicenseService(
             appName: "SaneClip",

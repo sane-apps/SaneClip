@@ -24,7 +24,7 @@ struct HistoryWindowTests {
 
         let payload: [String: Any] = [
             "version": 1,
-            "useFloatingHistoryWindow": true
+            "useFloatingHistoryWindow": true,
         ]
         let exported = try JSONSerialization.data(withJSONObject: payload)
 
@@ -45,49 +45,42 @@ struct HistoryWindowTests {
             encoding: .utf8
         )
 
-        // Resizable window + sane bounds (not infinite).
+        // Resizable window, sane bounds, remembered frame, on-screen clamp,
+        // Pro-gated route. (Dismissal behavior is covered behaviorally by the
+        // geometry-classifier tests below, not by fingerprinting here.)
         #expect(historyWindowSource.contains(".resizable"))
         #expect(historyWindowSource.contains("contentMinSize"))
         #expect(historyWindowSource.contains("contentMaxSize"))
-        // Non-activating panel: dismissal is driven by the explicit outside-
-        // click monitors, not app deactivation (which may never fire for a
-        // panel that never activates the app), so hidesOnDeactivate is off.
+        #expect(historyWindowSource.contains("setFrameAutosaveName(Self.historyWindowFrameAutosaveName)"))
+        #expect(historyWindowSource.contains("ensureWindowOnScreen"))
+        #expect(historyWindowSource.contains("min(max(frame.origin.x"))
+        #expect(historyWindowSource.contains("if SettingsModel.shared.useFloatingHistoryWindow, licenseService.isPro"))
+
+        // Non-activating Spotlight-style panel: it floats over your current app
+        // WITHOUT activating SaneClip, so dismissal is driven SOLELY by the
+        // outside-click monitors + geometry classifier — never by app
+        // deactivation. REGRESSION GUARD for Glenn #1007 ("clicking the toolbar
+        // closes the window"): on a non-activating panel SaneClip is usually
+        // inactive while the window is up, so a resign-active / !NSApp.isActive
+        // close would slam it shut the instant it opened and on every focus
+        // change mid-use. None of those paths may return.
+        #expect(historyWindowSource.contains(".nonactivatingPanel"))
         #expect(historyWindowSource.contains("window.hidesOnDeactivate = false"))
         #expect(historyWindowSource.contains("NSEvent.addGlobalMonitorForEvents"))
         #expect(historyWindowSource.contains("NSEvent.addLocalMonitorForEvents"))
-        #expect(historyWindowSource.contains("historyWindowOutsideClickLocalMonitor"))
-        #expect(historyWindowSource.contains("NSApplication.didResignActiveNotification"))
-        #expect(historyWindowSource.contains("historyWindowResignActiveObserver"))
-        #expect(historyWindowSource.contains("historyWindowOutsideClickTimer"))
-        #expect(historyWindowSource.contains("Timer.scheduledTimer(withTimeInterval: 0.15"))
-        #expect(historyWindowSource.contains("if !NSApp.isActive"))
-        #expect(historyWindowSource.contains("historyWindowOutsideClickTimer?.invalidate()"))
-        #expect(!historyWindowSource.contains("CGEvent.tapCreate"))
-        #expect(!historyWindowSource.contains("CGEvent.tapEnable"))
-        #expect(!historyWindowSource.contains("historyWindowOutsideClickEventTap"))
-        #expect(!historyWindowSource.contains("historyWindowOutsideClickRunLoopSource"))
-        #expect(historyWindowSource.contains("closeHistoryWindowFromOutsideInteraction"))
-        #expect(historyWindowSource.contains("historyWindow.orderOut(nil)"))
-        #expect(historyWindowSource.contains("self.historyWindow = nil"))
-        // Attached sheets (Edit, Smart Clear, previews) block every dismissal
-        // path — their frames can overhang the parent window at small sizes.
+        #expect(!historyWindowSource.contains("didResignActiveNotification"))
+        #expect(!historyWindowSource.contains("if !NSApp.isActive"))
+        #expect(!historyWindowSource.contains("Timer.scheduledTimer(withTimeInterval: 0.15"))
+        #expect(!historyWindowSource.contains("NSApp.activate(ignoringOtherApps: true)"))
+        #expect(!historyWindowSource.contains("NSApp.hide(nil)"))
+        #expect(!historyWindowSource.contains("func applicationDidResignActive"))
+
+        // Sheet-attached dismissal guard; no event-tap/overlay approach.
         #expect(historyWindowSource.contains("guard historyWindow.attachedSheet == nil else { return }"))
-        #expect(historyWindowSource.contains("hasAttachedSheet: historyWindow.attachedSheet != nil"))
-        #expect(!historyWindowSource.contains("historyWindowOutsideClickOverlay"))
-        #expect(!historyWindowSource.contains("HistoryWindowOutsideClickView"))
-        #expect(historyWindowSource.contains("handleHistoryWindowOutsideMouseDown"))
-        #expect(historyWindowSource.contains("NSEvent.removeMonitor"))
-        #expect(historyWindowSource.contains("func applicationDidResignActive"))
-        // Remembers last size + position across launches.
-        #expect(historyWindowSource.contains("setFrameAutosaveName(Self.historyWindowFrameAutosaveName)"))
-        #expect(historyWindowSource.contains("ensureWindowOnScreen"))
-        // Menu-bar trigger routes to the floating window only when the Pro
-        // setting is on; Basic falls back to the normal popover route.
-        #expect(historyWindowSource.contains("if SettingsModel.shared.useFloatingHistoryWindow, licenseService.isPro"))
-        // Off-screen guard clamps the restored origin into the visible frame
-        // (not just recover fully off-screen frames).
-        #expect(historyWindowSource.contains("min(max(frame.origin.x"))
-        // Setting is user-exposed, but Pro-gated in Basic.
+        #expect(historyWindowSource.contains("closeHistoryWindowFromOutsideInteraction"))
+        #expect(!historyWindowSource.contains("CGEvent.tapCreate"))
+
+        // Pro-gated floating-window setting is user-exposed.
         #expect(settingsSource.contains("Open history as a resizable floating window"))
         #expect(settingsSource.contains("feature: .floatingHistoryWindow"))
     }
@@ -430,7 +423,7 @@ struct HistoryWindowTests {
             "UI/History/HistoryFooterView.swift",
             "UI/History/ClipboardHistoryView.swift",
             "UI/History/ClipPreviewPane.swift",
-            "UI/History/HistoryPasteStackPanel.swift"
+            "UI/History/HistoryPasteStackPanel.swift",
         ]
         let forbidden = ["(.teal)", "(.orange)", "(.green)", "(.yellow)",
                          "Color.teal", "Color.orange", "Color.green", "Color.yellow"]
@@ -716,7 +709,7 @@ struct HistoryWindowTests {
             .init(name: "09-pro-floating-stack-560x680", width: 560, height: 680, pro: true, showStack: true),
             .init(name: "10-free-popover-longtext-320x500", width: 320, height: 500, seed: .longText),
             .init(name: "11-colorful-sources-440x700", width: 440, height: 700, seed: .colorful),
-            .init(name: "12-pro-floating-recording-560x680", width: 560, height: 680, pro: true, showStack: true, recording: true)
+            .init(name: "12-pro-floating-recording-560x680", width: 560, height: 680, pro: true, showStack: true, recording: true),
         ]
 
         let proLicense = makeForcedProLicense()
@@ -770,7 +763,7 @@ struct HistoryWindowTests {
             let sources = [
                 "Messages", "Brave Browser", "Codex", "Slack", "QuickTime Player",
                 "Visual Studio Code", "Notes", "Arc", "Google Chrome", "Terminal",
-                "Discord", "Figma", "Xcode", "Spotify"
+                "Discord", "Figma", "Xcode", "Spotify",
             ]
             manager.history = sources.map { name in
                 ClipboardItem(content: .text("Clip from \(name)"), sourceAppName: name)
@@ -780,7 +773,7 @@ struct HistoryWindowTests {
             let long = String(repeating: "supercalifragilistic-unbreakable-token-", count: 8)
             manager.history = [
                 ClipboardItem(content: .text(long), sourceAppName: "Safari"),
-                ClipboardItem(content: .text("Short normal clip"), sourceAppName: "Notes")
+                ClipboardItem(content: .text("Short normal clip"), sourceAppName: "Notes"),
             ]
             manager.pinnedItems = []
         case .rich:
@@ -799,7 +792,7 @@ struct HistoryWindowTests {
                 ClipboardItem(content: .text("func floatingWindow() { /* resizable */ }"), sourceAppName: "Xcode"),
                 ClipboardItem(content: .text("Customer quote worth saving"), sourceAppName: "Messages", note: "Testimonial"),
                 ClipboardItem(content: .text("Temporary build number 2312"), sourceAppName: "Terminal"),
-                pinned
+                pinned,
             ]
             manager.pinnedItems = [pinned]
         }
@@ -822,7 +815,8 @@ struct HistoryWindowTests {
 
     private func screenshotDir() -> String? {
         if let env = ProcessInfo.processInfo.environment["SANECLIP_SCREENSHOT_DIR"]?
-            .trimmingCharacters(in: .whitespacesAndNewlines), !env.isEmpty {
+            .trimmingCharacters(in: .whitespacesAndNewlines), !env.isEmpty
+        {
             return env
         }
         let hint = URL(fileURLWithPath: "/tmp/saneclip_screenshot_dir.txt")
@@ -889,7 +883,8 @@ struct HistoryWindowTests {
                CGWindowID(window.windowNumber),
                [.boundsIgnoreFraming, .bestResolution]
            ),
-           cgImage.width > 1, cgImage.height > 1 {
+           cgImage.width > 1, cgImage.height > 1
+        {
             let rep = NSBitmapImageRep(cgImage: cgImage)
             if let png = rep.representation(using: .png, properties: [:]) {
                 try png.write(to: url, options: .atomic)

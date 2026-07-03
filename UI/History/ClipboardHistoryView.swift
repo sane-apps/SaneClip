@@ -129,9 +129,27 @@ struct ClipboardHistoryView: View {
     @State private var stackTitleDraft = ""
     @State private var stackNoteDraft = ""
     @State private var settings = SettingsModel.shared
+    @State private var availableWidth: CGFloat = 0
+
+    /// Above this window width the floating window splits into list + preview.
+    /// The fixed 320-pt popover never reaches it, so the pane is exclusive to a
+    /// wide (Pro) floating window and never cramps a narrow one.
+    private static let previewPaneThreshold: CGFloat = 640
 
     private var isPro: Bool {
         licenseService?.isPro == true
+    }
+
+    /// Show the preview pane only when there is genuinely room for both the
+    /// list and the pane. Below the threshold everything stays single-column.
+    private var showsPreviewPane: Bool {
+        isPro && availableWidth >= Self.previewPaneThreshold
+    }
+
+    /// The clip currently highlighted in the list — the pane's subject.
+    private var selectedItem: ClipboardItem? {
+        guard selectedIndex >= 0, selectedIndex < allItems.count else { return nil }
+        return allItems[selectedIndex]
     }
 
     private var isAtFreeLimit: Bool {
@@ -376,8 +394,21 @@ struct ClipboardHistoryView: View {
 
             Divider()
 
-            // History list
-            historyList
+            // History list — splits into list + preview on a wide window.
+            if showsPreviewPane {
+                HStack(spacing: 0) {
+                    historyList
+                        .frame(width: max(320, availableWidth * 0.45))
+                    Divider()
+                    ClipPreviewPane(
+                        item: selectedItem,
+                        clipboardManager: clipboardManager,
+                        licenseService: licenseService
+                    )
+                }
+            } else {
+                historyList
+            }
 
             // Free-tier limit banner — shown when history is at cap
             if isAtFreeLimit {
@@ -440,6 +471,15 @@ struct ClipboardHistoryView: View {
                 onMerge: mergeQueuedItems
             )
         }
+        .background(
+            GeometryReader { proxy in
+                Color.clear
+                    .onAppear { availableWidth = proxy.size.width }
+                    .onChange(of: proxy.size.width) { _, newWidth in
+                        availableWidth = newWidth
+                    }
+            }
+        )
         .background(historyKeyboardShortcuts)
         .onAppear {
             selectedIndex = 0

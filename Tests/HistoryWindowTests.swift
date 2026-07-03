@@ -344,6 +344,37 @@ struct HistoryWindowTests {
         #expect(rowSource.contains("func dragItemProvider() -> NSItemProvider"))
     }
 
+    @Test("Wide floating window splits into list + preview pane; popover stays single-column")
+    func previewPaneGatingAndContent() throws {
+        let historySource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardHistoryView.swift"),
+            encoding: .utf8
+        )
+        let paneSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipPreviewPane.swift"),
+            encoding: .utf8
+        )
+        // Gated on Pro + a width threshold the fixed 320-pt popover can never
+        // reach, so the pane is exclusive to a wide floating window and never
+        // cramps a narrow one.
+        #expect(historySource.contains("previewPaneThreshold"))
+        #expect(historySource.contains("availableWidth >= Self.previewPaneThreshold"))
+        #expect(historySource.contains("isPro && availableWidth"))
+        #expect(historySource.contains("if showsPreviewPane"))
+        #expect(historySource.contains("ClipPreviewPane("))
+        // The threshold sits above the popover width and below the window max,
+        // so at least one real window size shows the pane and the popover never
+        // does.
+        #expect(ClipboardHistoryView.popoverWidth < 640)
+        #expect(ClipboardHistoryView.windowMaxWidth >= 640)
+        // The pane carries the recognition metadata people actually choose by,
+        // and reuses the same paste/pin paths as the rest of the UI.
+        #expect(paneSource.contains("Source app"))
+        #expect(paneSource.contains("Captured"))
+        #expect(paneSource.contains("pasteFromHistory(item:"))
+        #expect(paneSource.contains("togglePin(item:"))
+    }
+
     @Test("Footer keeps item count and actions reachable at narrow widths")
     func footerAvoidsSquash() throws {
         let footerSource = try String(

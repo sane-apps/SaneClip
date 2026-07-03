@@ -100,7 +100,7 @@ struct SettingsColorTests {
 
         #expect(
             violations.isEmpty,
-            "Settings applies raw functional SwiftUI hues (must use a BrandColors token, e.g. semanticSuccess / proUnlock / mergeTeal). Color modifiers scanned: \(modifierPattern). Violations:\n" + violations.joined(separator: "\n")
+            "Settings applies raw functional SwiftUI hues (must use a BrandColors token, e.g. semanticSuccess / proUnlock / mergeTeal). Color modifiers scanned: \(modifierPattern). Violations:\n\(violations.joined(separator: "\n"))"
         )
     }
 

@@ -392,14 +392,14 @@ struct HistoryWindowTests {
         #expect(footerSource.contains("private var showsSecondaryControls"))
         #expect(footerSource.contains("private var settingsButton"))
         #expect(footerSource.contains("private var smartClearButton"))
-        // The second row must never open with an orphaned divider: the merge
-        // group is extracted without a leading divider, and the paste-stack
-        // group's divider only appears when the merge group precedes it.
+        // The merge group carries no leading divider; the single separating
+        // divider lives in secondaryControls' one-row layout only.
         #expect(footerSource.contains("private var mergeControls"))
-        #expect(footerSource.contains("private var pasteStackLeadingDivider"))
-        // The only vertical divider left in the footer lives inside the
-        // conditional leading-divider helper — no group hard-codes its own.
         #expect(footerSource.components(separatedBy: "Divider().frame(height: 14)").count == 2)
+        // Overflow guard (Glenn's "can't reach Clear Queue / Stack"): the footer
+        // drops to one group per row via ViewThatFits when they can't share a
+        // row at 300-320pt — no clipped trailing edge, no horizontal scroller.
+        #expect(footerSource.contains("ViewThatFits(in: .horizontal)"))
         // The Pro paste-stack cluster is gated on having something to act on,
         // so the empty "0" chip never claims a footer row in the common
         // just-opened state; the whole second row collapses when idle.

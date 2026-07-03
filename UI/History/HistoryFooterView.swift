@@ -87,20 +87,37 @@ struct HistoryFooterView: View {
     // MARK: - Secondary controls (second row at narrow widths)
 
     private var secondaryControls: some View {
-        // Dividers only ever separate the merge and paste-stack groups; the
-        // row must never open with an orphaned divider hanging at its left
-        // edge, so each group carries its own leading divider only when
-        // something precedes it.
-        HStack(spacing: 8) {
-            if !mergeQueueIDs.isEmpty {
-                mergeControls
+        // At comfortable widths the merge and paste-stack groups share one row,
+        // separated by a single divider (never an orphaned leading one). When
+        // the window is narrow enough that both groups can't fit — a Pro user
+        // with a merge queue AND an active paste stack is ~313pt inside a 300pt
+        // window — ViewThatFits drops to one group per row so no control is ever
+        // clipped off the trailing edge. That is the "can't reach Clear Queue /
+        // Stack" class of bug Glenn reported, now without a horizontal scroller.
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) {
+                if !mergeQueueIDs.isEmpty {
+                    mergeControls
+                }
+                if !mergeQueueIDs.isEmpty, showsPasteStackCluster || showsPasteStackUpsell {
+                    Divider().frame(height: 14)
+                }
+                pasteStackGroup
             }
+            VStack(alignment: .leading, spacing: 6) {
+                if !mergeQueueIDs.isEmpty {
+                    mergeControls
+                }
+                pasteStackGroup
+            }
+        }
+    }
 
-            if showsPasteStackCluster {
-                pasteStackCluster
-            } else if showsPasteStackUpsell {
-                pasteStackUpsell
-            }
+    @ViewBuilder private var pasteStackGroup: some View {
+        if showsPasteStackCluster {
+            pasteStackCluster
+        } else if showsPasteStackUpsell {
+            pasteStackUpsell
         }
     }
 
@@ -130,19 +147,8 @@ struct HistoryFooterView: View {
         }
     }
 
-    /// Leading divider appears only when the merge group precedes this one.
-    private var pasteStackLeadingDivider: some View {
-        Group {
-            if !mergeQueueIDs.isEmpty {
-                Divider().frame(height: 14)
-            }
-        }
-    }
-
     private var pasteStackCluster: some View {
         HStack(spacing: 8) {
-            pasteStackLeadingDivider
-
             HStack(spacing: 4) {
                 // Recording indicator: while build-by-copying is on, the stack
                 // icon becomes a filled record dot so it's visible even with
@@ -179,7 +185,6 @@ struct HistoryFooterView: View {
 
     private var pasteStackUpsell: some View {
         HStack(spacing: 8) {
-            pasteStackLeadingDivider
             Button {
                 if let ls = licenseService {
                     ProUpsellWindow.show(feature: ProFeature.pasteStack, licenseService: ls)

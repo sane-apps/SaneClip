@@ -16,7 +16,9 @@ struct ClipboardRulesSection: View {
     @State private var removeDuplicateSpaces = ClipboardRulesManager.shared.removeDuplicateSpaces
     @State private var lowercaseURLs = ClipboardRulesManager.shared.lowercaseURLs
 
-    private var isPro: Bool { licenseService?.isPro == true }
+    private var isPro: Bool {
+        licenseService?.isPro == true
+    }
 
     var body: some View {
         CompactSection("Clipboard Rules") {
@@ -148,7 +150,7 @@ struct ProLockedRow: View {
                     Text("Pro")
                         .font(.system(size: 13, weight: .semibold))
                 }
-                .foregroundStyle(.teal)
+                .foregroundStyle(Color.proUnlock)
             }
             .buttonStyle(ClipActionButtonStyle())
             .controlSize(.small)
@@ -173,7 +175,7 @@ struct ProLockedSectionBanner: View {
             HStack(spacing: 6) {
                 Image(systemName: "lock.fill")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.teal)
+                    .foregroundStyle(Color.proUnlock)
                 Text("These settings require SaneClip Pro")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.white.opacity(0.92))
@@ -184,7 +186,7 @@ struct ProLockedSectionBanner: View {
                     Text("Pro")
                         .font(.system(size: 13, weight: .semibold))
                 }
-                .foregroundStyle(.teal)
+                .foregroundStyle(Color.proUnlock)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 9)

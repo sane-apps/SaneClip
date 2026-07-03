@@ -11,7 +11,9 @@ struct SnippetsSettingsView: View {
     @State private var showAddSheet = false
     @State private var showEditSheet = false
 
-    private var isPro: Bool { licenseService?.isPro == true }
+    private var isPro: Bool {
+        licenseService?.isPro == true
+    }
 
     var filteredSnippets: [Snippet] {
         snippetManager.search(searchText)
@@ -28,7 +30,7 @@ struct SnippetsSettingsView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "lock.fill")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.teal)
+                        .foregroundStyle(Color.proUnlock)
                     Text("Snippets require SaneClip Pro")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(.white)
@@ -44,14 +46,14 @@ struct SnippetsSettingsView: View {
                             Text("Pro")
                                 .font(.system(size: 13, weight: .semibold))
                         }
-                        .foregroundStyle(.teal)
+                        .foregroundStyle(Color.proUnlock)
                     }
                     .buttonStyle(ClipActionButtonStyle())
                     .controlSize(.small)
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
-                .background(Color.teal.opacity(0.10))
+                .background(Color.proUnlock.opacity(0.10))
 
                 Divider()
             }
@@ -98,36 +100,36 @@ struct SnippetsSettingsView: View {
                                     onCopy: { copySnippet(snippet) },
                                     onPaste: { clipboardManager?.pasteSnippet(snippet) }
                                 )
-                                    .tag(snippet)
-                                    .contextMenu {
-                                        if isPro {
-                                            Button("Paste Now") {
-                                                clipboardManager?.pasteSnippet(snippet)
-                                            }
-                                            .disabled(clipboardManager == nil)
-                                            Button("Copy for Manual Paste") {
-                                                copySnippet(snippet)
-                                            }
-                                            Divider()
-                                            Button("Edit") {
-                                                selectedSnippet = snippet
-                                                showEditSheet = true
-                                            }
-                                            Button("Duplicate") {
-                                                duplicateSnippet(snippet)
-                                            }
-                                            Divider()
-                                            Button("Delete", role: .destructive) {
-                                                snippetManager.delete(id: snippet.id)
-                                            }
-                                        } else {
-                                            Button("Snippets Pro \u{1F512}") {
-                                                if let ls = licenseService {
-                                                    ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
-                                                }
+                                .tag(snippet)
+                                .contextMenu {
+                                    if isPro {
+                                        Button("Paste Now") {
+                                            clipboardManager?.pasteSnippet(snippet)
+                                        }
+                                        .disabled(clipboardManager == nil)
+                                        Button("Copy for Manual Paste") {
+                                            copySnippet(snippet)
+                                        }
+                                        Divider()
+                                        Button("Edit") {
+                                            selectedSnippet = snippet
+                                            showEditSheet = true
+                                        }
+                                        Button("Duplicate") {
+                                            duplicateSnippet(snippet)
+                                        }
+                                        Divider()
+                                        Button("Delete", role: .destructive) {
+                                            snippetManager.delete(id: snippet.id)
+                                        }
+                                    } else {
+                                        Button("Snippets Pro \u{1F512}") {
+                                            if let ls = licenseService {
+                                                ProUpsellWindow.show(feature: ProFeature.snippets, licenseService: ls)
                                             }
                                         }
                                     }
+                                }
                             }
                         } header: {
                             SnippetSectionHeader(title: section.title, count: section.snippets.count)
@@ -165,7 +167,7 @@ struct SnippetsSettingsView: View {
                             Text("Pro")
                                 .font(.system(size: 13, weight: .semibold))
                         }
-                        .foregroundStyle(.teal)
+                        .foregroundStyle(Color.proUnlock)
                     }
                 })
                 .buttonStyle(ClipActionButtonStyle())
@@ -450,7 +452,7 @@ struct SnippetEditorSheet: View {
                                     .font(.system(size: 13, design: .monospaced))
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
-                                    .background(Color.orange.opacity(0.2))
+                                    .background(Color.secondary.opacity(0.18))
                                     .cornerRadius(4)
                             }
                         }

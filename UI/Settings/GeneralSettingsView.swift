@@ -362,10 +362,10 @@ struct GeneralSettingsView: View {
                                         .foregroundStyle(.white)
                                     Image(systemName: "lock.fill")
                                         .font(.system(size: 12, weight: .semibold))
-                                        .foregroundStyle(.teal)
+                                        .foregroundStyle(Color.proUnlock)
                                     Text("Pro")
                                         .font(.system(size: 13, weight: .semibold))
-                                        .foregroundStyle(.teal)
+                                        .foregroundStyle(Color.proUnlock)
                                 }
                             }
                             .buttonStyle(ClipActionButtonStyle())
@@ -424,7 +424,7 @@ struct GeneralSettingsView: View {
                                     Text("Pro")
                                         .font(.system(size: 13, weight: .semibold))
                                 }
-                                .foregroundStyle(.teal)
+                                .foregroundStyle(Color.proUnlock)
                             }
                             .buttonStyle(ClipActionButtonStyle())
                             .controlSize(.small)

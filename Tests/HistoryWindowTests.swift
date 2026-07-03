@@ -67,6 +67,10 @@ struct HistoryWindowTests {
         #expect(historyWindowSource.contains("closeHistoryWindowFromOutsideInteraction"))
         #expect(historyWindowSource.contains("historyWindow.orderOut(nil)"))
         #expect(historyWindowSource.contains("self.historyWindow = nil"))
+        // Attached sheets (Edit, Smart Clear, previews) block every dismissal
+        // path — their frames can overhang the parent window at small sizes.
+        #expect(historyWindowSource.contains("guard historyWindow.attachedSheet == nil else { return }"))
+        #expect(historyWindowSource.contains("hasAttachedSheet: historyWindow.attachedSheet != nil"))
         #expect(!historyWindowSource.contains("historyWindowOutsideClickOverlay"))
         #expect(!historyWindowSource.contains("HistoryWindowOutsideClickView"))
         #expect(historyWindowSource.contains("handleHistoryWindowOutsideMouseDown"))
@@ -113,6 +117,85 @@ struct HistoryWindowTests {
         #expect(SaneClipAppDelegate.shouldCloseHistoryWindowFromMouseDown(
             at: NSPoint(x: frame.maxX + 12, y: frame.midY),
             windowFrame: frame
+        ))
+    }
+
+    @Test("Floating history clicks do not dismiss the window while a sheet is attached")
+    func floatingHistorySheetClicksKeepWindowAlive() {
+        let frame = NSRect(x: 100, y: 200, width: 300, height: 360)
+
+        // At the 300x360 minimum window size the edit sheet (min height 420)
+        // hangs ~92pt below the parent frame — AppKit clamps a sheet's width
+        // to the parent window but not its height — so its Save/Cancel row
+        // sits below `historyWindow.frame`.
+        let saveCancelClick = NSPoint(x: frame.midX, y: frame.minY - 46)
+
+        // Without the sheet guard this click reads as "outside" and would
+        // destroy the window (and the in-progress edit).
+        #expect(SaneClipAppDelegate.shouldCloseHistoryWindowFromMouseDown(
+            at: saveCancelClick,
+            windowFrame: frame
+        ))
+        #expect(!SaneClipAppDelegate.shouldCloseHistoryWindowFromMouseDown(
+            at: saveCancelClick,
+            windowFrame: frame,
+            hasAttachedSheet: true
+        ))
+
+        // Even a genuine outside click must not dismiss while modal.
+        #expect(!SaneClipAppDelegate.shouldCloseHistoryWindowFromMouseDown(
+            at: NSPoint(x: frame.maxX + 200, y: frame.midY),
+            windowFrame: frame,
+            hasAttachedSheet: true
+        ))
+
+        // Inside clicks stay non-dismissing regardless of the sheet.
+        #expect(!SaneClipAppDelegate.shouldCloseHistoryWindowFromMouseDown(
+            at: NSPoint(x: frame.midX, y: frame.midY),
+            windowFrame: frame,
+            hasAttachedSheet: true
+        ))
+    }
+
+    @Test("Attached sheet really overhangs a min-size parent and stays guarded")
+    @MainActor
+    func attachedSheetOverhangKeepsWindowGuarded() async throws {
+        let panel = NSPanel(
+            contentRect: NSRect(x: 600, y: 400, width: 300, height: 360),
+            styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        panel.isReleasedWhenClosed = false
+        panel.orderFront(nil)
+        defer {
+            if let sheet = panel.attachedSheet { panel.endSheet(sheet) }
+            panel.close()
+        }
+
+        // Mirror the edit sheet's minimum text-item size from ClipboardItemRow.
+        let sheet = NSWindow(contentViewController: NSHostingController(
+            rootView: Color.clear.frame(minWidth: 300, minHeight: 420)
+        ))
+        // Completion-handler overload: the async overload would suspend here
+        // until the sheet is dismissed.
+        panel.beginSheet(sheet) { _ in }
+
+        // beginSheet attaches asynchronously; poll instead of a fixed sleep.
+        for _ in 0 ..< 40 where panel.attachedSheet == nil {
+            try await Task.sleep(nanoseconds: 50_000_000)
+        }
+        try #require(panel.attachedSheet != nil)
+
+        // Geometry precondition: the sheet extends below the parent frame.
+        #expect(sheet.frame.minY < panel.frame.minY)
+
+        let clickInOverhang = NSPoint(x: sheet.frame.midX, y: sheet.frame.minY + 15)
+        #expect(!panel.frame.contains(clickInOverhang))
+        #expect(!SaneClipAppDelegate.shouldCloseHistoryWindowFromMouseDown(
+            at: clickInOverhang,
+            windowFrame: panel.frame,
+            hasAttachedSheet: panel.attachedSheet != nil
         ))
     }
 

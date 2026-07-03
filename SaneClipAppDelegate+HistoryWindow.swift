@@ -51,12 +51,17 @@ extension SaneClipAppDelegate {
 
     /// Global-screen-point classifier for floating-window dismissal. Toolbar,
     /// title-bar, search, filter, and pause clicks are all still inside the
-    /// window frame and must not close it.
+    /// window frame and must not close it. While a sheet is attached (Edit,
+    /// Smart Clear confirmation, previews, save-preset) no click may dismiss:
+    /// AppKit clamps a sheet's width to the parent window but not its height,
+    /// so at small window sizes the sheet's Save/Cancel row hangs below
+    /// `windowFrame` and its clicks would otherwise read as "outside".
     nonisolated static func shouldCloseHistoryWindowFromMouseDown(
         at point: NSPoint,
-        windowFrame: NSRect
+        windowFrame: NSRect,
+        hasAttachedSheet: Bool = false
     ) -> Bool {
-        !windowFrame.contains(point)
+        !hasAttachedSheet && !windowFrame.contains(point)
     }
 
     /// Runs `action` behind the same Touch ID gate as the menu-bar popover
@@ -206,16 +211,38 @@ extension SaneClipAppDelegate {
     }
 
     private func handleHistoryWindowOutsideMouseDown(at point: NSPoint) {
-        guard let historyWindow, historyWindow.isVisible else {
+        guard let historyWindow else {
             removeHistoryWindowOutsideClickMonitor()
             return
         }
-        guard Self.shouldCloseHistoryWindowFromMouseDown(at: point, windowFrame: historyWindow.frame) else { return }
+        // Sheet attached (Edit, Smart Clear confirmation, previews,
+        // save-preset): dismissal stays completely inert — no close and no
+        // monitor teardown. `hidesOnDeactivate` can hide the panel mid-modal
+        // on an app switch; it reappears with the sheet (and these monitors)
+        // intact on reactivation.
+        guard historyWindow.attachedSheet == nil else { return }
+        guard historyWindow.isVisible else {
+            removeHistoryWindowOutsideClickMonitor()
+            return
+        }
+        guard Self.shouldCloseHistoryWindowFromMouseDown(
+            at: point,
+            windowFrame: historyWindow.frame,
+            hasAttachedSheet: historyWindow.attachedSheet != nil
+        ) else { return }
         closeHistoryWindowFromOutsideInteraction()
     }
 
     private func closeHistoryWindowFromOutsideInteraction() {
-        guard let historyWindow, historyWindow.isVisible else {
+        guard let historyWindow else {
+            removeHistoryWindowOutsideClickMonitor()
+            return
+        }
+        // Never destroy the window while a sheet is attached — that would
+        // throw away an in-progress edit. Covers the deactivation paths too
+        // (resign-active observer, activity timer, app delegate).
+        guard historyWindow.attachedSheet == nil else { return }
+        guard historyWindow.isVisible else {
             removeHistoryWindowOutsideClickMonitor()
             return
         }

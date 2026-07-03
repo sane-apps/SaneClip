@@ -106,7 +106,9 @@
 		995784D4DDD6C70020EC143F /* DirectDistributionSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DBD4FED60D446DFDA669D6A /* DirectDistributionSupport.swift */; };
 		9ABA34BEB2F16A4A3646750C /* StorageStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE7465DE4D6ABC7FA43FECC8 /* StorageStatsView.swift */; };
 		9B7EB9FCE9048313BC41114B /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D5C28D690980C222E8B0E03 /* SettingsModel.swift */; };
+		9E044D1E266CB51A703DC41D /* HistoryColorAndStackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7C68E3A37BA502EC5C2580 /* HistoryColorAndStackTests.swift */; };
 		9E661A60E6857138E707FBEB /* ShortcutsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE533676657861A14F5E44D /* ShortcutsSettingsView.swift */; };
+		9F525F1091AFE8E1D13F2936 /* HistoryRenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F83C8FF44783FFF888F0A9 /* HistoryRenderTests.swift */; };
 		A19EE790490B7CC63CBBD941 /* SetappIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64578021E526032605A2A68D /* SetappIntegration.swift */; };
 		A1E34C40B6B4693E554DB614 /* SharedClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB6B85899467ECE68DDCE6E /* SharedClipboardItem.swift */; };
 		A2DA6F029DD4A6EEEA2396AF /* RecentClipsIOSWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19827830127FF21617618069 /* RecentClipsIOSWidget.swift */; };
@@ -256,11 +258,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		04F83C8FF44783FFF888F0A9 /* HistoryRenderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryRenderTests.swift; sourceTree = "<group>"; };
 		05F69FF4560CBC2461673815 /* SaneClipShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipShare.entitlements; sourceTree = "<group>"; };
 		08C603FFD30732501E2A3640 /* SaneClipSettingsCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipSettingsCopy.swift; sourceTree = "<group>"; };
 		098AA40BC8DC5C2501EECC1C /* SyncConflictResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncConflictResolver.swift; sourceTree = "<group>"; };
 		09C2D5E2943BC51ED6D88512 /* SaneClipWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SaneClipWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A05D18D3E7C0978C181CE65 /* SaneClipAppStore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SaneClipAppStore.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A7C68E3A37BA502EC5C2580 /* HistoryColorAndStackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryColorAndStackTests.swift; sourceTree = "<group>"; };
 		122CA02DCD5F4E29C0FFF748 /* SaneClipAppDelegate+Menus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SaneClipAppDelegate+Menus.swift"; sourceTree = "<group>"; };
 		14D0EBBF195245B8CE7ECF07 /* SaneClip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SaneClip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15B3E464B22661AF3A383E88 /* SaneClipIOSShare.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SaneClipIOSShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -576,6 +580,8 @@
 			isa = PBXGroup;
 			children = (
 				E9E1F56A88FFA16B547F02D4 /* CustomerUIActions.yml */,
+				0A7C68E3A37BA502EC5C2580 /* HistoryColorAndStackTests.swift */,
+				04F83C8FF44783FFF888F0A9 /* HistoryRenderTests.swift */,
 				2B02919013D5CE12F0673190 /* HistoryWindowTests.swift */,
 				71B639CB4375AE4479924B74 /* SaneClipTests.swift */,
 				1775AC6444F4E26AD66FA435 /* SecurityTests.swift */,
@@ -874,7 +880,6 @@
 				};
 			};
 			buildConfigurationList = 1ED66BE7F3F13093DC0EDB23 /* Build configuration list for PBXProject "SaneClip" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -890,6 +895,7 @@
 				9B9B0D09FDAE079B73A7A0CB /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
+			productRefGroup = 4526C796D072235F7CAE5FCD /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -990,6 +996,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E044D1E266CB51A703DC41D /* HistoryColorAndStackTests.swift in Sources */,
+				9F525F1091AFE8E1D13F2936 /* HistoryRenderTests.swift in Sources */,
 				E98C4FEF242355BCC6724780 /* HistoryWindowTests.swift in Sources */,
 				D43CFBAE93357055AB6E3423 /* SaneClipTests.swift in Sources */,
 				6B47CA6E1CF35E4F6F645980 /* SecurityTests.swift in Sources */,

@@ -107,12 +107,12 @@ extension SaneClipAppDelegate {
     }
 
     /// Gets the history UI out of the way of a synthesized paste. The floating
-    /// panel is non-activating, so SaneClip is never frontmost and the synthetic
-    /// Cmd+V lands in the target app WHETHER OR NOT the panel is visible.
-    /// Therefore, with keep-open ON we leave the window exactly where it is —
-    /// no `orderOut`, no later reopen — which removes the ~480ms hide-then-
-    /// reappear "flicker" the window used to do on every paste. Without keep-open
-    /// (or for the menu-bar popover) we still dismiss so it gets out of the way.
+    /// panel is shown non-activating (see `showHistoryWindow`), so SaneClip never
+    /// becomes the ACTIVE app — your app stays active and the synthetic Cmd+V
+    /// lands there without us touching focus at all (this is exactly how Maccy
+    /// works). So with keep-open ON we simply leave the window where it is: no
+    /// hide, no reopen, no flicker. Without keep-open (or for the menu-bar
+    /// popover) we still dismiss so it gets out of the way after you pick.
     @objc func handleDismissForPaste() {
         if popover.isShown {
             popover.performClose(nil)
@@ -146,12 +146,18 @@ extension SaneClipAppDelegate {
             popover.performClose(nil)
         }
 
-        // A non-activating panel becomes key (so the search field is typeable)
-        // without activating SaneClip, so it appears over your current app
-        // like Spotlight — no app switch, and nothing to steal focus back on
-        // the keep-open reopen.
+        // Show the floating panel WITHOUT making SaneClip the active app — this
+        // is the crux of pasting into your app. `orderFrontRegardless()` brings
+        // the panel forward "even if its application isn't active, without
+        // changing either the key window or the main window" (Apple docs), and
+        // `makeKey()` on a `.nonactivatingPanel` makes it key (so the search
+        // field is typeable) WITHOUT activating SaneClip. Your app therefore
+        // stays the ACTIVE app, so the synthetic Cmd+V lands in it. This is
+        // exactly Maccy's pattern; `makeKeyAndOrderFront` instead activates
+        // SaneClip and the paste hits our own window (the bug this replaces).
         if let historyWindow, historyWindow.isVisible {
-            historyWindow.makeKeyAndOrderFront(nil)
+            historyWindow.orderFrontRegardless()
+            historyWindow.makeKey()
             installHistoryWindowOutsideClickMonitor()
             return
         }
@@ -159,7 +165,8 @@ extension SaneClipAppDelegate {
         let window = historyWindow ?? makeHistoryWindow()
         historyWindow = window
 
-        window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
+        window.makeKey()
         installHistoryWindowOutsideClickMonitor()
     }
 

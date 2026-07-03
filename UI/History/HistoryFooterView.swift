@@ -103,13 +103,13 @@ struct HistoryFooterView: View {
                 Text("\(mergeQueueIDs.count)")
                     .font(.subheadline.monospacedDigit())
             }
-            .foregroundStyle(.teal)
+            .foregroundStyle(Color.mergeTeal)
             .help("Items queued for merge")
 
             Button("Merge") { onMerge() }
                 .buttonStyle(.plain)
                 .font(.subheadline)
-                .foregroundStyle(.teal)
+                .foregroundStyle(Color.mergeTeal)
                 .fixedSize()
                 .disabled(mergeQueueIDs.count < 2)
 
@@ -140,7 +140,7 @@ struct HistoryFooterView: View {
                 Text("\(clipboardManager.pasteStack.count)")
                     .font(.subheadline.monospacedDigit())
             }
-            .foregroundStyle(.orange)
+            .foregroundStyle(Color.stackViolet)
             .help("Items in paste stack")
 
             Button(SettingsModel.shared.pausePasteStackConsumption ? "Paused" : "Paste") {
@@ -148,7 +148,7 @@ struct HistoryFooterView: View {
             }
             .buttonStyle(.plain)
             .font(.subheadline)
-            .foregroundStyle(.orange)
+            .foregroundStyle(Color.stackViolet)
             .fixedSize()
             .disabled(SettingsModel.shared.pausePasteStackConsumption || clipboardManager.pasteStack.isEmpty)
 
@@ -180,7 +180,7 @@ struct HistoryFooterView: View {
                     Text("Pro")
                         .font(.system(size: 11, weight: .semibold))
                 }
-                .foregroundStyle(.teal)
+                .foregroundStyle(Color.proUnlock)
             }
             .buttonStyle(.plain)
             .fixedSize()

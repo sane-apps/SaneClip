@@ -54,6 +54,40 @@ extension Color {
 
     /// Error red #ef4444
     static let semanticError = Color(hex: 0xEF4444)
+
+    // MARK: - History Semiotics
+
+    //
+    // One meaning per hue. Color in the history UI carries two orthogonal
+    // languages that must never blur:
+    //
+    //   1. IDENTITY — *which app* a clip came from — lives ONLY on the row's
+    //      left rail and row accents, via `SaneClipSourceColor`.
+    //   2. FUNCTION/STATE — *what a control does or a clip's state* — uses the
+    //      fixed palette below and NOTHING else. Each hue means exactly one
+    //      thing wherever it appears:
+    //
+    //   • Clip Blue  → primary action / active / selected / link  (`clipBlue`)
+    //   • Amber      → attention state: pinned or capture paused   (`pinnedOrange` / `semanticWarning`, same hex)
+    //   • Green      → success: a clip has been pasted             (`semanticSuccess`)
+    //   • Yellow     → Pro / unlock (brand "License" semantic)     (`proUnlock`)
+    //   • Teal       → merge: combine clips into one              (`mergeTeal`)
+    //   • Violet     → paste stack: queue clips to paste in order (`stackViolet`)
+    //   • Red        → destructive                                (`semanticError`)
+
+    /// Pro / unlock affordances. Brand guide: License = Yellow #FFD62E
+    /// ("Unlock state, purchase, and Pro access"). Every "… Pro" lock badge and
+    /// upsell uses this — never a feature hue like teal.
+    static let proUnlock = Color(hex: 0xFFD62E)
+
+    /// Merge queue — combining several clips into one. A true teal, kept
+    /// clearly greener than `clipBlue` so "merge" never reads as "primary
+    /// action".
+    static let mergeTeal = Color(hex: 0x33BBC4)
+
+    /// Paste stack — queueing clips to paste in sequence. A violet distinct
+    /// from every functional hue and from the source-identity palette.
+    static let stackViolet = Color(hex: 0x8E7BF0)
 }
 
 // MARK: - Hex Initializer

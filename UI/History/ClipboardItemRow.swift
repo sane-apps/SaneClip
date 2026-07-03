@@ -171,7 +171,7 @@ struct ClipboardItemRow: View {
                 if isPinned {
                     Image(systemName: "pin.fill")
                         .font(.caption2)
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(Color.pinnedOrange)
                         .padding(.top, 2)
                 }
 
@@ -320,7 +320,7 @@ struct ClipboardItemRow: View {
                                 Text("\(item.pasteCount)")
                                     .font(.caption2)
                             }
-                            .foregroundStyle(.green.opacity(0.8))
+                            .foregroundStyle(Color.semanticSuccess.opacity(0.85))
                             .help("Pasted \(item.pasteCount) time\(item.pasteCount == 1 ? "" : "s")")
                         }
 
@@ -357,13 +357,16 @@ struct ClipboardItemRow: View {
                         }
 
                         if item.collection != "Default" {
+                            // A collection is a user grouping, not a state, so
+                            // it stays a neutral chip — amber is reserved for
+                            // "pinned", never a label.
                             Text(item.collection)
                                 .font(.system(size: 10, weight: .medium))
                                 .lineLimit(1)
                                 .foregroundStyle(.white.opacity(0.85))
                                 .padding(.horizontal, 5)
                                 .padding(.vertical, 2)
-                                .background(Color.pinnedOrange.opacity(0.2))
+                                .background(Color.white.opacity(0.12))
                                 .clipShape(Capsule())
                         }
                     }

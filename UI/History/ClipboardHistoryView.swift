@@ -353,7 +353,7 @@ struct ClipboardHistoryView: View {
                                 .font(.caption2.monospacedDigit())
                         }
                     }
-                    .foregroundStyle(clipboardManager.isCapturePaused ? Color.orange : .secondary)
+                    .foregroundStyle(clipboardManager.isCapturePaused ? Color.semanticWarning : .secondary)
                 }
                 .buttonStyle(.plain)
                 .help(clipboardManager.isCapturePaused ? "Capture paused" : "Pause capture")
@@ -415,7 +415,7 @@ struct ClipboardHistoryView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "infinity")
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(.teal)
+                        .foregroundStyle(Color.proUnlock)
 
                     Text("50-item limit reached.")
                         .font(.system(size: 12, weight: .medium))
@@ -432,7 +432,7 @@ struct ClipboardHistoryView: View {
                             Text("Pro")
                                 .font(.system(size: 12, weight: .semibold))
                         }
-                        .foregroundStyle(.teal)
+                        .foregroundStyle(Color.proUnlock)
                     }
                     .buttonStyle(.plain)
 
@@ -440,8 +440,8 @@ struct ClipboardHistoryView: View {
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 7)
-                .background(Color.teal.opacity(0.12))
-                .overlay(Rectangle().frame(height: 1).foregroundStyle(Color.teal.opacity(0.25)), alignment: .top)
+                .background(Color.proUnlock.opacity(0.12))
+                .overlay(Rectangle().frame(height: 1).foregroundStyle(Color.proUnlock.opacity(0.25)), alignment: .top)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
 

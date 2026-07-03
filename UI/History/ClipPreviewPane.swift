@@ -93,14 +93,16 @@ struct ClipPreviewPane: View {
 
             Spacer(minLength: 8)
 
+            // Type badge is neutral — source hue means "which app", never
+            // "what type", so type carries no identity color.
             Text(typeLabel(item).uppercased())
                 .font(.system(.caption2, design: .monospaced))
-                .foregroundStyle(accent(item))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal, 7)
                 .padding(.vertical, 3)
                 .overlay(
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(accent(item).opacity(0.45), lineWidth: 1)
+                        .stroke(.secondary.opacity(0.35), lineWidth: 1)
                 )
         }
     }

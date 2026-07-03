@@ -6,6 +6,28 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+- 2026-07-03 ~11:30 Post-review follow-ups to the corrective pass (Claude review
+  of Glenn #994/#1007), staged for a 2.3.14 release — NOT released:
+  - NEW attached-sheet guard: a Mini geometry probe proved the edit sheet
+    (min 420pt tall) overhangs a 300x360 minimum-size floating window by
+    ~92pt — AppKit clamps sheet width to the parent but not height — so the
+    sheet's Save/Cancel clicks landed outside `historyWindow.frame` and the
+    outside-click path destroyed the window (and the in-progress edit).
+    Every dismissal path (click monitors, resign-active observer, 0.15s
+    timer, `applicationDidResignActive`) is now fully inert while
+    `historyWindow.attachedSheet != nil`, including monitor teardown, so a
+    `hidesOnDeactivate` hide mid-modal keeps monitors for the reappearing
+    window. Classifier gained a `hasAttachedSheet` parameter; new tests:
+    classifier cases, a real NSPanel+sheet overhang test (completion-handler
+    `beginSheet` — the async overload suspends until dismissal, see
+    research.md), and source fingerprints.
+  - CHANGELOG corrected: bf1886e's items were sitting under the already
+    shipped [2.3.13] entry, but 2.3.13 shipped WITHOUT them. They now live
+    under [2.3.14] - Unreleased (plus the new sheet-guard bullet); 2.3.13
+    keeps only what actually shipped plus a known-issues line. project.yml
+    bumped to 2.3.14/2314. Owner ships via release.sh from the Mini.
+  - Glenn #1007 is still needs_human/unanswered — reply AFTER 2.3.14 ships
+    (owner drafts; per policy never claim "fixed", ask him to confirm).
 - 2026-07-03 Glenn #994/#1007 corrective pass is implemented after re-reading
   both support threads and the exact screenshots. The 2026-07-02 proof entry
   was stale/insufficient: it rendered static states and did not reproduce

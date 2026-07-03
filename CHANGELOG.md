@@ -6,13 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.14] - Unreleased
+
+- Moves the merge queue and paste stack controls to their own footer row, so the horizontal scrollbar can no longer cover `Clear Queue` at narrow widths.
+- Fixes the Pro floating history window closing when you click its own title bar, search field, filter, or pause controls; only clicks truly outside the window close it now.
+- Adds a Pro pin button beside history search to keep the history window open after pasting — and the setting (renamed "Keep history window open after pasting") now also applies to normal history pastes, not just the paste stack.
+- Keeps the floating history window (and your in-progress edit) open while an Edit, Smart Clear, or preview sheet is showing, even when the sheet extends past the window edge at small window sizes.
+
+---
+
 ## [2.3.13] - 2026-07-02
 
-- Keeps merge queue controls readable at narrow widths without a footer scrollbar covering `Clear Queue`.
 - Keeps Edit Text Save and Cancel buttons visible while editing long clips.
 - Makes Clipboard Rules switches update visibly as soon as they are clicked.
-- Improves the Pro floating history window so clicks in the title/search/filter/pause area stay inside the window, while real outside clicks still close it.
-- Adds a Pro pin control beside history search so the keep-open-after-paste behavior is discoverable.
+- Keeps the resizable floating history window correctly Pro-gated and closes it when you click outside it.
+- Known issues, fixed in 2.3.14: the footer scrollbar could still cover `Clear Queue`, and clicks on the floating window's own title/search/filter/pause area wrongly closed it.
 
 ---
 

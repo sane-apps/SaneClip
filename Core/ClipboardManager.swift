@@ -822,6 +822,15 @@ class ClipboardManager {
     }
 
     @discardableResult
+    func pasteFromHistory(item: ClipboardItem) -> Bool {
+        paste(
+            item: item,
+            dismissPopover: true,
+            reopenPopoverAfterPaste: SettingsModel.shared.keepPasteStackOpenBetweenPastes
+        )
+    }
+
+    @discardableResult
     private func paste(item: ClipboardItem, dismissPopover: Bool, reopenPopoverAfterPaste: Bool) -> Bool {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()

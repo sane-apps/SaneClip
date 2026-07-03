@@ -60,10 +60,10 @@ struct HistoryWindowTests {
         #expect(historyWindowSource.contains("Timer.scheduledTimer(withTimeInterval: 0.15"))
         #expect(historyWindowSource.contains("if !NSApp.isActive"))
         #expect(historyWindowSource.contains("historyWindowOutsideClickTimer?.invalidate()"))
-        #expect(historyWindowSource.contains("CGEvent.tapCreate"))
-        #expect(historyWindowSource.contains("CGEvent.tapEnable"))
-        #expect(historyWindowSource.contains("historyWindowOutsideClickEventTap"))
-        #expect(historyWindowSource.contains("historyWindowOutsideClickRunLoopSource"))
+        #expect(!historyWindowSource.contains("CGEvent.tapCreate"))
+        #expect(!historyWindowSource.contains("CGEvent.tapEnable"))
+        #expect(!historyWindowSource.contains("historyWindowOutsideClickEventTap"))
+        #expect(!historyWindowSource.contains("historyWindowOutsideClickRunLoopSource"))
         #expect(historyWindowSource.contains("closeHistoryWindowFromOutsideInteraction"))
         #expect(historyWindowSource.contains("historyWindow.orderOut(nil)"))
         #expect(historyWindowSource.contains("self.historyWindow = nil"))
@@ -84,6 +84,36 @@ struct HistoryWindowTests {
         // Setting is user-exposed, but Pro-gated in Basic.
         #expect(settingsSource.contains("Open history as a resizable floating window"))
         #expect(settingsSource.contains("feature: .floatingHistoryWindow"))
+    }
+
+    @Test("Floating history inside toolbar clicks do not dismiss the window")
+    func floatingHistoryToolbarClicksStayInsideWindowFrame() {
+        let frame = NSRect(x: 100, y: 200, width: 480, height: 640)
+
+        // Glenn #1007 highlighted this top/title/search/filter/pause region.
+        // It is inside the floating window frame and must not be treated like
+        // an outside click.
+        #expect(!SaneClipAppDelegate.shouldCloseHistoryWindowFromMouseDown(
+            at: NSPoint(x: frame.minX + 24, y: frame.maxY - 20),
+            windowFrame: frame
+        ))
+        #expect(!SaneClipAppDelegate.shouldCloseHistoryWindowFromMouseDown(
+            at: NSPoint(x: frame.minX + 150, y: frame.maxY - 54),
+            windowFrame: frame
+        ))
+        #expect(!SaneClipAppDelegate.shouldCloseHistoryWindowFromMouseDown(
+            at: NSPoint(x: frame.maxX - 22, y: frame.maxY - 54),
+            windowFrame: frame
+        ))
+
+        #expect(SaneClipAppDelegate.shouldCloseHistoryWindowFromMouseDown(
+            at: NSPoint(x: frame.minX + 20, y: frame.maxY + 12),
+            windowFrame: frame
+        ))
+        #expect(SaneClipAppDelegate.shouldCloseHistoryWindowFromMouseDown(
+            at: NSPoint(x: frame.maxX + 12, y: frame.midY),
+            windowFrame: frame
+        ))
     }
 
     @Test("Sparkle check frequency resolves and normalizes intervals")
@@ -237,14 +267,44 @@ struct HistoryWindowTests {
             contentsOf: projectRootURL().appendingPathComponent("UI/History/HistoryFooterView.swift"),
             encoding: .utf8
         )
-        // Item count + Settings + Smart Clear stay pinned; only the secondary
-        // controls scroll (with an indicator) so nothing squashes or hides
-        // silently.
+        // Item count + Settings + Smart Clear stay pinned. Secondary controls
+        // get a second row; the footer must not use a horizontal scroller
+        // because its indicator covered "Clear Queue" in Glenn's screenshot.
         #expect(footerSource.contains("private var itemCountLabel"))
         #expect(footerSource.contains("private var secondaryControls"))
-        #expect(footerSource.contains("ScrollView(.horizontal, showsIndicators: true)"))
+        #expect(!footerSource.contains("ScrollView(.horizontal"))
+        #expect(footerSource.contains("private var showsSecondaryControls"))
         #expect(footerSource.contains("private var settingsButton"))
         #expect(footerSource.contains("private var smartClearButton"))
+    }
+
+    @Test("History paste honors the keep-open pin without changing URL-scheme paste")
+    func historyPasteUsesKeepOpenPath() throws {
+        let managerSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/ClipboardManager.swift"),
+            encoding: .utf8
+        )
+        let historySource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardHistoryView.swift"),
+            encoding: .utf8
+        )
+        let rowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRow.swift"),
+            encoding: .utf8
+        )
+        let urlSchemeSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/URLScheme/URLSchemeHandler.swift"),
+            encoding: .utf8
+        )
+
+        #expect(managerSource.contains("func pasteFromHistory(item: ClipboardItem) -> Bool"))
+        #expect(managerSource.contains("reopenPopoverAfterPaste: SettingsModel.shared.keepPasteStackOpenBetweenPastes"))
+        #expect(historySource.contains("clipboardManager.pasteFromHistory(item: item)"))
+        #expect(rowSource.contains("clipboardManager.pasteFromHistory(item: item)"))
+        #expect(historySource.contains("pin.fill"))
+        #expect(historySource.contains("@State private var settings = SettingsModel.shared"))
+        #expect(historySource.contains("settings.keepPasteStackOpenBetweenPastes.toggle()"))
+        #expect(urlSchemeSource.contains("clipboardManager.paste(item: item)"))
     }
 
     @Test("Glenn regressions pin edit footer and redraw Clipboard Rules toggles immediately")

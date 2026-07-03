@@ -193,7 +193,7 @@ class SettingsModel {
         }
     }
 
-    /// Keep the history panel visible between paste-stack actions by reopening it after each paste.
+    /// Keep the history panel visible after history or paste-stack pastes.
     var keepPasteStackOpenBetweenPastes: Bool {
         didSet {
             UserDefaults.standard.set(keepPasteStackOpenBetweenPastes, forKey: "keepPasteStackOpenBetweenPastes")

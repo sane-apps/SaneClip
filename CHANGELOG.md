@@ -8,10 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [2.3.13] - 2026-07-02
 
-Keeps merge queue controls readable at narrow widths.
-Keeps Edit Text Save and Cancel buttons visible while editing long clips.
-Makes Clipboard Rules switches update visibly as soon as they are clicked.
-Improves the Pro floating history window so it stays gated correctly and closes when you click outside it.
+- Keeps merge queue controls readable at narrow widths without a footer scrollbar covering `Clear Queue`.
+- Keeps Edit Text Save and Cancel buttons visible while editing long clips.
+- Makes Clipboard Rules switches update visibly as soon as they are clicked.
+- Improves the Pro floating history window so clicks in the title/search/filter/pause area stay inside the window, while real outside clicks still close it.
+- Adds a Pro pin control beside history search so the keep-open-after-paste behavior is discoverable.
 
 ---
 

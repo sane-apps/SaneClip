@@ -374,7 +374,7 @@ struct ClipboardItemRow: View {
         // would hijack that gesture and silently break reordering.
         .onDragOut(enabled: isPro && !isPinned) { dragItemProvider() }
         .onTapGesture {
-            clipboardManager.paste(item: item)
+            clipboardManager.pasteFromHistory(item: item)
         }
         .onHover { hovering in
             isHovering = hovering
@@ -388,7 +388,7 @@ struct ClipboardItemRow: View {
         .animation(.easeOut(duration: 0.15), value: isHovering)
         .contextMenu {
             // Primary actions
-            Button("Paste") { clipboardManager.paste(item: item) }
+            Button("Paste") { clipboardManager.pasteFromHistory(item: item) }
 
             // Paste as Plain Text — Pro only
             Button(isPro ? "Paste as Plain Text" : lockedMenuTitle("Paste as Plain Text")) {

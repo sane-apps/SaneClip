@@ -6,29 +6,48 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
-- 2026-07-02 Glenn #994 bugfix pass is implemented and Mini-verified:
-  - Fixed Glenn's reported merge/footer overlap, edit sheet clipped Save/Cancel
-    buttons, Clipboard Rules toggle redraw lag, and floating history outside-click
-    close behavior.
-  - Basic and Pro were both covered. New floating history and drag-out behavior
-    are Pro-gated in UI and runtime; Basic shows locked rows and falls back to
-    popover history.
-  - SaneClip release builds now pin the published SaneUI commit
-    `db137877711e55b158e58d1c9edccfa2d148206d` so shared license/keychain
-    automation fixes reach signed SaneClip builds without relying on a local
-    monorepo package path.
-  - Signed Pro proof used canonical `/Applications/SaneClip.app`, bundle id
-    `com.saneclip.app`, Developer ID `M78L6FXD48`, Pro fallback
-    `test-pro`, and `useFloatingHistoryWindow=1`.
-  - Final visual receipt:
-    `outputs/visual-audit-glenn-994/receipt.json` (validated true through
-    `SaneVisualReceipt`). Final outside-click pair:
-    `live/codex-shot-2026-07-02_02-29-06.png` and
-    `live/codex-shot-2026-07-02_02-29-32.png`.
-  - Verification: `./scripts/SaneMaster.rb verify --timeout 900
-    --no-grant-permissions` passed 189 tests; `sane_test.rb SaneClip
-    --pro-mode --no-logs` built, staged, signed, and launched the canonical app;
-    duplicate check found only `/Applications/SaneClip.app`.
+- 2026-07-03 Glenn #994/#1007 corrective pass is implemented after re-reading
+  both support threads and the exact screenshots. The 2026-07-02 proof entry
+  was stale/insufficient: it rendered static states and did not reproduce
+  Glenn's crowded footer or #1007 toolbar-click failure closely enough.
+  - Root causes found: the footer fix kept the crowded controls inside
+    `ScrollView(.horizontal, showsIndicators: true)`, so the scrollbar could
+    still cover `Clear Queue`; floating-window dismissal added a session-level
+    `CGEvent.tapCreate` path on top of AppKit monitors, creating an extra
+    coordinate route for inside-window clicks; normal history row/list paste
+    still called `clipboardManager.paste(item:)`, so the keep-open setting only
+    affected paste-stack paths.
+  - Current code removes the footer horizontal scroller and gives secondary
+    footer controls their own row; removes the CGEvent tap state/path; routes
+    row/list history paste through `pasteFromHistory(item:)`; adds a Pro pin
+    button beside search/pause; and renames the setting copy to
+    `Keep history window open after pasting`.
+  - Current proof: `./scripts/SaneMaster.rb verify --timeout 900
+    --no-grant-permissions` passed 191 tests on the Mini twice on
+    2026-07-03, including
+    `Floating history inside toolbar clicks do not dismiss the window`,
+    `Footer keeps item count and actions reachable at narrow widths`, and
+    `History paste honors the keep-open pin without changing URL-scheme paste`.
+  - Fresh visual receipts are in
+    `outputs/visual-audit-glenn-994-1007-finish-20260703-095551/`.
+    Inspected PNGs:
+    `matrix-02-pro-popover-merge-320x500.png` shows `Clear Queue` visible
+    without a horizontal scrollbar; `glenn-994-bug2-edit-sheet-buttons-visible.png`
+    shows Save/Cancel reachable at 450x420; the Clipboard Rules before/after
+    PNGs show immediate toggle redraw.
+  - Dynamic live-click proof for #1007 is now captured in
+    `outputs/live-click-proof-glenn-1007-20260703-100237/`. The current Pro
+    no-keychain runtime opened `SaneClip History` at bounds `[[959, 271],
+    [411, 718]]`; raw inside click `1051,321` on the search/top toolbar band
+    left the window open (`INSIDE_CLICK_OK`), and raw outside click `924,391`
+    closed it (`OUTSIDE_CLICK_OK`). `live-after-inside-coordinate-click.png`
+    shows the focused search row with the floating window still visible.
+  - SaneClip customer UI receipt was refreshed after the code changes:
+    `./scripts/SaneMaster.rb customer_ui_sweep --json` passed, launched a
+    fresh signed `/Applications/SaneClip.app`, produced live Peekaboo smoke
+    receipt `outputs/visual_smoke/visual_smoke_20260703-095904_90616/`, and
+    `./scripts/SaneMaster.rb customer_ui_contract --json --strict-visual
+    --no-exit` returned `ok: true` with zero issues.
 - 2026-07-01 ~20:00 EDT — **2.3.12 SHIPPED (direct channel)**; supersedes the
   "NOT committed, NOT released" note below. Verified live: appcast top entry
   2.3.12/2312, dist ZIP HTTP 200, website deployed with the new feature cards

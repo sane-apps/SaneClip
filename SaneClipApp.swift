@@ -45,7 +45,6 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     var historyWindow: NSWindow?, historyWindowOutsideClickMonitor: Any?, historyWindowOutsideClickLocalMonitor: Any?
     var historyWindowResignActiveObserver: NSObjectProtocol?
     var historyWindowOutsideClickTimer: Timer?
-    var historyWindowOutsideClickEventTap: CFMachPort?, historyWindowOutsideClickRunLoopSource: CFRunLoopSource?
     var clipboardManager: ClipboardManager!
     let screenCaptureService = ScreenCaptureService()
     let captureOCRService = CaptureOCRService()

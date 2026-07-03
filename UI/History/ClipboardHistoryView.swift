@@ -128,6 +128,7 @@ struct ClipboardHistoryView: View {
     @State private var editingStackNoteID: UUID?
     @State private var stackTitleDraft = ""
     @State private var stackNoteDraft = ""
+    @State private var settings = SettingsModel.shared
 
     private var isPro: Bool {
         licenseService?.isPro == true
@@ -338,6 +339,18 @@ struct ClipboardHistoryView: View {
                 }
                 .buttonStyle(.plain)
                 .help(clipboardManager.isCapturePaused ? "Capture paused" : "Pause capture")
+
+                if isPro {
+                    Button {
+                        settings.keepPasteStackOpenBetweenPastes.toggle()
+                    } label: {
+                        Image(systemName: settings.keepPasteStackOpenBetweenPastes ? "pin.fill" : "pin")
+                            .foregroundStyle(settings.keepPasteStackOpenBetweenPastes ? Color.clipBlue : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help(settings.keepPasteStackOpenBetweenPastes ? "Keep history open after paste" : "Close history after paste")
+                    .accessibilityLabel(settings.keepPasteStackOpenBetweenPastes ? "Unpin history after paste" : "Pin history after paste")
+                }
             }
             .padding(8)
             .background(.background.secondary)
@@ -593,7 +606,7 @@ struct ClipboardHistoryView: View {
     private func pasteSelectedItem() {
         guard selectedIndex >= 0, selectedIndex < allItems.count else { return }
         let item = allItems[selectedIndex]
-        clipboardManager.paste(item: item)
+        clipboardManager.pasteFromHistory(item: item)
     }
 
     private func deleteSelectedItem() {

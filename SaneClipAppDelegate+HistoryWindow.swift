@@ -49,6 +49,16 @@ extension SaneClipAppDelegate {
         return now.timeIntervalSince(lastAuth) < gracePeriod
     }
 
+    /// Global-screen-point classifier for floating-window dismissal. Toolbar,
+    /// title-bar, search, filter, and pause clicks are all still inside the
+    /// window frame and must not close it.
+    nonisolated static func shouldCloseHistoryWindowFromMouseDown(
+        at point: NSPoint,
+        windowFrame: NSRect
+    ) -> Bool {
+        !windowFrame.contains(point)
+    }
+
     /// Runs `action` behind the same Touch ID gate as the menu-bar popover
     /// path (requiresHistoryAuth + grace period). The ⌘⇧⌃Y hotkey and
     /// Dock-reopen paths previously skipped authentication entirely, so a
@@ -176,7 +186,6 @@ extension SaneClipAppDelegate {
                 }
             }
         }
-        installHistoryWindowOutsideClickEventTap()
     }
 
     func removeHistoryWindowOutsideClickMonitor() {
@@ -194,45 +203,6 @@ extension SaneClipAppDelegate {
         }
         historyWindowOutsideClickTimer?.invalidate()
         historyWindowOutsideClickTimer = nil
-        if let historyWindowOutsideClickRunLoopSource {
-            CFRunLoopRemoveSource(CFRunLoopGetMain(), historyWindowOutsideClickRunLoopSource, .commonModes)
-            self.historyWindowOutsideClickRunLoopSource = nil
-        }
-        if let historyWindowOutsideClickEventTap {
-            CFMachPortInvalidate(historyWindowOutsideClickEventTap)
-            self.historyWindowOutsideClickEventTap = nil
-        }
-    }
-
-    private func installHistoryWindowOutsideClickEventTap() {
-        let mask = (1 << CGEventType.leftMouseDown.rawValue)
-            | (1 << CGEventType.rightMouseDown.rawValue)
-            | (1 << CGEventType.otherMouseDown.rawValue)
-        let userInfo = Unmanaged.passUnretained(self).toOpaque()
-        guard let tap = CGEvent.tapCreate(
-            tap: .cgSessionEventTap,
-            place: .headInsertEventTap,
-            options: .listenOnly,
-            eventsOfInterest: CGEventMask(mask),
-            callback: { _, _, event, userInfo in
-                guard let userInfo else { return Unmanaged.passUnretained(event) }
-                let delegate = Unmanaged<SaneClipAppDelegate>.fromOpaque(userInfo).takeUnretainedValue()
-                let point = event.location
-                Task { @MainActor in
-                    delegate.handleHistoryWindowOutsideMouseDown(at: point)
-                }
-                return Unmanaged.passUnretained(event)
-            },
-            userInfo: userInfo
-        ) else {
-            return
-        }
-
-        historyWindowOutsideClickEventTap = tap
-        let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
-        historyWindowOutsideClickRunLoopSource = source
-        CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
-        CGEvent.tapEnable(tap: tap, enable: true)
     }
 
     private func handleHistoryWindowOutsideMouseDown(at point: NSPoint) {
@@ -240,7 +210,7 @@ extension SaneClipAppDelegate {
             removeHistoryWindowOutsideClickMonitor()
             return
         }
-        guard !historyWindow.frame.contains(point) else { return }
+        guard Self.shouldCloseHistoryWindowFromMouseDown(at: point, windowFrame: historyWindow.frame) else { return }
         closeHistoryWindowFromOutsideInteraction()
     }
 

@@ -64,7 +64,8 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 - ✅ Keeps merge queue controls readable at narrow widths
 - ✅ Keeps Edit Text Save and Cancel buttons visible while editing long clips
 - ✅ Makes Clipboard Rules switches update visibly as soon as they are clicked
-- ✅ Improves the Pro floating history window so it stays gated correctly and closes when you click outside it
+- ✅ Keeps the Pro floating history toolbar/search controls usable while still closing on real outside clicks
+- ✅ Adds a Pro pin control beside history search for keep-open-after-paste mode
 
 The prior `2.3.12` mobile follow-up kept synced Mac clipboard text appearing on iPhone and iPad automatically while the companion app is foregrounded.
 

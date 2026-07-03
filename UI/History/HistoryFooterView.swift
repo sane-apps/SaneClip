@@ -6,9 +6,9 @@ import SwiftUI
 ///
 /// Extracted from `ClipboardHistoryView` both to keep that view under the
 /// component size limit and to fix the squashed-toolbar bug Glenn reported: at
-/// narrow widths the inline controls wrapped character-by-character. The status
-/// cluster now lives in a horizontal scroll view so it never compresses, while
-/// Settings and Smart Clear stay pinned to the trailing edge.
+/// narrow widths the inline controls wrapped character-by-character and the
+/// horizontal scrollbar could cover "Clear Queue". The secondary controls now
+/// get their own row instead of a horizontal scroller.
 struct HistoryFooterView: View {
     var clipboardManager: ClipboardManager
     var licenseService: LicenseService?
@@ -26,24 +26,23 @@ struct HistoryFooterView: View {
     }
 
     var body: some View {
-        HStack(spacing: 8) {
-            // Item count stays pinned (always visible) — it is the primary
-            // status readout and must never scroll out of view.
-            itemCountLabel
-
-            // Only the secondary action controls (merge queue, paste stack)
-            // live in the scroll view, so at narrow widths they degrade to a
-            // horizontal scroll (with an indicator) instead of squashing or
-            // pushing the essentials off-screen.
-            ScrollView(.horizontal, showsIndicators: true) {
-                secondaryControls
-                    .padding(.trailing, 8)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                itemCountLabel
+                Spacer(minLength: 8)
+                settingsButton
+                smartClearButton
             }
 
-            settingsButton
-            smartClearButton
+            if showsSecondaryControls {
+                secondaryControls
+            }
         }
         .padding(8)
+    }
+
+    private var showsSecondaryControls: Bool {
+        !mergeQueueIDs.isEmpty || isPro || licenseService != nil
     }
 
     private var itemCountLabel: some View {
@@ -65,7 +64,7 @@ struct HistoryFooterView: View {
         }
     }
 
-    // MARK: - Secondary controls (scroll horizontally at narrow widths)
+    // MARK: - Secondary controls (second row at narrow widths)
 
     private var secondaryControls: some View {
         HStack(spacing: 8) {

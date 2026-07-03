@@ -48,7 +48,7 @@ enum SaneClipSettingsCopy {
 
     static let keepStackPanelOpenLabel = String(
         localized: "saneclip.settings.appearance.keep_stack_panel_open",
-        defaultValue: "Keep stack panel open while pasting"
+        defaultValue: "Keep history window open after pasting"
     )
 
     static let autoCloseStackPanelLabel = String(

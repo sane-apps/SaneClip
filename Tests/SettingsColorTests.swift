@@ -66,33 +66,42 @@ struct SettingsColorTests {
         // inside one of the color modifiers on the same line.
         let modifierPattern = Self.colorModifiers.joined(separator: "|")
 
+        // Collect every violation so a failure lists all offending lines at
+        // once (rather than a per-hue `#expect(false)`, which the Testing macro
+        // flags as always-failing).
+        var violations: [String] = []
+
         for url in files {
             let relative = "UI/Settings/\(url.lastPathComponent)"
             let source = try String(contentsOf: url, encoding: .utf8)
+            let lines = source.split(separator: "\n", omittingEmptySubsequences: false)
 
             for hue in Self.forbiddenHues {
                 // 1) Fully-qualified `Color.<hue>` anywhere is always wrong.
-                #expect(
-                    !source.contains("Color.\(hue)"),
-                    "\(relative) uses raw Color.\(hue) — use a BrandColors token (e.g. semanticSuccess / proUnlock / mergeTeal)"
-                )
+                if source.contains("Color.\(hue)") {
+                    violations.append("\(relative): raw Color.\(hue)")
+                }
 
                 // 2) A bare `.<hue>` used as an argument to a color modifier.
-                // We scan line-by-line: a line that both invokes a color
-                // modifier and contains the leading-dot hue is a violation.
-                for line in source.split(separator: "\n", omittingEmptySubsequences: false) {
+                // Scan line-by-line: a line that both invokes a color modifier
+                // and contains the leading-dot hue is a violation. Requiring the
+                // modifier on the same line avoids flagging an unrelated
+                // property like `.redChannel` on some non-color type.
+                for line in lines {
                     let text = String(line)
                     guard text.contains(".\(hue)") else { continue }
                     let mentionsModifier = Self.colorModifiers.contains { text.contains("\($0)(") }
                     if mentionsModifier {
-                        #expect(
-                            false,
-                            "\(relative) applies raw .\(hue) via a color modifier (\(modifierPattern)) — use a BrandColors token"
-                        )
+                        violations.append("\(relative): raw .\(hue) via a color modifier — \(text.trimmingCharacters(in: .whitespaces))")
                     }
                 }
             }
         }
+
+        #expect(
+            violations.isEmpty,
+            "Settings applies raw functional SwiftUI hues (must use a BrandColors token, e.g. semanticSuccess / proUnlock / mergeTeal). Color modifiers scanned: \(modifierPattern). Violations:\n" + violations.joined(separator: "\n")
+        )
     }
 
     @Test("Settings permission/existence status greens route through the semanticSuccess token")

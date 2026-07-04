@@ -22,6 +22,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Adds a Pro pin button beside history search to keep the history window open after pasting — and the setting (renamed "Keep history window open after pasting") now also applies to normal history pastes, not just the paste stack.
 - Keeps the floating history window (and your in-progress edit) open while an Edit, Smart Clear, or preview sheet is showing, even when the sheet extends past the window edge at small window sizes.
 - Fixes pinned clips being lost once your history filled up: a pinned item (and, for an image, its saved copy) could be dropped and quietly unpinned when it aged past your history limit. Pinned clips are now always kept, no matter how much you copy.
+- Select several clips (the merge-queue selection) and delete them all at once with a new Delete button, instead of removing them one by one.
+- New Pro rule "Strip trailing newline" drops just the final newline from copied text, so pasting a command into a terminal no longer runs it on its own — while keeping your indentation and blank lines intact.
+- The "Strip URL tracking parameters" rule now catches many more trackers (Google Ads gbraid/wbraid, Microsoft, X, HubSpot, Mailchimp, and others), not just the common utm_/fbclid ones.
+- History with many items from different apps scrolls more smoothly — source-app icons are now cached instead of looked up again for every row on every frame.
 
 ---
 

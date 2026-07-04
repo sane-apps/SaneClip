@@ -6,7 +6,27 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
-                                                                                                                                                <item>
+                                                                                                                                                        <item>
+            <title>2.3.14</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Sat, 04 Jul 2026 01:01:42 -0400</pubDate>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>SaneClip 2.3.14 improves the floating history window, Paste Stack recording, merge queue controls, pinned retention, clipboard cleanup rules, source-app icon performance, localized UI readiness, and privacy handling for encrypted or Touch ID-protected shared caches.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.14.zip"
+                       sparkle:version="2314"
+                       sparkle:shortVersionString="2.3.14"
+                       length="5191503"
+                       type="application/octet-stream"
+                       sparkle:edSignature="M+wXhqm0UsiAvBiPiH3TSvPL2OZHGXdxXN2Se2ermD65sah/G5XgCjHhvq08VvUZHa/2ubV7QzCcMQT6WdFpCw=="/>
+        </item>
+<item>
             <title>2.3.13</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Thu, 02 Jul 2026 10:01:15 -0400</pubDate>

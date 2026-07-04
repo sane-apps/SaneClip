@@ -67,6 +67,7 @@
 		5CDCB79E9D4672C86165AF05 /* SaneClipAppDelegate+Services.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550322A15EB237CAE1FE0641 /* SaneClipAppDelegate+Services.swift */; };
 		5DC8E283BF2B6BE71C2BEDED /* AutoPurgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B181DC2ABBFC0F6C29A7CB9 /* AutoPurgeService.swift */; };
 		5E33813FEBC7C8998E93B6AC /* ShortcutsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE533676657861A14F5E44D /* ShortcutsSettingsView.swift */; };
+		5EAD3B7347E22669A98A4BB6 /* NonActivatingHistoryPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484F03C8F49E543E27EC07C8 /* NonActivatingHistoryPanel.swift */; };
 		5ED4D24BD177013CA44D2963 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74750429D17786620EF008E /* main.swift */; };
 		600907227B6AB59919B7487E /* SaneUI in Frameworks */ = {isa = PBXBuildFile; productRef = 73D5F153A41A50F1EADAF7B5 /* SaneUI */; };
 		60E0917C7EE6C533E0E339D6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E0713E5848E1A9394B7528D /* SettingsView.swift */; };
@@ -162,6 +163,7 @@
 		DD741ED4E799B3DE999D2A65 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6709551974949109A6A239 /* EmptyStateView.swift */; };
 		DE0D1479DE595F1FA651F71F /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
 		DFC8A7437D713D82B5224D1E /* HistoryEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82FA89438430FB80B145A7C5 /* HistoryEncryption.swift */; };
+		E02AE20E509553F6E6C1BF50 /* NonActivatingHistoryPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484F03C8F49E543E27EC07C8 /* NonActivatingHistoryPanel.swift */; };
 		E06196B33A21D85F9F1E1E77 /* SaneClipAppDelegate+SingleInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9F2B0E332431DA2CA11720 /* SaneClipAppDelegate+SingleInstance.swift */; };
 		E1F118A7B4867A2E6F26A819 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1808F717600EB63D59B347DB /* SyncCoordinator.swift */; };
 		E429379D80B77779F626ACAE /* Snippet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25007B56789ED465BA3544BA /* Snippet.swift */; };
@@ -293,6 +295,7 @@
 		37E748D426976BE5B909D7C5 /* ClipboardHistoryViewModel+ClipboardImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ClipboardHistoryViewModel+ClipboardImport.swift"; sourceTree = "<group>"; };
 		3AA1B6A946118EB9C90AB95F /* RecentClipsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentClipsWidget.swift; sourceTree = "<group>"; };
 		44529FCAA8809428979A60BC /* SearchClipsIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchClipsIntent.swift; sourceTree = "<group>"; };
+		484F03C8F49E543E27EC07C8 /* NonActivatingHistoryPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonActivatingHistoryPanel.swift; sourceTree = "<group>"; };
 		4BCD829890D1F0F66702EC52 /* SaneClipIOSWidgetsDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipIOSWidgetsDebug.entitlements; sourceTree = "<group>"; };
 		4D77AB048F107D7E2F8AB415 /* SaneClipShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipShortcuts.swift; sourceTree = "<group>"; };
 		4EAA037C53A58CAB8C3CC5F6 /* HistoryListKeyboardShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListKeyboardShortcuts.swift; sourceTree = "<group>"; };
@@ -539,6 +542,7 @@
 				4EAA037C53A58CAB8C3CC5F6 /* HistoryListKeyboardShortcuts.swift */,
 				818608D0CE3AC25CF3561EAB /* HistoryPasteStackPanel.swift */,
 				26A259C64B747B2C66114C12 /* ImageCapturePreviewSheet.swift */,
+				484F03C8F49E543E27EC07C8 /* NonActivatingHistoryPanel.swift */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -1078,6 +1082,7 @@
 				1B087F07E87449ED477F0773 /* HistoryPasteStackPanel.swift in Sources */,
 				BD6B9217C4FE19690D7BC54F /* ImageCapturePreviewSheet.swift in Sources */,
 				AC08AFB9FA7B23BD5E397E74 /* KeychainHelper.swift in Sources */,
+				E02AE20E509553F6E6C1BF50 /* NonActivatingHistoryPanel.swift in Sources */,
 				57B416379732AE920E6501C7 /* ProFeature.swift in Sources */,
 				320FEED3394C8C797BDDABBD /* SaneClipApp.swift in Sources */,
 				E812BF831FF6958B56458D9E /* SaneClipAppDelegate+Capture.swift in Sources */,
@@ -1151,6 +1156,7 @@
 				CF0A85FFE2FF9B1F42F35E7D /* HistoryPasteStackPanel.swift in Sources */,
 				8BA0C72A571CC8FA56D934DC /* ImageCapturePreviewSheet.swift in Sources */,
 				281630B49BCFA5B27C0C93B4 /* KeychainHelper.swift in Sources */,
+				5EAD3B7347E22669A98A4BB6 /* NonActivatingHistoryPanel.swift in Sources */,
 				3EF2F8F390E9B433A6DA76B7 /* ProFeature.swift in Sources */,
 				B3761DF4123417A5EA8C0DF3 /* SaneClipApp.swift in Sources */,
 				DA98CD312096F687F34858F3 /* SaneClipAppDelegate+Capture.swift in Sources */,

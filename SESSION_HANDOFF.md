@@ -6,6 +6,43 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+- 2026-07-03 ~16:00 CORRECTIVE RE-AUDIT + FIX PASS — 2.3.14 HELD (do NOT ship yet):
+  - A 23-agent adversarial verification workflow DISPROVED the earlier "Glenn
+    #1007 fully fixed on main" claim. Ground truth on main `7e0e72c`: the
+    keep-open focus-steal fix lived ONLY on the unmerged
+    `feature/nonactivating-history-panel` branch; main still shipped the
+    activating panel + a `didResignActive` observer, a 0.15s `!NSApp.isActive`
+    timer, and `applicationDidResignActive` that all closed the window
+    BYPASSING the geometry classifier. So Glenn's New bug 1 (toolbar click
+    closes window) and New bug 2 (keep-open doesn't stay) were NOT fixed, and
+    the tests "covering" them were blind source-fingerprints that asserted the
+    buggy mechanism as correct. Tested-the-wrong-path trap, caught pre-ship.
+  - FIXED this session, all green on Mini `main`: merged the non-activating
+    branch (`9eea6e7`) and COMPLETED it (`a4cc7d4`) by removing the
+    deactivation-close paths (on a non-activating panel the app is usually
+    inactive while the window is up, so those would slam it shut the instant
+    it opened). Dismissal is now solely the geometry classifier; blind tests →
+    regression guards. Footer `ViewThatFits` so merge+stack controls never clip
+    at 300-320pt, and Settings Pro badges teal→`proUnlock` so teal = only
+    "merge" (`7340884`). Split the 909-line `HistoryWindowTests.swift` into
+    413 + 284 + 261 (`HistoryColorAndStackTests`, `HistoryRenderTests`), 23
+    tests intact, 199 green (`7439eae`).
+  - GATE before ship: a LIVE human paste-into-app test on the Mini must confirm
+    the non-activating focus behavior (unit-green only; can't be proven by
+    static renders or synthetic keys). Then owner ships + drafts the Glenn
+    reply (never "fixed"; ask him to confirm).
+  - REMAINING (owner's "fix everything" pass): (a) `verify` TCC reset —
+    `verify_support.rb grant_test_permissions` runs `tccutil reset` on the
+    app's Camera/Mic/ScreenRecording every run (test build shares the RELEASE
+    bundle id, so it wipes the installed app's grants and tests a reset state,
+    not the real path); proper fix = extract a focused `verify_permissions.rb`
+    (file is 848 lines, over the 800 cap) then delete the reset. (b) paste-stack
+    relaunch silent image-drop test + fix (needs a `ClipboardManager.swift`
+    split, 2607 lines). (c) AppleScript automation so the real window is
+    driveable/capturable (fixes the visual-verification gap + serves
+    blind/shortcut users). (d) Hook cleanup: visual gate scrapes phantom
+    filenames; `sanetools` false positives.
+
 - 2026-07-03 ~11:30 Post-review follow-ups to the corrective pass (Claude review
   of Glenn #994/#1007), staged for a 2.3.14 release — NOT released:
   - NEW attached-sheet guard: a Mini geometry probe proved the edit sheet

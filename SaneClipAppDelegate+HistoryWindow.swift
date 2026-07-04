@@ -259,7 +259,7 @@ extension SaneClipAppDelegate {
     /// style mask (Glenn's request #1/#2), constrains resizing to sane bounds,
     /// and restores the remembered frame — centering only on first use.
     private func makeHistoryWindow() -> NSPanel {
-        let window = NSPanel(
+        let window = NonActivatingHistoryPanel(
             contentRect: NSRect(
                 x: 0,
                 y: 0,

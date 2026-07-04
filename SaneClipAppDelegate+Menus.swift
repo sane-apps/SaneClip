@@ -37,7 +37,7 @@ extension SaneClipAppDelegate {
         let editMenuItem = NSMenuItem()
         mainMenu.addItem(editMenuItem)
 
-        let editMenu = NSMenu(title: "Edit")
+        let editMenu = NSMenu(title: String(localized: "Edit"))
         let captureScreenshotItem = NSMenuItem(
             title: CaptureWorkflow.screenshot.menuTitle,
             action: #selector(captureScreenshotFromMenu),
@@ -56,12 +56,12 @@ extension SaneClipAppDelegate {
 
         editMenu.addItem(NSMenuItem.separator())
 
-        let searchHistoryItem = NSMenuItem(title: "Search History", action: #selector(focusHistorySearch), keyEquivalent: "f")
+        let searchHistoryItem = NSMenuItem(title: String(localized: "Search History"), action: #selector(focusHistorySearch), keyEquivalent: "f")
         searchHistoryItem.keyEquivalentModifierMask = [.command]
         searchHistoryItem.target = self
         editMenu.addItem(searchHistoryItem)
 
-        let addExcludedAppItem = NSMenuItem(title: "Add Excluded App...", action: #selector(requestExcludedAppPicker), keyEquivalent: "n")
+        let addExcludedAppItem = NSMenuItem(title: String(localized: "Add Excluded App..."), action: #selector(requestExcludedAppPicker), keyEquivalent: "n")
         addExcludedAppItem.keyEquivalentModifierMask = [.command]
         addExcludedAppItem.target = self
         editMenu.addItem(addExcludedAppItem)
@@ -72,7 +72,7 @@ extension SaneClipAppDelegate {
         // closed and empty. Checkmark reflects the current mode via
         // validateMenuItem(_:).
         let recordStackItem = NSMenuItem(
-            title: "Record Copies to Paste Stack",
+            title: String(localized: "Record Copies to Paste Stack"),
             action: #selector(toggleStackRecordingFromMenu),
             keyEquivalent: "r"
         )
@@ -84,7 +84,7 @@ extension SaneClipAppDelegate {
         let settingsMenuItem = NSMenuItem()
         mainMenu.addItem(settingsMenuItem)
 
-        let settingsMenu = NSMenu(title: "Settings")
+        let settingsMenu = NSMenu(title: String(localized: "Settings"))
         for item in settingsMenuItems() {
             settingsMenu.addItem(item)
         }
@@ -101,21 +101,21 @@ extension SaneClipAppDelegate {
 
     private func settingsMenuItems() -> [NSMenuItem] {
         var items: [NSMenuItem] = [
-            settingsMenuItem(title: "General", action: #selector(openGeneralSettings), key: "1"),
-            settingsMenuItem(title: "Shortcuts", action: #selector(openShortcutsSettings), key: "2")
+            settingsMenuItem(title: String(localized: "General"), action: #selector(openGeneralSettings), key: "1"),
+            settingsMenuItem(title: String(localized: "Shortcuts"), action: #selector(openShortcutsSettings), key: "2")
         ]
 
         #if ENABLE_SYNC
-            items.append(settingsMenuItem(title: "Sync", action: #selector(openSyncSettings), key: "3"))
-            items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "4"))
-            items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "5"))
-            items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "6"))
-            items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "7"))
+            items.append(settingsMenuItem(title: String(localized: "Sync"), action: #selector(openSyncSettings), key: "3"))
+            items.append(settingsMenuItem(title: String(localized: "Snippets"), action: #selector(openSnippetsSettings), key: "4"))
+            items.append(settingsMenuItem(title: String(localized: "Storage"), action: #selector(openStorageSettings), key: "5"))
+            items.append(settingsMenuItem(title: String(localized: "License"), action: #selector(openLicenseSettings), key: "6"))
+            items.append(settingsMenuItem(title: String(localized: "About"), action: #selector(openAboutSettings), key: "7"))
         #else
-            items.append(settingsMenuItem(title: "Snippets", action: #selector(openSnippetsSettings), key: "3"))
-            items.append(settingsMenuItem(title: "Storage", action: #selector(openStorageSettings), key: "4"))
-            items.append(settingsMenuItem(title: "License", action: #selector(openLicenseSettings), key: "5"))
-            items.append(settingsMenuItem(title: "About", action: #selector(openAboutSettings), key: "6"))
+            items.append(settingsMenuItem(title: String(localized: "Snippets"), action: #selector(openSnippetsSettings), key: "3"))
+            items.append(settingsMenuItem(title: String(localized: "Storage"), action: #selector(openStorageSettings), key: "4"))
+            items.append(settingsMenuItem(title: String(localized: "License"), action: #selector(openLicenseSettings), key: "5"))
+            items.append(settingsMenuItem(title: String(localized: "About"), action: #selector(openAboutSettings), key: "6"))
         #endif
 
         return items
@@ -149,7 +149,7 @@ extension SaneClipAppDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        let showItem = NSMenuItem(title: "Show History", action: #selector(showPopover), keyEquivalent: "")
+        let showItem = NSMenuItem(title: String(localized: "Show History"), action: #selector(showPopover), keyEquivalent: "")
         showItem.target = self
         menu.addItem(showItem)
         menu.addItem(NSMenuItem.separator())
@@ -158,7 +158,7 @@ extension SaneClipAppDelegate {
         menu.addItem(buildSnippetsSubmenu())
         menu.addItem(NSMenuItem.separator())
 
-        let clearItem = NSMenuItem(title: "Clear History", action: #selector(clearHistoryFromMenu), keyEquivalent: "")
+        let clearItem = NSMenuItem(title: String(localized: "Clear History"), action: #selector(clearHistoryFromMenu), keyEquivalent: "")
         clearItem.target = self
         menu.addItem(clearItem)
 
@@ -188,23 +188,23 @@ extension SaneClipAppDelegate {
 
     #if APP_STORE
         private func addAppStoreCoreUtilityItems(to menu: NSMenu, settingsKeyEquivalent: String) {
-            let aboutItem = NSMenuItem(title: "About / Report a Bug...", action: #selector(openAboutSettings), keyEquivalent: "")
+            let aboutItem = NSMenuItem(title: String(localized: "About / Report a Bug..."), action: #selector(openAboutSettings), keyEquivalent: "")
             aboutItem.target = self
             menu.addItem(aboutItem)
 
-            let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: settingsKeyEquivalent)
+            let settingsItem = NSMenuItem(title: String(localized: "Settings..."), action: #selector(openSettings), keyEquivalent: settingsKeyEquivalent)
             settingsItem.target = self
             settingsItem.keyEquivalentModifierMask = settingsKeyEquivalent.isEmpty ? [] : [.command]
             menu.addItem(settingsItem)
 
-            let licenseItem = NSMenuItem(title: "License...", action: #selector(openLicenseSettings), keyEquivalent: "")
+            let licenseItem = NSMenuItem(title: String(localized: "License..."), action: #selector(openLicenseSettings), keyEquivalent: "")
             licenseItem.target = self
             menu.addItem(licenseItem)
         }
 
         private func addAppStoreQuitItem(to menu: NSMenu) {
             let quitItem = NSMenuItem(
-                title: "Quit SaneClip",
+                title: String(localized: "Quit SaneClip"),
                 action: #selector(NSApplication.terminate(_:)),
                 keyEquivalent: "q"
             )
@@ -231,16 +231,16 @@ extension SaneClipAppDelegate {
 
     private func buildSnippetsSubmenu() -> NSMenuItem {
         guard licenseService.isPro else {
-            let snippetsItem = NSMenuItem(title: "Snippets Pro \u{1F512}", action: #selector(showSnippetsUpsell), keyEquivalent: "")
+            let snippetsItem = NSMenuItem(title: String(localized: "Snippets Pro") + " \u{1F512}", action: #selector(showSnippetsUpsell), keyEquivalent: "")
             snippetsItem.target = self
             return snippetsItem
         }
 
-        let snippetsItem = NSMenuItem(title: "Snippets", action: nil, keyEquivalent: "")
+        let snippetsItem = NSMenuItem(title: String(localized: "Snippets"), action: nil, keyEquivalent: "")
         let snippetsMenu = NSMenu()
         let sections = SnippetManager.librarySections(for: SnippetManager.shared.snippets)
         if !sections.isEmpty {
-            let helpItem = NSMenuItem(title: "Paste into the frontmost email or document", action: nil, keyEquivalent: "")
+            let helpItem = NSMenuItem(title: String(localized: "Paste into the frontmost email or document"), action: nil, keyEquivalent: "")
             helpItem.isEnabled = false
             snippetsMenu.addItem(helpItem)
             snippetsMenu.addItem(NSMenuItem.separator())
@@ -262,12 +262,12 @@ extension SaneClipAppDelegate {
                 snippetsMenu.addItem(categoryItem)
             }
         } else {
-            let emptyItem = NSMenuItem(title: "No snippets", action: nil, keyEquivalent: "")
+            let emptyItem = NSMenuItem(title: String(localized: "No snippets"), action: nil, keyEquivalent: "")
             emptyItem.isEnabled = false
             snippetsMenu.addItem(emptyItem)
         }
         snippetsMenu.addItem(NSMenuItem.separator())
-        let settingsItem = NSMenuItem(title: "Open Snippets Settings...", action: #selector(openSnippetsSettingsFromMenu), keyEquivalent: "")
+        let settingsItem = NSMenuItem(title: String(localized: "Open Snippets Settings..."), action: #selector(openSnippetsSettingsFromMenu), keyEquivalent: "")
         settingsItem.target = self
         snippetsMenu.addItem(settingsItem)
         snippetsItem.submenu = snippetsMenu

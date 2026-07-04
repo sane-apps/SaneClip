@@ -6,7 +6,7 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
-### 2026-07-04 ~09:12 — Glenn #1012/#1013 regression fix pass for 2.3.15; code/visual/sweep green, live row-click automation inconclusive; proof gate corrected
+### 2026-07-04 ~10:20 — Glenn #1012/#1013 2.3.15 replacement submitted after isolated Mini proof
 
 State: Glenn reported three fresh 2.3.14 regressions after the July 4 release:
 floating keep-open/pinned history did not paste into the target app, fixed
@@ -66,14 +66,18 @@ New durable gates:
   customer sweep transcript
   `outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log`.
 
-Important limitation from aggressive live proof: attempts to drive the
-non-activating floating panel row click with Peekaboo/cliclick did not produce a
-valid TextEdit paste proof. Artifacts are under
-`outputs/live-click-proof-glenn-1012-1013-20260704-0845/`. The failed attempts
-showed automation opening layer-101 menus or targeting TextEdit underneath; do
-not cite them as a passed proof. A future release/reply should still get a real
-human or improved UI-automation row-click proof for Glenn's exact floating
-keep-open paste path.
+Important proof correction: the earlier failed live-click attempt under
+`outputs/live-click-proof-glenn-1012-1013-20260704-0845/` remains invalid and
+must not be cited. After the MacBook Air was turned off, a valid isolated Mini
+TextEdit proof was captured under `outputs/live-proof/glenn-20260704T140729Z/`:
+SaneClip 2.3.15 (2315) captured sentinel
+`GLENN_KEEP_OPEN_PASTE_PROOF_20260704T140739Z` in the sandboxed history at
+index 0, opened floating SaneClip History over TextEdit while TextEdit stayed
+frontmost, pasted the sentinel via Return from the selected history row, and
+kept SaneClip History open with the pin active. Key screenshots:
+`05-history-open-before-return.png` and `06-after-return-paste.png`. The same
+proof folder also shows Pause Capture countdown moving from `4m 59s` to
+`4m 56s` while idle, then capture resumed in `10-capture-resumed-cleanup.png`.
 
 The macOS App Store 2.3.14 lane was withdrawn on 2026-07-04 after it was known
 bad (`WAITING_FOR_REVIEW` -> `DEVELOPER_REJECTED`), then retargeted with
@@ -83,11 +87,18 @@ clear. 2.3.15 is the intended replacement patch release for these regressions.
 Fresh coverage/evidence after the proof-gate correction:
 - `./scripts/SaneMaster.rb verify --timeout 900 --no-grant-permissions` passed
   217 tests on 2026-07-04.
+- After the Air-off isolation step, `./scripts/SaneMaster.rb verify --timeout
+  900 --no-grant-permissions` passed again with 217 tests, and final
+  `./scripts/SaneMaster.rb appstore_preflight` returned `ALL CLEAR — ready for
+  App Store submission`.
 - `./scripts/SaneMaster.rb customer_ui_sweep` passed on 2026-07-04 with
   receipt `.sane/customer_ui_action_receipt.json`, host
   `Stephans-Mac-mini.local`, version 2.3.15 (2315), and visual smoke receipt
   `outputs/visual_smoke/visual_smoke_20260704-094842_23241/`; receipt generated
   `2026-07-04T13:50:18Z` with the corrected coverage schema.
+- Air-off `customer_ui_sweep` passed again with visual smoke receipt
+  `outputs/visual_smoke/visual_smoke_20260704-100433_54965/` and sweep
+  transcript `outputs/customer-ui/sweep-20260704T140610Z/customer-action-runtime.log`.
 - `./scripts/SaneMaster.rb release_preflight` passed at
   `2026-07-04T09:52:58-04:00` with expected warnings: uncommitted files,
   UserDefaults/migration change notice, pre-publish appcast/Homebrew still on
@@ -95,10 +106,13 @@ Fresh coverage/evidence after the proof-gate correction:
 - `./scripts/SaneMaster.rb appstore_preflight` passed at
   `2026-07-04T09:54:45-04:00` after the ASC retarget, with only the
   uncommitted-files warning.
-Before replying to Glenn, keep the wording to "should be getting better" /
-"please retest" rather than claiming the exact floating row-click path is proven
-by live UI automation. Still watch the Lemon Squeezy hosted-file gate during
-release; the previous 2.3.14 run left that hosted file stale at 2.3.13.
+- `appstore_submit.rb` uploaded `build/Export-AppStore/SaneClip.pkg`; Apple
+  processed build `2315` as build ID `aac49749-0108-40ec-8ef0-679b8662732e`,
+  attached it to ASC version `ffb9aca2-9956-4d3d-9096-0e0742f21c74`, and
+  submitted it for review. macOS SaneClip 2.3.15 is now `WAITING_FOR_REVIEW`.
+Before replying to Glenn, say the fix is submitted/in review and ask him to
+retest once available. Still watch the Lemon Squeezy hosted-file gate during
+direct release; this Apple replacement did not deploy the direct ZIP/LS file.
 
 ### 2026-07-04 ~05:25 — 2.3.14 direct release mostly live; Lemon Squeezy hosted file still blocks final completion
 

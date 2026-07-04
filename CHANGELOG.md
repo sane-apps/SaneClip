@@ -21,11 +21,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Fixes the Pro floating history window closing when you click its own title bar, search field, filter, or pause controls; only clicks truly outside the window close it now.
 - Adds a Pro pin button beside history search to keep the history window open after pasting — and the setting (renamed "Keep history window open after pasting") now also applies to normal history pastes, not just the paste stack.
 - Keeps the floating history window (and your in-progress edit) open while an Edit, Smart Clear, or preview sheet is showing, even when the sheet extends past the window edge at small window sizes.
+- The floating history window now stays non-activating while still accepting row clicks, so the first click on a clip works and the synthetic paste goes back into the app you were using instead of into SaneClip.
+- Keep-open mode no longer hides and reopens the floating history window after paste, which removes the visible flicker.
 - Fixes pinned clips being lost once your history filled up: a pinned item (and, for an image, its saved copy) could be dropped and quietly unpinned when it aged past your history limit. Pinned clips are now always kept, no matter how much you copy.
 - Select several clips (the merge-queue selection) and delete them all at once with a new Delete button, instead of removing them one by one.
+- Hover/drag tracking around history rows is wider and less fussy, so row affordances are easier to hit.
 - New Pro rule "Strip trailing newline" drops just the final newline from copied text, so pasting a command into a terminal no longer runs it on its own — while keeping your indentation and blank lines intact.
 - The "Strip URL tracking parameters" rule now catches many more trackers (Google Ads gbraid/wbraid, Microsoft, X, HubSpot, Mailchimp, and others), not just the common utm_/fbclid ones.
 - History with many items from different apps scrolls more smoothly — source-app icons are now cached instead of looked up again for every row on every frame.
+- When History Encryption or Touch ID history lock is enabled, SaneClip now clears widget and iOS app-group preview caches instead of keeping plaintext mirrored clips for widgets or companion surfaces.
+- Menus and app metadata are now localization-ready, with UI localizations staged for English, French, German, Spanish, Italian, Portuguese (Brazil), Japanese, Simplified Chinese, and Korean.
 
 ---
 
@@ -67,25 +72,16 @@ Pro is now free to try for 14 days. Basic remains included after the trial.
 
 Restores the visible iPhone clipboard save prompt, improves multi-clip paste saving, adds a Mac menu bar icon visibility setting that preserves app access, and updates Setapp/App Store signing readiness.
 
----
-
-## [2.3.9] - 2026-06-06
-
-Adds a Mac setting to hide the SaneClip menu bar icon while preserving at least one app entry point, and tightens the Setapp build entitlements by removing unused Apple Events and Sparkle review surface.
+- Tightens the Setapp build entitlements by removing unused Apple Events and Sparkle review surface.
 
 ---
 
 ## [2.3.8] - 2026-06-06
 
 Restores the visible iPhone clipboard save prompt, saves every current iOS pasteboard item SaneClip can access, improves image sharing, and aligns automation/privacy support copy with the shipped Mac and iPhone workflows.
-
----
-
-## [2.3.8] - 2026-06-06
-
-Restores the visible iPhone clipboard save prompt, saves every current pasteboard item iOS exposes, and clarifies that iPhone/iPad use explicit save, Share sheet, Shortcuts, and iCloud companion flows rather than silent background clipboard capture.
-Fixes iOS share extension image availability and keeps synced CloudKit uploads aligned with the History Encryption setting.
-Tightens public automation and privacy copy so customer-facing claims match the shipped URL scheme, App Intents, Shortcuts, and support flows.
+- Clarifies that iPhone/iPad use explicit save, Share sheet, Shortcuts, and iCloud companion flows rather than silent background clipboard capture.
+- Fixes iOS share extension image availability and keeps synced CloudKit uploads aligned with the History Encryption setting.
+- Tightens public automation and privacy copy so customer-facing claims match the shipped URL scheme, App Intents, Shortcuts, and support flows.
 
 ---
 

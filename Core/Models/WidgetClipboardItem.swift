@@ -120,6 +120,25 @@ struct IOSHistoryDataContainer: Codable {
     }
 }
 
+enum SharedClipboardCachePrivacy {
+    static let appGroupSuiteName = "group.com.saneclip.app"
+    static let encryptHistoryKey = "encryptHistory"
+
+    static func shouldWithholdPlaintextCaches(
+        defaults: UserDefaults = .standard,
+        sharedDefaults: UserDefaults? = UserDefaults(suiteName: appGroupSuiteName)
+    ) -> Bool {
+        let standardSetting = defaults.object(forKey: encryptHistoryKey) as? Bool ?? false
+        let sharedSetting = sharedDefaults?.object(forKey: encryptHistoryKey) as? Bool ?? false
+        return standardSetting || sharedSetting
+    }
+
+    static func clearPlaintextCaches(lastUpdated: Date = Date()) throws {
+        try WidgetDataContainer(recentItems: [], pinnedItems: [], lastUpdated: lastUpdated).save()
+        try IOSHistoryDataContainer(recentItems: [], pinnedItems: [], lastUpdated: lastUpdated).save()
+    }
+}
+
 struct StoredClipboardItem: Codable, Identifiable {
     enum ContentKind: String, Codable {
         case text

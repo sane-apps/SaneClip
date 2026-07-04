@@ -6,6 +6,20 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+### 2026-07-04 ~03:52 — 2.3.14 release-readiness audit green, not shipped
+
+State: Mini-first audit/release prep completed for SaneClip 2.3.14. `release_readiness --json --app SaneClip` is green with no candidate or portfolio blockers. `release_preflight --json` passed after fixing stale docs and privacy-cache behavior; warnings remain: dirty worktree, UserDefaults/migration upgrade-path warning, appcast/Homebrew still live at 2.3.13 until publish, 34 pending emails, and evening release timing. `appstore_preflight --json` also passed; only warning was dirty worktree.
+
+Changes made in this pass: documented 2.3.14 in `README.md` and `CHANGELOG.md`, corrected the README macOS badge to 14.0+, consolidated duplicate 2.3.9/2.3.8 changelog headings, updated public privacy/encryption copy, fixed stale `customer_ui_action_sweep.rb` Snippets Pro guard, and closed the security audit finding where encrypted history still left plaintext widget/iOS app-group caches. Follow-up release-note completeness pass added the rest of the 2.3.14 customer-facing upgrades: paste-into-app/first-click behavior, keep-open flicker removal, bulk merge-queue delete, trailing-newline cleanup, broader tracking cleanup, icon-cache scrolling, hover/drag tracking, and staged localizations. New tests in `Tests/SecurityTests.swift` cover shared-cache withholding and source ordering.
+
+Proof receipts:
+- Customer UI strict contract: `.sane/customer_ui_action_receipt.json`, generated `2026-07-04T03:43:30Z`, 12 actions, no issues.
+- Runtime cycle: `ruby ~/SaneApps/infra/SaneProcess/scripts/sane_test.rb SaneClip --release --pro-mode` launched `/Applications/SaneClip.app` as the single canonical Developer ID-signed copy on the Mini.
+- Visual proof matrix: `outputs/visual-audit-release-ready-20260704-034510/` with `proof-index.md`; inspected merge footer, edit sheet buttons, Clipboard Rules toggles, floating preview/actions, Paste Stack recording, and settings/security surfaces.
+- Tests: multiple `./scripts/SaneMaster.rb verify --timeout 900 --no-grant-permissions` runs passed 210 tests; release/appstore preflights reran tests too.
+
+Operational fix outside this repo: `sane-email-automation` clean temp clone commit `7bbc101` updated the SaneClip bundle webhook signed-download mapping to `SaneClip-2.3.13.zip`; deployed Worker version `7962ee3f-c6a9-48c3-a2c2-c1fc56b1e6fe`. Live Worker check returned SaneClip `2.3.13` / `2313`.
+
 ### 2026-07-03 ~23:00 — DAY'S WORK + INDEPENDENT VERIFY GUIDE (run on the Mini directly)
 
 State: `main` @ `14f68ef`, **Air ↔ Mini synced**, 208 tests green. **origin (GitHub) NOT pushed** (stuck at `7e0e72c` — publish decision, owner's call). Everything under the ~16:00 note below is superseded history.

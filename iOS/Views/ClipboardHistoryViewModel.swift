@@ -123,6 +123,15 @@ class ClipboardHistoryViewModel: ObservableObject {
 
     /// Load clipboard data from App Group shared container
     func loadFromSharedContainer() {
+        if SharedClipboardCachePrivacy.shouldWithholdPlaintextCaches(sharedDefaults: userDefaults) {
+            try? SharedClipboardCachePrivacy.clearPlaintextCaches()
+            isShowingDemoData = false
+            history = []
+            pinnedItems = []
+            lastSyncTime = nil
+            return
+        }
+
         if let fullContainer = IOSHistoryDataContainer.load(),
            !fullContainer.recentItems.isEmpty {
             isShowingDemoData = false
@@ -254,6 +263,13 @@ class ClipboardHistoryViewModel: ObservableObject {
 
     /// Persist history to the App Group shared container
     func saveToWidgetContainer() {
+        if SharedClipboardCachePrivacy.shouldWithholdPlaintextCaches(sharedDefaults: userDefaults) {
+            // ponytail: privacy beats stale widgets; add encrypted app-group cache only if widgets need encrypted previews.
+            try? SharedClipboardCachePrivacy.clearPlaintextCaches()
+            WidgetCenter.shared.reloadAllTimelines()
+            return
+        }
+
         let widgetItems = history.prefix(50).map { item in
             WidgetClipboardItem(
                 id: item.id,

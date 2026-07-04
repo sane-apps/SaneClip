@@ -8,7 +8,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/sane-apps/SaneClip?style=flat-square)](https://github.com/sane-apps/SaneClip/stargazers)
 [![License: PolyForm Shield](https://img.shields.io/badge/License-PolyForm%20Shield-blue.svg?style=flat-square)](LICENSE)
-[![macOS](https://img.shields.io/badge/macOS-15.0+-blue?style=flat-square)](https://www.apple.com/macos/)
+[![macOS](https://img.shields.io/badge/macOS-14.0+-blue?style=flat-square)](https://www.apple.com/macos/)
 [![Pricing](https://img.shields.io/badge/Pricing-Free_%2B_%2414.99_Pro-green?style=flat-square)](https://saneclip.com)
 [![Listed on macOS apps list](https://img.shields.io/badge/Listed%20on-macOS--apps--list%20(40k%E2%98%85)-black?style=flat-square)](https://github.com/serhii-londar/open-source-mac-os-apps)
 
@@ -57,17 +57,27 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ---
 
-## 🆕 Current macOS Direct Download: v2.3.13
+## 🆕 Next macOS Direct Download: v2.3.14
 
-**Current direct-download release (July 2026)**
+**Next direct-download release (staged for July 2026)**
 
+- ✅ Keeps only one SaneClip copy running so duplicate launches do not fight over clipboard history
+- ✅ Lets the Pro Paste Stack record copies as you build a queue
+- ✅ Pastes from the floating history window back into your app without focus stealing or first-click misses
+- ✅ Keeps the floating history window steady in keep-open mode instead of flickering closed and open
 - ✅ Keeps merge queue controls readable at narrow widths
+- ✅ Adds bulk delete for selected merge-queue clips
 - ✅ Keeps Edit Text Save and Cancel buttons visible while editing long clips
 - ✅ Makes Clipboard Rules switches update visibly as soon as they are clicked
 - ✅ Keeps the Pro floating history toolbar/search controls usable while still closing on real outside clicks
 - ✅ Adds a Pro pin control beside history search for keep-open-after-paste mode
+- ✅ Adds a trailing-newline cleanup rule and broader tracking-parameter cleanup
+- ✅ Scrolls large mixed-app histories more smoothly with cached source-app icons
+- ✅ Keeps pinned clips from being trimmed when history fills up
+- ✅ Clears widget and iOS preview caches when encrypted history or Touch ID lock is enabled
+- ✅ Adds eight UI localizations: French, German, Spanish, Italian, Portuguese (Brazil), Japanese, Simplified Chinese, and Korean
 
-The prior `2.3.12` mobile follow-up kept synced Mac clipboard text appearing on iPhone and iPad automatically while the companion app is foregrounded.
+The live public direct-download channel remains `2.3.13` until the owner ships `2.3.14` from the Mini.
 
 ---
 
@@ -224,6 +234,7 @@ SaneClip is **privacy-first**:
 
 - ✅ **On-Device by Default** — Your clipboard history stays on your Mac unless you enable sync or explicitly export/share it
 - ✅ **Optional iCloud Sync** — Syncs through your own iCloud account, not a SaneApps server
+- ✅ **Protected Shared Caches** — When History Encryption or Touch ID lock is enabled, widget and iOS preview caches are cleared instead of keeping plaintext clip mirrors
 - ✅ **No Clipboard-Content Upload to SaneApps** — Clipboard contents are not sent to SaneApps servers
 - ✅ **100% Transparent Code** — Verify yourself at [github.com/sane-apps/SaneClip](https://github.com/sane-apps/SaneClip)
 - ✅ **PolyForm Shield License** — Community-auditable, source-available

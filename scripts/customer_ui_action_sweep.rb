@@ -101,7 +101,7 @@ class CustomerUIActionSweep
       ['UI/Settings/SnippetsSettingsView.swift', 'Button("Duplicate")'],
       ['UI/Settings/SnippetsSettingsView.swift', 'SnippetEditorSheet('],
       ['UI/Settings/SnippetsSettingsView.swift', 'promptValuesIfNeeded(for snippet: Snippet)'],
-      ['SaneClipAppDelegate+Menus.swift', 'NSMenuItem(title: "Snippets Pro']
+      ['SaneClipAppDelegate+Menus.swift', 'String(localized: "Snippets Pro") + " \u{1F512}", action: #selector(showSnippetsUpsell)']
     ],
     'storage-stats-actions' => [
       ['UI/Settings/StorageStatsView.swift', 'StatCard(title: "Total Items"'],

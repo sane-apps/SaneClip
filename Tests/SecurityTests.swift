@@ -259,6 +259,72 @@ struct KeychainTests {
     }
 }
 
+// MARK: - Shared Cache Privacy Tests
+
+struct SharedCachePrivacyTests {
+    private func projectRootURL() -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
+
+    @Test("Encrypted history preference withholds plaintext app group caches")
+    func encryptedHistoryPreferenceWithholdsPlaintextAppGroupCaches() throws {
+        let standardSuite = "com.saneclip.tests.cache-privacy.standard.\(UUID().uuidString)"
+        let sharedSuite = "com.saneclip.tests.cache-privacy.shared.\(UUID().uuidString)"
+        let standardDefaults = try #require(UserDefaults(suiteName: standardSuite))
+        let sharedDefaults = try #require(UserDefaults(suiteName: sharedSuite))
+        defer {
+            standardDefaults.removePersistentDomain(forName: standardSuite)
+            sharedDefaults.removePersistentDomain(forName: sharedSuite)
+        }
+
+        #expect(!SharedClipboardCachePrivacy.shouldWithholdPlaintextCaches(defaults: standardDefaults, sharedDefaults: sharedDefaults))
+
+        standardDefaults.set(true, forKey: SharedClipboardCachePrivacy.encryptHistoryKey)
+        #expect(SharedClipboardCachePrivacy.shouldWithholdPlaintextCaches(defaults: standardDefaults, sharedDefaults: sharedDefaults))
+
+        standardDefaults.set(false, forKey: SharedClipboardCachePrivacy.encryptHistoryKey)
+        sharedDefaults.set(true, forKey: SharedClipboardCachePrivacy.encryptHistoryKey)
+        #expect(SharedClipboardCachePrivacy.shouldWithholdPlaintextCaches(defaults: standardDefaults, sharedDefaults: sharedDefaults))
+    }
+
+    @Test("Encrypted history guard runs before plaintext widget and iOS cache writes")
+    func encryptedHistoryGuardRunsBeforePlaintextCacheWrites() throws {
+        let repoRoot = projectRootURL()
+        let clipboardManagerSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("Core/ClipboardManager.swift"),
+            encoding: .utf8
+        )
+        let iosViewModelSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("iOS/Views/ClipboardHistoryViewModel.swift"),
+            encoding: .utf8
+        )
+        let widgetModelSource = try String(
+            contentsOf: repoRoot.appendingPathComponent("Core/Models/WidgetClipboardItem.swift"),
+            encoding: .utf8
+        )
+
+        #expect(widgetModelSource.contains("enum SharedClipboardCachePrivacy"))
+        #expect(widgetModelSource.contains("static let encryptHistoryKey = \"encryptHistory\""))
+        #expect(widgetModelSource.contains("static func clearPlaintextCaches"))
+
+        let macGuard = try #require(clipboardManagerSource.range(of: "SharedClipboardCachePrivacy.shouldWithholdPlaintextCaches()"))
+        let macPlaintextWrite = try #require(clipboardManagerSource.range(of: "let recentWidgetItems = history.prefix(10).map"))
+        #expect(macGuard.lowerBound < macPlaintextWrite.lowerBound)
+        #expect(clipboardManagerSource.contains("SharedClipboardCachePrivacy.clearPlaintextCaches()"))
+
+        let iosSaveFunction = try #require(iosViewModelSource.range(of: "func saveToWidgetContainer()"))
+        let iosGuard = try #require(iosViewModelSource.range(
+            of: "SharedClipboardCachePrivacy.shouldWithholdPlaintextCaches(sharedDefaults: userDefaults)",
+            range: iosSaveFunction.lowerBound..<iosViewModelSource.endIndex
+        ))
+        let iosPlaintextWrite = try #require(iosViewModelSource.range(of: "let widgetItems = history.prefix(50).map"))
+        #expect(iosGuard.lowerBound < iosPlaintextWrite.lowerBound)
+        #expect(iosViewModelSource.contains("SharedClipboardCachePrivacy.clearPlaintextCaches()"))
+    }
+}
+
 // MARK: - Shared Clipboard Item Tests
 
 struct SharedClipboardItemTests {

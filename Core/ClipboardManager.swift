@@ -2217,18 +2217,13 @@ class ClipboardManager {
 
     /// Updates widget data in the shared App Group container
     private func updateWidgetData() {
-        if SettingsModel.shared.requireTouchID {
-            let lockedContainer = WidgetDataContainer(
-                recentItems: [],
-                pinnedItems: [],
-                lastUpdated: Date()
-            )
+        if SettingsModel.shared.requireTouchID || SharedClipboardCachePrivacy.shouldWithholdPlaintextCaches() {
             do {
-                try lockedContainer.save()
+                try SharedClipboardCachePrivacy.clearPlaintextCaches()
                 WidgetCenter.shared.reloadAllTimelines()
-                logger.debug("Cleared widget previews while Touch ID history lock is enabled")
+                logger.debug("Cleared shared clipboard previews while history privacy protection is enabled")
             } catch {
-                logger.warning("Failed to clear locked widget data: \(error.localizedDescription)")
+                logger.warning("Failed to clear private shared clipboard caches: \(error.localizedDescription)")
             }
             return
         }

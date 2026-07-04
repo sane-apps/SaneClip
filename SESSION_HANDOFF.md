@@ -6,6 +6,7 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+- 2026-07-03 ~23:00 — full day's work + verify commands in **outputs/VERIFY-2026-07-03.md** (paste fix, pin-eviction data-loss fix, 4 Maccy easy-wins, 8-language localization; main@5bbed80, Air↔Mini synced, 208 tests green; origin NOT pushed). Everything below is superseded history:
 - 2026-07-03 ~16:00 CORRECTIVE RE-AUDIT + FIX PASS — 2.3.14 HELD (do NOT ship yet):
   - A 23-agent adversarial verification workflow DISPROVED the earlier "Glenn
     #1007 fully fixed on main" claim. Ground truth on main `7e0e72c`: the

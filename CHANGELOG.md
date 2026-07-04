@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.16] - 2026-07-04
+
+Important update to onboarding, licensing, and reliability. Recommended for all users.
+
+---
+
 ## [2.3.15] - 2026-07-04
 
 - Tightens keep-open history focus handoff so the floating history panel is ordered out before paste is attempted.

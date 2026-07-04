@@ -90,6 +90,7 @@
 		8595552721917F1C86C09F2E /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74750429D17786620EF008E /* main.swift */; };
 		859F847595C08FF8676DE3CA /* SaneClipIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305BB1EB756CA0FC1DAAFFAD /* SaneClipIntents.swift */; };
 		870D1423D4230D0A40E6DD4D /* TextTransformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEA795AFED8797FFAE0DD3E /* TextTransformService.swift */; };
+		87FCB96A27E1C512E3808972 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 4FA1409BE50480511F49804D /* Localizable.xcstrings */; };
 		88429CF77152B054F581B567 /* WebhookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9381D3ACF3CE661318DF305D /* WebhookService.swift */; };
 		8941A3DAF4AF4FC8A5F19C3F /* BrandColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5449565520B6E5CF68C78D6B /* BrandColors.swift */; };
 		8A491CA37BC3300E38235130 /* HistoryListKeyboardShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EAA037C53A58CAB8C3CC5F6 /* HistoryListKeyboardShortcuts.swift */; };
@@ -163,6 +164,7 @@
 		DACB7C32DC1C86EF2A630D43 /* ClipboardHistoryViewModel+ClipboardImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E748D426976BE5B909D7C5 /* ClipboardHistoryViewModel+ClipboardImport.swift */; };
 		DCCB437A7D9404CB8330057C /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E776995068A491A32269B2E /* OnboardingView.swift */; };
 		DD0A52895A6DC74A92D88CE0 /* SaneClipIOSWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2BF58DEC0153C26EA351A8 /* SaneClipIOSWidgets.swift */; };
+		DD598DDC80D412945611338C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 4FA1409BE50480511F49804D /* Localizable.xcstrings */; };
 		DD741ED4E799B3DE999D2A65 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6709551974949109A6A239 /* EmptyStateView.swift */; };
 		DE0D1479DE595F1FA651F71F /* WidgetClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EBF7159750CFC64A8BF9A /* WidgetClipboardItem.swift */; };
 		DFC8A7437D713D82B5224D1E /* HistoryEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82FA89438430FB80B145A7C5 /* HistoryEncryption.swift */; };
@@ -303,6 +305,7 @@
 		4BCD829890D1F0F66702EC52 /* SaneClipIOSWidgetsDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipIOSWidgetsDebug.entitlements; sourceTree = "<group>"; };
 		4D77AB048F107D7E2F8AB415 /* SaneClipShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaneClipShortcuts.swift; sourceTree = "<group>"; };
 		4EAA037C53A58CAB8C3CC5F6 /* HistoryListKeyboardShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListKeyboardShortcuts.swift; sourceTree = "<group>"; };
+		4FA1409BE50480511F49804D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		52265A0CE8AF6894E4CEE044 /* ExcludedAppsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExcludedAppsSettingsView.swift; sourceTree = "<group>"; };
 		5449565520B6E5CF68C78D6B /* BrandColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandColors.swift; sourceTree = "<group>"; };
 		550322A15EB237CAE1FE0641 /* SaneClipAppDelegate+Services.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SaneClipAppDelegate+Services.swift"; sourceTree = "<group>"; };
@@ -484,6 +487,7 @@
 			children = (
 				6E5B3959F17D55FF5C7F90E6 /* Assets.xcassets */,
 				AD5C75ADF36A7D05AEEFAE0C /* DMGIcon.icns */,
+				4FA1409BE50480511F49804D /* Localizable.xcstrings */,
 				6785DC91231845BA4B10499F /* PrivacyInfo.xcprivacy */,
 			);
 			path = Resources;
@@ -931,6 +935,7 @@
 			files = (
 				33A2F1BA06C9E4035D9DC8EC /* Assets.xcassets in Resources */,
 				2919E3AFFA4AE4ADE2B3BFF5 /* DMGIcon.icns in Resources */,
+				87FCB96A27E1C512E3808972 /* Localizable.xcstrings in Resources */,
 				37B069FE94A9771FA1BB63D0 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -941,6 +946,7 @@
 			files = (
 				31AE3F98F164FB0ECD0829BD /* Assets.xcassets in Resources */,
 				414A920720EECE33D2310A7C /* DMGIcon.icns in Resources */,
+				DD598DDC80D412945611338C /* Localizable.xcstrings in Resources */,
 				F5163A69E164634BA8652A30 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

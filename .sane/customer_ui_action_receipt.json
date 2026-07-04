@@ -1,10 +1,10 @@
 {
   "app": "SaneClip",
   "status": "passed",
-  "host": "mini",
-  "generated_at": "2026-07-04T05:10:45Z",
-  "manifest_sha256": "1d39775a05542c43b71a1eb6e5e3d911864d0d45dacd554bb5c4c8243b217e9e",
-  "source_fingerprint": "7279cf85be8ca43f676e7cedf3467ffbffdafdc44093ffc947bfdd74a70eb9ce",
+  "host": "Stephans-Mac-mini.local",
+  "generated_at": "2026-07-04T13:50:18Z",
+  "manifest_sha256": "fcf11fcf780023feaa3056823fd944e95f98be5d49afe0c2576f16f7625e2e18",
+  "source_fingerprint": "9f23e0a64985981efde21a88bf89ab9ef87096132b654ac37ca4a1bc7486f098",
   "tested_action_ids": [
     "status-menu-dock-core-actions",
     "history-search-filter-navigation",
@@ -21,35 +21,37 @@
   ],
   "action_results": {
     "status-menu-dock-core-actions": {
-      "status": "passed",
-      "proof_level": "full_runtime_completion",
+      "coverage_status": "covered",
+      "completion_scope": "structured_coverage_only",
+      "proof_level": "runtime_visual",
       "functional_state": {
         "status": "established",
         "detail": "Seeded clipboard history with representative text, URL, code, image, snippet, collection, tag, and paste-stack items. Load deterministic clipboard/history fixtures before opening customer surfaces. Restore fixture history after destructive row, stack, or clear actions. Tests/Fixtures/customer-ui/clipboard-history/"
       },
-      "inputs": [
+      "declared_inputs": [
         "Open the shipped status menu and Dock menu.",
         "Verify Capture Screenshot, Capture Text from Screen, Show History, recent-item paste, Snippets, Clear History, Settings, License, Check for Updates, About / Report a Bug, and Quit are wired where applicable.",
         "For Quit and update checks, verify the menu item and first safe surface rather than publishing or quitting during the sweep."
       ],
-      "output_assertions": [
+      "covered_assertions": [
         "Status and Dock menus are built from the same customer action surface.",
         "Utility actions route to the shared SaneUI settings, license, update, about, and bug report surfaces.",
         "Recent items and snippets can be selected without leaving duplicate app instances."
       ],
       "workflow": {
         "runner": "scripts/customer_ui_action_sweep.rb",
-        "outcome": "Status menu and Dock menu expose core SaneClip actions passed with structured Mini evidence",
-        "steps_completed": [
+        "outcome": "Status menu and Dock menu expose core SaneClip actions covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
+        "completion_scope": "structured_coverage_only",
+        "steps_covered": [
           "Open the shipped status menu and Dock menu.",
           "Verify Capture Screenshot, Capture Text from Screen, Show History, recent-item paste, Snippets, Clear History, Settings, License, Check for Updates, About / Report a Bug, and Quit are wired where applicable.",
           "For Quit and update checks, verify the menu item and first safe surface rather than publishing or quitting during the sweep."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json",
           "docs/images/screenshot-menu.png",
-          "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -58,9 +60,9 @@
           "detail": "8 shipped source/test markers verified on the Mini"
         },
         {
-          "type": "mini_click",
-          "detail": "Mini interaction transcript for status-menu-dock-core-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json"
+          "type": "mini_runtime",
+          "detail": "Mini runtime metadata for status-menu-dock-core-actions",
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json"
         },
         {
           "type": "screenshot",
@@ -70,45 +72,47 @@
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for status-menu-dock-core-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for status-menu-dock-core-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         }
       ]
     },
     "history-search-filter-navigation": {
-      "status": "passed",
-      "proof_level": "full_runtime_completion",
+      "coverage_status": "covered",
+      "completion_scope": "structured_coverage_only",
+      "proof_level": "runtime_visual",
       "functional_state": {
         "status": "established",
         "detail": "Seeded clipboard history with representative text, URL, code, image, snippet, collection, tag, and paste-stack items. Load deterministic clipboard/history fixtures before opening customer surfaces. Restore fixture history after destructive row, stack, or clear actions. Tests/Fixtures/customer-ui/clipboard-history/"
       },
-      "inputs": [
+      "declared_inputs": [
         "Open history from the menu bar or shortcut.",
         "Search, clear search, toggle filters, change date/type/collection/tag filters, save/apply presets, and navigate the list with keyboard shortcuts.",
         "Paste or delete the selected row only in a safe fixture run."
       ],
-      "output_assertions": [
+      "covered_assertions": [
         "Search and filters change the visible result set.",
         "Keyboard navigation ignores text fields and sheet focus.",
         "Presets persist and can be cleared without corrupting history."
       ],
       "workflow": {
         "runner": "scripts/customer_ui_action_sweep.rb",
-        "outcome": "Clipboard history search, filters, navigation, and presets are live passed with structured Mini evidence",
-        "steps_completed": [
+        "outcome": "Clipboard history search, filters, navigation, and presets are live covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
+        "completion_scope": "structured_coverage_only",
+        "steps_covered": [
           "Open history from the menu bar or shortcut.",
           "Search, clear search, toggle filters, change date/type/collection/tag filters, save/apply presets, and navigate the list with keyboard shortcuts.",
           "Paste or delete the selected row only in a safe fixture run."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json",
           "docs/images/appstore-mac-popover.png",
-          "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -117,9 +121,9 @@
           "detail": "7 shipped source/test markers verified on the Mini"
         },
         {
-          "type": "mini_click",
-          "detail": "Mini interaction transcript for history-search-filter-navigation",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json"
+          "type": "mini_runtime",
+          "detail": "Mini runtime metadata for history-search-filter-navigation",
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json"
         },
         {
           "type": "screenshot",
@@ -129,45 +133,50 @@
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for history-search-filter-navigation",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for history-search-filter-navigation",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         }
       ]
     },
     "history-item-row-actions": {
-      "status": "passed",
-      "proof_level": "full_runtime_completion",
+      "coverage_status": "covered",
+      "completion_scope": "structured_coverage_only",
+      "proof_level": "runtime_visual",
       "functional_state": {
         "status": "established",
         "detail": "Seeded clipboard history with representative text, URL, code, image, snippet, collection, tag, and paste-stack items. Load deterministic clipboard/history fixtures before opening customer surfaces. Restore fixture history after destructive row, stack, or clear actions. Tests/Fixtures/customer-ui/clipboard-history/"
       },
-      "inputs": [
+      "declared_inputs": [
         "Use row hover/action and context menu controls for representative text, URL, code, and image items.",
         "Paste, copy, pin/unpin, edit content, update title/tags/collection/note, copy OCR text, export an image, and delete a fixture item.",
+        "With keep-open pinned in floating and fixed history modes, verify the visual keep-open states and the code path that orders history out before paste is attempted; Glenn's exact target-app receipt remains customer retest or manual proof.",
         "Verify Basic users see Pro gates for Pro-only row actions."
       ],
-      "output_assertions": [
+      "covered_assertions": [
         "Basic pinning remains available.",
         "Pro-only paste transforms, organization, notes, and image OCR actions are gated or executed correctly.",
-        "Edits use the batch update path so row metadata and pinned copies stay aligned."
+        "Edits use the batch update path so row metadata and pinned copies stay aligned.",
+        "Keep-open paste hides the floating panel before synthetic Cmd+V and only restores history after direct-build paste simulation succeeds."
       ],
       "workflow": {
         "runner": "scripts/customer_ui_action_sweep.rb",
-        "outcome": "Clipboard item rows expose copy, paste, pin, edit, organize, image, and delete actions passed with structured Mini evidence",
-        "steps_completed": [
+        "outcome": "Clipboard item rows expose copy, paste, pin, edit, organize, image, and delete actions covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
+        "completion_scope": "structured_coverage_only",
+        "steps_covered": [
           "Use row hover/action and context menu controls for representative text, URL, code, and image items.",
           "Paste, copy, pin/unpin, edit content, update title/tags/collection/note, copy OCR text, export an image, and delete a fixture item.",
+          "With keep-open pinned in floating and fixed history modes, verify the visual keep-open states and the code path that orders history out before paste is attempted; Glenn's exact target-app receipt remains customer retest or manual proof.",
           "Verify Basic users see Pro gates for Pro-only row actions."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json",
-          "docs/images/screenshot-popover.png",
-          "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json",
+          "outputs/capture-renders/glenn-1012-keep-open-pin-visible-before-paste.png",
+          "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -176,56 +185,61 @@
           "detail": "8 shipped source/test markers verified on the Mini"
         },
         {
-          "type": "mini_click",
-          "detail": "Mini interaction transcript for history-item-row-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json"
+          "type": "mini_runtime",
+          "detail": "Mini runtime metadata for history-item-row-actions",
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json"
         },
         {
           "type": "screenshot",
           "detail": "Mini visual proof for history-item-row-actions",
-          "path": "docs/images/screenshot-popover.png"
+          "path": "outputs/capture-renders/glenn-1012-keep-open-pin-visible-before-paste.png"
         },
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for history-item-row-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for history-item-row-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         }
       ]
     },
     "paste-stack-actions": {
-      "status": "passed",
-      "proof_level": "full_runtime_completion",
+      "coverage_status": "covered",
+      "completion_scope": "structured_coverage_only",
+      "proof_level": "runtime_visual",
       "functional_state": {
         "status": "established",
         "detail": "Seeded clipboard history with representative text, URL, code, image, snippet, collection, tag, and paste-stack items. Load deterministic clipboard/history fixtures before opening customer surfaces. Restore fixture history after destructive row, stack, or clear actions. Tests/Fixtures/customer-ui/clipboard-history/"
       },
-      "inputs": [
+      "declared_inputs": [
         "Add fixture items to the paste stack.",
         "Open the stack panel, paste an item, move items, move to top, rename, add a note, undo the last paste, pause consumption, and clear the stack.",
+        "Add three fixture rows to the Merge Queue, close/reopen floating history, switch to fixed history and back, and verify the footer still shows all three queued items until the user clears or merges them.",
         "Verify Basic users see a Pro gate instead of silent no-op controls."
       ],
-      "output_assertions": [
+      "covered_assertions": [
         "Stack controls mutate only the stack fixture.",
         "Consumption settings persist and are reflected in the panel.",
+        "Merge Queue selection is manager state, not view-local state, so it survives history view recreation and floating/fixed mode switches.",
         "Basic/Pro gates match the public feature boundary."
       ],
       "workflow": {
         "runner": "scripts/customer_ui_action_sweep.rb",
-        "outcome": "Paste Stack can add, paste, reorder, rename, note, undo, pause, and clear items passed with structured Mini evidence",
-        "steps_completed": [
+        "outcome": "Paste Stack can add, paste, reorder, rename, note, undo, pause, and clear items covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
+        "completion_scope": "structured_coverage_only",
+        "steps_covered": [
           "Add fixture items to the paste stack.",
           "Open the stack panel, paste an item, move items, move to top, rename, add a note, undo the last paste, pause consumption, and clear the stack.",
+          "Add three fixture rows to the Merge Queue, close/reopen floating history, switch to fixed history and back, and verify the footer still shows all three queued items until the user clears or merges them.",
           "Verify Basic users see a Pro gate instead of silent no-op controls."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json",
-          "docs/images/product-hunt-gallery-01.png",
-          "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json"
+          "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json",
+          "outputs/capture-renders/glenn-1012-floating-reopened-merge-queue-retains-3.png",
+          "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json"
         ]
       },
       "evidence": [
@@ -234,52 +248,54 @@
           "detail": "7 shipped source/test markers verified on the Mini"
         },
         {
-          "type": "mini_click",
-          "detail": "Mini interaction transcript for paste-stack-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json"
+          "type": "mini_runtime",
+          "detail": "Mini runtime metadata for paste-stack-actions",
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json"
         },
         {
           "type": "screenshot",
           "detail": "Mini visual proof for paste-stack-actions",
-          "path": "docs/images/product-hunt-gallery-01.png"
+          "path": "outputs/capture-renders/glenn-1012-floating-reopened-merge-queue-retains-3.png"
         },
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for paste-stack-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json"
         }
       ]
     },
     "capture-screenshot-text-actions": {
-      "status": "passed",
-      "proof_level": "full_runtime_completion",
+      "coverage_status": "covered",
+      "completion_scope": "structured_coverage_only",
+      "proof_level": "runtime_visual",
       "functional_state": {
         "status": "established",
         "detail": "Seeded clipboard history with representative text, URL, code, image, snippet, collection, tag, and paste-stack items. Load deterministic clipboard/history fixtures before opening customer surfaces. Restore fixture history after destructive row, stack, or clear actions. Tests/Fixtures/customer-ui/clipboard-history/"
       },
-      "inputs": [
+      "declared_inputs": [
         "Verify menu and shortcut routes for Capture Screenshot and Capture Text from Screen.",
         "Verify the safe Screen Recording permission surface and copy.",
         "Verify fixture-level ScreenCaptureKit and OCR wiring without claiming a human picker selection unless that fixture was actually run."
       ],
-      "output_assertions": [
+      "covered_assertions": [
         "Capture actions do not auto-request screen recording from deep inside capture service code.",
         "Permission denial opens an explainable first surface.",
         "OCR text and screenshot sidecars flow into history and preview controls when capture fixtures are present."
       ],
       "workflow": {
         "runner": "scripts/customer_ui_action_sweep.rb",
-        "outcome": "Capture Screenshot and Capture Text from Screen verify safe first surfaces and capture fixtures passed with structured Mini evidence",
-        "steps_completed": [
+        "outcome": "Capture Screenshot and Capture Text from Screen verify safe first surfaces and capture fixtures covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
+        "completion_scope": "structured_coverage_only",
+        "steps_covered": [
           "Verify menu and shortcut routes for Capture Screenshot and Capture Text from Screen.",
           "Verify the safe Screen Recording permission surface and copy.",
           "Verify fixture-level ScreenCaptureKit and OCR wiring without claiming a human picker selection unless that fixture was actually run."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json",
           "docs/images/appstore-mac-settings.png",
-          "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -288,9 +304,9 @@
           "detail": "10 shipped source/test markers verified on the Mini"
         },
         {
-          "type": "mini_click",
-          "detail": "Mini interaction transcript for capture-screenshot-text-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json"
+          "type": "mini_runtime",
+          "detail": "Mini runtime metadata for capture-screenshot-text-actions",
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json"
         },
         {
           "type": "screenshot",
@@ -300,12 +316,12 @@
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for capture-screenshot-text-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for capture-screenshot-text-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         },
         {
           "type": "external_boundary",
@@ -314,35 +330,40 @@
       ]
     },
     "settings-general-security-history-actions": {
-      "status": "passed",
-      "proof_level": "full_runtime_completion",
+      "coverage_status": "covered",
+      "completion_scope": "structured_coverage_only",
+      "proof_level": "runtime_visual",
       "functional_state": {
         "status": "established",
         "detail": "Seeded clipboard history with representative text, URL, code, image, snippet, collection, tag, and paste-stack items. Load deterministic clipboard/history fixtures before opening customer surfaces. Restore fixture history after destructive row, stack, or clear actions. Tests/Fixtures/customer-ui/clipboard-history/"
       },
-      "inputs": [
+      "declared_inputs": [
         "Open General settings.",
         "Toggle login item, Dock icon, menu bar icon, paste sound, sensitive-data protection, Touch ID, encryption, excluded apps, history size, expiry, capture limits, capture pause/resume, update checks, import, and export where safe.",
+        "Pause capture for 5, 15, and 60 minutes and verify the visible countdown decrements while the pasteboard is idle.",
         "For Touch ID, import/export, update checks, and selected-app panels, verify the safe first surface or fixture rather than mutating user data."
       ],
-      "output_assertions": [
+      "covered_assertions": [
         "Settings persist through SettingsModel or the shared SaneUI components.",
         "Security-disabling actions authenticate before changing protected state.",
+        "Capture pause countdown is invalidated by the monitor timer and does not wait for a new pasteboard change before updating.",
         "External panels are opened only as safe first surfaces in the sweep."
       ],
       "workflow": {
         "runner": "scripts/customer_ui_action_sweep.rb",
-        "outcome": "General settings update startup, appearance, security, history, capture, update, and import/export behavior passed with structured Mini evidence",
-        "steps_completed": [
+        "outcome": "General settings update startup, appearance, security, history, capture, update, and import/export behavior covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
+        "completion_scope": "structured_coverage_only",
+        "steps_covered": [
           "Open General settings.",
           "Toggle login item, Dock icon, menu bar icon, paste sound, sensitive-data protection, Touch ID, encryption, excluded apps, history size, expiry, capture limits, capture pause/resume, update checks, import, and export where safe.",
+          "Pause capture for 5, 15, and 60 minutes and verify the visible countdown decrements while the pasteboard is idle.",
           "For Touch ID, import/export, update checks, and selected-app panels, verify the safe first surface or fixture rather than mutating user data."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json",
-          "docs/images/screenshot-settings.png",
-          "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json",
+          "outputs/capture-renders/glenn-1013-pause-countdown-visible-while-idle.png",
+          "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -351,24 +372,24 @@
           "detail": "10 shipped source/test markers verified on the Mini"
         },
         {
-          "type": "mini_click",
-          "detail": "Mini interaction transcript for settings-general-security-history-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json"
+          "type": "mini_runtime",
+          "detail": "Mini runtime metadata for settings-general-security-history-actions",
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json"
         },
         {
           "type": "screenshot",
           "detail": "Mini visual proof for settings-general-security-history-actions",
-          "path": "docs/images/screenshot-settings.png"
+          "path": "outputs/capture-renders/glenn-1013-pause-countdown-visible-while-idle.png"
         },
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for settings-general-security-history-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for settings-general-security-history-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         },
         {
           "type": "external_boundary",
@@ -377,35 +398,37 @@
       ]
     },
     "settings-shortcuts-actions": {
-      "status": "passed",
-      "proof_level": "full_runtime_completion",
+      "coverage_status": "covered",
+      "completion_scope": "structured_coverage_only",
+      "proof_level": "runtime_visual",
       "functional_state": {
         "status": "established",
         "detail": "Seeded clipboard history with representative text, URL, code, image, snippet, collection, tag, and paste-stack items. Load deterministic clipboard/history fixtures before opening customer surfaces. Restore fixture history after destructive row, stack, or clear actions. Tests/Fixtures/customer-ui/clipboard-history/"
       },
-      "inputs": [
+      "declared_inputs": [
         "Open Shortcuts settings.",
         "Verify recorders for Show Clipboard History, Paste as Plain Text, Paste Stack, Smart Paste, Ignore Next Copy, Capture Screenshot, Capture Text from Screen, and quick-paste slots.",
         "Reset Show Clipboard History to Command-Shift-Control-Y in a fixture or source/test proof."
       ],
-      "output_assertions": [
+      "covered_assertions": [
         "Default shortcuts match documented values.",
         "Basic mode does not retain legacy Pro-only shortcut defaults.",
         "Reset restores the documented Show Clipboard History shortcut."
       ],
       "workflow": {
         "runner": "scripts/customer_ui_action_sweep.rb",
-        "outcome": "Shortcut settings expose recorders, defaults, reset, and Pro gates passed with structured Mini evidence",
-        "steps_completed": [
+        "outcome": "Shortcut settings expose recorders, defaults, reset, and Pro gates covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
+        "completion_scope": "structured_coverage_only",
+        "steps_covered": [
           "Open Shortcuts settings.",
           "Verify recorders for Show Clipboard History, Paste as Plain Text, Paste Stack, Smart Paste, Ignore Next Copy, Capture Screenshot, Capture Text from Screen, and quick-paste slots.",
           "Reset Show Clipboard History to Command-Shift-Control-Y in a fixture or source/test proof."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json",
           "docs/images/screenshot-shortcuts.png",
-          "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -414,9 +437,9 @@
           "detail": "7 shipped source/test markers verified on the Mini"
         },
         {
-          "type": "mini_click",
-          "detail": "Mini interaction transcript for settings-shortcuts-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json"
+          "type": "mini_runtime",
+          "detail": "Mini runtime metadata for settings-shortcuts-actions",
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json"
         },
         {
           "type": "screenshot",
@@ -426,42 +449,44 @@
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for settings-shortcuts-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for settings-shortcuts-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         }
       ]
     },
     "snippets-management-actions": {
-      "status": "passed",
+      "coverage_status": "covered",
+      "completion_scope": "structured_coverage_only",
       "proof_level": "fixture_completion",
       "functional_state": {
         "status": "established",
         "detail": "Seeded clipboard history with representative text, URL, code, image, snippet, collection, tag, and paste-stack items. Load deterministic clipboard/history fixtures before opening customer surfaces. Restore fixture history after destructive row, stack, or clear actions. Tests/Fixtures/customer-ui/clipboard-history/"
       },
-      "inputs": [
+      "declared_inputs": [
         "Search snippets, add a snippet, edit it, duplicate it, delete it, copy for manual paste, paste now, and fill placeholder values.",
         "Verify Basic users see a Pro gate and can reach the Snippets settings surface."
       ],
-      "output_assertions": [
+      "covered_assertions": [
         "Snippet mutations persist through SnippetManager.",
         "Paste actions use ClipboardManager when available.",
         "Placeholder prompts can be canceled without changing the pasteboard."
       ],
       "workflow": {
         "runner": "scripts/customer_ui_action_sweep.rb",
-        "outcome": "Snippets can search, add, edit, duplicate, delete, copy, paste, and fill placeholders passed with structured Mini evidence",
-        "steps_completed": [
+        "outcome": "Snippets can search, add, edit, duplicate, delete, copy, paste, and fill placeholders covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
+        "completion_scope": "structured_coverage_only",
+        "steps_covered": [
           "Search snippets, add a snippet, edit it, duplicate it, delete it, copy for manual paste, paste now, and fill placeholder values.",
           "Verify Basic users see a Pro gate and can reach the Snippets settings surface."
         ],
         "artifacts": [
           "docs/images/screenshot-snippets.png",
-          "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260704T051045Z/settings-state-receipt.json"
+          "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/settings-state-receipt.json"
         ]
       },
       "evidence": [
@@ -477,39 +502,41 @@
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for snippets-management-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json"
         },
         {
           "type": "state_receipt",
           "detail": "State receipt for snippets-management-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/settings-state-receipt.json"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/settings-state-receipt.json"
         }
       ]
     },
     "storage-stats-actions": {
-      "status": "passed",
+      "coverage_status": "covered",
+      "completion_scope": "structured_coverage_only",
       "proof_level": "runtime_visual",
       "functional_state": {
         "status": "established",
         "detail": "Seeded clipboard history with representative text, URL, code, image, snippet, collection, tag, and paste-stack items. Load deterministic clipboard/history fixtures before opening customer surfaces. Restore fixture history after destructive row, stack, or clear actions. Tests/Fixtures/customer-ui/clipboard-history/"
       },
-      "inputs": [
+      "declared_inputs": [
         "Open Storage settings.",
         "Verify total items, pinned count, storage size, and type breakdown render from ClipboardManager state."
       ],
-      "output_assertions": [
+      "covered_assertions": [
         "Storage stats handle empty and populated histories.",
         "Type icons match text, link, code, long text, and image categories."
       ],
       "workflow": {
         "runner": "scripts/customer_ui_action_sweep.rb",
-        "outcome": "Storage tab renders item counts, pinned count, file size, and item type breakdown passed with structured Mini evidence",
-        "steps_completed": [
+        "outcome": "Storage tab renders item counts, pinned count, file size, and item type breakdown covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
+        "completion_scope": "structured_coverage_only",
+        "steps_covered": [
           "Open Storage settings.",
           "Verify total items, pinned count, storage size, and type breakdown render from ClipboardManager state."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json",
           "docs/images/screenshot-storage.png"
         ]
       },
@@ -519,9 +546,9 @@
           "detail": "5 shipped source/test markers verified on the Mini"
         },
         {
-          "type": "mini_click",
-          "detail": "Mini interaction transcript for storage-stats-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json"
+          "type": "mini_runtime",
+          "detail": "Mini runtime metadata for storage-stats-actions",
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json"
         },
         {
           "type": "screenshot",
@@ -531,35 +558,37 @@
       ]
     },
     "sync-settings-actions": {
-      "status": "passed",
+      "coverage_status": "covered",
+      "completion_scope": "structured_coverage_only",
       "proof_level": "fixture_completion",
       "functional_state": {
         "status": "established",
         "detail": "Seeded clipboard history with representative text, URL, code, image, snippet, collection, tag, and paste-stack items. Load deterministic clipboard/history fixtures before opening customer surfaces. Restore fixture history after destructive row, stack, or clear actions. Tests/Fixtures/customer-ui/clipboard-history/"
       },
-      "inputs": [
+      "declared_inputs": [
         "Open Sync settings in a sync-enabled build.",
         "Verify the sync toggle, status rows, connected-device list, privacy copy, and Reset Sync confirmation surface.",
         "Do not claim CloudKit network completion unless a fixture or sync run proves it."
       ],
-      "output_assertions": [
+      "covered_assertions": [
         "Sync UI is compiled only behind ENABLE_SYNC.",
         "Reset Sync requires confirmation and preserves local history.",
         "CloudKit behavior is proven by unit fixtures or left as an explicit external-service boundary."
       ],
       "workflow": {
         "runner": "scripts/customer_ui_action_sweep.rb",
-        "outcome": "iCloud sync settings verify safe controls, diagnostics, devices, and reset confirmation passed with structured Mini evidence",
-        "steps_completed": [
+        "outcome": "iCloud sync settings verify safe controls, diagnostics, devices, and reset confirmation covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
+        "completion_scope": "structured_coverage_only",
+        "steps_covered": [
           "Open Sync settings in a sync-enabled build.",
           "Verify the sync toggle, status rows, connected-device list, privacy copy, and Reset Sync confirmation surface.",
           "Do not claim CloudKit network completion unless a fixture or sync run proves it."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json",
           "docs/images/product-hunt-gallery-02.png",
-          "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -568,9 +597,9 @@
           "detail": "6 shipped source/test markers verified on the Mini"
         },
         {
-          "type": "mini_click",
-          "detail": "Mini interaction transcript for sync-settings-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json"
+          "type": "mini_runtime",
+          "detail": "Mini runtime metadata for sync-settings-actions",
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json"
         },
         {
           "type": "screenshot",
@@ -580,12 +609,12 @@
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for sync-settings-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for sync-settings-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         },
         {
           "type": "external_boundary",
@@ -594,35 +623,37 @@
       ]
     },
     "onboarding-permission-pro-gates": {
-      "status": "passed",
-      "proof_level": "full_runtime_completion",
+      "coverage_status": "covered",
+      "completion_scope": "structured_coverage_only",
+      "proof_level": "runtime_visual",
       "functional_state": {
         "status": "established",
         "detail": "Seeded clipboard history with representative text, URL, code, image, snippet, collection, tag, and paste-stack items. Load deterministic clipboard/history fixtures before opening customer surfaces. Restore fixture history after destructive row, stack, or clear actions. Tests/Fixtures/customer-ui/clipboard-history/"
       },
-      "inputs": [
+      "declared_inputs": [
         "Verify welcome copy lists Basic and Pro capabilities.",
         "Verify Accessibility and Screen Recording permission actions open safe first surfaces.",
         "Verify Basic users are not blocked from the app and Pro gates appear for Pro-only features."
       ],
-      "output_assertions": [
+      "covered_assertions": [
         "Permission copy names the actual features that need access.",
         "First-launch onboarding resumes on the permission page after restart.",
         "License, unlock, and restore purchase surfaces are reachable without hidden hard gates."
       ],
       "workflow": {
         "runner": "scripts/customer_ui_action_sweep.rb",
-        "outcome": "Onboarding, permissions, and Basic/Pro gates match shipped capabilities passed with structured Mini evidence",
-        "steps_completed": [
+        "outcome": "Onboarding, permissions, and Basic/Pro gates match shipped capabilities covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
+        "completion_scope": "structured_coverage_only",
+        "steps_covered": [
           "Verify welcome copy lists Basic and Pro capabilities.",
           "Verify Accessibility and Screen Recording permission actions open safe first surfaces.",
           "Verify Basic users are not blocked from the app and Pro gates appear for Pro-only features."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json",
           "docs/images/product-hunt-gallery-03.png",
-          "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -631,9 +662,9 @@
           "detail": "8 shipped source/test markers verified on the Mini"
         },
         {
-          "type": "mini_click",
-          "detail": "Mini interaction transcript for onboarding-permission-pro-gates",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json"
+          "type": "mini_runtime",
+          "detail": "Mini runtime metadata for onboarding-permission-pro-gates",
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json"
         },
         {
           "type": "screenshot",
@@ -643,43 +674,45 @@
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for onboarding-permission-pro-gates",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for onboarding-permission-pro-gates",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         }
       ]
     },
     "ios-widget-extension-actions": {
-      "status": "passed",
+      "coverage_status": "covered",
+      "completion_scope": "structured_coverage_only",
       "proof_level": "fixture_completion",
       "functional_state": {
         "status": "established",
         "detail": "Seeded clipboard history with representative text, URL, code, image, snippet, collection, tag, and paste-stack items. Load deterministic clipboard/history fixtures before opening customer surfaces. Restore fixture history after destructive row, stack, or clear actions. Tests/Fixtures/customer-ui/clipboard-history/"
       },
-      "inputs": [
+      "declared_inputs": [
         "Verify iOS history, pinned, settings, share extension, widget, and Shortcut entry points are present in source/tests.",
         "Do not mark iOS device or CloudKit runtime completion unless a device/simulator fixture actually ran."
       ],
-      "output_assertions": [
+      "covered_assertions": [
         "Customer-visible companion app and extension surfaces compile from their source of truth.",
         "Intent commands are parsed and guarded by tests.",
         "Runtime device verification remains a separate blocker if no fixture is available."
       ],
       "workflow": {
         "runner": "scripts/customer_ui_action_sweep.rb",
-        "outcome": "iOS app, share extension, widgets, and App Intents expose customer actions safely passed with structured Mini evidence",
-        "steps_completed": [
+        "outcome": "iOS app, share extension, widgets, and App Intents expose customer actions safely covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
+        "completion_scope": "structured_coverage_only",
+        "steps_covered": [
           "Verify iOS history, pinned, settings, share extension, widget, and Shortcut entry points are present in source/tests.",
           "Do not mark iOS device or CloudKit runtime completion unless a device/simulator fixture actually ran."
         ],
         "artifacts": [
-          "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json",
           "docs/images/screenshot-ios-history-dark.png",
-          "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json",
-          "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json",
+          "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         ]
       },
       "evidence": [
@@ -688,9 +721,9 @@
           "detail": "8 shipped source/test markers verified on the Mini"
         },
         {
-          "type": "mini_click",
-          "detail": "Mini interaction transcript for ios-widget-extension-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json"
+          "type": "mini_runtime",
+          "detail": "Mini runtime metadata for ios-widget-extension-actions",
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json"
         },
         {
           "type": "screenshot",
@@ -700,12 +733,12 @@
         {
           "type": "fixture",
           "detail": "Established representative clipboard fixture state for ios-widget-extension-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json"
         },
         {
           "type": "log",
           "detail": "Runtime log for ios-widget-extension-actions",
-          "path": "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+          "path": "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
         },
         {
           "type": "external_boundary",
@@ -715,12 +748,19 @@
     }
   },
   "screenshots": [
+    "outputs/capture-renders/history-smart-clear-render.png",
+    "outputs/capture-renders/settings-general-render.png",
+    "outputs/capture-renders/settings-shortcuts-render.png",
+    "outputs/capture-renders/settings-snippets-render.png",
+    "outputs/capture-renders/settings-storage-render.png",
+    "outputs/capture-renders/settings-sync-render.png",
+    "outputs/capture-renders/settings-about-render.png",
     "docs/images/screenshot-menu.png",
     "docs/images/appstore-mac-popover.png",
-    "docs/images/screenshot-popover.png",
-    "docs/images/product-hunt-gallery-01.png",
+    "outputs/capture-renders/glenn-1012-keep-open-pin-visible-before-paste.png",
+    "outputs/capture-renders/glenn-1012-floating-reopened-merge-queue-retains-3.png",
     "docs/images/appstore-mac-settings.png",
-    "docs/images/screenshot-settings.png",
+    "outputs/capture-renders/glenn-1013-pause-countdown-visible-while-idle.png",
     "docs/images/screenshot-shortcuts.png",
     "docs/images/screenshot-snippets.png",
     "docs/images/screenshot-storage.png",
@@ -729,10 +769,10 @@
     "docs/images/screenshot-ios-history-dark.png"
   ],
   "evidence": {
-    "app_version": "2.3.14",
-    "app_build": "2314",
-    "sweep_started_at": "2026-07-04T05:10:45Z",
-    "sweep_mode": "Mini structured customer-surface proof with explicit external-boundary scoping; no destructive user-data mutation.",
+    "app_version": "2.3.15",
+    "app_build": "2315",
+    "sweep_started_at": "2026-07-04T13:50:18Z",
+    "sweep_mode": "Mini structured customer-surface coverage with explicit external-boundary scoping; no destructive user-data mutation and no fake live click proof.",
     "transcript": [
       "source_guard=status-menu-dock-core-actions ok checks=8",
       "source_guard=history-search-filter-navigation ok checks=7",
@@ -746,13 +786,13 @@
       "source_guard=sync-settings-actions ok checks=6",
       "source_guard=onboarding-permission-pro-gates ok checks=8",
       "source_guard=ios-widget-extension-actions ok checks=8",
-      "screenshot_fixtures=docs/images/screenshot-menu.png, docs/images/appstore-mac-popover.png, docs/images/screenshot-popover.png, docs/images/product-hunt-gallery-01.png, docs/images/appstore-mac-settings.png, docs/images/screenshot-settings.png, docs/images/screenshot-shortcuts.png, docs/images/screenshot-snippets.png, docs/images/screenshot-storage.png, docs/images/product-hunt-gallery-02.png, docs/images/product-hunt-gallery-03.png, docs/images/screenshot-ios-history-dark.png"
+      "screenshot_fixtures=outputs/capture-renders/history-smart-clear-render.png, outputs/capture-renders/settings-general-render.png, outputs/capture-renders/settings-shortcuts-render.png, outputs/capture-renders/settings-snippets-render.png, outputs/capture-renders/settings-storage-render.png, outputs/capture-renders/settings-sync-render.png, outputs/capture-renders/settings-about-render.png, docs/images/screenshot-menu.png, docs/images/appstore-mac-popover.png, outputs/capture-renders/glenn-1012-keep-open-pin-visible-before-paste.png, outputs/capture-renders/glenn-1012-floating-reopened-merge-queue-retains-3.png, docs/images/appstore-mac-settings.png, outputs/capture-renders/glenn-1013-pause-countdown-visible-while-idle.png, docs/images/screenshot-shortcuts.png, docs/images/screenshot-snippets.png, docs/images/screenshot-storage.png, docs/images/product-hunt-gallery-02.png, docs/images/product-hunt-gallery-03.png, docs/images/screenshot-ios-history-dark.png"
     ],
     "artifacts": {
-      "mini_click": "outputs/customer-ui/sweep-20260704T051045Z/mini-click-transcript.json",
-      "fixture": "outputs/customer-ui/sweep-20260704T051045Z/fixture-state.json",
-      "state_receipt": "outputs/customer-ui/sweep-20260704T051045Z/settings-state-receipt.json",
-      "runtime_log": "outputs/customer-ui/sweep-20260704T051045Z/customer-action-runtime.log"
+      "mini_runtime": "outputs/customer-ui/sweep-20260704T135018Z/mini-runtime-evidence.json",
+      "fixture": "outputs/customer-ui/sweep-20260704T135018Z/fixture-state.json",
+      "state_receipt": "outputs/customer-ui/sweep-20260704T135018Z/settings-state-receipt.json",
+      "runtime_log": "outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log"
     },
     "external_boundaries": {
       "capture-screenshot-text-actions": "ScreenCaptureKit picker and Screen Recording permission require a human/system permission surface; this sweep verifies menu, shortcut, permission-copy, service, OCR, and preview fixtures only.",

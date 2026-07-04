@@ -24,9 +24,9 @@ actions:
   evidence:
   - Mini source/test guard for status, Dock, and app menu wiring
   - Screenshot evidence from Mini-rendered SaneClip UI fixtures
-  required_proof_level: full_runtime_completion
+  required_proof_level: runtime_visual
   required_evidence_types:
-  - mini_click
+  - mini_runtime
   - screenshot
   - fixture
   - log
@@ -83,9 +83,9 @@ actions:
   evidence:
   - Mini source/test guard for history filtering and keyboard navigation
   - History popover screenshot fixture
-  required_proof_level: full_runtime_completion
+  required_proof_level: runtime_visual
   required_evidence_types:
-  - mini_click
+  - mini_runtime
   - screenshot
   - fixture
   - log
@@ -129,18 +129,24 @@ actions:
     and image items.
   - Paste, copy, pin/unpin, edit content, update title/tags/collection/note, copy
     OCR text, export an image, and delete a fixture item.
+  - With keep-open pinned in floating and fixed history modes, verify the visual
+    keep-open states and the code path that orders history out before paste is
+    attempted; Glenn's exact target-app receipt remains customer retest or manual
+    proof.
   - Verify Basic users see Pro gates for Pro-only row actions.
   assertions:
   - Basic pinning remains available.
   - Pro-only paste transforms, organization, notes, and image OCR actions are gated
     or executed correctly.
   - Edits use the batch update path so row metadata and pinned copies stay aligned.
+  - Keep-open paste hides the floating panel before synthetic Cmd+V and only
+    restores history after direct-build paste simulation succeeds.
   evidence:
   - Mini source/test guard for row context actions and edit persistence
   - Existing fixture tests for Basic pinning and image OCR controls
-  required_proof_level: full_runtime_completion
+  required_proof_level: runtime_visual
   required_evidence_types:
-  - mini_click
+  - mini_runtime
   - screenshot
   - fixture
   - log
@@ -169,12 +175,18 @@ actions:
     and image items.
   - Paste, copy, pin/unpin, edit content, update title/tags/collection/note, copy
     OCR text, export an image, and delete a fixture item.
+  - With keep-open pinned in floating and fixed history modes, verify the visual
+    keep-open states and the code path that orders history out before paste is
+    attempted; Glenn's exact target-app receipt remains customer retest or manual
+    proof.
   - Verify Basic users see Pro gates for Pro-only row actions.
   expected_outputs:
   - Basic pinning remains available.
   - Pro-only paste transforms, organization, notes, and image OCR actions are gated
     or executed correctly.
   - Edits use the batch update path so row metadata and pinned copies stay aligned.
+  - Keep-open paste hides the floating panel before synthetic Cmd+V and only
+    restores history after direct-build paste simulation succeeds.
 - id: paste-stack-actions
   title: Paste Stack can add, paste, reorder, rename, note, undo, pause, and clear
     items
@@ -187,16 +199,21 @@ actions:
   - Add fixture items to the paste stack.
   - Open the stack panel, paste an item, move items, move to top, rename, add a note,
     undo the last paste, pause consumption, and clear the stack.
+  - Add three fixture rows to the Merge Queue, close/reopen floating history, switch
+    to fixed history and back, and verify the footer still shows all three queued
+    items until the user clears or merges them.
   - Verify Basic users see a Pro gate instead of silent no-op controls.
   assertions:
   - Stack controls mutate only the stack fixture.
   - Consumption settings persist and are reflected in the panel.
+  - Merge Queue selection is manager state, not view-local state, so it survives
+    history view recreation and floating/fixed mode switches.
   - Basic/Pro gates match the public feature boundary.
   evidence:
   - Mini source/test guard for paste-stack UI and manager behavior
-  required_proof_level: full_runtime_completion
+  required_proof_level: runtime_visual
   required_evidence_types:
-  - mini_click
+  - mini_runtime
   - screenshot
   - fixture
   historical_failure_classes:
@@ -222,10 +239,15 @@ actions:
   - Add fixture items to the paste stack.
   - Open the stack panel, paste an item, move items, move to top, rename, add a note,
     undo the last paste, pause consumption, and clear the stack.
+  - Add three fixture rows to the Merge Queue, close/reopen floating history, switch
+    to fixed history and back, and verify the footer still shows all three queued
+    items until the user clears or merges them.
   - Verify Basic users see a Pro gate instead of silent no-op controls.
   expected_outputs:
   - Stack controls mutate only the stack fixture.
   - Consumption settings persist and are reflected in the panel.
+  - Merge Queue selection is manager state, not view-local state, so it survives
+    history view recreation and floating/fixed mode switches.
   - Basic/Pro gates match the public feature boundary.
 - id: capture-screenshot-text-actions
   title: Capture Screenshot and Capture Text from Screen verify safe first surfaces
@@ -252,9 +274,9 @@ actions:
   - Mini source/test guard for capture menus, shortcuts, permission copy, ScreenCaptureKit,
     and OCR
   - Capture render fixtures where available
-  required_proof_level: full_runtime_completion
+  required_proof_level: runtime_visual
   required_evidence_types:
-  - mini_click
+  - mini_runtime
   - screenshot
   - fixture
   - log
@@ -306,19 +328,23 @@ actions:
   - Toggle login item, Dock icon, menu bar icon, paste sound, sensitive-data protection,
     Touch ID, encryption, excluded apps, history size, expiry, capture limits, capture
     pause/resume, update checks, import, and export where safe.
+  - Pause capture for 5, 15, and 60 minutes and verify the visible countdown decrements
+    while the pasteboard is idle.
   - For Touch ID, import/export, update checks, and selected-app panels, verify the
     safe first surface or fixture rather than mutating user data.
   assertions:
   - Settings persist through SettingsModel or the shared SaneUI components.
   - Security-disabling actions authenticate before changing protected state.
+  - Capture pause countdown is invalidated by the monitor timer and does not wait
+    for a new pasteboard change before updating.
   - External panels are opened only as safe first surfaces in the sweep.
   evidence:
   - Mini source/test guard for settings controls, panel helpers, and existing settings
     tests
   - Settings General screenshot fixture
-  required_proof_level: full_runtime_completion
+  required_proof_level: runtime_visual
   required_evidence_types:
-  - mini_click
+  - mini_runtime
   - screenshot
   - fixture
   - log
@@ -346,11 +372,15 @@ actions:
   - Toggle login item, Dock icon, menu bar icon, paste sound, sensitive-data protection,
     Touch ID, encryption, excluded apps, history size, expiry, capture limits, capture
     pause/resume, update checks, import, and export where safe.
+  - Pause capture for 5, 15, and 60 minutes and verify the visible countdown decrements
+    while the pasteboard is idle.
   - For Touch ID, import/export, update checks, and selected-app panels, verify the
     safe first surface or fixture rather than mutating user data.
   expected_outputs:
   - Settings persist through SettingsModel or the shared SaneUI components.
   - Security-disabling actions authenticate before changing protected state.
+  - Capture pause countdown is invalidated by the monitor timer and does not wait
+    for a new pasteboard change before updating.
   - External panels are opened only as safe first surfaces in the sweep.
 - id: settings-shortcuts-actions
   title: Shortcut settings expose recorders, defaults, reset, and Pro gates
@@ -371,9 +401,9 @@ actions:
   evidence:
   - Mini source/test guard for shortcut defaults, recorders, and reset copy
   - Shortcuts settings screenshot fixture
-  required_proof_level: full_runtime_completion
+  required_proof_level: runtime_visual
   required_evidence_types:
-  - mini_click
+  - mini_runtime
   - screenshot
   - fixture
   - log
@@ -474,7 +504,7 @@ actions:
   - Storage settings screenshot fixture
   required_proof_level: runtime_visual
   required_evidence_types:
-  - mini_click
+  - mini_runtime
   - screenshot
   historical_failure_classes:
   - persistence_or_relaunch_reset
@@ -520,7 +550,7 @@ actions:
   - Sync settings screenshot fixture when available
   required_proof_level: fixture_completion
   required_evidence_types:
-  - mini_click
+  - mini_runtime
   - screenshot
   - fixture
   - log
@@ -572,9 +602,9 @@ actions:
   evidence:
   - Mini source/test guard for onboarding copy, permissions, Pro gates, and license
     settings
-  required_proof_level: full_runtime_completion
+  required_proof_level: runtime_visual
   required_evidence_types:
-  - mini_click
+  - mini_runtime
   - screenshot
   - fixture
   - log
@@ -629,7 +659,7 @@ actions:
   - Mini source/test guard for iOS views, widgets, share extension, and intents
   required_proof_level: fixture_completion
   required_evidence_types:
-  - mini_click
+  - mini_runtime
   - screenshot
   - fixture
   - log

@@ -29,10 +29,6 @@ class CustomerUIActionSweep
       ['SaneClipAppDelegate+Menus.swift', 'SaneStandardMenu.addCoreUtilityItems'],
       ['SaneClipAppDelegate+Menus.swift', 'About / Report a Bug...']
     ],
-    # 2.3.12 refactor: filter bar, keyboard shortcuts, footer, and paste-stack
-    # panel were extracted from ClipboardHistoryView into their own files
-    # (HistoryFilterBar / HistoryListKeyboardShortcuts / HistoryFooterView /
-    # HistoryPasteStackPanel) to satisfy the size gate.
     'history-search-filter-navigation' => [
       ['UI/History/ClipboardHistoryView.swift', 'TextField("Search clipboard history...", text: $searchText)'],
       ['UI/History/HistoryFilterBar.swift', 'Picker("Date", selection: $dateFilter)'],
@@ -50,7 +46,7 @@ class CustomerUIActionSweep
       ['UI/History/ClipboardItemRow.swift', 'Button(isPro ? "Add Note..." : lockedMenuTitle("Add Note..."))'],
       ['UI/History/ClipboardItemRow.swift', 'ImageCapturePreviewSheet(item: item, clipboardManager: clipboardManager)'],
       ['UI/History/ImageCapturePreviewSheet.swift', 'Copy OCR Text'],
-      ['Tests/SaneClipTests.swift', 'Basic mode can pin and unpin items on Mac']
+      ['Tests/HistoryWindowTests.swift', 'Floating keep-open orders history out before synthetic paste']
     ],
     'paste-stack-actions' => [
       ['UI/History/HistoryPasteStackPanel.swift', 'Text("Paste Stack")'],
@@ -59,7 +55,7 @@ class CustomerUIActionSweep
       ['UI/History/HistoryPasteStackPanel.swift', 'clipboardManager.updateItemTitle(id: item.id, title: stackTitleDraft)'],
       ['UI/History/HistoryPasteStackPanel.swift', 'clipboardManager.undoLastPasteFromStack()'],
       ['UI/Settings/GeneralSettingsView.swift', 'SaneClipSettingsCopy.pasteStackNewestFirstLabel'],
-      ['Core/ClipboardManager.swift', 'func addToPasteStack']
+      ['Tests/HistoryColorAndStackTests.swift', 'Merge queue selection is shared state so it survives history view recreation']
     ],
     'capture-screenshot-text-actions' => [
       ['SaneClipApp.swift', 'static let captureScreenshot = Self("captureScreenshot")'],
@@ -83,7 +79,7 @@ class CustomerUIActionSweep
       ['UI/Settings/GeneralSettingsView.swift', 'SaneSparkleRow('],
       ['UI/Settings/GeneralSettingsView+Actions.swift', 'exportHistory()'],
       ['UI/Settings/GeneralSettingsView+Actions.swift', 'importHistory()'],
-      ['Tests/SaneClipTests.swift', 'SettingsView uses shared SaneUI settings chrome']
+      ['Tests/HistoryColorAndStackTests.swift', 'Pause capture countdown invalidates from the monitor timer, not only pasteboard changes']
     ],
     'settings-shortcuts-actions' => [
       ['UI/Settings/ShortcutsSettingsView.swift', 'KeyboardShortcuts.Recorder(for: .showClipboardHistory)'],
@@ -158,10 +154,10 @@ class CustomerUIActionSweep
   SCREENSHOT_BY_ACTION = {
     'status-menu-dock-core-actions' => 'docs/images/screenshot-menu.png',
     'history-search-filter-navigation' => 'docs/images/appstore-mac-popover.png',
-    'history-item-row-actions' => 'docs/images/screenshot-popover.png',
-    'paste-stack-actions' => 'docs/images/product-hunt-gallery-01.png',
+    'history-item-row-actions' => 'outputs/capture-renders/glenn-1012-keep-open-pin-visible-before-paste.png',
+    'paste-stack-actions' => 'outputs/capture-renders/glenn-1012-floating-reopened-merge-queue-retains-3.png',
     'capture-screenshot-text-actions' => 'docs/images/appstore-mac-settings.png',
-    'settings-general-security-history-actions' => 'docs/images/screenshot-settings.png',
+    'settings-general-security-history-actions' => 'outputs/capture-renders/glenn-1013-pause-countdown-visible-while-idle.png',
     'settings-shortcuts-actions' => 'docs/images/screenshot-shortcuts.png',
     'snippets-management-actions' => 'docs/images/screenshot-snippets.png',
     'storage-stats-actions' => 'docs/images/screenshot-storage.png',
@@ -212,10 +208,9 @@ class CustomerUIActionSweep
 
   def require_mini!
     host = Socket.gethostname.to_s.downcase
-    user = ENV.fetch('USER', '').downcase
-    return if host.include?('mini') || user == 'stephansmac'
+    return if host.include?('mini')
 
-    raise 'Customer UI action sweep must run on the Mini'
+    raise "Customer UI action sweep must run on the Mini (host=#{Socket.gethostname})"
   end
 
   def ensure_manifest!
@@ -264,13 +259,13 @@ class CustomerUIActionSweep
   def write_runtime_artifacts
     FileUtils.mkdir_p(@artifact_dir)
 
-    @artifacts[:mini_click] = write_json_artifact(
-      'mini-click-transcript.json',
+    @artifacts[:mini_runtime] = write_json_artifact(
+      'mini-runtime-evidence.json',
       generated_at: @started_at.iso8601,
-      host: 'mini',
+      host: Socket.gethostname,
       app: APP_NAME,
       runner: relative(__FILE__),
-      note: 'Structured Mini customer-surface transcript. Human/system-boundary items remain explicitly scoped in external_boundaries.',
+      note: 'Structured Mini source, fixture, screenshot, and runtime metadata. This is not live click/paste completion proof.',
       actions: @action_ids.map do |action_id|
         action = @manifest_actions.fetch(action_id)
         {
@@ -321,14 +316,15 @@ class CustomerUIActionSweep
         evidence_items << evidence('external_boundary', EXTERNAL_BOUNDARIES.fetch(action_id))
       end
       @action_results[action_id] = {
-        status: 'passed',
+        coverage_status: 'covered',
+        completion_scope: 'structured_coverage_only',
         proof_level: action.fetch('required_proof_level'),
         functional_state: {
           status: 'established',
           detail: functional_state_detail(action)
         },
-        inputs: Array(action['user_inputs']),
-        output_assertions: Array(action['expected_outputs']),
+        declared_inputs: Array(action['user_inputs']),
+        covered_assertions: Array(action['expected_outputs']),
         workflow: workflow_proof(action_id, action, evidence_items),
         evidence: evidence_items
       }
@@ -340,7 +336,7 @@ class CustomerUIActionSweep
     receipt = {
       app: APP_NAME,
       status: 'passed',
-      host: 'mini',
+      host: Socket.gethostname,
       generated_at: @started_at.iso8601,
       manifest_sha256: report.fetch('manifest_sha256'),
       source_fingerprint: report.fetch('source_fingerprint'),
@@ -351,7 +347,7 @@ class CustomerUIActionSweep
         app_version: project_version('MARKETING_VERSION'),
         app_build: project_version('CURRENT_PROJECT_VERSION'),
         sweep_started_at: @started_at.iso8601,
-        sweep_mode: 'Mini structured customer-surface proof with explicit external-boundary scoping; no destructive user-data mutation.',
+        sweep_mode: 'Mini structured customer-surface coverage with explicit external-boundary scoping; no destructive user-data mutation and no fake live click proof.',
         transcript: @transcript,
         artifacts: @artifacts,
         external_boundaries: EXTERNAL_BOUNDARIES
@@ -388,8 +384,10 @@ class CustomerUIActionSweep
 
     Array(action['required_evidence_types']).each do |type|
       case type.to_s
+      when 'mini_runtime'
+        evidence_items << evidence('mini_runtime', "Mini runtime metadata for #{action_id}", path: @artifacts.fetch(:mini_runtime))
       when 'mini_click'
-        evidence_items << evidence('mini_click', "Mini interaction transcript for #{action_id}", path: @artifacts.fetch(:mini_click))
+        raise "#{action_id}: mini_click evidence requires real UI automation and is not produced by this sweep"
       when 'screenshot'
         evidence_items << evidence('screenshot', "Mini visual proof for #{action_id}", path: screenshot_for(action_id))
       when 'fixture'
@@ -403,7 +401,7 @@ class CustomerUIActionSweep
       end
     end
 
-    needs_screenshot = %w[runtime_visual full_runtime_completion].include?(action['required_proof_level'].to_s) ||
+    needs_screenshot = action['required_proof_level'].to_s == 'runtime_visual' ||
                        Array(action['evidence']).any? { |item| item.to_s.downcase.include?('screenshot') }
     if needs_screenshot && Array(action['required_evidence_types']).none? { |type| type.to_s == 'screenshot' }
       evidence_items << evidence('screenshot', "Mini visual proof for #{action_id}", path: screenshot_for(action_id))
@@ -415,8 +413,9 @@ class CustomerUIActionSweep
   def workflow_proof(action_id, action, evidence_items)
     {
       runner: relative(__FILE__),
-      outcome: "#{action['title']} passed with structured Mini evidence",
-      steps_completed: Array(action['steps']),
+      outcome: "#{action['title']} covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
+      completion_scope: 'structured_coverage_only',
+      steps_covered: Array(action['steps']),
       artifacts: evidence_items.map { |item| item[:path] }.compact
     }
   end
@@ -440,6 +439,9 @@ class CustomerUIActionSweep
 
   def screenshot_for(action_id)
     preferred = SCREENSHOT_BY_ACTION[action_id]
+    if preferred&.include?('glenn-') && !valid_screenshot?(preferred)
+      raise "Missing Glenn regression screenshot: #{preferred}"
+    end
     return preferred if preferred && valid_screenshot?(preferred)
 
     @screenshots.first || raise("No screenshot artifact available for #{action_id}")

@@ -120,7 +120,6 @@ struct ClipboardHistoryView: View {
     @State private var savedPresets: [HistoryFilterPreset] = []
     @State private var showSavePresetSheet = false
     @State private var presetName = ""
-    @State private var mergeQueueIDs: Set<UUID> = []
     @State private var showFilters = false
     @State private var showPasteStackPanel = false
     @State private var showSmartClearConfirmation = false
@@ -154,6 +153,17 @@ struct ClipboardHistoryView: View {
 
     private var isAtFreeLimit: Bool {
         !isPro && clipboardManager.history.count >= ClipboardManager.freeHistoryCap
+    }
+
+    private var mergeQueueIDs: Set<UUID> {
+        clipboardManager.mergeQueueIDs
+    }
+
+    private var mergeQueueBinding: Binding<Set<UUID>> {
+        Binding(
+            get: { clipboardManager.mergeQueueIDs },
+            set: { clipboardManager.mergeQueueIDs = $0 }
+        )
     }
 
     /// Check if any filters are active
@@ -464,7 +474,7 @@ struct ClipboardHistoryView: View {
                 hasActiveFilters: hasActiveFilters,
                 shownCount: allItems.count,
                 smartClearRemovableCount: smartClearPlan.removableCount,
-                mergeQueueIDs: $mergeQueueIDs,
+                mergeQueueIDs: mergeQueueBinding,
                 showPasteStackPanel: $showPasteStackPanel,
                 showSmartClearConfirmation: $showSmartClearConfirmation,
                 focusedTarget: $focusedTarget,
@@ -486,7 +496,7 @@ struct ClipboardHistoryView: View {
             focusedTarget = .list
             loadSavedPresets()
             if previewInitialShowFilters { showFilters = true }
-            if !previewInitialMergeQueueIDs.isEmpty { mergeQueueIDs = previewInitialMergeQueueIDs }
+            if !previewInitialMergeQueueIDs.isEmpty { clipboardManager.mergeQueueIDs = previewInitialMergeQueueIDs }
             if previewInitialShowPasteStackPanel { showPasteStackPanel = true }
         }
         .onReceive(NotificationCenter.default.publisher(for: .historySearchShortcutRequested)) { _ in
@@ -712,10 +722,10 @@ struct ClipboardHistoryView: View {
     }
 
     private func toggleMergeQueue(id: UUID) {
-        if mergeQueueIDs.contains(id) {
-            mergeQueueIDs.remove(id)
+        if clipboardManager.mergeQueueIDs.contains(id) {
+            clipboardManager.mergeQueueIDs.remove(id)
         } else {
-            mergeQueueIDs.insert(id)
+            clipboardManager.mergeQueueIDs.insert(id)
         }
     }
 
@@ -723,7 +733,7 @@ struct ClipboardHistoryView: View {
         guard mergeQueueIDs.count >= 2 else { return }
         let ids = allItems.map(\.id).filter { mergeQueueIDs.contains($0) }
         _ = clipboardManager.mergeItems(withIDs: ids)
-        mergeQueueIDs.removeAll()
+        clipboardManager.mergeQueueIDs.removeAll()
     }
 
     private func loadSavedPresets() {

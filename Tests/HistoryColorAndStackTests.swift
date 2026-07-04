@@ -94,6 +94,112 @@ struct HistoryColorAndStackTests {
         #expect(urlSchemeSource.contains("clipboardManager.paste(item: item)"))
     }
 
+    @Test("Pause capture countdown invalidates from the monitor timer, not only pasteboard changes")
+    @MainActor
+    func pauseCaptureCountdownTicksWithoutPasteboardChange() {
+        let manager = ClipboardManager(startMonitoring: false, loadPersistedState: false, persistenceEnabled: false)
+        let now = Date()
+
+        #expect(ClipboardManager.capturePauseRemainingText(until: now.addingTimeInterval(65), now: now) == "1m 5s")
+        #expect(ClipboardManager.capturePauseRemainingText(until: now.addingTimeInterval(5), now: now) == "5s")
+        #expect(ClipboardManager.capturePauseRemainingText(until: now.addingTimeInterval(-1), now: now) == nil)
+
+        manager.pauseCapture(minutes: 5)
+        #expect(manager.capturePauseRemainingText != nil)
+        #expect(manager.refreshCapturePauseDisplayTick(now: Date().addingTimeInterval(2)))
+        manager.resumeCapture()
+        #expect(manager.capturePauseRemainingText == nil)
+    }
+
+    @Test("Merge queue selection is shared state so it survives history view recreation")
+    @MainActor
+    func mergeQueueSelectionSurvivesViewRecreation() {
+        let manager = ClipboardManager(startMonitoring: false, loadPersistedState: false, persistenceEnabled: false)
+        let items = (0 ..< 3).map { ClipboardItem(content: .text("queued \($0)")) }
+        manager.history = items
+        manager.mergeQueueIDs = Set(items.map(\.id))
+
+        let recreatedViewSelection = manager.mergeQueueIDs
+        #expect(recreatedViewSelection.count == 3)
+
+        _ = manager.removeHistoryItems(withIDs: [items[0].id])
+        #expect(!manager.mergeQueueIDs.contains(items[0].id))
+        #expect(manager.mergeQueueIDs.count == 2)
+    }
+
+    @Test("Merge queue drops IDs for items removed by trim and expiry")
+    @MainActor
+    func mergeQueueIDsPruneWhenHistoryItemsDisappear() {
+        let manager = ClipboardManager(startMonitoring: false, loadPersistedState: false, persistenceEnabled: false)
+        manager.licenseService = makeForcedProLicense()
+
+        let originalMax = SettingsModel.shared.maxHistorySize
+        let originalExpire = SettingsModel.shared.autoExpireHours
+        defer {
+            SettingsModel.shared.maxHistorySize = originalMax
+            SettingsModel.shared.autoExpireHours = originalExpire
+        }
+
+        SettingsModel.shared.maxHistorySize = 2
+        let oldQueued = ClipboardItem(content: .text("old queued"), timestamp: Date().addingTimeInterval(-300))
+        let newerQueued = ClipboardItem(content: .text("new queued"), timestamp: Date().addingTimeInterval(-200))
+        let freshItems = (0 ..< 2).map { ClipboardItem(content: .text("fresh \($0)")) }
+        manager.history = freshItems + [oldQueued, newerQueued]
+        manager.mergeQueueIDs = [oldQueued.id, newerQueued.id]
+
+        manager.enforceHistoryLimitIfNeeded(saveAfterTrim: false)
+        #expect(manager.mergeQueueIDs.isEmpty)
+
+        SettingsModel.shared.maxHistorySize = originalMax
+        SettingsModel.shared.autoExpireHours = 1
+        let expired = ClipboardItem(content: .text("expired"), timestamp: Date().addingTimeInterval(-7200))
+        let current = ClipboardItem(content: .text("current"))
+        manager.history = [current, expired]
+        manager.mergeQueueIDs = [expired.id]
+        manager.checkClipboardForTesting()
+        #expect(!manager.mergeQueueIDs.contains(expired.id))
+    }
+
+    @Test("Paste success sound waits for simulated paste success")
+    func pasteSuccessSoundWaitsForSimulation() throws {
+        let source = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/ClipboardManager.swift"),
+            encoding: .utf8
+        )
+
+        #expect(source.contains("let didPaste = self.simulatePaste()"))
+        #expect(source.contains("if didPaste {\n                    SettingsModel.shared.pasteSound.play()"))
+        #expect(source.contains("if didPaste && reopenPopoverAfterPaste {"))
+        #expect(!source.contains("SettingsModel.shared.pasteSound.play()\n        if dismissPopover"))
+    }
+
+    @Test("Customer UI proof sweep does not fake Mini click completion")
+    func customerUISweepProofContractRejectsFakeClickEvidence() throws {
+        let source = try String(
+            contentsOf: projectRootURL().appendingPathComponent("scripts/customer_ui_action_sweep.rb"),
+            encoding: .utf8
+        )
+        let manifest = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Tests/CustomerUIActions.yml"),
+            encoding: .utf8
+        )
+
+        #expect(!source.contains("user == 'stephansmac'"))
+        #expect(!source.contains("host: 'mini'"))
+        #expect(source.contains("Socket.gethostname"))
+        #expect(source.contains("mini_click evidence requires real UI automation"))
+        #expect(source.contains("coverage_status: 'covered'"))
+        #expect(source.contains("completion_scope: 'structured_coverage_only'"))
+        #expect(source.contains("covered_assertions: Array(action['expected_outputs'])"))
+        #expect(source.contains("steps_covered: Array(action['steps'])"))
+        #expect(!source.contains("output_assertions: Array(action['expected_outputs'])"))
+        #expect(!source.contains("steps_completed: Array(action['steps'])"))
+        #expect(!manifest.contains("mini_click"))
+        #expect(!manifest.contains("full_runtime_completion"))
+        #expect(manifest.contains("mini_runtime"))
+        #expect(manifest.contains("Glenn's exact target-app receipt remains customer retest or manual"))
+    }
+
     @Test("Glenn regressions pin edit footer and redraw Clipboard Rules toggles immediately")
     func glennEditAndClipboardRulesRegressionsAreCovered() throws {
         let rowSource = try String(

@@ -107,6 +107,7 @@ class ClipboardManager {
     var history: [ClipboardItem] = []
     var pinnedItems: [ClipboardItem] = []
     var pasteStack: [ClipboardItem] = []
+    var mergeQueueIDs: Set<UUID> = []
     var isPasteStackMode: Bool {
         !pasteStack.isEmpty
     }
@@ -158,6 +159,8 @@ class ClipboardManager {
     private var timer: Timer?
     private var ignoreNextCapture = false
     private var capturePausedUntil: Date?
+    private var capturePauseDisplayTick = 0
+    private var lastCapturePauseRemainingSecond: Int?
     private var maxHistorySize: Int {
         SettingsModel.shared.maxHistorySize
     }
@@ -175,8 +178,13 @@ class ClipboardManager {
     }
 
     var capturePauseRemainingText: String? {
-        guard isCapturePaused, let capturePausedUntil else { return nil }
-        let remaining = max(0, Int(capturePausedUntil.timeIntervalSinceNow))
+        _ = capturePauseDisplayTick
+        return Self.capturePauseRemainingText(until: capturePausedUntil)
+    }
+
+    nonisolated static func capturePauseRemainingText(until capturePausedUntil: Date?, now: Date = Date()) -> String? {
+        guard let capturePausedUntil, now < capturePausedUntil else { return nil }
+        let remaining = max(0, Int(capturePausedUntil.timeIntervalSince(now)))
         let minutes = remaining / 60
         let seconds = remaining % 60
         if minutes > 0 {
@@ -224,6 +232,7 @@ class ClipboardManager {
 
         // Cleanup expired items periodically
         cleanupExpiredItems()
+        refreshCapturePauseDisplayTick()
 
         let pasteboard = NSPasteboard.general
         guard pasteboard.changeCount != lastChangeCount else { return }
@@ -265,6 +274,12 @@ class ClipboardManager {
         processClipboardContent(pasteboard, sourceAppBundleID: sourceAppBundleID, sourceAppName: sourceAppName)
     }
 
+    #if DEBUG
+        func checkClipboardForTesting() {
+            checkClipboard()
+        }
+    #endif
+
     private func containsTransientTypes(_ pasteboard: NSPasteboard) -> Bool {
         guard let types = pasteboard.types else { return false }
 
@@ -287,10 +302,14 @@ class ClipboardManager {
 
         let cutoff = Date().addingTimeInterval(-Double(expireHours * 3600))
         let beforeCount = history.count
+        var removedIDs: Set<UUID> = []
 
         // Remove expired items, but preserve pinned items
         history.removeAll { item in
             let shouldRemove = !isPinned(item) && item.timestamp < cutoff
+            if shouldRemove {
+                removedIDs.insert(item.id)
+            }
             if shouldRemove, case .image = item.content {
                 deleteImageAssets(id: item.id)
             }
@@ -299,6 +318,7 @@ class ClipboardManager {
 
         let afterCount = history.count
         if afterCount < beforeCount {
+            mergeQueueIDs.subtract(removedIDs)
             saveHistory()
             logger.debug("Cleaned up \(beforeCount - afterCount) expired items")
         }
@@ -713,13 +733,38 @@ class ClipboardManager {
     func pauseCapture(minutes: Int) {
         guard minutes > 0 else {
             capturePausedUntil = nil
+            lastCapturePauseRemainingSecond = nil
+            capturePauseDisplayTick += 1
             return
         }
         capturePausedUntil = Date().addingTimeInterval(TimeInterval(minutes * 60))
+        lastCapturePauseRemainingSecond = nil
+        refreshCapturePauseDisplayTick()
     }
 
     func resumeCapture() {
         capturePausedUntil = nil
+        lastCapturePauseRemainingSecond = nil
+        capturePauseDisplayTick += 1
+    }
+
+    @discardableResult
+    func refreshCapturePauseDisplayTick(now: Date = Date()) -> Bool {
+        guard let capturePausedUntil else {
+            lastCapturePauseRemainingSecond = nil
+            return false
+        }
+        guard now < capturePausedUntil else {
+            self.capturePausedUntil = nil
+            lastCapturePauseRemainingSecond = nil
+            capturePauseDisplayTick += 1
+            return true
+        }
+        let remaining = max(0, Int(capturePausedUntil.timeIntervalSince(now)))
+        guard remaining != lastCapturePauseRemainingSecond else { return false }
+        lastCapturePauseRemainingSecond = remaining
+        capturePauseDisplayTick += 1
+        return true
     }
 
     func importCapturedImage(
@@ -879,7 +924,6 @@ class ClipboardManager {
             saveHistory()
         }
 
-        SettingsModel.shared.pasteSound.play()
         if dismissPopover {
             dismissAndPaste(reopenPopoverAfterPaste: reopenPopoverAfterPaste)
         }
@@ -921,7 +965,6 @@ class ClipboardManager {
             saveHistory()
         }
 
-        SettingsModel.shared.pasteSound.play()
         dismissAndPaste(reopenPopoverAfterPaste: reopenPopoverAfterPaste)
         return true
     }
@@ -959,7 +1002,6 @@ class ClipboardManager {
                 saveHistory()
             }
 
-            SettingsModel.shared.pasteSound.play()
             dismissAndPaste(reopenPopoverAfterPaste: reopenPopoverAfterPaste)
             return true
         } else {
@@ -1009,7 +1051,6 @@ class ClipboardManager {
             saveHistory()
         }
 
-        SettingsModel.shared.pasteSound.play()
         dismissAndPaste()
     }
 
@@ -1031,7 +1072,6 @@ class ClipboardManager {
 
         SnippetManager.shared.incrementUseCount(for: snippet)
 
-        SettingsModel.shared.pasteSound.play()
         dismissAndPaste()
     }
 
@@ -1250,8 +1290,11 @@ class ClipboardManager {
         #else
             Task { @MainActor in
                 try? await Task.sleep(for: .milliseconds(300))
-                self.simulatePaste()
-                if reopenPopoverAfterPaste {
+                let didPaste = self.simulatePaste()
+                if didPaste {
+                    SettingsModel.shared.pasteSound.play()
+                }
+                if didPaste && reopenPopoverAfterPaste {
                     NotificationCenter.default.post(name: .reopenHistoryAfterPaste, object: nil)
                 }
                 self.isPasting = false
@@ -1401,6 +1444,7 @@ class ClipboardManager {
         history.removeAll { $0.id == item.id }
         pinnedItems.removeAll { $0.id == item.id }
         pasteStack.removeAll { $0.id == item.id }
+        mergeQueueIDs.remove(item.id)
         saveHistory()
         savePasteStack()
 
@@ -1442,12 +1486,14 @@ class ClipboardManager {
             let syncLimit = effectiveHistoryLimit() ?? (maxHistorySize > 0 ? maxHistorySize : nil)
             if let syncLimit, history.count > syncLimit {
                 let removed = history.suffix(from: syncLimit)
+                let removedIDs = Set(removed.map(\.id))
                 for removedItem in removed {
                     if case .image = removedItem.content {
                         deleteImageAssets(id: removedItem.id)
                     }
                 }
                 history = Array(history.prefix(syncLimit))
+                mergeQueueIDs.subtract(removedIDs)
             }
 
             saveHistory()
@@ -1463,6 +1509,7 @@ class ClipboardManager {
             }
             history.removeAll { $0.id == itemID }
             pinnedItems.removeAll { $0.id == itemID }
+            mergeQueueIDs.remove(itemID)
             saveHistory()
             logger.debug("Deleted synced item: \(itemID)")
         }
@@ -1513,6 +1560,7 @@ class ClipboardManager {
 
         history.removeAll { !pinnedIDs.contains($0.id) }
         pasteStack.removeAll()
+        mergeQueueIDs.subtract(removedIDs)
         lastPastedFromStack = nil
         saveHistory()
         savePasteStack()
@@ -1537,6 +1585,7 @@ class ClipboardManager {
         history.removeAll { ids.contains($0.id) }
         pinnedItems.removeAll { ids.contains($0.id) }
         pasteStack.removeAll { ids.contains($0.id) }
+        mergeQueueIDs.subtract(ids)
         if let lastPastedFromStack, ids.contains(lastPastedFromStack.id) {
             self.lastPastedFromStack = nil
         }
@@ -2386,6 +2435,7 @@ class ClipboardManager {
         let kept = Array(history.prefix(effectiveMax))
         let keptIDs = Set(kept.map(\.id))
         let overflow = history.suffix(from: effectiveMax)
+        let removedIDs = Set(overflow.filter { !protectedIDs.contains($0.id) }.map(\.id))
 
         for item in overflow where !protectedIDs.contains(item.id) {
             if case .image = item.content {
@@ -2400,6 +2450,7 @@ class ClipboardManager {
         pinnedItems = pinnedItems.filter { pinned in
             history.contains { $0.id == pinned.id }
         }
+        mergeQueueIDs.subtract(removedIDs)
 
         if saveAfterTrim {
             saveHistory()

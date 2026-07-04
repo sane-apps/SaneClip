@@ -90,6 +90,85 @@ struct HistoryRenderTests {
     }
 
     @MainActor
+    @Test("Render Glenn 1012 and 1013 regression proof screenshots when requested")
+    func renderGlenn1012And1013ProofScreenshots() throws {
+        guard let rawDir = screenshotDir() else { return }
+        let outputDir = URL(
+            fileURLWithPath: NSString(string: rawDir).expandingTildeInPath,
+            isDirectory: true
+        )
+        try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
+
+        let proLicense = makeForcedProLicense()
+        let queuedManager = ClipboardManager(startMonitoring: false, loadPersistedState: false, persistenceEnabled: false)
+        queuedManager.history = [
+            ClipboardItem(content: .text("Glenn merge queue item 1"), sourceAppName: "Safari"),
+            ClipboardItem(content: .text("Glenn merge queue item 2"), sourceAppName: "Notes"),
+            ClipboardItem(content: .text("Glenn merge queue item 3"), sourceAppName: "TextEdit"),
+        ]
+        queuedManager.mergeQueueIDs = Set(queuedManager.history.map(\.id))
+
+        try renderHistoryPNG(
+            manager: queuedManager,
+            license: proLicense,
+            width: 411,
+            height: 718,
+            showFilters: false,
+            mergeIDs: [],
+            showStack: false,
+            to: outputDir.appendingPathComponent("glenn-1012-floating-reopened-merge-queue-retains-3.png")
+        )
+
+        try renderHistoryPNG(
+            manager: queuedManager,
+            license: proLicense,
+            width: 320,
+            height: 500,
+            showFilters: false,
+            mergeIDs: [],
+            showStack: false,
+            to: outputDir.appendingPathComponent("glenn-1012-fixed-switch-merge-queue-retains-3.png")
+        )
+
+        let settings = SettingsModel.shared
+        let originalKeepOpen = settings.keepPasteStackOpenBetweenPastes
+        settings.keepPasteStackOpenBetweenPastes = true
+        defer { settings.keepPasteStackOpenBetweenPastes = originalKeepOpen }
+        try renderHistoryPNG(
+            manager: makeManager(seed: .rich, withStack: false),
+            license: proLicense,
+            width: 411,
+            height: 718,
+            showFilters: false,
+            mergeIDs: [],
+            showStack: false,
+            to: outputDir.appendingPathComponent("glenn-1012-keep-open-pin-visible-before-paste.png")
+        )
+
+        let pausedManager = makeManager(seed: .rich, withStack: false)
+        pausedManager.pauseCapture(minutes: 5)
+        try renderHistoryPNG(
+            manager: pausedManager,
+            license: proLicense,
+            width: 411,
+            height: 718,
+            showFilters: false,
+            mergeIDs: [],
+            showStack: false,
+            to: outputDir.appendingPathComponent("glenn-1013-pause-countdown-visible-while-idle.png")
+        )
+
+        for filename in [
+            "glenn-1012-floating-reopened-merge-queue-retains-3.png",
+            "glenn-1012-fixed-switch-merge-queue-retains-3.png",
+            "glenn-1012-keep-open-pin-visible-before-paste.png",
+            "glenn-1013-pause-countdown-visible-while-idle.png",
+        ] {
+            #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent(filename).path))
+        }
+    }
+
+    @MainActor
     private func makeForcedProLicense() -> LicenseService {
         setenv("SANEAPPS_FORCE_PRO_MODE", "1", 1)
         let service = LicenseService(

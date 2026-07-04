@@ -6,6 +6,100 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+### 2026-07-04 ~09:12 — Glenn #1012/#1013 regression fix pass for 2.3.15; code/visual/sweep green, live row-click automation inconclusive; proof gate corrected
+
+State: Glenn reported three fresh 2.3.14 regressions after the July 4 release:
+floating keep-open/pinned history did not paste into the target app, fixed
+keep-open did not stay open after paste, Merge Queue state disappeared across
+floating/fixed close/switches, and Pause Capture countdown froze until a new
+pasteboard event. Threads reviewed with `check-inbox.sh review`: #1013,
+#1012, #1007, #994. Do not reply or resolve without the normal review/hash
+approval gate.
+
+Root causes fixed in code:
+- Floating keep-open returned early from `handleDismissForPaste`, leaving the
+  non-activating history panel visible/key during Cmd+V. It now always orders
+  the panel out before synthetic paste; reopen is handled by the existing
+  `.reopenHistoryAfterPaste` notification.
+- Merge Queue IDs lived in `ClipboardHistoryView @State`, so recreating the
+  floating/fixed hosting view lost the footer/count. The queue is now shared
+  manager state and is pruned on delete/clear.
+- Pause countdown was computed from `Date()` but no observable value changed
+  while the pasteboard was idle. The monitor timer now refreshes an observable
+  countdown tick before the unchanged-pasteboard early return.
+- Paste success sound no longer plays before `simulatePaste()` succeeds, and
+  direct builds no longer reopen keep-open history after a failed paste
+  simulation, so a blocked paste cannot sound or look successful.
+- Merge Queue IDs are now pruned when history entries disappear through delete,
+  clear, history-limit trim, expiry cleanup, and sync deletion/trim. The
+  executable regression test covers trim/expiry; source review covers the sync
+  paths because they compile only in sync-enabled builds.
+
+New durable gates:
+- `./scripts/SaneMaster.rb verify --timeout 900 --no-grant-permissions`
+  passed 215 tests on the Mini after the 2.3.15 version/project regeneration;
+  rerun after the proof-gate correction before shipping. Key tests now include:
+  `Floating keep-open orders history out before synthetic paste`, `Merge queue
+  selection is shared state so it survives history view recreation`, `Merge
+  queue drops IDs for items removed by trim and expiry`, `Customer UI proof
+  sweep does not fake Mini click completion`, `Pause capture countdown
+  invalidates from the monitor timer`, and `Paste success sound waits for
+  simulated paste success`.
+- Glenn visual receipts regenerated via `/tmp/saneclip_screenshot_dir.txt` into
+  `outputs/capture-renders/`: `glenn-1012-floating-reopened-merge-queue-retains-3.png`,
+  `glenn-1012-fixed-switch-merge-queue-retains-3.png`,
+  `glenn-1012-keep-open-pin-visible-before-paste.png`, and
+  `glenn-1013-pause-countdown-visible-while-idle.png`.
+- `Tests/CustomerUIActions.yml` now explicitly requires the missed classes:
+  keep-open floating/fixed focus handoff, Merge Queue persistence across view
+  recreation/mode switch, and idle Pause Capture countdown decrement. It no
+  longer claims live TextEdit receipt unless that proof actually exists.
+- `scripts/customer_ui_action_sweep.rb` now routes the affected actions to
+  Glenn-specific screenshots and hard-fails if those screenshots are missing.
+  It now refuses `mini_click` evidence, records the actual Mini hostname, and
+  writes `coverage_status: covered`, `covered_assertions`, and `steps_covered`
+  instead of per-action completed/passed claims. Final sweep after rebuild/launch
+  refreshed
+  `.sane/customer_ui_action_receipt.json`; runtime log
+  `outputs/live-logs/customer_ui_saneclip_20260704T134735Z.log`; visual smoke
+  receipt `outputs/visual_smoke/visual_smoke_20260704-094842_23241/`;
+  customer sweep transcript
+  `outputs/customer-ui/sweep-20260704T135018Z/customer-action-runtime.log`.
+
+Important limitation from aggressive live proof: attempts to drive the
+non-activating floating panel row click with Peekaboo/cliclick did not produce a
+valid TextEdit paste proof. Artifacts are under
+`outputs/live-click-proof-glenn-1012-1013-20260704-0845/`. The failed attempts
+showed automation opening layer-101 menus or targeting TextEdit underneath; do
+not cite them as a passed proof. A future release/reply should still get a real
+human or improved UI-automation row-click proof for Glenn's exact floating
+keep-open paste path.
+
+The macOS App Store 2.3.14 lane was withdrawn on 2026-07-04 after it was known
+bad (`WAITING_FOR_REVIEW` -> `DEVELOPER_REJECTED`), then retargeted with
+`appstore_submit.rb --preflight-version-state --repair-version-state` so the
+editable macOS lane is now 2.3.15 (`DEVELOPER_REJECTED`) and iOS 2.3.15 is
+clear. 2.3.15 is the intended replacement patch release for these regressions.
+Fresh coverage/evidence after the proof-gate correction:
+- `./scripts/SaneMaster.rb verify --timeout 900 --no-grant-permissions` passed
+  217 tests on 2026-07-04.
+- `./scripts/SaneMaster.rb customer_ui_sweep` passed on 2026-07-04 with
+  receipt `.sane/customer_ui_action_receipt.json`, host
+  `Stephans-Mac-mini.local`, version 2.3.15 (2315), and visual smoke receipt
+  `outputs/visual_smoke/visual_smoke_20260704-094842_23241/`; receipt generated
+  `2026-07-04T13:50:18Z` with the corrected coverage schema.
+- `./scripts/SaneMaster.rb release_preflight` passed at
+  `2026-07-04T09:52:58-04:00` with expected warnings: uncommitted files,
+  UserDefaults/migration change notice, pre-publish appcast/Homebrew still on
+  2.3.14, and 36 pending emails.
+- `./scripts/SaneMaster.rb appstore_preflight` passed at
+  `2026-07-04T09:54:45-04:00` after the ASC retarget, with only the
+  uncommitted-files warning.
+Before replying to Glenn, keep the wording to "should be getting better" /
+"please retest" rather than claiming the exact floating row-click path is proven
+by live UI automation. Still watch the Lemon Squeezy hosted-file gate during
+release; the previous 2.3.14 run left that hosted file stale at 2.3.13.
+
 ### 2026-07-04 ~05:25 — 2.3.14 direct release mostly live; Lemon Squeezy hosted file still blocks final completion
 
 State: SaneClip 2.3.14 direct-channel release ran from the Mini and published

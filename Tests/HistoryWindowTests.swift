@@ -275,18 +275,48 @@ struct HistoryWindowTests {
         // The panel is non-activating (Spotlight-style): it floats over the
         // current app without making SaneClip frontmost.
         #expect(historyWindowSource.contains(".nonactivatingPanel"))
-        // The dismiss handler just orders the panel out; because we are never
-        // frontmost, the synthetic Cmd+V lands in the target app. It must NOT
-        // hide the whole app any more, and showing must NOT activate SaneClip
-        // — either would steal focus on the keep-open reopen.
+        // The dismiss handler orders the panel out before Cmd+V; leaving a key
+        // history window visible can send paste to SaneClip instead of the target
+        // app. It must NOT hide the whole app, and showing must NOT activate
+        // SaneClip — either would steal focus on the keep-open reopen.
         #expect(historyWindowSource.contains("func handleDismissForPaste()"))
         #expect(historyWindowSource.contains("historyWindow.orderOut(nil)"))
+        #expect(!historyWindowSource.contains("keepPasteStackOpenBetweenPastes { return }"))
         #expect(!historyWindowSource.contains("NSApp.hide(nil)"))
         #expect(!historyWindowSource.contains("NSApp.activate(ignoringOtherApps: true)"))
         // Reopen-after-paste routes to the window when floating.
         #expect(historyWindowSource.contains("func handleReopenHistoryAfterPaste()"))
         // A second menu-bar click closes the floating window.
         #expect(appSource.contains("historyWindow.close() // second menu-bar click closes the floating window"))
+    }
+
+    @Test("Floating keep-open orders history out before synthetic paste")
+    @MainActor
+    func floatingKeepOpenHidesBeforePaste() {
+        let app = SaneClipAppDelegate()
+        app.popover = NSPopover()
+        let panel = NonActivatingHistoryPanel(
+            contentRect: NSRect(x: 500, y: 500, width: 320, height: 500),
+            styleMask: [.titled, .closable, .resizable, .fullSizeContentView, .nonactivatingPanel],
+            backing: .buffered,
+            defer: false
+        )
+        panel.isReleasedWhenClosed = false
+        panel.orderFrontRegardless()
+        app.historyWindow = panel
+
+        let originalKeepOpen = SettingsModel.shared.keepPasteStackOpenBetweenPastes
+        SettingsModel.shared.keepPasteStackOpenBetweenPastes = true
+        defer {
+            SettingsModel.shared.keepPasteStackOpenBetweenPastes = originalKeepOpen
+            panel.close()
+        }
+
+        #expect(panel.isVisible)
+        app.handleDismissForPaste()
+
+        #expect(!panel.isVisible)
+        #expect(app.historyWindow != nil)
     }
 
     @Test("Killer update: keyboard nav, honest quick-paste hint, and discoverability wiring")

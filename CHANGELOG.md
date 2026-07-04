@@ -6,7 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
-## [2.3.14] - Unreleased
+## [2.3.15] - 2026-07-04
+
+- Tightens keep-open history focus handoff so the floating history panel is ordered out before paste is attempted.
+- Keeps Merge Queue selections and counts through floating/fixed history window reopen and mode switches until you clear or merge them.
+- Keeps the Pause Capture countdown updating while the pasteboard is idle.
+- Only plays the paste-success sound after the simulated paste succeeds.
+
+## [2.3.14] - 2026-07-04
 
 - SaneClip now makes sure it only ever runs as one copy. Two copies at once would both watch the clipboard and fight over your history, so a duplicate launch quietly steps aside and brings the running one forward.
 - The Pro Paste Stack can now build itself as you copy: turn on "Record copies" (in the stack panel, or Edit ▸ Record Copies to Paste Stack / ⌘⇧R) and everything you copy is added to the stack in order, ready to paste back one after another. It stays a fully editable, reorderable list, and is capped so it can't grow forever. Clips in the stack are kept even as older history scrolls off, so a stack you built by copying is still there after a restart.

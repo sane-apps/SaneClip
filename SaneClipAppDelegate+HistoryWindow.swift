@@ -106,18 +106,14 @@ extension SaneClipAppDelegate {
         withHistoryAuth { [weak self] in self?.showHistoryWindow() }
     }
 
-    /// Gets the history UI out of the way of a synthesized paste. The floating
-    /// panel is shown non-activating (see `showHistoryWindow`), so SaneClip never
-    /// becomes the ACTIVE app — your app stays active and the synthetic Cmd+V
-    /// lands there without us touching focus at all (this is exactly how Maccy
-    /// works). So with keep-open ON we simply leave the window where it is: no
-    /// hide, no reopen, no flicker. Without keep-open (or for the menu-bar
-    /// popover) we still dismiss so it gets out of the way after you pick.
+    /// Gets the history UI out of the way of a synthesized paste. Even a
+    /// non-activating panel can still be the key window, so leaving it visible
+    /// during Cmd+V can send the keystroke to SaneClip instead of the target app.
+    /// Keep-open is handled by `.reopenHistoryAfterPaste`; first hide, then paste.
     @objc func handleDismissForPaste() {
         if popover.isShown {
             popover.performClose(nil)
         } else if let historyWindow, historyWindow.isVisible {
-            if SettingsModel.shared.keepPasteStackOpenBetweenPastes { return }
             removeHistoryWindowOutsideClickMonitor()
             historyWindow.orderOut(nil)
         }
@@ -127,9 +123,8 @@ extension SaneClipAppDelegate {
     /// (e.g. paste-stack "keep open while consuming"). Routes to the window or
     /// the popover to match the user's chosen presentation.
     @objc func handleReopenHistoryAfterPaste() {
-        // If keep-open kept the floating window visible (the non-activating panel
-        // never had to hide for the paste), there is nothing to reopen — a
-        // makeKeyAndOrderFront here would just re-flash the window.
+        // If another path already reopened the floating window, avoid a second
+        // order-front flash.
         if let historyWindow, historyWindow.isVisible { return }
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 180_000_000)

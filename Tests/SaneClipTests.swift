@@ -2407,7 +2407,7 @@ struct SaneClipTests {
         #expect(!historySource.contains("Upgrade to Pro — \\(licenseService?.displayPriceLabel"))
         #expect(settingsSource.contains("Text(\"These settings require SaneClip Pro\")"))
         #expect(!settingsSource.contains("Text(\"Upgrade — \\(licenseService?.displayPriceLabel"))
-        #expect(menuSource.contains("NSMenuItem(title: \"Snippets Pro \\u{1F512}\", action: #selector(showSnippetsUpsell), keyEquivalent: \"\")"))
+        #expect(menuSource.contains("String(localized: \"Snippets Pro\") + \" \\u{1F512}\", action: #selector(showSnippetsUpsell)"))
         #expect(appSource.contains("var captureTextMenuItemTitle: String {"))
         #expect(appSource.contains("licenseService.isPro ? CaptureWorkflow.text.menuTitle : \"Capture Text from Screen Pro 🔒\""))
         #expect(appSource.contains("@objc func showSnippetsUpsell()"))

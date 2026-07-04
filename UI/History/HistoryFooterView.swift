@@ -139,6 +139,16 @@ struct HistoryFooterView: View {
                 .fixedSize()
                 .disabled(mergeQueueIDs.count < 2)
 
+            Button("Delete") {
+                clipboardManager.removeHistoryItems(withIDs: mergeQueueIDs)
+                mergeQueueIDs.removeAll()
+            }
+            .buttonStyle(.plain)
+            .font(.subheadline)
+            .foregroundStyle(Color.semanticError.opacity(0.95))
+            .fixedSize()
+            .help("Delete the \(mergeQueueIDs.count) selected item(s)")
+
             Button("Clear Queue") { mergeQueueIDs.removeAll() }
                 .buttonStyle(.plain)
                 .font(.subheadline)

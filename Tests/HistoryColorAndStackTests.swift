@@ -299,6 +299,34 @@ struct HistoryColorAndStackTests {
         }
     }
 
+    @Test("removeHistoryItems deletes a multi-selection from history, pins, and stack")
+    @MainActor
+    func removeHistoryItemsDeletesSelection() {
+        let manager = ClipboardManager(startMonitoring: false, loadPersistedState: false, persistenceEnabled: false)
+        manager.licenseService = makeForcedProLicense()
+
+        let items = (0 ..< 4).map { ClipboardItem(content: .text("item \($0)")) }
+        for item in items {
+            manager.history.insert(item, at: 0)
+        }
+        manager.togglePin(item: items[0]) // pinned
+        manager.addToPasteStack(items[1]) // queued in the paste stack
+
+        // The footer "Delete" button (Maccy #239 bulk delete) calls this batch API
+        // with the merge-queue selection. Deleting the pinned + stacked items must
+        // remove them from every collection, not just history.
+        let toDelete: Set<UUID> = [items[0].id, items[1].id]
+        manager.removeHistoryItems(withIDs: toDelete)
+
+        for id in toDelete {
+            #expect(!manager.history.contains { $0.id == id })
+            #expect(!manager.pinnedItems.contains { $0.id == id })
+            #expect(!manager.pasteStack.contains { $0.id == id })
+        }
+        #expect(manager.history.contains { $0.id == items[2].id })
+        #expect(manager.history.contains { $0.id == items[3].id })
+    }
+
     @MainActor
     private func makeForcedProLicense() -> LicenseService {
         setenv("SANEAPPS_FORCE_PRO_MODE", "1", 1)

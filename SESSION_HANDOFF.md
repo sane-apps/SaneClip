@@ -6,7 +6,24 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
-- 2026-07-03 ~23:00 — full day's work + verify commands in **outputs/VERIFY-2026-07-03.md** (paste fix, pin-eviction data-loss fix, 4 Maccy easy-wins, 8-language localization; main@5bbed80, Air↔Mini synced, 208 tests green; origin NOT pushed). Everything below is superseded history:
+### 2026-07-03 ~23:00 — DAY'S WORK + INDEPENDENT VERIFY GUIDE (run on the Mini directly)
+
+State: `main` @ `14f68ef`, **Air ↔ Mini synced**, 208 tests green. **origin (GitHub) NOT pushed** (stuck at `7e0e72c` — publish decision, owner's call). Everything under the ~16:00 note below is superseded history.
+
+Build + full suite (expect `208 tests ... passed`):
+```
+cd ~/SaneApps/apps/SaneClip && xcodebuild test -scheme SaneClip -destination "platform=macOS" \
+  CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO 2>&1 | grep -iE "Test run with|✘|\*\* TEST"
+```
+Build + launch real app: `ruby ~/SaneApps/infra/SaneProcess/scripts/sane_test.rb SaneClip --release --local --pro-mode`
+
+What shipped today + how to verify each:
+1. **Paste-into-app fix** (Glenn #1007, `ad001cc`) — clicking a row auto-pastes into the app you were typing in, no focus steal. Root cause: `.nonactivatingPanel` defaults `canBecomeKey=false` → first click swallowed; fix = `NonActivatingHistoryPanel` forces `canBecomeKey=true`. Verify hands-on: type in TextEdit, copy, open history (⌃⌘⇧Y), click a snippet → pastes into TextEdit. (Proven 3/3 with a disambiguating live test.)
+2. **Pin-eviction data-loss fix** (`07a8d07`) — `enforceHistoryLimitIfNeeded` now protects pinned IDs (was paste-stack only). Test: `pinnedItemsSurviveHistoryTrim`.
+3. **4 Maccy easy-wins** (`547520f`/`e105ce8`/`1a469c3`): #1413 wider tracking strip (test `stripsWidenedTrackingParams`), #1044 "Strip trailing newline" Pro rule (`stripsOnlyTrailingNewlines`), #1416 `Core/SourceAppIconCache.swift` (`iconCacheCachesAndHandlesMissing`), #239 merge-queue bulk delete — red **Delete** in footer (`removeHistoryItemsDeletesSelection`). Tests in `ClipboardTransformsTests` + `HistoryColorAndStackTests`. (#1345 was ALREADY done via `SettingsModel.maxCaptureTextBytes`.)
+4. **Localization — 8 languages** (`42402b1`/`6c12417`/`519f192`/`f4fd3f1`/`5bbed80`): 356 strings machine-translated + AI-web-verified into de/fr/es/it/pt-BR/ja/zh-Hans/ko in `Resources/Localizable.xcstrings` (100% coverage, 0 placeholder mismatches, `CFBundleLocalizations` set). Verify a locale renders: `echo /tmp/de>/tmp/saneclip_screenshot_dir.txt; mkdir -p /tmp/de; xcodebuild test -scheme SaneClip -destination "platform=macOS" -only-testing:SaneClipTests/HistoryRenderTests -testLanguage de -testRegion DE CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO; rm /tmp/saneclip_screenshot_dir.txt; open /tmp/de/matrix-03-pro-floating-480x640.png` (swap `de`→`fr`/`ja`/…). 1 known gap: plural "Notes" label unextracted.
+
+DEFERRED (blocked by over-cap core files, won't game the gate): image-perf #1080/#384 (needs `ClipboardImageStore` extracted from 2600-line ClipboardManager.swift); snippet-hotkey #1125 (needs KeyboardShortcuts registration extracted from at-cap SaneClipApp.swift). OWNER-ONLY: ship 2.3.14 via `release.sh`; reply Glenn #1007 (never "fixed"); decide 2.3.14-bundle-vs-2.3.15; push GitHub origin. Full Maccy shortlist in the `maccy-easy-wins-shortlist` memory; long-form verify guide scp'd to Mini `~/SaneApps/apps/SaneClip/outputs/VERIFY-2026-07-03.md`.
 - 2026-07-03 ~16:00 CORRECTIVE RE-AUDIT + FIX PASS — 2.3.14 HELD (do NOT ship yet):
   - A 23-agent adversarial verification workflow DISPROVED the earlier "Glenn
     #1007 fully fixed on main" claim. Ground truth on main `7e0e72c`: the

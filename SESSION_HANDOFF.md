@@ -6,6 +6,56 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+### 2026-07-04 ~05:25 — 2.3.14 direct release mostly live; Lemon Squeezy hosted file still blocks final completion
+
+State: SaneClip 2.3.14 direct-channel release ran from the Mini and published
+the signed/notarized ZIP to the public channels, but the release script stopped
+at the Lemon Squeezy hosted-file post-release gate. Do not rerun the full
+release for this; the script explicitly requested hosted-file sync followed by
+post-release checks only.
+
+Live/published direct-channel receipts:
+- GitHub release/tag: `v2.3.14`; direct ZIP uploaded.
+- Dist URL verified during release:
+  `https://dist.saneclip.com/updates/SaneClip-2.3.14.zip`.
+- ZIP SHA256:
+  `837257f807f6b85e1634b6df94f1eedce7d79e1d6e9c6beebcccc7b585d6edb0`.
+- Appcast updated and propagated with exactly one 2.3.14 entry.
+- Cloudflare Pages deploy completed (`saneclip-site` preview:
+  `https://c076a528.saneclip-site.pages.dev`).
+- Homebrew tap updated to 2.3.14 (`sane-apps/homebrew-tap` commit `ded3b0a`).
+- Email webhook deployed live with SaneClip 2.3.14 bundle mapping
+  (`sane-email-automation` commit `f9a8b19`).
+
+Blocking direct-channel follow-up:
+- Lemon Squeezy hosted file for product `779223`, variant `1228215`, still
+  reports hosted `2.3.13` while appcast expects `2.3.14`.
+- Local upload staging is ready:
+  `/Users/stephansmac/Desktop/LemonSqueezy-Uploads/SaneClip-2.3.14.zip`.
+  The stale local `SaneClip-2.3.13.zip` staging copy was removed.
+- Chrome is open to the Lemon Squeezy login page and is not authenticated. Sign
+  in, replace/unpublish old hosted files so only the appcast-matching 2.3.14 ZIP
+  is published, then run:
+  `bash /Users/stephansmac/SaneApps/infra/SaneProcess/scripts/release.sh --project /Users/stephansmac/SaneApps/apps/SaneClip --version 2.3.14 --post-release-checks-only`.
+- Hosted-file receipt:
+  `/Users/stephansmac/SaneApps/infra/SaneProcess/outputs/hosted_file_actions/post-release-saneclip-2.3.14-20260704T045743Z-86761.json`.
+
+App Store channel:
+- Customer UI sweep reran after release metadata commits and passed, refreshing
+  `.sane/customer_ui_action_receipt.json` at `2026-07-04T05:10:45Z`.
+- Visual proof artifacts:
+  `outputs/visual_smoke/visual_smoke_20260704-010907_91831/screen.png`,
+  `outputs/visual_smoke/visual_smoke_20260704-010907_91831/menu.png`, and
+  live log `outputs/live-logs/customer_ui_saneclip_20260704T050834Z.log`.
+- `./scripts/SaneMaster.rb appstore_preflight --json` passed: all clear for
+  App Store submission.
+- macOS App Store build `2314` uploaded, processed, attached to version 2.3.14
+  (`appStoreVersion` ID `ffb9aca2-9956-4d3d-9096-0e0742f21c74`, build ID
+  `96143641-2098-4048-9a56-37daa57f4ca2`), screenshots/metadata synced, and
+  review submission reached `WAITING_FOR_REVIEW`.
+- Commit pushed after the release metadata commits:
+  `23cda7d chore: refresh SaneClip customer UI receipt`.
+
 ### 2026-07-04 ~03:52 — 2.3.14 release-readiness audit green, not shipped
 
 State: Mini-first audit/release prep completed for SaneClip 2.3.14. `release_readiness --json --app SaneClip` is green with no candidate or portfolio blockers. `release_preflight --json` passed after fixing stale docs and privacy-cache behavior; warnings remain: dirty worktree, UserDefaults/migration upgrade-path warning, appcast/Homebrew still live at 2.3.13 until publish, 34 pending emails, and evening release timing. `appstore_preflight --json` also passed; only warning was dirty worktree.

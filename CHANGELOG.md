@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Fixes the Pro floating history window closing when you click its own title bar, search field, filter, or pause controls; only clicks truly outside the window close it now.
 - Adds a Pro pin button beside history search to keep the history window open after pasting — and the setting (renamed "Keep history window open after pasting") now also applies to normal history pastes, not just the paste stack.
 - Keeps the floating history window (and your in-progress edit) open while an Edit, Smart Clear, or preview sheet is showing, even when the sheet extends past the window edge at small window sizes.
+- Fixes pinned clips being lost once your history filled up: a pinned item (and, for an image, its saved copy) could be dropped and quietly unpinned when it aged past your history limit. Pinned clips are now always kept, no matter how much you copy.
 
 ---
 

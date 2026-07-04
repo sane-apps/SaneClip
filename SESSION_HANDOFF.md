@@ -6,6 +6,50 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+### 2026-07-04 ~11:50 - SaneClip 2.3.15 direct/Sparkle ship complete; Glenn draft awaiting approval
+
+State: SaneClip 2.3.15 is fully live on the direct/Sparkle channel and the
+known-bad Apple submission has been replaced. Apple build `2315` is attached to
+ASC version `ffb9aca2-9956-4d3d-9096-0e0742f21c74` with submission
+`ff4be602-730e-47a4-9f9c-f2a37dca5744`; latest confirmed state was
+`WAITING_FOR_REVIEW`.
+
+Direct-channel receipts:
+- Full Developer ID release completed after abandoning invalid `--skip-build`
+  resume attempts that found empty archive products. Notary submission
+  `bb216353-aa09-4710-b1e7-af0c4af746ce` was accepted and stapled.
+- GitHub release `sane-apps/SaneClip@v2.3.15`, R2 ZIP
+  `https://dist.saneclip.com/updates/SaneClip-2.3.15.zip`, appcast build
+  `2315`, website JSON-LD version `2.3.15`, redirect
+  `https://go.saneapps.com/download/saneclip`, and the live email webhook all
+  verify against 2.3.15.
+- Public ZIP SHA256:
+  `1da75ea5b9e6dff9c3fb189e8c8e8e661d27c58b2d17f5bbbaee6c8fbd79f386`;
+  length `5196756`.
+- Homebrew tap commit `3626fba` has the correct cask via GitHub API; raw GitHub
+  may lag briefly from propagation only.
+- Lemon Squeezy product `779223`, variant `1228215`, now has exactly one
+  published hosted file: `SaneClip-2.3.15.zip`. The stale `2.3.13` file was
+  deleted in Safari after user confirmation. Fresh
+  `SaneMaster.rb hosted_file_actions --json` shows SaneClip status `In sync`.
+
+Final verification after Lemon Squeezy cleanup:
+- `bash /Users/stephansmac/SaneApps/infra/SaneProcess/scripts/release.sh --project
+  /Users/stephansmac/SaneApps/apps/SaneClip --version 2.3.15
+  --post-release-checks-only` passed at `2026-07-04T15:48:43Z`.
+- Post-release probe:
+  `outputs/release/post-release-probes-20260704T154843Z-97588.txt`.
+- Hosted-file receipt:
+  `/Users/stephansmac/SaneApps/infra/SaneProcess/outputs/hosted_file_actions/post-release-saneclip-2.3.15-20260704T154843Z-97588.json`.
+
+Glenn reply is prepared but not sent. Email #1013 was reviewed, reconciled, and
+fact-verified against the two release receipts. Presented draft:
+`/tmp/reply_1013.txt`, SHA256
+`4ae086a91e3dd6c35422855f9fa265f274ae8855d559fb2386abdc95ce367730`.
+Do not send until the user explicitly approves that exact draft; then run
+`check-inbox.sh approve /tmp/reply_1013.txt --user-approval "<exact quote>"`
+and `check-inbox.sh reply 1013 /tmp/reply_1013.txt`.
+
 ### 2026-07-04 ~10:20 — Glenn #1012/#1013 2.3.15 replacement submitted after isolated Mini proof
 
 State: Glenn reported three fresh 2.3.14 regressions after the July 4 release:

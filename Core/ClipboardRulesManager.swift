@@ -39,6 +39,14 @@ class ClipboardRulesManager {
         set { UserDefaults.standard.set(newValue, forKey: "rule.removeDuplicateSpaces") }
     }
 
+    /// Strip only trailing newline(s) so pasting into a terminal doesn't run the
+    /// command. Unlike `autoTrimWhitespace` (which strips all leading/trailing
+    /// whitespace) this preserves leading indentation and internal blank lines.
+    var stripTrailingNewline: Bool {
+        get { UserDefaults.standard.bool(forKey: "rule.stripTrailingNewline") }
+        set { UserDefaults.standard.set(newValue, forKey: "rule.stripTrailingNewline") }
+    }
+
     // MARK: - Initialization
 
     private init() {
@@ -55,7 +63,7 @@ class ClipboardRulesManager {
         var result = text
 
         // Only apply URL tracking param stripping to actual URLs
-        if stripTrackingParams && isURL(result) {
+        if stripTrackingParams, isURL(result) {
             result = ClipboardItem.stripTrackingParams(from: result)
         }
 
@@ -66,6 +74,12 @@ class ClipboardRulesManager {
         if normalizeLineEndings {
             result = result.replacingOccurrences(of: "\r\n", with: "\n")
                 .replacingOccurrences(of: "\r", with: "\n")
+        }
+
+        if stripTrailingNewline {
+            while result.hasSuffix("\n") || result.hasSuffix("\r") {
+                result.removeLast()
+            }
         }
 
         if removeDuplicateSpaces {

@@ -45,14 +45,12 @@ struct ClipboardItem: Identifiable {
         self.ocrText = ocrText
     }
 
-    /// Get the app icon for the source app
+    /// Get the app icon for the source app. Cached by bundle id (see
+    /// `SourceAppIconCache`) so a scrolling history doesn't do two NSWorkspace
+    /// lookups per visible row on every render frame.
     var sourceAppIcon: NSImage? {
-        guard let bundleID = sourceAppBundleID,
-              let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)
-        else {
-            return nil
-        }
-        return NSWorkspace.shared.icon(forFile: appURL.path)
+        guard let bundleID = sourceAppBundleID else { return nil }
+        return SourceAppIconCache.icon(forBundleID: bundleID)
     }
 
     var contentHash: String {
@@ -171,7 +169,10 @@ struct ClipboardItem: Identifiable {
 
         let trackingPrefixes = [
             "utm_", "fbclid", "gclid", "ref_", "mc_",
-            "yclid", "msclkid", "_ga", "_gl", "igshid", "s_kwcid"
+            "yclid", "msclkid", "_ga", "_gl", "igshid", "s_kwcid",
+            "gbraid", "wbraid", "dclid", "twclid", "li_fat_id", "mkt_tok",
+            "_hsenc", "_hsmi", "oly_anon_id", "vero_id", "__s", "spm",
+            "at_medium", "at_campaign", "cmpid", "ncid", "scid", "trk_contact"
         ]
 
         components.queryItems = components.queryItems?.filter { item in

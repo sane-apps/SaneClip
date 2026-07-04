@@ -14,6 +14,7 @@ struct ClipboardRulesSection: View {
     @State private var autoTrimWhitespace = ClipboardRulesManager.shared.autoTrimWhitespace
     @State private var normalizeLineEndings = ClipboardRulesManager.shared.normalizeLineEndings
     @State private var removeDuplicateSpaces = ClipboardRulesManager.shared.removeDuplicateSpaces
+    @State private var stripTrailingNewline = ClipboardRulesManager.shared.stripTrailingNewline
     @State private var lowercaseURLs = ClipboardRulesManager.shared.lowercaseURLs
 
     private var isPro: Bool {
@@ -100,6 +101,24 @@ struct ClipboardRulesSection: View {
 
             if isPro {
                 CompactToggle(
+                    label: "Strip trailing newline",
+                    isOn: Binding(
+                        get: { stripTrailingNewline },
+                        set: { newValue in
+                            stripTrailingNewline = newValue
+                            rules.stripTrailingNewline = newValue
+                        }
+                    )
+                )
+                .help("Drop the final newline so pasting into a terminal doesn't run the command")
+            } else {
+                ProLockedRow(label: "Strip trailing newline", feature: .clipboardRules, licenseService: licenseService)
+            }
+
+            CompactDivider()
+
+            if isPro {
+                CompactToggle(
                     label: "Lowercase URL hosts",
                     isOn: Binding(
                         get: { lowercaseURLs },
@@ -122,6 +141,7 @@ struct ClipboardRulesSection: View {
         autoTrimWhitespace = rules.autoTrimWhitespace
         normalizeLineEndings = rules.normalizeLineEndings
         removeDuplicateSpaces = rules.removeDuplicateSpaces
+        stripTrailingNewline = rules.stripTrailingNewline
         lowercaseURLs = rules.lowercaseURLs
     }
 }

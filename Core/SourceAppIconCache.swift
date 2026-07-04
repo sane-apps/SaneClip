@@ -9,7 +9,9 @@ import AppKit
 /// thread-safe and self-evicts under memory pressure, so a stale icon simply
 /// re-resolves on the next read.
 enum SourceAppIconCache {
-    private static let cache = NSCache<NSString, NSImage>()
+    /// NSCache is documented thread-safe; the compiler just can't prove it because
+    /// NSCache isn't Sendable. `nonisolated(unsafe)` vouches for that safety.
+    private nonisolated(unsafe) static let cache = NSCache<NSString, NSImage>()
 
     /// The cached icon for `bundleID`, resolving and caching it on first use.
     /// Returns `nil` if the app can't be located (e.g. it was uninstalled).

@@ -269,6 +269,36 @@ struct HistoryColorAndStackTests {
         #expect(manager.pasteStack.count == 3)
     }
 
+    @Test("Pinned items survive the history trim so a pin is never silently lost")
+    @MainActor
+    func pinnedItemsSurviveHistoryTrim() {
+        let manager = ClipboardManager(startMonitoring: false, loadPersistedState: false, persistenceEnabled: false)
+        manager.licenseService = makeForcedProLicense()
+
+        SettingsModel.shared.maxHistorySize = 5
+        defer { SettingsModel.shared.maxHistorySize = 100 }
+
+        // Pin three clips via the real pin path, then flood history so the pins
+        // fall past the cap and the trim runs over them.
+        let pinned = (0 ..< 3).map { ClipboardItem(content: .text("pinned \($0)")) }
+        for item in pinned {
+            manager.history.insert(item, at: 0)
+            manager.togglePin(item: item)
+        }
+        for index in 0 ..< 20 {
+            manager.history.insert(ClipboardItem(content: .text("filler \(index)")), at: 0)
+        }
+        manager.enforceHistoryLimitIfNeeded(saveAfterTrim: false)
+
+        // Every pinned item stays in history AND stays pinned — no silent unpin
+        // and (for images) no asset deletion. Regression guard for the trim that
+        // protected the paste stack but not pins (Maccy #1220 class).
+        for item in pinned {
+            #expect(manager.history.contains { $0.id == item.id })
+            #expect(manager.pinnedItems.contains { $0.id == item.id })
+        }
+    }
+
     @MainActor
     private func makeForcedProLicense() -> LicenseService {
         setenv("SANEAPPS_FORCE_PRO_MODE", "1", 1)

@@ -2382,13 +2382,11 @@ class ClipboardManager {
     func enforceHistoryLimitIfNeeded(saveAfterTrim: Bool = true) {
         guard let effectiveMax = effectiveHistoryLimit(), history.count > effectiveMax else { return }
 
-        // Items queued in the paste stack (including ones recorded by build-by-
-        // copying) must outlive normal history churn — the stack is a durable
-        // ordered collection, and it is persisted by id, so evicting its
-        // backing history item (and, for images, deleting its assets) would
-        // silently empty the stack on the next launch. Protect them from the
-        // trim exactly like pinned items, capped by the stack's own limit.
-        let protectedIDs = Set(pasteStack.map(\.id))
+        // Paste-stack items AND pinned items must survive the trim: the stack is
+        // persisted by id, and a pin is an explicit "keep this". Evicting either
+        // (and deleting image assets) empties the stack or drops the pin on next
+        // launch. The pinnedItems filter below assumed a guard the trim omitted.
+        let protectedIDs = Set(pasteStack.map(\.id)).union(pinnedItems.map(\.id))
 
         let kept = Array(history.prefix(effectiveMax))
         let keptIDs = Set(kept.map(\.id))

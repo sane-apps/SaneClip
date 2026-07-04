@@ -44,6 +44,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
     var popover: NSPopover!
     var historyWindow: NSWindow?, historyWindowOutsideClickMonitor: Any?, historyWindowOutsideClickLocalMonitor: Any?
+    var licenseGateWindow: NSWindow?
     var clipboardManager: ClipboardManager!
     let screenCaptureService = ScreenCaptureService()
     let captureOCRService = CaptureOCRService()
@@ -134,8 +135,11 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             }
         #endif
 
-        // Freemium: always allow app to start — no hard gate
         licenseService.checkCachedLicense()
+        if presentExpiredTrialGateIfNeeded() {
+            return
+        }
+
         setupApp()
         initializeSyncOnLaunch()
         SetappIntegration.logPurchaseType()
@@ -164,6 +168,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool {
+        if presentExpiredTrialGateIfNeeded() {
+            return false
+        }
+
         withHistoryAuth { [weak self] in self?.showHistoryPopover() }
         return false
     }
@@ -242,6 +250,43 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
                 SetappIntegration.showReleaseNotesIfNeeded(delay: 0.2)
             }
         )
+    }
+
+    @discardableResult
+    func presentExpiredTrialGateIfNeeded() -> Bool {
+        guard licenseService.hasExpiredProTrial else { return false }
+        showExpiredTrialGate()
+        return true
+    }
+
+    private func showExpiredTrialGate() {
+        if let window = licenseGateWindow {
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
+        let rootView = LicenseGateView(licenseService: licenseService, appIcon: "list.clipboard.fill")
+            .preferredColorScheme(.dark)
+            .onChange(of: licenseService.isLicensed) { _, licensed in
+                guard licensed else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                    self?.licenseGateWindow?.close()
+                    self?.licenseGateWindow = nil
+                    if self?.clipboardManager == nil {
+                        self?.setupApp()
+                        self?.initializeSyncOnLaunch()
+                    }
+                }
+            }
+
+        let window = NSWindow(contentViewController: NSHostingController(rootView: rootView))
+        window.title = "SaneClip Trial Ended"
+        window.setContentSize(NSSize(width: 560, height: 680))
+        window.center()
+        window.makeKeyAndOrderFront(nil)
+        licenseGateWindow = window
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     var captureTextMenuItemTitle: String {
@@ -649,6 +694,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     @objc private func togglePopover() {
+        if presentExpiredTrialGateIfNeeded() {
+            return
+        }
+
         guard statusItem.button != nil else { return }
         SetappIntegration.reportMenuBarInteraction()
 
@@ -699,6 +748,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func showPopover() {
+        if presentExpiredTrialGateIfNeeded() {
+            return
+        }
+
         // Check if Touch ID is required
         if requiresHistoryAuth {
             // Check if within grace period
@@ -723,6 +776,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func pasteFromMenu(_ sender: NSMenuItem) {
+        if presentExpiredTrialGateIfNeeded() {
+            return
+        }
+
         let index = sender.tag
         guard index < clipboardManager.history.count else { return }
 
@@ -745,6 +802,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func pasteSnippetFromMenu(_ sender: NSMenuItem) {
+        if presentExpiredTrialGateIfNeeded() {
+            return
+        }
+
         guard let idString = sender.representedObject as? String,
               let id = UUID(uuidString: idString),
               let snippet = SnippetManager.shared.snippets.first(where: { $0.id == id })

@@ -21,6 +21,10 @@ extension SaneClipAppDelegate {
     func runCaptureWorkflow(_ workflow: CaptureWorkflow) async {
         NSApp.activate(ignoringOtherApps: true)
 
+        if presentExpiredTrialGateIfNeeded() {
+            return
+        }
+
         if workflow == .text, licenseService.isPro == false {
             ProUpsellWindow.show(feature: ProFeature.ocrCapture, licenseService: licenseService)
             return

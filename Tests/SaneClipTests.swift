@@ -553,7 +553,7 @@ struct SaneClipTests {
             encoding: .utf8
         )
 
-        let saneUIRevision = "db137877711e55b158e58d1c9edccfa2d148206d"
+        let saneUIRevision = "6adafae62cfb37b54f2167e70de9fc5e9b4effb9"
         #expect(projectSource.contains("url: https://github.com/sane-apps/SaneUI.git"))
         #expect(projectSource.contains("revision: \(saneUIRevision)"))
         #expect(!projectSource.contains("path: ../../infra/SaneUI"))

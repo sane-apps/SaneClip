@@ -7,6 +7,10 @@ extension SaneClipAppDelegate {
     static let historyWindowFrameAutosaveName = "SaneClipHistoryWindowFrame"
 
     func showHistoryPopover() {
+        if presentExpiredTrialGateIfNeeded() {
+            return
+        }
+
         // When the user prefers a free-floating window, route every history
         // trigger to it instead of the menu-bar-anchored popover.
         if SettingsModel.shared.useFloatingHistoryWindow, licenseService.isPro {
@@ -89,6 +93,10 @@ extension SaneClipAppDelegate {
     }
 
     func toggleHistoryWindow() {
+        if presentExpiredTrialGateIfNeeded() {
+            return
+        }
+
         if popover.isShown {
             popover.performClose(nil)
         }

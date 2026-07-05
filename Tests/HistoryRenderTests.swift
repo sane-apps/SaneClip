@@ -62,6 +62,7 @@ struct HistoryRenderTests {
             .init(name: "10-free-popover-longtext-320x500", width: 320, height: 500, seed: .longText),
             .init(name: "11-colorful-sources-440x700", width: 440, height: 700, seed: .colorful),
             .init(name: "12-pro-floating-recording-560x680", width: 560, height: 680, pro: true, showStack: true, recording: true),
+            .init(name: "13-pro-popover-merge-stack-320x500", width: 320, height: 500, pro: true, mergeActive: true, showStack: true),
         ]
 
         let proLicense = makeForcedProLicense()

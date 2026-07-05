@@ -925,7 +925,10 @@ class ClipboardManager {
         }
 
         if dismissPopover {
-            dismissAndPaste(reopenPopoverAfterPaste: reopenPopoverAfterPaste)
+            dismissAndPaste(
+                reopenPopoverAfterPaste: reopenPopoverAfterPaste,
+                hideBeforePaste: !reopenPopoverAfterPaste
+            )
         }
         return true
     }
@@ -965,7 +968,10 @@ class ClipboardManager {
             saveHistory()
         }
 
-        dismissAndPaste(reopenPopoverAfterPaste: reopenPopoverAfterPaste)
+        dismissAndPaste(
+            reopenPopoverAfterPaste: reopenPopoverAfterPaste,
+            hideBeforePaste: !reopenPopoverAfterPaste
+        )
         return true
     }
 
@@ -1002,7 +1008,10 @@ class ClipboardManager {
                 saveHistory()
             }
 
-            dismissAndPaste(reopenPopoverAfterPaste: reopenPopoverAfterPaste)
+            dismissAndPaste(
+                reopenPopoverAfterPaste: reopenPopoverAfterPaste,
+                hideBeforePaste: !reopenPopoverAfterPaste
+            )
             return true
         } else {
             return paste(item: item, dismissPopover: true, reopenPopoverAfterPaste: reopenPopoverAfterPaste)
@@ -1273,14 +1282,17 @@ class ClipboardManager {
         savePasteStack()
     }
 
-    /// Dismiss the popover (so Cmd+V targets the correct app) then simulate paste.
-    private func dismissAndPaste(reopenPopoverAfterPaste: Bool = false) {
+    /// Gets history out of the Cmd+V target path, then simulates paste.
+    private func dismissAndPaste(reopenPopoverAfterPaste: Bool = false, hideBeforePaste: Bool = true) {
         guard !isPasting else {
             logger.debug("Paste already in flight — skipping duplicate")
             return
         }
         isPasting = true
-        NotificationCenter.default.post(name: .dismissForPaste, object: nil)
+        NotificationCenter.default.post(
+            name: .dismissForPaste,
+            object: hideBeforePaste ? PasteDismissBehavior.hide : PasteDismissBehavior.keepVisible
+        )
         #if APP_STORE
             showCopiedNotification()
             if reopenPopoverAfterPaste {

@@ -33,6 +33,11 @@ extension Notification.Name {
     static let reopenHistoryAfterPaste = Notification.Name("SaneClipReopenHistoryAfterPaste")
 }
 
+enum PasteDismissBehavior {
+    case hide
+    case keepVisible
+}
+
 /// Parsed URL scheme command for testability
 enum URLSchemeCommand: Equatable {
     case paste(index: Int)

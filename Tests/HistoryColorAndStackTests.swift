@@ -86,6 +86,8 @@ struct HistoryColorAndStackTests {
 
         #expect(managerSource.contains("func pasteFromHistory(item: ClipboardItem) -> Bool"))
         #expect(managerSource.contains("reopenPopoverAfterPaste: SettingsModel.shared.keepPasteStackOpenBetweenPastes"))
+        #expect(managerSource.contains("hideBeforePaste: !reopenPopoverAfterPaste"))
+        #expect(managerSource.contains("PasteDismissBehavior.keepVisible"))
         #expect(historySource.contains("clipboardManager.pasteFromHistory(item: item)"))
         #expect(rowSource.contains("clipboardManager.pasteFromHistory(item: item)"))
         #expect(historySource.contains("pin.fill"))
@@ -197,7 +199,7 @@ struct HistoryColorAndStackTests {
         #expect(!manifest.contains("mini_click"))
         #expect(!manifest.contains("full_runtime_completion"))
         #expect(manifest.contains("mini_runtime"))
-        #expect(manifest.contains("Glenn's exact target-app receipt remains customer retest or manual"))
+        #expect(manifest.contains("keeps floating and fixed history visible"))
     }
 
     @Test("Glenn regressions pin edit footer and redraw Clipboard Rules toggles immediately")

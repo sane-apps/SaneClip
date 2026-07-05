@@ -167,7 +167,6 @@ struct ClipboardItemRow: View {
                 .frame(width: 3)
 
             HStack(alignment: .top, spacing: 8) {
-                // Pin indicator
                 if isPinned {
                     Image(systemName: "pin.fill")
                         .font(.caption2)
@@ -175,10 +174,8 @@ struct ClipboardItemRow: View {
                         .padding(.top, 2)
                 }
 
-                // Content & metadata stacked
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(alignment: .top, spacing: 6) {
-                        // Content-type icon for faster scanning
                         contentTypeIcon
                             .font(.caption)
                             .foregroundStyle(accentColor)
@@ -222,7 +219,6 @@ struct ClipboardItemRow: View {
                         }
                     }
 
-                    // Note indicator
                     if let note = item.note, !note.isEmpty {
                         HStack(spacing: 4) {
                             Image(systemName: "note.text")
@@ -267,14 +263,7 @@ struct ClipboardItemRow: View {
                         .padding(.leading, 20)
                     }
 
-                    // Metadata line — lead with the strongest recognition
-                    // cues (which app it came from, and when), the way people
-                    // actually pick a clip. The word/char count is demoted to
-                    // hover; full detail lives in the preview pane.
                     HStack(spacing: 6) {
-                        // Source app: icon + name. The name was previously only
-                        // a tooltip, so a clip's origin was invisible unless you
-                        // had learned the source-color rail.
                         if let icon = item.sourceAppIcon {
                             Image(nsImage: icon)
                                 .resizable()
@@ -295,24 +284,12 @@ struct ClipboardItemRow: View {
                                 .foregroundStyle(.primary.opacity(0.55))
                         }
 
-                        // When
                         Text(item.timeAgo)
                             .font(.caption)
                             .lineLimit(1)
                             .fixedSize()
                             .foregroundStyle(.primary.opacity(0.5))
 
-                        // Word/char count — demoted, revealed on hover only.
-                        if isHovering {
-                            Text("· \(item.stats)")
-                                .font(.caption2)
-                                .lineLimit(1)
-                                .fixedSize()
-                                .foregroundStyle(.secondary.opacity(0.55))
-                        }
-
-                        // Paste count badge (kept — a genuine recognition
-                        // signal: "the one I keep reaching for").
                         if item.pasteCount > 0 {
                             HStack(spacing: 2) {
                                 Image(systemName: "doc.on.doc")
@@ -326,8 +303,6 @@ struct ClipboardItemRow: View {
 
                         Spacer()
 
-                        // Drag-out affordance: signals Recent rows can be
-                        // dragged into other apps (pinned rows reorder instead).
                         if isHovering, isPro, !isPinned {
                             Image(systemName: "line.3.horizontal")
                                 .font(.caption2)
@@ -338,6 +313,8 @@ struct ClipboardItemRow: View {
                         if let hint = shortcutHint {
                             Text(hint)
                                 .font(.system(.caption2, design: .monospaced))
+                                .lineLimit(1)
+                                .fixedSize(horizontal: true, vertical: false)
                                 .foregroundStyle(.primary.opacity(0.55))
                                 .padding(.horizontal, 4)
                                 .background(Color.primary.opacity(0.05))
@@ -388,6 +365,7 @@ struct ClipboardItemRow: View {
                 .stroke(accentColor.opacity(isSelected ? 0.4 : 0.1), lineWidth: 1)
         )
         .contentShape(Rectangle())
+        .help(item.stats)
         // Drag-out is enabled only for non-pinned (Recent) rows. Pinned rows
         // keep the List's `.onMove` drag-to-reorder — a row-level `.onDrag`
         // would hijack that gesture and silently break reordering.

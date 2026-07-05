@@ -96,6 +96,8 @@ The Mac app starts with 14 days of Pro access. After the trial, Pro is required 
 - Clipboard rules
 - Export and import
 - Pinning, search, source-aware filtering, screenshots, excluded apps, and auto-delete controls
+- Capture Screenshot into history
+- Free iPhone/iPad companion app with optional private iCloud sync
 
 ---
 

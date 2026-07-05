@@ -5,25 +5,37 @@
     <link>https://saneclip.com/appcast.xml</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
-<item>
-            <title>2.3.16</title>
-            <link>https://saneclip.com/download</link>
-            <pubDate>Sat, 04 Jul 2026 18:26:54 -0400</pubDate>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <description>
-                <![CDATA[
-                <h2>What's New</h2>
-                <ul>
-                <li>Important update to onboarding, licensing, and reliability. Recommended for all users.</li>
-                </ul>
-                ]]>
-            </description>
-            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.16.zip"
-                       sparkle:version="2316"
-                       sparkle:shortVersionString="2.3.16"
-                       length="5220573"
-                       type="application/octet-stream"
-                       sparkle:edSignature="sInB83Q4gL36VVwhM1nYX/U0px/K/MgYFQm0CmyBjM7WJ1jU/3sBprZW0L72YG78o5ol1wVnHNEudpz3Uy+tCg=="/>
-        </item>
+    <item>
+      <title>2.3.16</title>
+      <link>https://saneclip.com/download</link>
+      <pubDate>Sat, 04 Jul 2026 18:26:54 -0400</pubDate>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <description>
+        <![CDATA[
+        <h2>What's New</h2>
+        <ul>
+        <li>Important update to onboarding, licensing, and reliability. Recommended for all users.</li>
+        </ul>
+        ]]>
+      </description>
+      <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.16.zip"
+                 sparkle:version="2316"
+                 sparkle:shortVersionString="2.3.16"
+                 length="5220573"
+                 type="application/octet-stream"
+                 sparkle:edSignature="sInB83Q4gL36VVwhM1nYX/U0px/K/MgYFQm0CmyBjM7WJ1jU/3sBprZW0L72YG78o5ol1wVnHNEudpz3Uy+tCg=="/>
+    </item>
+    <item>
+      <title>2.2.12</title>
+      <link>https://saneclip.com/download</link>
+      <pubDate>Tue, 24 Jun 2026 09:00:00 -0400</pubDate>
+      <sparkle:informationalUpdate>
+        <sparkle:belowVersion>2208</sparkle:belowVersion>
+      </sparkle:informationalUpdate>
+      <description><![CDATA[
+    <h2>Manual Install Required</h2>
+    <p>This update directs older builds to the manual download page before installer-launcher updates continue.</p>
+    ]]></description>
+    </item>
 </channel>
 </rss>

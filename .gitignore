@@ -94,6 +94,7 @@ releases/
 .claude/recent_actions.json
 .claude/read_history.json
 .claude/research-locks.json
+.claude/gate-hits.json
 .claude/user_patterns.json
 .claude/bypass_mode.txt
 .claude/saneloop-archive/

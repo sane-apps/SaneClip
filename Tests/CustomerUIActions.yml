@@ -130,17 +130,17 @@ actions:
   - Paste, copy, pin/unpin, edit content, update title/tags/collection/note, copy
     OCR text, export an image, and delete a fixture item.
   - With keep-open pinned in floating and fixed history modes, verify the visual
-    keep-open states and the code path that orders history out before paste is
-    attempted; Glenn's exact target-app receipt remains customer retest or manual
-    proof.
+    keep-open states and the code path that keeps floating and fixed history visible
+    while clearing key status before paste.
   - Verify Basic users see Pro gates for Pro-only row actions.
   assertions:
   - Basic pinning remains available.
   - Pro-only paste transforms, organization, notes, and image OCR actions are gated
     or executed correctly.
   - Edits use the batch update path so row metadata and pinned copies stay aligned.
-  - Keep-open paste hides the floating panel before synthetic Cmd+V and only
-    restores history after direct-build paste simulation succeeds.
+  - Keep-open paste keeps the floating panel and fixed popover visible, clears key
+    status before synthetic Cmd+V, and requests front/key restore after direct-build
+    paste succeeds.
   evidence:
   - Mini source/test guard for row context actions and edit persistence
   - Existing fixture tests for Basic pinning and image OCR controls
@@ -176,17 +176,17 @@ actions:
   - Paste, copy, pin/unpin, edit content, update title/tags/collection/note, copy
     OCR text, export an image, and delete a fixture item.
   - With keep-open pinned in floating and fixed history modes, verify the visual
-    keep-open states and the code path that orders history out before paste is
-    attempted; Glenn's exact target-app receipt remains customer retest or manual
-    proof.
+    keep-open states and the code path that keeps floating and fixed history visible
+    while clearing key status before paste.
   - Verify Basic users see Pro gates for Pro-only row actions.
   expected_outputs:
   - Basic pinning remains available.
   - Pro-only paste transforms, organization, notes, and image OCR actions are gated
     or executed correctly.
   - Edits use the batch update path so row metadata and pinned copies stay aligned.
-  - Keep-open paste hides the floating panel before synthetic Cmd+V and only
-    restores history after direct-build paste simulation succeeds.
+  - Keep-open paste keeps the floating panel and fixed popover visible, clears key
+    status before synthetic Cmd+V, and requests front/key restore after direct-build
+    paste succeeds.
 - id: paste-stack-actions
   title: Paste Stack can add, paste, reorder, rename, note, undo, pause, and clear
     items

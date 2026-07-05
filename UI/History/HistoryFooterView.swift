@@ -86,30 +86,27 @@ struct HistoryFooterView: View {
 
     // MARK: - Secondary controls (second row at narrow widths)
 
-    private var secondaryControls: some View {
-        // At comfortable widths the merge and paste-stack groups share one row,
-        // separated by a single divider (never an orphaned leading one). When
-        // the window is narrow enough that both groups can't fit — a Pro user
-        // with a merge queue AND an active paste stack is ~313pt inside a 300pt
-        // window — ViewThatFits drops to one group per row so no control is ever
-        // clipped off the trailing edge. That is the "can't reach Clear Queue /
-        // Stack" class of bug Glenn reported, now without a horizontal scroller.
-        ViewThatFits(in: .horizontal) {
+    @ViewBuilder private var secondaryControls: some View {
+        if hasMergeAndPasteStack {
+            stackedSecondaryControls
+        } else {
             HStack(spacing: 8) {
                 if !mergeQueueIDs.isEmpty {
                     mergeControls
                 }
-                if !mergeQueueIDs.isEmpty, showsPasteStackCluster || showsPasteStackUpsell {
-                    Divider().frame(height: 14)
-                }
                 pasteStackGroup
             }
-            VStack(alignment: .leading, spacing: 6) {
-                if !mergeQueueIDs.isEmpty {
-                    mergeControls
-                }
-                pasteStackGroup
-            }
+        }
+    }
+
+    private var hasMergeAndPasteStack: Bool {
+        !mergeQueueIDs.isEmpty && (showsPasteStackCluster || showsPasteStackUpsell)
+    }
+
+    private var stackedSecondaryControls: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            mergeControls
+            pasteStackGroup
         }
     }
 

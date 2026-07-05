@@ -6,6 +6,108 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+### 2026-07-05 ~10:30 - Glenn #1016 evidence reviewed; code and visual proof green
+
+State: Xcode 26 attempted project/scheme "recommended settings" changes that
+were not safe to keep. The accidental `project.pbxproj` churn changed signing
+toward Automatic/Apple Development in direct/debug lanes and blanked some team
+settings. Regenerating from `project.yml` restored the generated project source
+of truth; the remaining Xcode project/scheme diffs are generated metadata plus
+target buildable-name corrections. The intentional project-source change is
+`ENABLE_DEBUG_DYLIB: NO` for the main SaneClip target; without it, Xcode 26 set
+`ENABLE_DEBUG_DYLIB=YES`, and `SaneMaster.rb verify` failed linking
+`SaneClipTests` because `SaneClip.app/Contents/MacOS/SaneClip.debug.dylib` was
+missing.
+
+Glenn #1016 review is complete through the guarded inbox path. Attachments were
+saved under `~/Desktop/Screenshots/email1016-*`: three footer/hover screenshots,
+`SaneClip.mov`, and diagnostics. The screenshots/video confirm the reported
+fixed-window Merge Queue + Paste Stack footer crowding and minimum-width hover
+row instability in SaneClip 2.3.15 (2315). Diagnostics showed
+`accessibilityGranted: true`, `historyCount: 12`, and `pasteStackCount: 1`.
+
+Current local source now has fixes and guards for:
+- Merge Queue and Paste Stack split into separate footer rows when both exist.
+- Hover rows no longer add inline stats; stats are tooltip-only, and shortcut
+  badges stay one line.
+- Floating and fixed keep-open paste paths keep the history surface visible
+  while clearing key status before synthetic paste.
+- Fixed keep-open paste now requests front/key restore for an already-visible
+  popover after paste via `makeKeyAndOrderFront(nil)`. Do not overclaim
+  `isKeyWindow` proof from XCTest; `_NSPopoverWindow.isKeyWindow` stayed false
+  in the test host even after the documented AppKit restore call.
+- Non-keep-open fixed-popover paste temporarily disables popover animation
+  before `close()` so the popover is actually hidden before Cmd+V.
+
+Fresh support/status pass:
+- `check-inbox.sh read 1016` / `review 1016` confirmed Glenn's 2026-07-05
+  06:12:06 UTC message (2:12 a.m. Eastern) plus three screenshots,
+  `SaneClip.mov`, and `Diagnostics.txt`.
+- Video was re-read from the fresh attachment: 20.31s, 872x1402; the
+  regenerated contact sheet shows the minimum-width hover row instability.
+- `check-inbox.sh check` still shows #1016 as Glenn's newest SaneClip thread,
+  with #1012/#1007 as older related duplicates.
+- `gh search issues --owner sane-apps --state open` returns no open SaneClip
+  issue; the only support-scoped open issue is unrelated SaneClick #6.
+- Glenn's drag-order note is classified separately: current code supports
+  pinned-item reorder and Paste Stack reorder, while Recent rows use drag-out to
+  other apps. Do not describe arbitrary Recent-history reorder as fixed unless
+  that feature is explicitly added.
+
+Verification:
+- `./scripts/SaneMaster.rb verify --timeout 900 --no-grant-permissions` passed
+  220 tests after the fixed-popover focus-contract correction.
+- `./scripts/SaneMaster.rb customer_ui_sweep` passed with receipt generated
+  `2026-07-05T14:28:55Z`, 12 covered action IDs, and structured coverage only
+  for live paste completion. Live log:
+  `outputs/live-logs/customer_ui_saneclip_20260705T142644Z.log`; transcript:
+  `outputs/customer-ui/sweep-20260705T142855Z/customer-action-runtime.log`;
+  visual smoke:
+  `outputs/visual_smoke/visual_smoke_20260705-102718_45359/receipt.json`.
+- `./scripts/SaneMaster.rb release_preflight` passed with caution: 20
+  uncommitted files and 36 pending customer emails. Do not call the release
+  clean until those warning categories are intentionally accepted or cleared.
+- `git diff --check` passed.
+
+### 2026-07-05 ~06:10 - Superseded Glenn #1016 first-pass fix notes
+
+State: `SaneMaster.rb status` surfaced new Glenn email #1016 and SaneClip
+release drift: Lemon Squeezy still hosted 2.3.15 while appcast/direct expected
+2.3.16, and launch readiness remained no-go. `check-inbox.sh review 1016`
+completed and opened all five attachments: four screenshots/video plus
+diagnostics. Glenn was running SaneClip 2.3.15 (2315), with Accessibility
+granted, `historyCount: 12`, and `pasteStackCount: 1`.
+
+What was fixed from #1016:
+- Narrow history footers now split Merge Queue and Paste Stack controls into
+  separate rows when both are active, so counts/actions stay visible at the
+  fixed 320px history width.
+- Clipboard row hover no longer injects inline stats that reflow the row; stats
+  remain available as a tooltip, and the shortcut badge stays one line.
+- Added the 320px Pro merge+paste-stack render scenario:
+  `matrix-13-pro-popover-merge-stack-320x500.png`.
+
+Superseded by the 10:05 entry above: the visible keep-open path has now been
+changed and verified for both floating and fixed history. Keep this section only
+as context for why the later no-hide AppKit fix needed extra proof.
+
+Release caveat: this is a source fix only. The project is still at 2.3.16
+(`2316`), and the existing `releases/SaneClip-2.3.16.zip` was built on
+2026-07-04 before these changes. Bump to 2.3.17+ before shipping; do not rebuild
+or advertise this fix as the already-published 2.3.16 artifact.
+
+Verification:
+- `./scripts/SaneMaster.rb verify --timeout 900 --no-grant-permissions` passed
+  217 tests after the code/doc/appcast fixes.
+- `ruby ~/SaneApps/infra/SaneProcess/scripts/sane_test.rb SaneClip --release
+  --pro-mode` built, staged `/Applications/SaneClip.app`, preserved TCC,
+  launched PID 33333, captured SaneClip logs, and the test instance was quit
+  afterward.
+- Screenshot-enabled verify passed 217 tests and generated receipts under
+  `/tmp/saneclip_glenn1016_render/`; visual check of
+  `matrix-13-pro-popover-merge-stack-320x500.png` showed Merge Queue and Paste
+  Stack split into separate footer rows at 320px.
+
 ### 2026-07-04 ~11:50 - SaneClip 2.3.15 direct/Sparkle ship complete; Glenn draft awaiting approval
 
 State: SaneClip 2.3.15 is fully live on the direct/Sparkle channel and the

@@ -275,13 +275,14 @@ struct HistoryWindowTests {
         // The panel is non-activating (Spotlight-style): it floats over the
         // current app without making SaneClip frontmost.
         #expect(historyWindowSource.contains(".nonactivatingPanel"))
-        // The dismiss handler orders the panel out before Cmd+V; leaving a key
-        // history window visible can send paste to SaneClip instead of the target
-        // app. It must NOT hide the whole app, and showing must NOT activate
-        // SaneClip — either would steal focus on the keep-open reopen.
-        #expect(historyWindowSource.contains("func handleDismissForPaste()"))
+        // Normal paste still orders the panel out before Cmd+V; keep-open paste
+        // keeps the panel visible but resigns key status so the target app gets
+        // Cmd+V without Glenn's close/reopen flicker.
+        #expect(historyWindowSource.contains("func handleDismissForPaste(_ notification: Notification)"))
         #expect(historyWindowSource.contains("historyWindow.orderOut(nil)"))
-        #expect(!historyWindowSource.contains("keepPasteStackOpenBetweenPastes { return }"))
+        #expect(historyWindowSource.contains("historyWindow.resignKey()"))
+        #expect(historyWindowSource.contains("popover.contentViewController?.view.window?.resignKey()"))
+        #expect(historyWindowSource.contains("case .keepVisible:"))
         #expect(!historyWindowSource.contains("NSApp.hide(nil)"))
         #expect(!historyWindowSource.contains("NSApp.activate(ignoringOtherApps: true)"))
         // Reopen-after-paste routes to the window when floating.
@@ -290,9 +291,9 @@ struct HistoryWindowTests {
         #expect(appSource.contains("historyWindow.close() // second menu-bar click closes the floating window"))
     }
 
-    @Test("Floating keep-open orders history out before synthetic paste")
+    @Test("Floating keep-open keeps history visible while clearing key status")
     @MainActor
-    func floatingKeepOpenHidesBeforePaste() {
+    func floatingKeepOpenStaysVisibleBeforePaste() {
         let app = SaneClipAppDelegate()
         app.popover = NSPopover()
         let panel = NonActivatingHistoryPanel(
@@ -313,10 +314,108 @@ struct HistoryWindowTests {
         }
 
         #expect(panel.isVisible)
-        app.handleDismissForPaste()
+        app.handleDismissForPaste(Notification(name: .dismissForPaste, object: PasteDismissBehavior.keepVisible))
+
+        #expect(panel.isVisible)
+        #expect(app.historyWindow != nil)
+    }
+
+    @Test("Floating normal paste still hides history before synthetic paste")
+    @MainActor
+    func floatingNormalPasteHidesBeforePaste() {
+        let app = SaneClipAppDelegate()
+        app.popover = NSPopover()
+        let panel = NonActivatingHistoryPanel(
+            contentRect: NSRect(x: 500, y: 500, width: 320, height: 500),
+            styleMask: [.titled, .closable, .resizable, .fullSizeContentView, .nonactivatingPanel],
+            backing: .buffered,
+            defer: false
+        )
+        panel.isReleasedWhenClosed = false
+        panel.orderFrontRegardless()
+        app.historyWindow = panel
+        defer { panel.close() }
+
+        #expect(panel.isVisible)
+        app.handleDismissForPaste(Notification(name: .dismissForPaste, object: PasteDismissBehavior.hide))
 
         #expect(!panel.isVisible)
         #expect(app.historyWindow != nil)
+    }
+
+    @Test("Fixed keep-open keeps popover visible and requests focus restore")
+    @MainActor
+    func fixedKeepOpenStaysVisibleBeforePaste() throws {
+        let app = SaneClipAppDelegate()
+        let popover = NSPopover()
+        popover.contentSize = NSSize(width: 320, height: 500)
+        popover.contentViewController = NSHostingController(
+            rootView: Color.clear.frame(width: 320, height: 500)
+        )
+        app.popover = popover
+
+        let anchorView = NSView(frame: NSRect(x: 0, y: 0, width: 32, height: 32))
+        let anchorWindow = NSWindow(
+            contentRect: NSRect(x: 520, y: 520, width: 80, height: 80),
+            styleMask: [.titled],
+            backing: .buffered,
+            defer: false
+        )
+        anchorWindow.isReleasedWhenClosed = false
+        anchorWindow.contentView = anchorView
+        anchorWindow.orderFront(nil)
+        popover.show(relativeTo: anchorView.bounds, of: anchorView, preferredEdge: .maxY)
+        defer {
+            popover.performClose(nil)
+            anchorWindow.close()
+        }
+
+        try #require(popover.isShown)
+        let popoverWindow = try #require(popover.contentViewController?.view.window)
+        app.handleDismissForPaste(Notification(name: .dismissForPaste, object: PasteDismissBehavior.keepVisible))
+        anchorWindow.makeKey()
+
+        #expect(popover.isShown)
+        #expect(!popoverWindow.isKeyWindow)
+        let historyWindowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipAppDelegate+HistoryWindow.swift"),
+            encoding: .utf8
+        )
+        #expect(historyWindowSource.contains("} else if popover.isShown {"))
+        #expect(historyWindowSource.contains("makeKeyAndOrderFront(nil)"))
+    }
+
+    @Test("Fixed normal paste still hides popover before synthetic paste")
+    @MainActor
+    func fixedNormalPasteHidesBeforePaste() throws {
+        let app = SaneClipAppDelegate()
+        let popover = NSPopover()
+        popover.contentSize = NSSize(width: 320, height: 500)
+        popover.contentViewController = NSHostingController(
+            rootView: Color.clear.frame(width: 320, height: 500)
+        )
+        app.popover = popover
+
+        let anchorView = NSView(frame: NSRect(x: 0, y: 0, width: 32, height: 32))
+        let anchorWindow = NSWindow(
+            contentRect: NSRect(x: 540, y: 540, width: 80, height: 80),
+            styleMask: [.titled],
+            backing: .buffered,
+            defer: false
+        )
+        anchorWindow.isReleasedWhenClosed = false
+        anchorWindow.contentView = anchorView
+        anchorWindow.orderFront(nil)
+        popover.show(relativeTo: anchorView.bounds, of: anchorView, preferredEdge: .maxY)
+        defer {
+            popover.performClose(nil)
+            anchorWindow.close()
+        }
+
+        try #require(popover.isShown)
+        app.handleDismissForPaste(Notification(name: .dismissForPaste, object: PasteDismissBehavior.hide))
+
+        #expect(!popover.isShown)
     }
 
     @Test("Killer update: keyboard nav, honest quick-paste hint, and discoverability wiring")
@@ -422,14 +521,16 @@ struct HistoryWindowTests {
         #expect(footerSource.contains("private var showsSecondaryControls"))
         #expect(footerSource.contains("private var settingsButton"))
         #expect(footerSource.contains("private var smartClearButton"))
-        // The merge group carries no leading divider; the single separating
-        // divider lives in secondaryControls' one-row layout only.
+        // The merge group carries no divider; when paste-stack controls are
+        // also present the footer stacks groups instead of squeezing a divider
+        // into a clipped row.
         #expect(footerSource.contains("private var mergeControls"))
-        #expect(footerSource.components(separatedBy: "Divider().frame(height: 14)").count == 2)
-        // Overflow guard (Glenn's "can't reach Clear Queue / Stack"): the footer
-        // drops to one group per row via ViewThatFits when they can't share a
-        // row at 300-320pt — no clipped trailing edge, no horizontal scroller.
-        #expect(footerSource.contains("ViewThatFits(in: .horizontal)"))
+        #expect(!footerSource.contains("Divider().frame(height: 14)"))
+        // Overflow guard (Glenn's "can't reach Clear Queue / Stack"): Merge
+        // Queue and Paste Stack always split into rows when both are present —
+        // no clipped count, no horizontal scroller.
+        #expect(footerSource.contains("private var hasMergeAndPasteStack"))
+        #expect(footerSource.contains("private var stackedSecondaryControls"))
         // The Pro paste-stack cluster is gated on having something to act on,
         // so the empty "0" chip never claims a footer row in the common
         // just-opened state; the whole second row collapses when idle.
@@ -439,5 +540,14 @@ struct HistoryWindowTests {
         #expect(footerSource.contains("private var pasteStackUpsell"))
         // The second row is no longer shown just because the user is Pro.
         #expect(!footerSource.contains("!mergeQueueIDs.isEmpty || isPro || licenseService != nil"))
+        // Narrow rows must not reflow on hover by injecting extra stats inline;
+        // stats live in the tooltip, and shortcut badges stay one line.
+        let rowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRow.swift"),
+            encoding: .utf8
+        )
+        #expect(rowSource.contains(".help(item.stats)"))
+        #expect(rowSource.contains(".fixedSize(horizontal: true, vertical: false)"))
+        #expect(!rowSource.contains("Text(\"· \\(item.stats)"))
     }
 }

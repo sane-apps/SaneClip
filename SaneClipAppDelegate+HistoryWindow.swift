@@ -114,31 +114,53 @@ extension SaneClipAppDelegate {
         withHistoryAuth { [weak self] in self?.showHistoryWindow() }
     }
 
-    /// Gets the history UI out of the way of a synthesized paste. Even a
-    /// non-activating panel can still be the key window, so leaving it visible
-    /// during Cmd+V can send the keystroke to SaneClip instead of the target app.
-    /// Keep-open is handled by `.reopenHistoryAfterPaste`; first hide, then paste.
-    @objc func handleDismissForPaste() {
+    /// Gets the history UI out of the way of a synthesized paste. Normal paste
+    /// hides history; keep-open paste leaves the visible history surface up and
+    /// only resigns key status so Cmd+V can target the previous app.
+    @objc func handleDismissForPaste(_ notification: Notification) {
+        let behavior = notification.object as? PasteDismissBehavior ?? .hide
         if popover.isShown {
-            popover.performClose(nil)
+            switch behavior {
+            case .hide:
+                closePopoverImmediatelyForPaste()
+            case .keepVisible:
+                popover.contentViewController?.view.window?.resignKey()
+            }
         } else if let historyWindow, historyWindow.isVisible {
-            removeHistoryWindowOutsideClickMonitor()
-            historyWindow.orderOut(nil)
+            switch behavior {
+            case .hide:
+                removeHistoryWindowOutsideClickMonitor()
+                historyWindow.orderOut(nil)
+            case .keepVisible:
+                historyWindow.resignKey()
+            }
         }
+    }
+
+    private func closePopoverImmediatelyForPaste() {
+        let wasAnimating = popover.animates
+        popover.animates = false
+        popover.close()
+        popover.animates = wasAnimating
     }
 
     /// Re-shows history after a paste when the flow asked to keep it open
     /// (e.g. paste-stack "keep open while consuming"). Routes to the window or
     /// the popover to match the user's chosen presentation.
     @objc func handleReopenHistoryAfterPaste() {
-        // If another path already reopened the floating window, avoid a second
-        // order-front flash.
-        if let historyWindow, historyWindow.isVisible { return }
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 180_000_000)
             if SettingsModel.shared.useFloatingHistoryWindow, licenseService.isPro {
-                showHistoryWindow()
-            } else if !popover.isShown {
+                if let historyWindow, historyWindow.isVisible {
+                    historyWindow.orderFrontRegardless()
+                    historyWindow.makeKey()
+                    installHistoryWindowOutsideClickMonitor()
+                } else {
+                    showHistoryWindow()
+                }
+            } else if popover.isShown {
+                popover.contentViewController?.view.window?.makeKeyAndOrderFront(nil)
+            } else {
                 showHistoryPopover()
             }
         }

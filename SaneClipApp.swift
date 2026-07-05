@@ -428,7 +428,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         // Dismiss popover when paste is about to simulate Cmd+V
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(handleDismissForPaste),
+            selector: #selector(handleDismissForPaste(_:)),
             name: .dismissForPaste,
             object: nil
         )

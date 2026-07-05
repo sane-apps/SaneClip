@@ -10,6 +10,7 @@
       <link>https://saneclip.com/download</link>
       <pubDate>Sat, 04 Jul 2026 18:26:54 -0400</pubDate>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:criticalUpdate/>
       <description>
         <![CDATA[
         <h2>What's New</h2>

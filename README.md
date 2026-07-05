@@ -4,7 +4,7 @@
 
 ### The Only Clipboard Manager That Takes Privacy Seriously
 
-**Privacy-first clipboard history · On-device by default · No personal-content upload · Pro adds Touch ID + local history encryption**
+**Privacy-first clipboard history · On-device by default · No personal-content upload · Full Pro for 14 days, then pay once**
 
 [![GitHub stars](https://img.shields.io/github/stars/sane-apps/SaneClip?style=flat-square)](https://github.com/sane-apps/SaneClip/stargazers)
 [![License: PolyForm Shield](https://img.shields.io/badge/License-PolyForm%20Shield-blue.svg?style=flat-square)](LICENSE)
@@ -77,7 +77,7 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ---
 
-## 🧾 Free 14-Day Trial + Pro
+## 🧾 Full Pro for 14 Days + Pay Once
 
 The Mac app starts with 14 days of Pro access. After the trial, Pro is required and remains a one-time $14.99 purchase. The iPhone/iPad companion remains a separate free App Store download that uses your iCloud account for sync.
 

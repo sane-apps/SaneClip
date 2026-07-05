@@ -44,7 +44,7 @@
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         "name": "SaneClip",
-  "description": "A secure clipboard manager for macOS. Download starts a 14-day Pro trial for OCR capture, Touch ID lock, encryption, and advanced paste tools. Pro is required after trial.",
+  "description": "A secure clipboard manager for macOS. Download starts full Pro for 14 days, including OCR capture, Touch ID lock, encryption, and advanced paste tools. Pro is required after trial.",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "macOS 14 Sonoma or later",
         "offers": {
@@ -1309,7 +1309,7 @@
         .sustainability-option p { font-size: 0.9375rem; color: var(--text-secondary); line-height: 1.5; }
         @media (max-width: 768px) { .sustainability-options { grid-template-columns: 1fr; } }
         .price-note { position: relative; display: inline; color: var(--text-primary); font-size: 0.9375rem; vertical-align: super; margin-left: 3px; cursor: default; }
-        .price-note::after { content: "One-time Pro unlock. Pro is required after trial."; position: absolute; left: calc(100% + 6px); top: 50%; transform: translateY(-50%); background: var(--bg-card); color: var(--text-primary); padding: 8px 14px; border-radius: 8px; font-size: 0.9375rem; font-style: italic; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.1s; z-index: 999; border: 1px solid var(--border); }
+        .price-note::after { content: "One-time Pro purchase. Pro is required after trial."; position: absolute; left: calc(100% + 6px); top: 50%; transform: translateY(-50%); background: var(--bg-card); color: var(--text-primary); padding: 8px 14px; border-radius: 8px; font-size: 0.9375rem; font-style: italic; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.1s; z-index: 999; border: 1px solid var(--border); }
         .price-note:hover::after { opacity: 1; }
         @media (max-width: 768px) { .price-note { display: none; } }
 
@@ -1565,7 +1565,7 @@
         <a href="https://sanehosts.com" data-cta="cross_sell_sanehosts_mobile">SaneHosts &mdash; Ad &amp; Tracker Blocker</a>
         <a href="https://saneclick.com" data-cta="cross_sell_saneclick_mobile">SaneClick &mdash; Finder Actions</a>
         <a href="https://saneapps.com" data-cta="cross_sell_saneapps_mobile">See all SaneApps &rarr;</a>
-        <a href="/download" class="mobile-nav-cta" data-cta="download_trial">Start Free 14-Day Trial</a>
+        <a href="/download" class="mobile-nav-cta" data-cta="download_trial">Start Full Pro Trial</a>
     </div>
 
     <section class="hero">
@@ -1579,34 +1579,17 @@
                 <span>&#128274; On-Device by Default &middot; &#128176; No Subscriptions &middot; &#128269; 100% Transparent Code</span>
             </div>
             <div class="animate-in delay-5" style="margin: 22px auto 28px; text-align: center;">
-                <a href="/download" class="pricing-cta pricing-cta-pro" style="display: inline-flex; align-items: center; justify-content: center; width: auto; min-width: 240px;" data-cta="download_trial">Start Free 14-Day Trial</a>
-                <p style="color: var(--text-muted); font-size: 0.92rem; margin: 12px 0 6px;">14 days free. No credit card required. Pro is required after trial.</p>
+                <a href="/download" class="pricing-cta pricing-cta-pro" style="display: inline-flex; align-items: center; justify-content: center; width: auto; min-width: 240px;" data-cta="download_trial">Start Full Pro Trial</a>
+                <p style="color: var(--text-muted); font-size: 0.92rem; margin: 12px 0 6px;">Full Pro for 14 days. No credit card required. Pro is required after trial.</p>
                 <a href="https://go.saneapps.com/buy/saneclip?ref=website-hero" style="color: var(--accent); font-weight: 700; text-decoration: none;" data-cta="buy_pro">Buy Pro now — $14.99 once</a>
             </div>
-            <div class="animate-in delay-5" id="pricing">
-                <div class="hero-pricing-grid">
-                    <div class="pricing-card">
-                        <p class="pricing-label">Trial access</p>
-                        <p class="pricing-price">14 days</p>
-                        <p class="pricing-price-note">Pro required after 14 days</p>
-                        <ul class="pricing-features">
-                            <li>Clipboard history (50 items)</li>
-                            <li>Search, source filtering, and pinning</li>
-                            <li>Floating resizable history window</li>
-                            <li>Full keyboard navigation</li>
-                            <li>Drag &amp; drop clips into other apps</li>
-                            <li>Standard paste</li>
-                            <li>Capture Screenshot into history</li>
-                            <li>Free iPhone &amp; iPad companion app with optional private iCloud sync</li>
-                            <li>On-device by default privacy</li>
-                        </ul>
-                    </div>
+            <div class="animate-in delay-5" id="pricing" style="scroll-margin-top: 120px;">
+                <div class="hero-pricing-grid" style="max-width: 520px; grid-template-columns: 1fr;">
                     <div class="pricing-card featured">
-                        <p class="pricing-label">Free trial</p>
+                        <p class="pricing-label">Full Pro Trial</p>
                         <p class="pricing-price">$14.99<span class="price-note">*</span></p>
-                        <p class="pricing-price-note">14 days free. No credit card required.</p>
+                        <p class="pricing-price-note">Every Pro feature free for 14 days. Then Pro is required.</p>
                         <ul class="pricing-features">
-                            <li>OCR capture and unlimited history</li>
                             <li class="extra">Unlimited clipboard history</li>
                             <li class="extra">Touch ID history lock</li>
                             <li class="extra">OCR capture for text grabs and searchable screenshots</li>
@@ -1923,7 +1906,7 @@
         <div class="container">
             <h2 class="section-title">How SaneClip Stacks Up</h2>
             <p class="section-subtitle">I built what I wished existed. Here's how SaneClip Pro compares.</p>
-            <p class="section-subtitle" style="margin-top: -10px; font-size: 0.95rem;">This table reflects SaneClip Pro. Download starts a free 14-day trial, then Pro is required to continue.</p>
+            <p class="section-subtitle" style="margin-top: -10px; font-size: 0.95rem;">This table reflects SaneClip Pro. Download starts full Pro for 14 days, then Pro is required to continue.</p>
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
                     <thead>
@@ -2229,7 +2212,7 @@
                     <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 30px;">Download starts 14 days of Pro. After the trial, keep Pro with a one-time purchase.</p>
                     <div class="sustainability-options">
                         <a href="/download" class="sustainability-option">
-                            <h4>Start Free 14-Day Trial</h4>
+                            <h4>Start Full Pro Trial</h4>
                             <p>All Mac Pro features for 14 days. No credit card required; Pro is required after trial.</p>
                         </a>
                         <a href="https://go.saneapps.com/buy/saneclip?ref=website" class="sustainability-option featured">

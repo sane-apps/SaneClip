@@ -9,10 +9,10 @@
 [![GitHub stars](https://img.shields.io/github/stars/sane-apps/SaneClip?style=flat-square)](https://github.com/sane-apps/SaneClip/stargazers)
 [![License: PolyForm Shield](https://img.shields.io/badge/License-PolyForm%20Shield-blue.svg?style=flat-square)](LICENSE)
 [![macOS](https://img.shields.io/badge/macOS-14.0+-blue?style=flat-square)](https://www.apple.com/macos/)
-[![Pricing](https://img.shields.io/badge/Pricing-Free_%2B_%2414.99_Pro-green?style=flat-square)](https://saneclip.com)
+[![Pricing](https://img.shields.io/badge/Pricing-14--day_trial_%2B_%2414.99_Pro-green?style=flat-square)](https://saneclip.com)
 [![Listed on macOS apps list](https://img.shields.io/badge/Listed%20on-macOS--apps--list%20(40k%E2%98%85)-black?style=flat-square)](https://github.com/serhii-londar/open-source-mac-os-apps)
 
-> **⭐ Star this repo if you find it useful!** · **[⬇️ Download Free](https://saneclip.com/download)** · **[💰 Upgrade to Pro for $14.99 once](https://go.saneapps.com/buy/saneclip?ref=github-readme)**
+> **⭐ Star this repo if you find it useful!** · **[⬇️ Start a free 14-day Pro trial](https://saneclip.com/download)** · **[💰 Buy Pro for $14.99 once](https://go.saneapps.com/buy/saneclip?ref=github-readme)**
 
 <img src="docs/images/screenshot-popover.png" alt="SaneClip Screenshot" width="600">
 
@@ -57,44 +57,31 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ---
 
-## 🆕 Next macOS Direct Download: v2.3.14
+## 🆕 Current macOS Direct Download: v2.3.16
 
-**Next direct-download release (staged for July 2026)**
+**Current direct-download release (July 2026)**
 
+- ✅ Starts Mac users with a free 14-day Pro trial, then requires Pro for continued use
 - ✅ Keeps only one SaneClip copy running so duplicate launches do not fight over clipboard history
-- ✅ Lets the Pro Paste Stack record copies as you build a queue
 - ✅ Pastes from the floating history window back into your app without focus stealing or first-click misses
-- ✅ Keeps the floating history window steady in keep-open mode instead of flickering closed and open
-- ✅ Keeps merge queue controls readable at narrow widths
+- ✅ Keeps the Pro floating history window steady in keep-open mode instead of flickering closed and open
+- ✅ Improves Pro Paste Stack recording, pinning, and toolbar behavior
 - ✅ Adds bulk delete for selected merge-queue clips
 - ✅ Keeps Edit Text Save and Cancel buttons visible while editing long clips
 - ✅ Makes Clipboard Rules switches update visibly as soon as they are clicked
-- ✅ Keeps the Pro floating history toolbar/search controls usable while still closing on real outside clicks
-- ✅ Adds a Pro pin control beside history search for keep-open-after-paste mode
 - ✅ Adds a trailing-newline cleanup rule and broader tracking-parameter cleanup
 - ✅ Scrolls large mixed-app histories more smoothly with cached source-app icons
 - ✅ Keeps pinned clips from being trimmed when history fills up
 - ✅ Clears widget and iOS preview caches when encrypted history or Touch ID lock is enabled
 - ✅ Adds eight UI localizations: French, German, Spanish, Italian, Portuguese (Brazil), Japanese, Simplified Chinese, and Korean
 
-The live public direct-download channel remains `2.3.13` until the owner ships `2.3.14` from the Mini.
-
 ---
 
-## 🧾 Free vs Pro (Current)
+## 🧾 Free 14-Day Trial + Pro
 
-### Free includes
-- Clipboard history (last 50 items)
-- Standard paste with original formatting
-- Search and source-aware filtering
-- Pin and unpin important clips
-- Capture Screenshot into history
-- Excluded apps and auto-delete controls
-- Optional "open at mouse cursor" launch mode
-- Free iPhone/iPad companion app with optional private iCloud sync
-- On-device privacy defaults
+The Mac app starts with 14 days of Pro access. After the trial, Pro is required and remains a one-time $14.99 purchase. The iPhone/iPad companion remains a separate free App Store download that uses your iCloud account for sync.
 
-### Pro adds on Mac
+### Pro includes
 - Unlimited history
 - Touch ID history lock
 - History encryption (AES-256-GCM)
@@ -108,6 +95,7 @@ The live public direct-download channel remains `2.3.13` until the owner ships `
 - Titles, tags, collections, and item notes
 - Clipboard rules
 - Export and import
+- Pinning, search, source-aware filtering, screenshots, excluded apps, and auto-delete controls
 
 ---
 
@@ -254,11 +242,9 @@ See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) for full details.
 
 ## 📦 Installation
 
-**SaneClip Basic is $0.** Clipboard history, search, pinning, screenshots, private defaults, and the free iPhone/iPad companion app are included.
+**SaneClip for Mac starts with a free 14-day Pro trial.** After the trial, Pro is required and remains a one-time $14.99 purchase. The iPhone/iPad companion remains a separate free App Store download that uses your iCloud account for sync.
 
-**Mac Pro is a one-time unlock.** The iPhone/iPad companion remains a separate free App Store download that uses your iCloud account for sync.
-
-Want more? **[Upgrade to Pro ($14.99 once)](https://go.saneapps.com/buy/saneclip?ref=github-readme)** for OCR capture, unlimited history, Touch ID lock, encryption-at-rest, smarter paste, snippets, and advanced rules.
+**[Buy Pro ($14.99 once)](https://go.saneapps.com/buy/saneclip?ref=github-readme)** for OCR capture, unlimited history, Touch ID lock, encryption-at-rest, smarter paste, snippets, and advanced rules.
 
 ### Install
 
@@ -368,7 +354,7 @@ Before opening a PR:
 - 🐛 [Report a Bug](https://github.com/sane-apps/SaneClip/issues/new?template=bug_report.md)
 - 💡 [Request a Feature](https://github.com/sane-apps/SaneClip/issues/new?template=feature_request.md)
 
-**Cloning without starring?** For real bro? Gimme that star!
+**If SaneClip helps you, star the repo.** Stars help other Mac users find maintained privacy-first software.
 
 ---
 
@@ -391,7 +377,7 @@ SaneClip is available in two versions with different capabilities:
 
 > **Why the difference?** The Mac App Store version runs in Apple's sandbox, which blocks simulated keyboard events (used for auto-paste). Instead, the App Store version copies items to your clipboard and shows a notification — just press Cmd+V to paste. All other features work identically.
 
-**Direct download:** [Free Basic at saneclip.com/download](https://saneclip.com/download) · [Upgrade to Pro for $14.99 once](https://go.saneapps.com/buy/saneclip?ref=github-readme) — includes Sparkle auto-updates.
+**Direct download:** [Start the free 14-day Pro trial at saneclip.com/download](https://saneclip.com/download) · [Buy Pro for $14.99 once](https://go.saneapps.com/buy/saneclip?ref=github-readme) — includes Sparkle auto-updates.
 
 ---
 

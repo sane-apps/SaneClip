@@ -263,90 +263,13 @@ struct ClipboardItemRow: View {
                         .padding(.leading, 20)
                     }
 
-                    HStack(spacing: 6) {
-                        if let icon = item.sourceAppIcon {
-                            Image(nsImage: icon)
-                                .resizable()
-                                .frame(width: 14, height: 14)
-                        }
-                        if let appName = item.sourceAppName, !appName.isEmpty {
-                            Text(appName)
-                                .font(.caption)
-                                .lineLimit(1)
-                                .fixedSize()
-                                .foregroundStyle(.primary.opacity(0.72))
-                            Text("·")
-                                .font(.caption)
-                                .foregroundStyle(.secondary.opacity(0.5))
-                        } else if case .image = item.content {
-                            Image(systemName: "photo")
-                                .font(.caption2)
-                                .foregroundStyle(.primary.opacity(0.55))
-                        }
-
-                        Text(item.timeAgo)
-                            .font(.caption)
-                            .lineLimit(1)
-                            .fixedSize()
-                            .foregroundStyle(.primary.opacity(0.5))
-
-                        if item.pasteCount > 0 {
-                            HStack(spacing: 2) {
-                                Image(systemName: "doc.on.doc")
-                                    .font(.system(size: 9))
-                                Text("\(item.pasteCount)")
-                                    .font(.caption2)
-                            }
-                            .foregroundStyle(Color.semanticSuccess.opacity(0.85))
-                            .help("Pasted \(item.pasteCount) time\(item.pasteCount == 1 ? "" : "s")")
-                        }
-
-                        Spacer()
-
-                        if isHovering, isPro, !isPinned {
-                            Image(systemName: "line.3.horizontal")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary.opacity(0.6))
-                                .help("Drag to another app")
-                        }
-
-                        if let hint = shortcutHint {
-                            Text(hint)
-                                .font(.system(.caption2, design: .monospaced))
-                                .lineLimit(1)
-                                .fixedSize(horizontal: true, vertical: false)
-                                .foregroundStyle(.primary.opacity(0.55))
-                                .padding(.horizontal, 4)
-                                .background(Color.primary.opacity(0.05))
-                                .cornerRadius(4)
-                        }
-
-                        if case .image = item.content {
-                            Button {
-                                showImagePreviewSheet = true
-                            } label: {
-                                Image(systemName: "eye")
-                                    .font(.caption)
-                                    .foregroundStyle(accentColor)
-                            }
-                            .buttonStyle(.plain)
-                            .help("Preview image")
-                        }
-
-                        if item.collection != "Default" {
-                            // A collection is a user grouping, not a state, so
-                            // it stays a neutral chip — amber is reserved for
-                            // "pinned", never a label.
-                            Text(item.collection)
-                                .font(.system(size: 10, weight: .medium))
-                                .lineLimit(1)
-                                .foregroundStyle(.white.opacity(0.85))
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 2)
-                                .background(Color.white.opacity(0.12))
-                                .clipShape(Capsule())
-                        }
-                    }
+                    ClipboardItemRowMetadata(
+                        item: item,
+                        accentColor: accentColor,
+                        showsDragAffordance: isHovering && isPro && !isPinned,
+                        shortcutHint: shortcutHint,
+                        onPreviewImage: { showImagePreviewSheet = true }
+                    )
                 }
 
                 Spacer(minLength: 4)
@@ -442,10 +365,12 @@ struct ClipboardItemRow: View {
             }
 
             // Open Link (for URLs only)
-            if item.isURL, case let .text(urlString) = item.content,
-               let url = URL(string: urlString.trimmingCharacters(in: .whitespacesAndNewlines)) {
-                Button("Open Link") {
-                    NSWorkspace.shared.open(url)
+            if item.isURL, case let .text(urlString) = item.content {
+                let trimmedURLString = urlString.trimmingCharacters(in: .whitespacesAndNewlines)
+                if let url = URL(string: trimmedURLString) {
+                    Button("Open Link") {
+                        NSWorkspace.shared.open(url)
+                    }
                 }
             }
 

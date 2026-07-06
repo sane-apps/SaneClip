@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.18] - 2026-07-06
+
+Improves narrow history row resizing, keeps hover metadata and actions stable across window shapes, and tightens Paste Stack controls so compact rows stay readable.
+
+---
+
 ## [2.3.17] - 2026-07-06
 
 Fixes history keep-open paste reliability, preserves Merge Queue selections after reopening history, keeps Pause Capture countdowns refreshed while idle, and removes direct-store update/donation UI from App Store and Setapp builds.

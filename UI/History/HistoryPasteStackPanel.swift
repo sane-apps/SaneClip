@@ -18,7 +18,7 @@ struct HistoryPasteStackPanel: View {
             HStack {
                 Text("Paste Stack")
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary.opacity(0.9))
+                    .foregroundStyle(.white)
 
                 // Build-by-copying: while on, every copy is appended to the
                 // stack. Uses the stack's own violet so the color still means
@@ -31,7 +31,7 @@ struct HistoryPasteStackPanel: View {
                         Text(clipboardManager.isRecordingStack ? "Recording copies" : "Record copies")
                     }
                     .font(.caption)
-                    .foregroundStyle(clipboardManager.isRecordingStack ? Color.stackViolet : .secondary)
+                    .foregroundStyle(clipboardManager.isRecordingStack ? Color.stackViolet : .white.opacity(0.9))
                 }
                 .buttonStyle(.plain)
                 .help("Automatically add every copy to the stack, in order")
@@ -55,7 +55,7 @@ struct HistoryPasteStackPanel: View {
                 }
                 .buttonStyle(.plain)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.white.opacity(0.9))
             }
 
             HStack(spacing: 10) {
@@ -71,14 +71,14 @@ struct HistoryPasteStackPanel: View {
                 .toggleStyle(.checkbox)
             }
             .font(.caption)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.white.opacity(0.9))
 
             if clipboardManager.pasteStack.isEmpty {
                 Text(clipboardManager.isRecordingStack
                     ? "Recording — the next things you copy land here, in order."
                     : "Paste stack is empty. Turn on \u{201C}Record copies\u{201D} to build one as you copy, or use \u{201C}Add to Paste Stack\u{201D} on any clip.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.9))
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.vertical, 8)
             } else {
@@ -103,77 +103,23 @@ struct HistoryPasteStackPanel: View {
             HStack(spacing: 8) {
                 Text("#\(index + 1)")
                     .font(.system(.caption, design: .monospaced))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.9))
                     .frame(width: 24, alignment: .leading)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(item.title?.isEmpty == false ? item.title! : item.preview)
                         .lineLimit(1)
                         .font(.subheadline.weight(.medium))
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(.white)
                     if let note = item.note, !note.isEmpty {
                         Text(note)
                             .lineLimit(1)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.white.opacity(0.9))
                     }
                 }
-                Spacer()
-                Button("Paste") {
-                    clipboardManager.pasteFromStackItem(id: item.id)
-                }
-                .buttonStyle(.plain)
-                .font(.caption)
-                Button("Top") {
-                    clipboardManager.movePasteStackItemToTop(id: item.id)
-                }
-                .buttonStyle(.plain)
-                .font(.caption)
-                Button {
-                    clipboardManager.movePasteStackItemUp(id: item.id)
-                } label: {
-                    Image(systemName: "arrow.up")
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(.secondary)
-                .help("Move up")
-                Button {
-                    clipboardManager.movePasteStackItemDown(id: item.id)
-                } label: {
-                    Image(systemName: "arrow.down")
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(.secondary)
-                .help("Move down")
-                Button(editingStackTitleID == item.id ? "Save Title" : "Rename") {
-                    if editingStackTitleID == item.id {
-                        clipboardManager.updateItemTitle(id: item.id, title: stackTitleDraft)
-                        editingStackTitleID = nil
-                    } else {
-                        editingStackTitleID = item.id
-                        stackTitleDraft = item.title ?? ""
-                    }
-                }
-                .buttonStyle(.plain)
-                .font(.caption)
-                Button(editingStackNoteID == item.id ? "Save Note" : "Note") {
-                    if editingStackNoteID == item.id {
-                        clipboardManager.updateItemNote(id: item.id, note: stackNoteDraft)
-                        editingStackNoteID = nil
-                    } else {
-                        editingStackNoteID = item.id
-                        stackNoteDraft = item.note ?? ""
-                    }
-                }
-                .buttonStyle(.plain)
-                .font(.caption)
-                Button {
-                    clipboardManager.removeFromPasteStack(id: item.id)
-                } label: {
-                    Image(systemName: "xmark.circle")
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(.secondary)
-                .help("Remove from stack")
+                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+
+                stackRowActions(for: item)
             }
 
             if editingStackTitleID == item.id {
@@ -185,5 +131,67 @@ struct HistoryPasteStackPanel: View {
                     .textFieldStyle(.roundedBorder)
             }
         }
+    }
+
+    private func stackRowActions(for item: ClipboardItem) -> some View {
+        HStack(spacing: 8) {
+            stackIconButton("return", "Paste this stack item", color: .stackViolet) {
+                clipboardManager.pasteFromStackItem(id: item.id)
+            }
+            stackIconButton("arrow.up.to.line", "Move to top") {
+                clipboardManager.movePasteStackItemToTop(id: item.id)
+            }
+            stackIconButton("arrow.up", "Move up") {
+                clipboardManager.movePasteStackItemUp(id: item.id)
+            }
+            stackIconButton("arrow.down", "Move down") {
+                clipboardManager.movePasteStackItemDown(id: item.id)
+            }
+            stackIconButton(
+                editingStackTitleID == item.id ? "checkmark" : "pencil",
+                editingStackTitleID == item.id ? "Save title" : "Rename"
+            ) {
+                if editingStackTitleID == item.id {
+                    clipboardManager.updateItemTitle(id: item.id, title: stackTitleDraft)
+                    editingStackTitleID = nil
+                } else {
+                    editingStackTitleID = item.id
+                    stackTitleDraft = item.title ?? ""
+                }
+            }
+            stackIconButton(
+                editingStackNoteID == item.id ? "checkmark.circle" : "note.text",
+                editingStackNoteID == item.id ? "Save note" : "Edit note"
+            ) {
+                if editingStackNoteID == item.id {
+                    clipboardManager.updateItemNote(id: item.id, note: stackNoteDraft)
+                    editingStackNoteID = nil
+                } else {
+                    editingStackNoteID = item.id
+                    stackNoteDraft = item.note ?? ""
+                }
+            }
+            stackIconButton("xmark.circle", "Remove from stack") {
+                clipboardManager.removeFromPasteStack(id: item.id)
+            }
+        }
+        .fixedSize(horizontal: true, vertical: false)
+    }
+
+    private func stackIconButton(
+        _ systemImage: String,
+        _ help: String,
+        color: Color = .white.opacity(0.9),
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.caption)
+                .frame(width: 14, height: 14)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(color)
+        .help(help)
+        .accessibilityLabel(help)
     }
 }

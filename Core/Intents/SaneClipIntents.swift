@@ -25,7 +25,7 @@ struct GetClipboardHistoryIntent: AppIntent {
 
         let source = pinnedOnly ? clipboardManager.pinnedItems : clipboardManager.history
         let texts = source.prefix(limit).compactMap { item -> String? in
-            if case .text(let string) = item.content {
+            if case let .text(string) = item.content {
                 return string
             }
             return nil
@@ -94,14 +94,14 @@ struct SearchClipboardIntent: AppIntent {
         let lowercasedQuery = query.lowercased()
         let results = clipboardManager.history
             .filter { item in
-                if case .text(let string) = item.content {
+                if case let .text(string) = item.content {
                     return string.lowercased().contains(lowercasedQuery)
                 }
                 return false
             }
             .prefix(limit)
             .compactMap { item -> String? in
-                if case .text(let string) = item.content {
+                if case let .text(string) = item.content {
                     return string
                 }
                 return nil
@@ -284,39 +284,44 @@ private enum IntentSecurityGate {
 
 // MARK: - App Shortcuts Provider
 
-/// Provides discoverable App Shortcuts for Siri and Shortcuts.app
-/// Note: All intents are available in Shortcuts.app even without explicit shortcuts
-struct SaneClipShortcuts: AppShortcutsProvider {
-    static var appShortcuts: [AppShortcut] {
-        AppShortcut(
-            intent: GetClipboardHistoryIntent(),
-            phrases: [
-                "Get clipboard history from \(.applicationName)",
-                "Show my \(.applicationName) clipboard",
-                "What's in my \(.applicationName)"
-            ],
-            shortTitle: "Get History",
-            systemImageName: "doc.on.clipboard"
-        )
+#if !DEBUG
+    // Provides discoverable App Shortcuts for Siri and Shortcuts.app.
+    // All intents are available in Shortcuts.app even without explicit shortcuts.
+    // swiftlint:disable trailing_comma
+    struct SaneClipShortcuts: AppShortcutsProvider {
+        static var appShortcuts: [AppShortcut] {
+            AppShortcut(
+                intent: GetClipboardHistoryIntent(),
+                phrases: [
+                    "Get clipboard history from \(.applicationName)",
+                    "Show my \(.applicationName) clipboard",
+                    "What's in my \(.applicationName)",
+                ],
+                shortTitle: "Get History",
+                systemImageName: "doc.on.clipboard"
+            )
 
-        AppShortcut(
-            intent: ClearHistoryIntent(),
-            phrases: [
-                "Clear \(.applicationName) history",
-                "Delete clipboard history in \(.applicationName)"
-            ],
-            shortTitle: "Clear History",
-            systemImageName: "trash"
-        )
+            AppShortcut(
+                intent: ClearHistoryIntent(),
+                phrases: [
+                    "Clear \(.applicationName) history",
+                    "Delete clipboard history in \(.applicationName)",
+                ],
+                shortTitle: "Clear History",
+                systemImageName: "trash"
+            )
 
-        AppShortcut(
-            intent: ListSnippetsIntent(),
-            phrases: [
-                "List snippets in \(.applicationName)",
-                "Show my \(.applicationName) snippets"
-            ],
-            shortTitle: "List Snippets",
-            systemImageName: "text.quote"
-        )
+            AppShortcut(
+                intent: ListSnippetsIntent(),
+                phrases: [
+                    "List snippets in \(.applicationName)",
+                    "Show my \(.applicationName) snippets",
+                ],
+                shortTitle: "List Snippets",
+                systemImageName: "text.quote"
+            )
+        }
     }
-}
+
+    // swiftlint:enable trailing_comma
+#endif

@@ -170,6 +170,81 @@ struct HistoryRenderTests {
     }
 
     @MainActor
+    @Test("Render Glenn 1016 narrow hover metadata proof screenshot when requested")
+    func renderGlenn1016NarrowHoverMetadataProof() throws {
+        guard let rawDir = screenshotDir() else { return }
+        let outputDir = URL(
+            fileURLWithPath: NSString(string: rawDir).expandingTildeInPath,
+            isDirectory: true
+        )
+        try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
+
+        let longSourceItem = ClipboardItem(
+            content: .text("Screenshot received: narrow hover row pressure sample"),
+            sourceAppName: "Equifax GC Ban extension",
+            pasteCount: 1,
+            title: "Screenshot received",
+            tags: ["launch", "priority", "q3"],
+            collection: "Planning"
+        )
+        let view = VStack(alignment: .leading, spacing: 8) {
+            Text("300 pt hover row")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.9))
+
+            HStack(alignment: .top, spacing: 8) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Color.clipBlue)
+                    .frame(width: 4)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(longSourceItem.title ?? longSourceItem.preview)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(1)
+                        .foregroundStyle(.white)
+                    Text(longSourceItem.preview)
+                        .font(.caption)
+                        .lineLimit(2)
+                        .foregroundStyle(.white.opacity(0.9))
+                    HStack(spacing: 4) {
+                        ForEach(longSourceItem.tags, id: \.self) { tag in
+                            Text("#\(tag)")
+                                .font(.system(size: 10, weight: .medium))
+                                .lineLimit(1)
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 2)
+                                .background(Color.clipBlue.opacity(0.2))
+                                .cornerRadius(4)
+                        }
+                    }
+                    ClipboardItemRowMetadata(
+                        item: longSourceItem,
+                        accentColor: .clipBlue,
+                        showsDragAffordance: true,
+                        shortcutHint: "⌘⌃1",
+                        onPreviewImage: {}
+                    )
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(9)
+            .frame(width: 300, alignment: .leading)
+            .background(RoundedRectangle(cornerRadius: 10).fill(Color.black.opacity(0.35)))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.clipBlue.opacity(0.45), lineWidth: 1)
+            )
+        }
+        .padding(12)
+        .background(Color(red: 0.08, green: 0.08, blue: 0.09))
+        .preferredColorScheme(.dark)
+
+        let url = outputDir.appendingPathComponent("glenn-1016-narrow-hover-metadata-adaptive.png")
+        try renderViewPNG(view, size: CGSize(width: 324, height: 158), to: url)
+        #expect(FileManager.default.fileExists(atPath: url.path))
+    }
+
+    @MainActor
     private func makeForcedProLicense() -> LicenseService {
         setenv("SANEAPPS_FORCE_PRO_MODE", "1", 1)
         let service = LicenseService(
@@ -337,5 +412,23 @@ struct HistoryRenderTests {
         }
         try png.write(to: url, options: .atomic)
         window.orderOut(nil)
+    }
+
+    @MainActor
+    private func renderViewPNG<V: View>(_ view: V, size: CGSize, to url: URL) throws {
+        let controller = NSHostingController(rootView: view.frame(width: size.width, height: size.height))
+        controller.view.frame = NSRect(origin: .zero, size: size)
+        controller.view.layoutSubtreeIfNeeded()
+
+        guard let bitmap = controller.view.bitmapImageRepForCachingDisplay(in: controller.view.bounds) else {
+            Issue.record("Failed to render \(url.lastPathComponent)")
+            return
+        }
+        controller.view.cacheDisplay(in: controller.view.bounds, to: bitmap)
+        guard let png = bitmap.representation(using: .png, properties: [:]) else {
+            Issue.record("Failed to encode \(url.lastPathComponent)")
+            return
+        }
+        try png.write(to: url, options: .atomic)
     }
 }

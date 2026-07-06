@@ -435,6 +435,10 @@ struct HistoryWindowTests {
             contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRow.swift"),
             encoding: .utf8
         )
+        let metadataSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRowMetadata.swift"),
+            encoding: .utf8
+        )
         let keyboardSource = try String(
             contentsOf: projectRootURL().appendingPathComponent("UI/History/HistoryListKeyboardShortcuts.swift"),
             encoding: .utf8
@@ -459,7 +463,8 @@ struct HistoryWindowTests {
         // Floating-window toggle is discoverable in General settings.
         #expect(generalSettings.contains("Open history as a resizable floating window"))
         // Drag-out affordance on hover for non-pinned rows.
-        #expect(rowSource.contains("Drag to another app"))
+        #expect(rowSource.contains("showsDragAffordance: isHovering && isPro && !isPinned"))
+        #expect(metadataSource.contains("Drag to another app"))
     }
 
     @Test("Clip rows drag out only when not pinned so pinned reorder survives")
@@ -545,8 +550,33 @@ struct HistoryWindowTests {
             contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRow.swift"),
             encoding: .utf8
         )
+        let metadataSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ClipboardItemRowMetadata.swift"),
+            encoding: .utf8
+        )
+        let stackSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/HistoryPasteStackPanel.swift"),
+            encoding: .utf8
+        )
+        #expect(rowSource.contains("ClipboardItemRowMetadata("))
         #expect(rowSource.contains(".help(item.stats)"))
-        #expect(rowSource.contains(".fixedSize(horizontal: true, vertical: false)"))
+        #expect(metadataSource.contains("ViewThatFits(in: .horizontal)"))
+        #expect(metadataSource.contains("row(showSourceName: true, showCollection: true)"))
+        #expect(metadataSource.contains("row(showSourceName: true, showCollection: false)"))
+        #expect(metadataSource.contains("row(showSourceName: false, showCollection: false)"))
+        #expect(metadataSource.contains("showsDragAffordance"))
+        #expect(metadataSource.contains(".fixedSize(horizontal: true, vertical: false)"))
+        #expect(!rowSource.contains("Text(appName)"))
+        #expect(!metadataSource.contains(".fixedSize()"))
         #expect(!rowSource.contains("Text(\"· \\(item.stats)"))
+        // Paste Stack actions are icon buttons with help/accessibility labels,
+        // so 320 px rows cannot split action text into odd shapes.
+        #expect(stackSource.contains("private func stackRowActions"))
+        #expect(stackSource.contains("private func stackIconButton"))
+        #expect(stackSource.contains(".accessibilityLabel(help)"))
+        #expect(!stackSource.contains("Button(\"Paste\")"))
+        #expect(!stackSource.contains("Button(\"Top\")"))
+        #expect(!stackSource.contains("Button(editingStackTitleID"))
+        #expect(!stackSource.contains("Button(editingStackNoteID"))
     }
 }

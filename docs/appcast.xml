@@ -5,7 +5,27 @@
     <link>https://saneclip.com/appcast.xml</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
-            <item>
+                    <item>
+            <title>2.3.18</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Mon, 06 Jul 2026 16:35:33 -0400</pubDate>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Improves narrow history row resizing, keeps hover metadata and actions stable across window shapes, and tightens Paste Stack controls so compact rows stay readable.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.18.zip"
+                       sparkle:version="2318"
+                       sparkle:shortVersionString="2.3.18"
+                       length="5216286"
+                       type="application/octet-stream"
+                       sparkle:edSignature="eAqJ/10pxB0z7vrEMvZ+by+IGezFLssmGNNSo/MesoAn6NY6QEhOejTpaDy+9NDbfAtxHOC7J/7TptNhaqqdAg=="/>
+        </item>
+<item>
             <title>2.3.17</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Mon, 06 Jul 2026 11:01:00 -0400</pubDate>

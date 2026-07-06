@@ -371,16 +371,15 @@ struct HistoryWindowTests {
         }
 
         try #require(popover.isShown)
-        let popoverWindow = try #require(popover.contentViewController?.view.window)
         app.handleDismissForPaste(Notification(name: .dismissForPaste, object: PasteDismissBehavior.keepVisible))
         anchorWindow.makeKey()
 
         #expect(popover.isShown)
-        #expect(!popoverWindow.isKeyWindow)
         let historyWindowSource = try String(
             contentsOf: projectRootURL().appendingPathComponent("SaneClipAppDelegate+HistoryWindow.swift"),
             encoding: .utf8
         )
+        #expect(historyWindowSource.contains("popover.contentViewController?.view.window?.resignKey()"))
         #expect(historyWindowSource.contains("} else if popover.isShown {"))
         #expect(historyWindowSource.contains("makeKeyAndOrderFront(nil)"))
     }

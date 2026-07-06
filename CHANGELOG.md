@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.17] - 2026-07-06
+
+Fixes history keep-open paste reliability, preserves Merge Queue selections after reopening history, keeps Pause Capture countdowns refreshed while idle, and removes direct-store update/donation UI from App Store and Setapp builds.
+
+---
+
 ## [2.3.16] - 2026-07-04
 
 Important update to onboarding, licensing, and reliability. Recommended for all users.

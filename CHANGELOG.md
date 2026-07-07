@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.19] - 2026-07-06
+
+Improves fixed history focus after keep-open paste and direct update reliability for older installs.
+
+---
+
 ## [2.3.18] - 2026-07-06
 
 Improves narrow history row resizing, keeps hover metadata and actions stable across window shapes, and tightens Paste Stack controls so compact rows stay readable.

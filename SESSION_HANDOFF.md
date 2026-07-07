@@ -6,6 +6,58 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+### 2026-07-07 ~02:05 - SaneClip 2.3.19 shipped across review channels; Lemon hosted file still needs 2FA dashboard sync
+
+State: SaneClip 2.3.19 was released for the direct/Sparkle channel and submitted
+to both App Store review lanes. The strict direct post-release gate is still red
+only because Lemon Squeezy product `779223`, variant `1228215`, still publishes
+`SaneClip-2.3.18.zip`; the dashboard session is open at Lemon Squeezy 2FA and
+requires the one-time password before the hosted-file swap can be completed.
+
+Released/submitted:
+- Direct/Sparkle 2.3.19: live appcast build `2319`, R2 ZIP
+  `https://dist.saneclip.com/updates/SaneClip-2.3.19.zip`, SHA256
+  `4bc95ff6fc9be26df0b6fee43d4281abd78d07d70bdbf17429dcf29437a55914`,
+  GitHub release `v2.3.19`, Homebrew tap updated, website deployed, and email
+  webhook updated.
+- App Store macOS 2.3.19: build `2319` processed, attached, screenshots and
+  metadata refreshed, submitted for review; ASC state `WAITING_FOR_REVIEW`.
+- App Store iOS 2.3.19: IPA exported from `build/SaneClip-iOS.xcarchive`, build
+  `2319` processed as `929497eb-7880-480d-8d9c-979924774e30`, screenshots and
+  metadata refreshed, submitted for review; ASC state `WAITING_FOR_REVIEW`.
+- Setapp 2.3.19: package
+  `outputs/setapp_review/20260707T012525Z-saneclip-2.3.19-setapp/SaneClip-Setapp-2.3.19.zip`
+  notarized/stapled/validated and uploaded to app `1847`, version `47647`;
+  portal status is `2.3.19` / `2319`, `In Review`, `action_required=false`.
+
+Verification:
+- `./scripts/SaneMaster.rb appstore_preflight` passed after both submissions:
+  222 tests passed, Git clean, macOS/iOS ASC lanes both `2.3.19
+  (WAITING_FOR_REVIEW)`, signing/IAP/policy/artifact checks green.
+- `./scripts/SaneMaster.rb setapp_status --json --soft` confirms SaneClip
+  `2.3.19` / `2319` In Review.
+- `bash ~/SaneApps/infra/SaneProcess/scripts/release.sh --project
+  ~/SaneApps/apps/SaneClip --version 2.3.19 --post-release-checks-only` fails
+  only on Lemon Squeezy hosted-file drift:
+  `hosted=2.3.18 expected=2.3.19 variant=1228215`.
+- Upload staging exists at
+  `~/Desktop/LemonSqueezy-Uploads/SaneClip-2.3.19.zip`.
+- SaneProcess commit `517019b` adds the shared Sparkle guard so informational
+  appcast entries without top-level `sparkle:version` are blocked in release
+  preflight and live fleet validation. Tests passed:
+  `ruby scripts/sanemaster/release_guardrail_test.rb` 170/170 and
+  `ruby scripts/validation_report_test.rb` 73/73.
+
+Next required action: after Lemon Squeezy 2FA is completed, open
+`https://app.lemonsqueezy.com/products/779223`, go to Files for variant
+`1228215`, replace the published file with
+`~/Desktop/LemonSqueezy-Uploads/SaneClip-2.3.19.zip`, delete or unpublish the
+old `2.3.18` file, then rerun only:
+
+```bash
+bash /Users/stephansmac/SaneApps/infra/SaneProcess/scripts/release.sh --project /Users/stephansmac/SaneApps/apps/SaneClip --version 2.3.19 --post-release-checks-only
+```
+
 ### 2026-07-07 ~00:55 - Glenn #1034 follow-up reviewed; appcast live repaired; focus fix source verified
 
 State: Glenn's follow-up email #1034 was reviewed through `check-inbox.sh review

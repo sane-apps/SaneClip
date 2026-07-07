@@ -425,10 +425,12 @@ struct SaneClipTests {
     @Test("Manual update fallback only triggers for actionable Sparkle failures")
     func manualUpdateFallbackGate() {
         let installError = NSError(domain: SUSparkleErrorDomain, code: Int(SparkleErrorCode.installation.rawValue))
+        let appcastParseError = NSError(domain: SUSparkleErrorDomain, code: Int(SparkleErrorCode.appcastParse.rawValue))
         let noUpdateError = NSError(domain: SUSparkleErrorDomain, code: Int(SparkleErrorCode.noUpdate.rawValue))
         let otherDomainError = NSError(domain: NSCocoaErrorDomain, code: NSFileNoSuchFileError)
 
         #expect(UpdateService.shouldOfferManualDownloadFallback(for: installError, updateCheck: .updates))
+        #expect(UpdateService.shouldOfferManualDownloadFallback(for: appcastParseError, updateCheck: .updates))
         #expect(!UpdateService.shouldOfferManualDownloadFallback(for: noUpdateError, updateCheck: .updates))
         #expect(!UpdateService.shouldOfferManualDownloadFallback(for: installError, updateCheck: .updatesInBackground))
         #expect(!UpdateService.shouldOfferManualDownloadFallback(for: otherDomainError, updateCheck: .updates))

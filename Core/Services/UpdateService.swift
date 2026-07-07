@@ -9,6 +9,7 @@ import SaneUI
     private let updateLogger = Logger(subsystem: "com.saneclip.app", category: "Update")
 
     enum SparkleErrorCode: Int32 {
+        case appcastParse = 1000
         case noUpdate = 1001
         case runningFromDiskImage = 1003
         case temporaryDirectory = 2000
@@ -192,7 +193,7 @@ import SaneUI
 
             let alert = NSAlert()
             alert.messageText = "Update couldn’t finish automatically"
-            alert.informativeText = "SaneClip couldn’t launch the installer on this Mac. Open the download page and install the latest version manually?"
+            alert.informativeText = "SaneClip couldn’t complete the automatic update on this Mac. Open the download page and install the latest version manually?"
             alert.alertStyle = .warning
             alert.addButton(withTitle: "Open Download Page")
             alert.addButton(withTitle: "Cancel")
@@ -212,7 +213,8 @@ import SaneUI
                  .installationCanceled?,
                  .installationAuthorizeLater?:
                 return false
-            case .runningFromDiskImage?,
+            case .appcastParse?,
+                 .runningFromDiskImage?,
                  .temporaryDirectory?,
                  .download?,
                  .unarchiving?,

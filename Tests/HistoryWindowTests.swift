@@ -365,11 +365,12 @@ struct HistoryWindowTests {
         #expect(app.historyWindow != nil)
     }
 
-    @Test("Fixed keep-open keeps popover visible and requests focus restore")
+    @Test("Fixed keep-open makes popover non-transient before paste and requests focus restore")
     @MainActor
     func fixedKeepOpenStaysVisibleBeforePaste() throws {
         let app = SaneClipAppDelegate()
         let popover = NSPopover()
+        popover.behavior = .transient
         popover.contentSize = NSSize(width: 320, height: 500)
         popover.contentViewController = NSHostingController(
             rootView: Color.clear.frame(width: 320, height: 500)
@@ -393,14 +394,17 @@ struct HistoryWindowTests {
         }
 
         try #require(popover.isShown)
+        #expect(popover.behavior == .transient)
         app.handleDismissForPaste(Notification(name: .dismissForPaste, object: PasteDismissBehavior.keepVisible))
         anchorWindow.makeKey()
 
         #expect(popover.isShown)
+        #expect(popover.behavior == .applicationDefined)
         let historyWindowSource = try String(
             contentsOf: projectRootURL().appendingPathComponent("SaneClipAppDelegate+HistoryWindow.swift"),
             encoding: .utf8
         )
+        #expect(historyWindowSource.contains("popover.behavior = .applicationDefined"))
         #expect(historyWindowSource.contains("popover.contentViewController?.view.window?.resignKey()"))
         #expect(historyWindowSource.contains("} else if popover.isShown {"))
         #expect(historyWindowSource.contains("restoreFixedPopoverFocusAfterPaste()"))

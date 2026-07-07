@@ -124,6 +124,7 @@ extension SaneClipAppDelegate {
             case .hide:
                 closePopoverImmediatelyForPaste()
             case .keepVisible:
+                popover.behavior = .applicationDefined
                 popover.contentViewController?.view.window?.resignKey()
             }
         } else if let historyWindow, historyWindow.isVisible {
@@ -138,6 +139,7 @@ extension SaneClipAppDelegate {
     }
 
     private func closePopoverImmediatelyForPaste() {
+        popover.behavior = .transient
         let wasAnimating = popover.animates
         popover.animates = false
         popover.close()
@@ -360,6 +362,7 @@ extension SaneClipAppDelegate {
     func showPopoverAtButton() {
         guard let button = statusItem.button else { return }
         resetHistoryPopoverSize()
+        popover.behavior = .transient
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
 
         if let popoverWindow = popover.contentViewController?.view.window {
@@ -370,6 +373,7 @@ extension SaneClipAppDelegate {
     func showPopoverAtCursor() {
         guard let button = statusItem.button else { return }
         resetHistoryPopoverSize()
+        popover.behavior = .transient
 
         // Use the status item as an anchor view, then reposition to cursor.
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)

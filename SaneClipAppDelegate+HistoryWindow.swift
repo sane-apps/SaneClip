@@ -144,6 +144,12 @@ extension SaneClipAppDelegate {
         popover.animates = wasAnimating
     }
 
+    private func restoreFixedPopoverFocusAfterPaste() {
+        guard let popoverWindow = popover.contentViewController?.view.window else { return }
+        NSApp.activate(ignoringOtherApps: true)
+        popoverWindow.makeKeyAndOrderFront(nil)
+    }
+
     /// Re-shows history after a paste when the flow asked to keep it open
     /// (e.g. paste-stack "keep open while consuming"). Routes to the window or
     /// the popover to match the user's chosen presentation.
@@ -159,7 +165,7 @@ extension SaneClipAppDelegate {
                     showHistoryWindow()
                 }
             } else if popover.isShown {
-                popover.contentViewController?.view.window?.makeKeyAndOrderFront(nil)
+                restoreFixedPopoverFocusAfterPaste()
             } else {
                 showHistoryPopover()
             }

@@ -6,6 +6,74 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+### 2026-07-07 ~00:55 - Glenn #1034 follow-up reviewed; appcast live repaired; focus fix source verified
+
+State: Glenn's follow-up email #1034 was reviewed through `check-inbox.sh review
+1034`. Attachments were saved/opened under
+`~/Desktop/Screenshots/email1034-att328-1zm0s5ws.png`,
+`email1034-att329-z3nrne1i.png`, and `email1034-att330-fg45qqls.png`.
+Diagnostics showed SaneClip `2.3.18 (2318)` on macOS `26.5.2`.
+
+Findings:
+- Fixed-history keep-open paste left the already-visible NSPopover unfocused
+  after paste. Screenshot `att328` shows the dim/unfocused history window;
+  `att329` shows the same window focused.
+- In-app direct updates were failing with Sparkle
+  `SUSparkleErrorDomain code=1000` parse errors. The appcast was XML-valid, but
+  the legacy no-enclosure informational `2.2.12` item lacked top-level
+  `sparkle:version` / `sparkle:shortVersionString`, which Sparkle expects for
+  manual-download appcast items.
+
+Implemented:
+- `SaneClipAppDelegate+HistoryWindow.swift`: fixed popover keep-open paste now
+  restores focus after paste via a fixed-popover-only helper that activates
+  SaneClip and calls `makeKeyAndOrderFront(nil)`. Floating history remains on
+  the non-activating path and must not call `NSApp.activate`.
+- `docs/appcast.xml`: legacy informational `2.2.12` now includes
+  `sparkle:version` `2212` and `sparkle:shortVersionString` `2.2.12`.
+- SaneProcess shared guardrails now block informational Sparkle appcast entries
+  missing top-level `sparkle:version` in both per-app release preflight and live
+  fleet validation. This applies to all direct/Sparkle apps, not just SaneClip.
+- Website-only deploy completed and verified live `https://saneclip.com/appcast.xml`.
+
+Verification:
+- `ruby scripts/sanemaster/release_guardrail_test.rb` passed 170/170 in
+  SaneProcess.
+- `ruby scripts/validation_report_test.rb` passed 73/73 in SaneProcess.
+- `xmllint --noout docs/appcast.xml` passed.
+- Local and live appcast audit: SaneBar, SaneClick, SaneClip, SaneHosts,
+  SaneSales, SaneSync, and SaneVideo are HTTP 200, XML-valid, have latest
+  enclosure metadata, and have no informational entries missing
+  `sparkle:version` or required manual links.
+- `./scripts/SaneMaster.rb verify --timeout 900 --no-grant-permissions` passed
+  222 tests after the test-slice correction.
+- `./scripts/SaneMaster.rb release_preflight` passed with warnings only:
+  6 uncommitted files, 37 pending customer emails, and evening timing. Technical
+  gates were green, including live appcast/download/Homebrew/webhook checks and
+  222 tests.
+- `./scripts/SaneMaster.rb appstore_preflight` passed with warning only:
+  6 uncommitted files. ASC lanes, IAP, signing, policy guardrails, target graph,
+  compiled artifact audit, metadata, and 222 tests were green.
+- `./scripts/SaneMaster.rb setapp_status --json --soft` could not verify live
+  portal status because there is no current Mini Safari developer session or
+  `SETAPP_PORTAL_TOKEN`. The repo still has SaneClip Setapp config for app ID
+  `1847`, version ID `47647`, bundle ID `com.saneclip.app-setapp`, scheme
+  `SaneClipSetapp`, and listing screenshot metadata.
+- `ruby ~/SaneApps/infra/SaneProcess/scripts/sane_test.rb SaneClip --release
+  --pro-mode` staged and launched the canonical Developer ID app at
+  `/Applications/SaneClip.app`.
+- First `customer_ui_sweep` was blocked by visual contamination from QuickTime
+  and a stale SaneClickExtension helper; both were cleared. Rerun passed with
+  transcript `outputs/customer-ui/sweep-20260707T005333Z/customer-action-runtime.log`,
+  live log `outputs/live-logs/customer_ui_saneclip_20260707T005123Z.log`, and
+  visual smoke receipt
+  `outputs/visual_smoke/visual_smoke_20260706-205157_63599/receipt.json`.
+
+Release caveat: the appcast parse error is fixed live. The fixed-history focus
+change is source-verified and locally staged, but it is not in a public binary
+until the next direct/App Store/Setapp build is submitted. Setapp live status is
+auth-blocked until portal credentials/session are restored.
+
 ### 2026-07-05 ~10:30 - Glenn #1016 evidence reviewed; code and visual proof green
 
 State: Xcode 26 attempted project/scheme "recommended settings" changes that

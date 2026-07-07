@@ -630,6 +630,8 @@ struct SaneClipTests {
 
         #expect(latestItem.contains("<title>2.2.12</title>"))
         #expect(latestItem.contains("<link>https://saneclip.com/download</link>"))
+        #expect(latestItem.contains("<sparkle:version>2212</sparkle:version>"))
+        #expect(latestItem.contains("<sparkle:shortVersionString>2.2.12</sparkle:shortVersionString>"))
         #expect(latestItem.contains("<sparkle:informationalUpdate>"))
         #expect(latestItem.contains("<sparkle:belowVersion>2208</sparkle:belowVersion>"))
     }

@@ -71,7 +71,14 @@ struct HistoryWindowTests {
         #expect(!historyWindowSource.contains("didResignActiveNotification"))
         #expect(!historyWindowSource.contains("if !NSApp.isActive"))
         #expect(!historyWindowSource.contains("Timer.scheduledTimer(withTimeInterval: 0.15"))
-        #expect(!historyWindowSource.contains("NSApp.activate(ignoringOtherApps: true)"))
+        let showHistoryWindowRange = try #require(
+            historyWindowSource.range(
+                of: #"func showHistoryWindow\(\)[\s\S]*?func installHistoryWindowOutsideClickMonitor\(\)"#,
+                options: .regularExpression
+            )
+        )
+        let showHistoryWindowSource = String(historyWindowSource[showHistoryWindowRange])
+        #expect(!showHistoryWindowSource.contains("NSApp.activate(ignoringOtherApps: true)"))
         #expect(!historyWindowSource.contains("NSApp.hide(nil)"))
         #expect(!historyWindowSource.contains("func applicationDidResignActive"))
 
@@ -284,9 +291,24 @@ struct HistoryWindowTests {
         #expect(historyWindowSource.contains("popover.contentViewController?.view.window?.resignKey()"))
         #expect(historyWindowSource.contains("case .keepVisible:"))
         #expect(!historyWindowSource.contains("NSApp.hide(nil)"))
-        #expect(!historyWindowSource.contains("NSApp.activate(ignoringOtherApps: true)"))
         // Reopen-after-paste routes to the window when floating.
         #expect(historyWindowSource.contains("func handleReopenHistoryAfterPaste()"))
+        let reopenRange = try #require(
+            historyWindowSource.range(
+                of: #"@objc func handleReopenHistoryAfterPaste\(\)[\s\S]*?func showHistoryWindow\(\)"#,
+                options: .regularExpression
+            )
+        )
+        let reopenSource = String(historyWindowSource[reopenRange])
+        let floatingReopenBranch = try #require(
+            reopenSource.range(
+                of: #"if SettingsModel.shared.useFloatingHistoryWindow, licenseService.isPro \{[\s\S]*?\} else if popover\.isShown \{"#,
+                options: .regularExpression
+            )
+        )
+        let floatingReopenSource = String(reopenSource[floatingReopenBranch])
+        #expect(!floatingReopenSource.contains("NSApp.activate(ignoringOtherApps: true)"))
+        #expect(!floatingReopenSource.contains("makeKeyAndOrderFront"))
         // A second menu-bar click closes the floating window.
         #expect(appSource.contains("historyWindow.close() // second menu-bar click closes the floating window"))
     }
@@ -381,7 +403,9 @@ struct HistoryWindowTests {
         )
         #expect(historyWindowSource.contains("popover.contentViewController?.view.window?.resignKey()"))
         #expect(historyWindowSource.contains("} else if popover.isShown {"))
-        #expect(historyWindowSource.contains("makeKeyAndOrderFront(nil)"))
+        #expect(historyWindowSource.contains("restoreFixedPopoverFocusAfterPaste()"))
+        #expect(historyWindowSource.contains("NSApp.activate(ignoringOtherApps: true)"))
+        #expect(historyWindowSource.contains("popoverWindow.makeKeyAndOrderFront(nil)"))
     }
 
     @Test("Fixed normal paste still hides popover before synthetic paste")

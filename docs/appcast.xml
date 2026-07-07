@@ -70,6 +70,8 @@
       <title>2.2.12</title>
       <link>https://saneclip.com/download</link>
       <pubDate>Tue, 24 Jun 2026 09:00:00 -0400</pubDate>
+      <sparkle:version>2212</sparkle:version>
+      <sparkle:shortVersionString>2.2.12</sparkle:shortVersionString>
       <sparkle:informationalUpdate>
         <sparkle:belowVersion>2208</sparkle:belowVersion>
       </sparkle:informationalUpdate>

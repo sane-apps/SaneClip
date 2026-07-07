@@ -193,7 +193,7 @@ appstore:
         Touch ID history lock, AES-GCM history encryption at rest and encrypted sync payloads before upload,
         paste as plain text, smart paste, text transforms, paste stack, snippets, item notes, clipboard rules, and export/import.
       keywords: "clipboard,copy paste,history,snippets,touch id,security,productivity,mac utility"
-      whats_new: "Improves narrow history row resizing, keeps hover metadata and actions stable across window shapes, and tightens Paste Stack controls so compact rows stay readable."
+      whats_new: "Improves history focus after pasting with keep-open enabled and keeps compact history controls stable across window sizes."
       marketing_url: "https://saneclip.com"
     ios:
       subtitle: "Clipboard History + Widgets"
@@ -203,7 +203,7 @@ appstore:
         Browse your recent clips, copy them again in one tap, save new text and links from the Share Sheet, and keep important items pinned across devices.
         Clipboard contents are never sent to SaneApps servers. Pro adds encryption and more advanced workflows, including encrypted sync payloads before upload when History Encryption is enabled.
       keywords: "clipboard,copy paste,history,widgets,icloud,snippets,productivity,notes"
-      whats_new: "Improves reliability around shared history state and keeps the companion App Store metadata aligned with the 2.3.18 stability release."
+      whats_new: "Improves shared history reliability and keeps the companion app aligned with the current SaneClip stability release."
       marketing_url: "https://saneclip.com"
   review_notes: "SaneClip is a freemium App Store app. Basic is free in the App Store build. SaneClip Pro Unlock is an optional one-time non-consumable StoreKit in-app purchase. No external checkout links or license keys are used in the App Store build."
   iap:

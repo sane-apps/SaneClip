@@ -5,7 +5,27 @@
     <link>https://saneclip.com/appcast.xml</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
-                            <item>
+                                    <item>
+            <title>2.3.20</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Thu, 09 Jul 2026 01:01:21 -0400</pubDate>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Fixes keep-open fixed history pastes so subsequent selections return to the target app.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.20.zip"
+                       sparkle:version="2320"
+                       sparkle:shortVersionString="2.3.20"
+                       length="5217570"
+                       type="application/octet-stream"
+                       sparkle:edSignature="zveaR9GOTMt6bTW8dKjFoAnBnfmXhfk2RTpvyJeq2+nXsfS1MmWg4vQgIfpEdhG8Q9CgHwSTkF6SCncqMGD8AQ=="/>
+        </item>
+<item>
             <title>2.3.19</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Mon, 06 Jul 2026 21:16:15 -0400</pubDate>

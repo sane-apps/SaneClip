@@ -10,6 +10,7 @@ extension SaneClipAppDelegate {
         if presentExpiredTrialGateIfNeeded() {
             return
         }
+        rememberCurrentPasteTargetApplication()
 
         // When the user prefers a free-floating window, route every history
         // trigger to it instead of the menu-bar-anchored popover.
@@ -99,6 +100,7 @@ extension SaneClipAppDelegate {
 
         if popover.isShown {
             popover.performClose(nil)
+            return
         }
 
         if let historyWindow, historyWindow.isVisible {
@@ -107,7 +109,7 @@ extension SaneClipAppDelegate {
             return
         }
 
-        guard licenseService.isPro else {
+        guard SettingsModel.shared.useFloatingHistoryWindow, licenseService.isPro else {
             withHistoryAuth { [weak self] in self?.showHistoryPopover() }
             return
         }
@@ -126,6 +128,7 @@ extension SaneClipAppDelegate {
             case .keepVisible:
                 popover.behavior = .applicationDefined
                 popover.contentViewController?.view.window?.resignKey()
+                restoreLastExternalPasteTargetApplication()
             }
         } else if let historyWindow, historyWindow.isVisible {
             switch behavior {
@@ -150,6 +153,30 @@ extension SaneClipAppDelegate {
         guard let popoverWindow = popover.contentViewController?.view.window else { return }
         NSApp.activate(ignoringOtherApps: true)
         popoverWindow.makeKeyAndOrderFront(nil)
+    }
+
+    @objc func handleWorkspaceDidActivateApplication(_ notification: Notification) {
+        let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
+        rememberPasteTargetApplication(app)
+    }
+
+    func rememberCurrentPasteTargetApplication() {
+        rememberPasteTargetApplication(NSWorkspace.shared.frontmostApplication)
+    }
+
+    private func rememberPasteTargetApplication(_ app: NSRunningApplication?) {
+        guard let app, !app.isTerminated else { return }
+        guard app != NSRunningApplication.current else { return }
+        if let ownBundleID = Bundle.main.bundleIdentifier,
+           app.bundleIdentifier == ownBundleID {
+            return
+        }
+        lastExternalPasteTargetApplication = app
+    }
+
+    private func restoreLastExternalPasteTargetApplication() {
+        guard let app = lastExternalPasteTargetApplication, !app.isTerminated else { return }
+        _ = app.activate(options: [])
     }
 
     /// Re-shows history after a paste when the flow asked to keep it open

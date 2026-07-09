@@ -44,6 +44,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
     var popover: NSPopover!
     var historyWindow: NSWindow?, historyWindowOutsideClickMonitor: Any?, historyWindowOutsideClickLocalMonitor: Any?
+    var lastExternalPasteTargetApplication: NSRunningApplication?
     var licenseGateWindow: NSWindow?
     var clipboardManager: ClipboardManager!
     let screenCaptureService = ScreenCaptureService()
@@ -100,6 +101,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     deinit {
         NotificationCenter.default.removeObserver(self, name: .menuBarIconChanged, object: nil)
         NotificationCenter.default.removeObserver(self, name: .menuBarVisibilityChanged, object: nil)
+        NSWorkspace.shared.notificationCenter.removeObserver(self)
     }
 
     func applicationDidFinishLaunching(_: Notification) {
@@ -436,6 +438,12 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             self,
             selector: #selector(handleReopenHistoryAfterPaste),
             name: .reopenHistoryAfterPaste,
+            object: nil
+        )
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector(handleWorkspaceDidActivateApplication(_:)),
+            name: NSWorkspace.didActivateApplicationNotification,
             object: nil
         )
 

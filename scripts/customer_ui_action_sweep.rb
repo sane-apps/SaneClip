@@ -47,7 +47,7 @@ class CustomerUIActionSweep
       ['UI/History/ClipboardItemRow.swift', 'ImageCapturePreviewSheet(item: item, clipboardManager: clipboardManager)'],
       ['UI/History/ImageCapturePreviewSheet.swift', 'Copy OCR Text'],
       ['Tests/HistoryWindowTests.swift', 'Floating keep-open keeps history visible while clearing key status'],
-      ['Tests/HistoryWindowTests.swift', 'Fixed keep-open keeps popover visible and requests focus restore']
+      ['Tests/HistoryWindowTests.swift', 'Fixed keep-open makes popover non-transient before paste and requests focus restore']
     ],
     'paste-stack-actions' => [
       ['UI/History/HistoryPasteStackPanel.swift', 'Text("Paste Stack")'],

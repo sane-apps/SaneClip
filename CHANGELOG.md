@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.20] - 2026-07-09
+
+Fixes keep-open fixed history pastes so the next selected clip goes back into the app you were using instead of landing in SaneClip or doing nothing.
+
+---
+
 ## [2.3.19] - 2026-07-06
 
 Improves fixed history focus after keep-open paste and direct update reliability for older installs.

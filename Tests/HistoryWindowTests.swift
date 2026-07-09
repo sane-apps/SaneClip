@@ -259,8 +259,9 @@ struct HistoryWindowTests {
             encoding: .utf8
         )
 
-        // toggleHistoryWindow (⌘⇧⌃Y hotkey) must not open the Pro window directly in Basic.
-        #expect(historyWindowSource.contains("guard licenseService.isPro else"))
+        // toggleHistoryWindow (⌘⇧⌃Y hotkey) must not open the floating window
+        // unless the floating-window preference is enabled for Pro.
+        #expect(historyWindowSource.contains("guard SettingsModel.shared.useFloatingHistoryWindow, licenseService.isPro else"))
         #expect(historyWindowSource.contains("withHistoryAuth { [weak self] in self?.showHistoryPopover() }"))
         #expect(historyWindowSource.contains("withHistoryAuth { [weak self] in self?.showHistoryWindow() }"))
         // Dock/Finder reopen must go through the same gate.
@@ -289,6 +290,7 @@ struct HistoryWindowTests {
         #expect(historyWindowSource.contains("historyWindow.orderOut(nil)"))
         #expect(historyWindowSource.contains("historyWindow.resignKey()"))
         #expect(historyWindowSource.contains("popover.contentViewController?.view.window?.resignKey()"))
+        #expect(historyWindowSource.contains("restoreLastExternalPasteTargetApplication()"))
         #expect(historyWindowSource.contains("case .keepVisible:"))
         #expect(!historyWindowSource.contains("NSApp.hide(nil)"))
         // Reopen-after-paste routes to the window when floating.
@@ -400,16 +402,25 @@ struct HistoryWindowTests {
 
         #expect(popover.isShown)
         #expect(popover.behavior == .applicationDefined)
+        #expect(app.lastExternalPasteTargetApplication == nil)
         let historyWindowSource = try String(
             contentsOf: projectRootURL().appendingPathComponent("SaneClipAppDelegate+HistoryWindow.swift"),
             encoding: .utf8
         )
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
         #expect(historyWindowSource.contains("popover.behavior = .applicationDefined"))
         #expect(historyWindowSource.contains("popover.contentViewController?.view.window?.resignKey()"))
+        #expect(historyWindowSource.contains("restoreLastExternalPasteTargetApplication()"))
         #expect(historyWindowSource.contains("} else if popover.isShown {"))
         #expect(historyWindowSource.contains("restoreFixedPopoverFocusAfterPaste()"))
         #expect(historyWindowSource.contains("NSApp.activate(ignoringOtherApps: true)"))
         #expect(historyWindowSource.contains("popoverWindow.makeKeyAndOrderFront(nil)"))
+        #expect(historyWindowSource.contains("lastExternalPasteTargetApplication"))
+        #expect(appSource.contains("NSWorkspace.didActivateApplicationNotification"))
+        #expect(historyWindowSource.contains("app.activate(options: [])"))
     }
 
     @Test("Fixed normal paste still hides popover before synthetic paste")

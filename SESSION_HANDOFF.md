@@ -6,6 +6,46 @@ Active handoff only. Older capture/App Store/pricing notes were compacted on
 
 ## Current State
 
+### 2026-07-14 - Setapp iOS integration CODED on Air (commit `1c45e61`, main, UNPUSHED); Mini build/test/submit pending
+
+State: Setapp iOS framework integration for the SaneClipIOS target is complete
+and committed locally on the Air as `1c45e61`. The commit is UNPUSHED because
+the pre-push verify gate cannot run inside the sandboxed session (EPERM on
+`~/.sanemaster`), and ssh to the Mini is blocked there too (key + agent socket
+both sandbox-denied). Nothing is wrong with the change itself; it needs an
+owner-terminal push, then the Mini side.
+
+What `1c45e61` contains:
+- `project.yml`: existing `Setapp` SPM package (from: 5.0.1) added to
+  SaneClipIOS dependencies only; `CFBundleURLTypes` (name `Setapp`, scheme
+  `$(PRODUCT_BUNDLE_IDENTIFIER)`, role None) in iOS info properties;
+  `iOS/Setapp/setappPublicKey.pem` bundled via explicit
+  `buildPhase: resources` entry (excluded from the general `iOS` source glob);
+  ALL targets bumped 2.3.20/2320 -> 2.3.21/2321 (owner: iOS stays
+  version-locked with Mac); pre-existing duplicated
+  MARKETING_VERSION/CURRENT_PROJECT_VERSION pairs removed from 5 targets.
+- `iOS/SaneClipIOSApp.swift`: `import Setapp`,
+  `SetappManager.shared.start(with: .default)` in `App.init()`, `.onOpenURL`
+  with `canOpen`/`open` guard.
+- `iOS/Setapp/setappPublicKey.pem`: public key from Setapp portal (draft
+  46888; portal step DONE 7/14 — App Store URL set, key generated).
+
+Next (Mini, in order):
+1. `git pull` in `~/SaneApps/apps/SaneClip` (after owner pushes), `xcodegen`,
+   build + run tests. First-build watchpoints: exact
+   `SetappManager.open(url:)` signature (may need an `options:` param) and
+   strict-concurrency diagnostics on the `init()` call — fix on the spot.
+2. Verify `setappPublicKey.pem` is in the generated Copy Bundle Resources
+   phase of SaneClipIOS.
+3. Archive Release-AppStore, submit iOS 2.3.21/2321 to Apple review per
+   saneapps-appstore-submit-runbook (ASC key S34998ZCRT). App Store app id is
+   6758898132 (NOT 6759330868 = SaneClick). Stop at WAITING_FOR_REVIEW.
+4. Queue Setapp MAC lane: upload 2320 (Glenn subsequent-paste fix) via
+   `scripts/setapp_upload.rb`. The 2321 bump does not affect this artifact.
+5. Do NOT submit the Setapp iOS draft until the new build is LIVE on the App
+   Store; then set draft version to 2.3.21, keep the 5 screenshots, tick the
+   attestation (truthful by then), submit. Setapp review is <=24h.
+
 ### 2026-07-07 ~02:05 - SaneClip 2.3.19 shipped across review channels; Lemon hosted file still needs 2FA dashboard sync
 
 State: SaneClip 2.3.19 was released for the direct/Sparkle channel and submitted

@@ -1,4 +1,4 @@
-import Setapp
+@preconcurrency import Setapp
 import SwiftUI
 
 @main
@@ -38,7 +38,7 @@ struct SaneClipIOSApp: App {
                 }
                 .onOpenURL { url in
                     guard SetappManager.shared.canOpen(url: url) else { return }
-                    _ = SetappManager.shared.open(url: url)
+                    _ = SetappManager.shared.open(url: url, options: [:])
                 }
         }
     }

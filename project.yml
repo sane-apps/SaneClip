@@ -196,10 +196,8 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.3.20"
-        CURRENT_PROJECT_VERSION: "2320"
-        MARKETING_VERSION: "2.3.20"
-        CURRENT_PROJECT_VERSION: "2320"
+        MARKETING_VERSION: "2.3.21"
+        CURRENT_PROJECT_VERSION: "2321"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         ENABLE_DEBUG_DYLIB: NO
@@ -414,8 +412,8 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.3.20"
-        CURRENT_PROJECT_VERSION: "2320"
+        MARKETING_VERSION: "2.3.21"
+        CURRENT_PROJECT_VERSION: "2321"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -494,10 +492,8 @@ targets:
       base:
         PRODUCT_NAME: SaneClipWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.widgets
-        MARKETING_VERSION: "2.3.20"
-        CURRENT_PROJECT_VERSION: "2320"
-        MARKETING_VERSION: "2.3.20"
-        CURRENT_PROJECT_VERSION: "2320"
+        MARKETING_VERSION: "2.3.21"
+        CURRENT_PROJECT_VERSION: "2321"
         SWIFT_VERSION: 6.0
         CODE_SIGN_STYLE: Manual
         SKIP_INSTALL: YES
@@ -554,6 +550,10 @@ targets:
       - path: iOS
         excludes:
           - "**/CLAUDE.md"
+          - "Setapp/**"
+      # Explicit resources phase so the Setapp key is bundled (framework loads it by filename).
+      - path: iOS/Setapp/setappPublicKey.pem
+        buildPhase: resources
       - path: Shared
         excludes:
           - "**/CLAUDE.md"
@@ -567,6 +567,7 @@ targets:
       - path: Core/Security/SensitiveDataDetector.swift
     dependencies:
       - package: SaneUI
+      - package: Setapp
       - target: SaneClipIOSWidgets
         embed: true
         codeSign: true
@@ -582,6 +583,12 @@ targets:
         AppStoreProductID: com.saneclip.app.pro.unlock
         LSApplicationCategoryType: "public.app-category.productivity"
         ITSAppUsesNonExemptEncryption: false
+        # Setapp iOS framework: custom URL scheme = bundle ID (docs.setapp.com/docs/add-custom-url-scheme-support-to-your-application-target)
+        CFBundleURLTypes:
+          - CFBundleURLName: Setapp
+            CFBundleTypeRole: None
+            CFBundleURLSchemes:
+              - "$(PRODUCT_BUNDLE_IDENTIFIER)"
         UILaunchScreen: {}
         UIBackgroundModes:
           - remote-notification
@@ -598,10 +605,8 @@ targets:
       base:
         PRODUCT_NAME: SaneClip
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app
-        MARKETING_VERSION: "2.3.20"
-        CURRENT_PROJECT_VERSION: "2320"
-        MARKETING_VERSION: "2.3.20"
-        CURRENT_PROJECT_VERSION: "2320"
+        MARKETING_VERSION: "2.3.21"
+        CURRENT_PROJECT_VERSION: "2321"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: 6.0
@@ -651,10 +656,8 @@ targets:
       base:
         PRODUCT_NAME: SaneClipIOSWidgets
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.ioswidgets
-        MARKETING_VERSION: "2.3.20"
-        CURRENT_PROJECT_VERSION: "2320"
-        MARKETING_VERSION: "2.3.20"
-        CURRENT_PROJECT_VERSION: "2320"
+        MARKETING_VERSION: "2.3.21"
+        CURRENT_PROJECT_VERSION: "2321"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"
@@ -709,10 +712,8 @@ targets:
       base:
         PRODUCT_NAME: SaneClipIOSShare
         PRODUCT_BUNDLE_IDENTIFIER: com.saneclip.app.share
-        MARKETING_VERSION: "2.3.20"
-        CURRENT_PROJECT_VERSION: "2320"
-        MARKETING_VERSION: "2.3.20"
-        CURRENT_PROJECT_VERSION: "2320"
+        MARKETING_VERSION: "2.3.21"
+        CURRENT_PROJECT_VERSION: "2321"
         SWIFT_VERSION: 6.0
         IPHONEOS_DEPLOYMENT_TARGET: 18.0
         TARGETED_DEVICE_FAMILY: "1,2"

@@ -1,3 +1,4 @@
+import Setapp
 import SwiftUI
 
 @main
@@ -5,6 +6,11 @@ struct SaneClipIOSApp: App {
     @StateObject private var viewModel = ClipboardHistoryViewModel()
     @AppStorage("hasCompletedOnboardingIOS") private var hasCompletedOnboarding = false
     private let launchArgs = Set(ProcessInfo.processInfo.arguments)
+
+    init() {
+        // Must run before any other SetappManager call; reads setappPublicKey.pem from the bundle.
+        SetappManager.shared.start(with: .default)
+    }
 
     private var forceOnboarding: Bool {
         launchArgs.contains("--force-onboarding")
@@ -29,6 +35,10 @@ struct SaneClipIOSApp: App {
                     set: { if $0 { hasCompletedOnboarding = false } }
                 )) {
                     OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
+                }
+                .onOpenURL { url in
+                    guard SetappManager.shared.canOpen(url: url) else { return }
+                    _ = SetappManager.shared.open(url: url)
                 }
         }
     }

@@ -197,14 +197,17 @@ This is the standard protocol for investigating problems. Used by Rule #3, Circu
 | **context7 MCP** | Library documentation | Third-party packages (KeyboardShortcuts, Sparkle) |
 | **WebSearch/WebFetch** | Solutions, patterns, best practices | Error messages, architectural questions |
 | **Grep/Glob/Read** | Local investigation | Find similar patterns, check implementations |
-| **memory MCP** | Past bug patterns, architecture decisions | "Have we seen this before?" |
+| **AgentMemory** | Shared bug patterns and architecture decisions | "Have we seen this before?" |
 
-### Memory MCP Usage
+### AgentMemory Usage
 
 ```
-# Project-scoped searches (Official Memory MCP)
-mcp__memory__search_nodes query: "clipboard"
+# Shared semantic search
+mcp__agentmemory__memory_smart_search query: "SaneClip clipboard"
 ```
+
+Use Serena for project-scoped long-form notes. The legacy `mcp__memory__*`
+namespace is retired.
 
 ### Research Output -> Plan
 
@@ -394,7 +397,7 @@ Use SaneMaster for macOS builds/tests. Xcode Tools MCP handles build/test/previe
 |------|-------|
 | Build/test commands | `./scripts/SaneMaster.rb verify` |
 | Project structure | `project.yml` (XcodeGen config) |
-| Past bugs/learnings | Official Memory MCP: `mcp__memory__search_nodes` |
+| Past bugs/learnings | AgentMemory: `mcp__agentmemory__memory_smart_search` |
 | Touch ID/security | `Core/ClipboardManager.swift` (authentication logic) |
 | Clipboard logic | `Core/ClipboardManager.swift` |
 | UI components | `UI/` directory |

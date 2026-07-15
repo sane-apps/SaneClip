@@ -2,7 +2,7 @@
 
 Active handoff only. Older capture/App Store/pricing notes were compacted on
 2026-05-21 to keep startup context small. Durable history remains in git,
-`CHANGELOG.md`, `ARCHITECTURE.md`, Serena memory, and the knowledge graph.
+`CHANGELOG.md`, `ARCHITECTURE.md`, Serena memory, and shared AgentMemory.
 
 ## Current State
 

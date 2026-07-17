@@ -1584,6 +1584,11 @@
             border: 1px solid rgba(0, 153, 255, 0.35);
             box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
         }
+        .hero-watch-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 30px; align-items: center; max-width: 1120px; margin: 14px auto 10px; padding: 0 8px; }
+        .hero-watch-video video { width: 100%; aspect-ratio: 16/9; height: auto; background: #0a0a0f; border-radius: 14px; border: 1px solid rgba(0, 153, 255, 0.35); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); display: block; }
+        .hero-watch-video .watch-after { margin: 12px 0 0; font-size: 14.5px; color: var(--text-primary); text-align: center; }
+        .hero-watch-grid .hero-pricing-grid { margin: 0 auto; }
+        @media (max-width: 940px) { .hero-watch-grid { grid-template-columns: 1fr; } }
         .clip-video-caption {
             font-size: 14px;
             font-weight: 600;
@@ -1696,7 +1701,15 @@
                 <p style="color: var(--text-muted); font-size: 0.92rem; margin: 12px 0 6px;">Full Pro for 14 days. No credit card required. Pro is required after trial.</p>
                 <a href="https://go.saneapps.com/buy/saneclip?ref=website-hero" style="color: var(--accent); font-weight: 700; text-decoration: none;" data-cta="buy_pro">Buy Pro now — $14.99 once</a>
             </div>
-            <div class="animate-in delay-5" id="pricing" style="scroll-margin-top: 120px;">
+            <!-- Hero: the pitch video front and center, pricing right beside it. -->
+            <div class="hero-watch-grid animate-in delay-5" id="watch" style="scroll-margin-top: 110px;">
+                <div class="hero-watch-video">
+                    <video controls preload="metadata" poster="demo/saneclip-pitch-poster.jpg" playsinline width="1920" height="1080" aria-label="SaneClip pitch video: a clipboard that forgets, then a real screen capture of the history popup quick-pasting an older clip, the Touch ID and encryption feature set, and the one-time price">
+                        <source src="demo/saneclip-pitch.mp4" type="video/mp4">
+                    </video>
+                    <p class="watch-after">The 1-minute demo &mdash; real popup on screen, no mockups.</p>
+                </div>
+            <div id="pricing" style="scroll-margin-top: 120px;">
                 <div class="hero-pricing-grid" style="max-width: 520px; grid-template-columns: 1fr;">
                     <div class="pricing-card featured">
                         <p class="pricing-label">Full Pro Trial</p>
@@ -1724,6 +1737,7 @@
                     <a href="https://setapp.com/apps/saneclip" class="setapp-link" data-cta="setapp_saneclip" target="_blank" rel="noopener">Get SaneClip on Setapp</a>
                 </div>
             </div>
+            </div>
             <p class="animate-in delay-5 hero-pricing-footer" style="color: var(--text-muted); font-size: 0.85rem; margin-top: var(--phi-sm); margin-bottom: 36px;"><code style="background: var(--bg-card); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer;" onclick="copyToClipboard(this)" title="Click to copy">brew install --cask sane-apps/tap/saneclip</code></p>
             <div class="animate-in delay-5" style="max-width: 780px; margin: 0 auto 34px; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: rgba(92, 232, 255, 0.08); text-align: center;">
                 <p style="color: var(--text-primary); font-weight: 700; margin-bottom: 6px;">Buying more than one SaneApps Mac app?</p>
@@ -1746,35 +1760,26 @@
                 </div>
             </div>
 
-            <!-- Real screen capture: copy in TextEdit, then paste an older clip from SaneClip (recorded unedited). -->
-            <div class="clip-video-wrap animate-in delay-5">
-                <video class="clip-video" autoplay muted loop playsinline preload="metadata" width="1650" height="722" poster="demo/saneclip-demo-poster.jpg" aria-label="Screen recording: a line of text is copied in TextEdit, the SaneClip menu bar popup opens with the copy at the top of the clipboard history, and a quick-paste shortcut instantly pastes an older URL clip back into the document">
-                    <source src="demo/saneclip-history-demo.mp4" type="video/mp4">
-                </video>
-                <p class="clip-video-caption">Real capture, no mockups &mdash; copy anything, then click an older clip to paste it right back.</p>
-            </div>
         </div>
     </section>
 
-    <!-- Watch: the pitch demo (click-to-play, self-hosted, no autoplay; reduced-motion-safe by design) -->
-    <section id="watch" style="padding: 72px 0 10px; scroll-margin-top: 110px;">
+    <!-- Raw capture: the unedited copy-and-paste loop (muted autoplay; guarded by the site's reduced-motion JS) -->
+    <section id="raw-capture" style="padding: 72px 0 10px; scroll-margin-top: 110px; overflow-x: clip;">
         <style>
-            #watch .watch-wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; text-align: center; }
-            #watch .watch-kicker { font-size: 14px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
-            #watch h2 { font-size: clamp(26px, 3vw, 38px); margin: 0 0 10px; color: var(--text-primary); }
-            #watch .watch-sub { margin: 0 0 22px; font-size: 15px; color: var(--text-primary); }
-            #watch video { width: 100%; max-width: 960px; aspect-ratio: 16/9; height: auto; background: #0a0a0f; border-radius: 14px; border: 1px solid rgba(0, 153, 255, 0.35); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); display: block; margin: 0 auto; }
-            #watch .watch-after { margin: 18px 0 0; font-size: 14.5px; color: var(--text-primary); }
-            #watch .watch-after a { color: var(--accent); text-decoration: none; font-weight: 700; }
+            #raw-capture .watch-wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; text-align: center; }
+            #raw-capture .watch-kicker { font-size: 14px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+            #raw-capture h2 { font-size: clamp(26px, 3vw, 38px); margin: 0 0 18px; color: var(--text-primary); }
         </style>
         <div class="watch-wrap">
-            <p class="watch-kicker">See it in action</p>
-            <h2>Watch the 1-minute demo</h2>
-            <p class="watch-sub">Clipboard history, quick-paste, and Touch ID privacy &mdash; with the real popup on screen.</p>
-            <video controls preload="metadata" poster="demo/saneclip-pitch-poster.jpg" playsinline width="1920" height="1080" aria-label="SaneClip pitch video: a clipboard that forgets, then a real screen capture of the history popup quick-pasting an older clip, the Touch ID and encryption feature set, and the one-time price">
-                <source src="demo/saneclip-pitch.mp4" type="video/mp4">
-            </video>
-            <p class="watch-after">Sold? <a href="/download" data-cta="download_trial_watch">Start the full Pro trial</a> &mdash; 14 days free, no credit card required.</p>
+            <p class="watch-kicker">Real capture, no mockups</p>
+            <h2>Copy, forget, paste it back</h2>
+            <div class="clip-video-wrap" style="margin: 0 auto;">
+                <video class="clip-video" autoplay muted loop playsinline preload="metadata" width="1650" height="722" poster="demo/saneclip-demo-poster.jpg" aria-label="Screen recording: a line of text is copied in TextEdit, the SaneClip menu bar popup opens with the copy at the top of the clipboard history, and a quick-paste shortcut instantly pastes an older URL clip back into the document">
+                    <source src="demo/saneclip-history-demo.mp4" type="video/mp4">
+                </video>
+                <p class="clip-video-caption">Copy anything, then paste an older clip right back &mdash; straight from the menu bar.</p>
+            </div>
+            <p style="margin: 18px 0 0; font-size: 14.5px; color: var(--text-primary);">Sold? <a href="/download" data-cta="download_trial_watch" style="color: var(--accent); text-decoration: none; font-weight: 700;">Start the full Pro trial</a> &mdash; 14 days free, no credit card required.</p>
         </div>
         <script type="application/ld+json">
         {

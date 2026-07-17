@@ -313,11 +313,14 @@
             margin-bottom: 60px;
         }
 
-        /* Animation */
-        .animate-in {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.6s ease forwards;
+        /* Animation — load-in only hides content when animations are actually enabled.
+           With reduced motion (or animations off) everything stays fully visible. */
+        @media (prefers-reduced-motion: no-preference) {
+            .animate-in {
+                opacity: 0;
+                transform: translateY(20px);
+                animation: fadeInUp 0.6s ease forwards;
+            }
         }
 
         .delay-1 { animation-delay: 0.1s; }
@@ -1511,6 +1514,115 @@
                 text-align: center;
             }
         }
+
+        /* ---------- Motion & liveliness — progressive enhancement.
+           Page stays fully readable with no JS and with reduced motion:
+           nothing below ever sits at opacity:0 unless html.io (JS) or
+           prefers-reduced-motion: no-preference is active. ---------- */
+        @view-transition { navigation: auto; }
+
+        /* Hover lifts (small, user-initiated; transform/opacity only) */
+        .testimonial-card {
+            transition: transform 0.35s cubic-bezier(0.22, 0.7, 0.3, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+        }
+        .testimonial-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 153, 255, 0.35) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+        .btn-secondary:hover,
+        .pricing-cta-free:hover {
+            transform: translateY(-2px);
+        }
+        .setapp-link {
+            transition: transform 0.25s ease, background 0.2s ease, border-color 0.2s ease;
+        }
+        .setapp-link:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Hero stage: positioning context for the ambient glow + clipboard micro-demo */
+        .hero { overflow-x: clip; }
+        .hero-stage {
+            position: relative;
+            max-width: 480px;
+            margin: 0 auto;
+            isolation: isolate;
+        }
+        .hero-stage::before {
+            content: "";
+            position: absolute;
+            inset: 6% -12%;
+            background: radial-gradient(closest-side, rgba(0, 153, 255, 0.22), transparent 72%);
+            filter: blur(12px);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Real screen-capture demo video (replaces the old decorative micro-demo). */
+        .clip-video-wrap {
+            position: relative;
+            isolation: isolate;
+            max-width: 760px;
+            margin: 34px auto 0;
+            pointer-events: auto;
+        }
+        .clip-video-wrap::before {
+            content: '';
+            position: absolute;
+            inset: -8% -12%;
+            background: radial-gradient(closest-side, rgba(0, 153, 255, 0.16), transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+        }
+        .clip-video {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 153, 255, 0.35);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+        }
+        .clip-video-caption {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        /* Scroll reveals — IO fallback path. html.io is added by JS only when CSS
+           scroll-timelines are unsupported; no-JS and crawlers get the full static page.
+           Reveals animate `translate`, so hover `transform` lifts stay independent. */
+        html.io .reveal {
+            opacity: 0;
+            translate: 0 18px;
+            transition: opacity 0.7s cubic-bezier(0.22, 0.7, 0.3, 1), translate 0.7s cubic-bezier(0.22, 0.7, 0.3, 1);
+        }
+        html.io .reveal.in {
+            opacity: 1;
+            translate: 0 0;
+        }
+        @keyframes riseIn {
+            from { opacity: 0; translate: 0 18px; }
+            to { opacity: 1; translate: 0 0; }
+        }
+        @keyframes glowBreathe {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.05); }
+        }
+        @media (prefers-reduced-motion: no-preference) {
+            html { scroll-behavior: smooth; }
+            .hero-stage::before { animation: glowBreathe 9s ease-in-out infinite; }
+            @supports (animation-timeline: view()) {
+                .reveal {
+                    animation: riseIn 0.8s cubic-bezier(0.22, 0.7, 0.3, 1) both;
+                    animation-timeline: view();
+                    animation-range: entry 8% entry 45%;
+                }
+            }
+        }
     </style>
 </head>
 <body>
@@ -1626,24 +1738,34 @@
                 <p class="hero-screenshot-copy">Search your history, filter by source, pin important clips — then detach it all into a floating, resizable window and drag clips straight into other apps.</p>
                 <p class="hero-screenshot-note">Real screenshot from SaneClip on macOS.</p>
             </div>
-            <div class="hero-screenshot animate-in delay-5">
-                <img src="images/screenshot-popover.png" alt="SaneClip clipboard history">
+            <div class="hero-stage animate-in delay-5">
+                <div class="hero-screenshot">
+                    <img src="images/screenshot-popover.png" alt="SaneClip clipboard history">
+                </div>
+            </div>
+
+            <!-- Real screen capture: copy in TextEdit, then paste an older clip from SaneClip (recorded unedited). -->
+            <div class="clip-video-wrap animate-in delay-5">
+                <video class="clip-video" autoplay muted loop playsinline preload="metadata" width="1190" height="720" poster="demo/saneclip-demo-poster.jpg" aria-label="Screen recording: a line of text is copied in TextEdit, the SaneClip menu bar popup opens with the copy at the top of the clipboard history, and clicking an older hex-color clip instantly pastes it back into the document">
+                    <source src="demo/saneclip-history-demo.mp4" type="video/mp4">
+                </video>
+                <p class="clip-video-caption">Real capture, no mockups &mdash; copy anything, then click an older clip to paste it right back.</p>
             </div>
         </div>
     </section>
 
     <section class="ios-companion" id="ios">
         <div class="container">
-            <h2 class="section-title">Your Clipboard, on iPhone</h2>
-            <p class="section-subtitle">SaneClip can sync Mac history through your own iCloud account. Browse, search, and copy synced clips from the iPhone companion while it is active.</p>
-            <div class="ios-features">
+            <h2 class="section-title reveal">Your Clipboard, on iPhone</h2>
+            <p class="section-subtitle reveal">SaneClip can sync Mac history through your own iCloud account. Browse, search, and copy synced clips from the iPhone companion while it is active.</p>
+            <div class="ios-features reveal">
                 <span>Siri Shortcuts</span>
                 <span>Share Extension</span>
                 <span>Widgets</span>
                 <span>Tap to Copy</span>
                 <span>Source-Aware Colors</span>
             </div>
-            <div class="ios-screenshots">
+            <div class="ios-screenshots reveal">
                 <div class="ios-screenshot-item" onclick="openLightbox('images/screenshot-ios-history-dark.png', 'Clipboard History on iPhone — Source-aware colors for synced Mac history'); return false">
                     <img src="images/screenshot-ios-history-dark.png" alt="SaneClip iOS - Clipboard History" loading="lazy">
                     <p>History</p>
@@ -1664,13 +1786,13 @@
 
     <section class="features" id="features">
         <div class="container">
-            <h2 class="section-title">Everything you need. Nothing you don't.</h2>
-            <p class="section-subtitle">A clipboard manager that respects your privacy and stays out of your way.</p>
+            <h2 class="section-title reveal">Everything you need. Nothing you don't.</h2>
+            <p class="section-subtitle reveal">A clipboard manager that respects your privacy and stays out of your way.</p>
             <div class="feature-grid">
                 <!-- === ROW 1: UNIQUE TO SANECLIP (featured glow) === -->
 
                 <!-- Touch ID Lock -->
-                <a href="#" onclick="openLightbox('images/screenshot-popover.png', 'Touch ID Protection — Biometric security for your clipboard history'); return false" class="feature-card">
+                <a href="#" onclick="openLightbox('images/screenshot-popover.png', 'Touch ID Protection — Biometric security for your clipboard history'); return false" class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -1682,7 +1804,7 @@
                 </a>
 
                 <!-- Strong Encryption -->
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -1693,7 +1815,7 @@
                 </div>
 
                 <!-- Sensitive Data Detection -->
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -1707,7 +1829,7 @@
                 <!-- === ROW 2: UNIQUE TO SANECLIP (featured glow) === -->
 
                 <!-- OCR Capture -->
-                <a href="#" onclick="openLightbox('images/screenshot-popover.png', 'OCR Capture — Grab text from screenshots and save searchable sidecars'); return false" class="feature-card">
+                <a href="#" onclick="openLightbox('images/screenshot-popover.png', 'OCR Capture — Grab text from screenshots and save searchable sidecars'); return false" class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="4" width="18" height="14" rx="2"></rect>
@@ -1723,7 +1845,7 @@
                 </a>
 
                 <!-- Password Manager Safe -->
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -1735,7 +1857,7 @@
                 </div>
 
                 <!-- Source-Aware Colors -->
-                <a href="#" onclick="openLightbox('images/screenshot-floating-colorful.png', 'Source App Tracking — Every app gets its own color, not just Apple apps'); return false" class="feature-card">
+                <a href="#" onclick="openLightbox('images/screenshot-floating-colorful.png', 'Source App Tracking — Every app gets its own color, not just Apple apps'); return false" class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="13.5" cy="6.5" r="0.5"></circle>
@@ -1750,7 +1872,7 @@
                 </a>
 
                 <!-- Clipboard Rules -->
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
@@ -1761,7 +1883,7 @@
                 </div>
 
                 <!-- Floating History Window -->
-                <a href="#" onclick="openLightbox('images/screenshot-floating-wide.png', 'Floating History Window — Detach, resize, and keep it wherever you work'); return false" class="feature-card">
+                <a href="#" onclick="openLightbox('images/screenshot-floating-wide.png', 'Floating History Window — Detach, resize, and keep it wherever you work'); return false" class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="5" width="18" height="14" rx="2"></rect>
@@ -1774,7 +1896,7 @@
                 </a>
 
                 <!-- Drag & Drop Out -->
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="3" width="12" height="12" rx="2"></rect>
@@ -1789,7 +1911,7 @@
                 <!-- === ROW 3: UNIQUE TO SANECLIP === -->
 
                 <!-- Automation -->
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="16 18 22 12 16 6"></polyline>
@@ -1801,7 +1923,7 @@
                 </div>
 
                 <!-- Private by Design -->
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M9 12l2 2 4-4"/>
@@ -1813,7 +1935,7 @@
                 </div>
 
                 <!-- Auto-Expire -->
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -1825,7 +1947,7 @@
                 </div>
 
                 <!-- Search & Unlimited History -->
-                <a href="#" onclick="openLightbox('images/screenshot-popover.png', 'Search &amp; History — Find anything you ever copied or captured'); return false" class="feature-card">
+                <a href="#" onclick="openLightbox('images/screenshot-popover.png', 'Search &amp; History — Find anything you ever copied or captured'); return false" class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="11" cy="11" r="8"></circle>
@@ -1837,7 +1959,7 @@
                 </a>
 
                 <!-- Keyboard Shortcuts -->
-                <a href="#" onclick="openLightbox('images/screenshot-shortcuts.png', 'Lightning Shortcuts — Global hotkeys for instant access'); return false" class="feature-card">
+                <a href="#" onclick="openLightbox('images/screenshot-shortcuts.png', 'Lightning Shortcuts — Global hotkeys for instant access'); return false" class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
@@ -1849,7 +1971,7 @@
                 </a>
 
                 <!-- Pin Items & Snippets -->
-                <a href="#" onclick="openLightbox('images/screenshot-snippets.png', 'Pins &amp; Snippets — Keep important text and reusable workflows always accessible'); return false" class="feature-card">
+                <a href="#" onclick="openLightbox('images/screenshot-snippets.png', 'Pins &amp; Snippets — Keep important text and reusable workflows always accessible'); return false" class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="17" x2="12" y2="22"></line>
@@ -1861,7 +1983,7 @@
                 </a>
 
                 <!-- Paste Stack -->
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="4" y="4" width="16" height="6" rx="1"></rect>
@@ -1873,7 +1995,7 @@
                 </div>
 
                 <!-- Text Transforms -->
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="4 7 4 4 20 4 20 7"></polyline>
@@ -1886,7 +2008,7 @@
                 </div>
 
                 <!-- Export & Import -->
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -1903,10 +2025,10 @@
 
     <section class="comparison" id="compare">
         <div class="container">
-            <h2 class="section-title">How SaneClip Stacks Up</h2>
-            <p class="section-subtitle">I built what I wished existed. Here's how SaneClip Pro compares.</p>
-            <p class="section-subtitle" style="margin-top: -10px; font-size: 0.95rem;">This table reflects SaneClip Pro. Download starts full Pro for 14 days, then Pro is required to continue.</p>
-            <div class="comparison-table-wrapper">
+            <h2 class="section-title reveal">How SaneClip Stacks Up</h2>
+            <p class="section-subtitle reveal">I built what I wished existed. Here's how SaneClip Pro compares.</p>
+            <p class="section-subtitle reveal" style="margin-top: -10px; font-size: 0.95rem;">This table reflects SaneClip Pro. Download starts full Pro for 14 days, then Pro is required to continue.</p>
+            <div class="comparison-table-wrapper reveal">
                 <table class="comparison-table">
                     <thead>
                         <tr>
@@ -2118,19 +2240,19 @@
 
     <section class="support" id="support">
         <div class="container">
-            <h2 class="section-title">Support SaneClip</h2>
-            <p class="section-subtitle support-subtitle">
+            <h2 class="section-title reveal">Support SaneClip</h2>
+            <p class="section-subtitle support-subtitle reveal">
                 I build apps because I love building things that work well.<br>
                 If SaneClip saves you time, consider buying me a coffee.<br><br>
                 <span>Thank you. — Mr. Sane</span>
             </p>
-            <a href="https://github.com/sponsors/MrSaneApps" class="btn btn-primary github-sponsor-btn" target="_blank" rel="noopener">
+            <a href="https://github.com/sponsors/MrSaneApps" class="btn btn-primary github-sponsor-btn reveal" target="_blank" rel="noopener">
                 <svg height="16" viewBox="0 0 16 16" width="16" fill="currentColor" style="margin-right: 8px;">
                     <path d="M4.25 2.5c-1.336 0-2.75 1.164-2.75 3 0 2.15 1.58 4.144 3.365 5.682A20.565 20.565 0 008 13.393a20.561 20.561 0 003.135-2.211C12.92 9.644 14.5 7.65 14.5 5.5c0-1.836-1.414-3-2.75-3-1.373 0-2.609.986-3.029 2.456a.75.75 0 01-1.442 0C6.859 3.486 5.623 2.5 4.25 2.5zM8 14.25l-.345.666-.002-.001-.006-.003-.018-.01a7.643 7.643 0 01-.31-.17 22.075 22.075 0 01-3.434-2.414C2.045 10.731 0 8.35 0 5.5 0 2.836 2.086 1 4.25 1 5.797 1 7.153 1.802 8 3.02 8.847 1.802 10.203 1 11.75 1 13.914 1 16 2.836 16 5.5c0 2.85-2.045 5.231-3.885 6.818a22.08 22.08 0 01-3.744 2.584l-.018.01-.006.003h-.002L8 14.25z"/>
                 </svg>
                 Sponsor on GitHub
             </a>
-            <div class="crypto-addresses">
+            <div class="crypto-addresses reveal">
                 <div class="crypto-grid">
                     <div class="crypto-item crypto-btc">
                         <img class="crypto-logo" src="https://cdn.jsdelivr.net/gh/spothq/cryptocurrency-icons@master/svg/color/btc.svg" alt="BTC" width="24" height="24">
@@ -2169,10 +2291,10 @@
 
     <section class="more-apps">
         <div class="container">
-            <h2 class="section-title">More from SaneApps</h2>
-            <p class="more-apps-subtitle">Simple Mac utilities that respect your time and privacy.</p>
+            <h2 class="section-title reveal">More from SaneApps</h2>
+            <p class="more-apps-subtitle reveal">Simple Mac utilities that respect your time and privacy.</p>
             <div class="more-apps-grid">
-                <a href="https://sanehosts.com" class="app-card" data-cta="cross_sell_sanehosts_card">
+                <a href="https://sanehosts.com" class="app-card reveal" data-cta="cross_sell_sanehosts_card">
                     <div class="app-card-header">
                         <img src="images/sanehosts-icon.png" alt="SaneHosts" class="app-card-icon">
                         <div class="app-card-name">SaneHosts</div>
@@ -2180,7 +2302,7 @@
                     <p class="app-card-tagline">Block ads and trackers across your Mac with a simple local app.</p>
                     <span class="app-card-cta">Learn more →</span>
                 </a>
-                <a href="https://saneclick.com" class="app-card" data-cta="cross_sell_saneclick_card">
+                <a href="https://saneclick.com" class="app-card reveal" data-cta="cross_sell_saneclick_card">
                     <div class="app-card-header">
                         <img src="images/saneclick-icon.png" alt="SaneClick" class="app-card-icon">
                         <div class="app-card-name">SaneClick</div>
@@ -2189,7 +2311,7 @@
                     <span class="app-card-cta">Learn more →</span>
                 </a>
             </div>
-            <div class="more-apps-hub">
+            <div class="more-apps-hub reveal">
                 <a href="https://saneapps.com" data-cta="cross_sell_saneapps_hub">See all apps at saneapps.com →</a>
             </div>
         </div>
@@ -2197,7 +2319,7 @@
 
         <section class="sustainability">
         <div class="container">
-            <div class="sustainability-card">
+            <div class="sustainability-card reveal">
                 <h2 style="font-family: 'Playfair Display', serif; font-size: 2.25rem; margin-bottom: 20px;">&#128269; Transparent Code + Sustainable</h2>
                 <div class="sustainability-body">
                     <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 30px;">Download starts 14 days of Pro. After the trial, keep Pro with a one-time purchase.</p>
@@ -2217,11 +2339,11 @@
     </section>
     <section style="padding: 60px 0 80px; text-align: center; overflow: hidden;">
         <div class="container">
-            <h2 class="section-title">Trusted by Thousands of Mac Users</h2>
-            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 40px;">From the SaneApps community</p>
+            <h2 class="section-title reveal">Trusted by Thousands of Mac Users</h2>
+            <p class="reveal" style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 40px;">From the SaneApps community</p>
         </div>
         <div class="testimonial-mask" style="overflow: hidden; mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);">
-            <div class="testimonial-track" style="display: flex; gap: 20px; animation: testimonialScroll 20s linear infinite; width: max-content;" onmouseenter="this.style.animationPlayState='paused'" onmouseleave="this.style.animationPlayState='running'">
+            <div class="testimonial-track" style="display: flex; gap: 20px; width: max-content;" onmouseenter="this.style.animationPlayState='paused'" onmouseleave="this.style.animationPlayState='running'">
                 <div class="testimonial-card" style="background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); border-radius: 16px; padding: 24px 28px; border: 1px solid var(--border); text-align: left; min-width: 340px; max-width: 340px; flex-shrink: 0;">
                     <p style="font-style: italic; color: var(--text-primary); margin-bottom: 16px; font-size: 0.95rem; line-height: 1.6;">"I purchased Saneclip because you do amazing work."</p>
                     <div style="color: var(--accent); font-size: 0.9rem; font-weight: 500;">Glenn C. (Email)</div>
@@ -2286,6 +2408,13 @@
         @keyframes testimonialScroll {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
+        }
+
+        /* Marquee only runs when motion is allowed; pauses on hover.
+           With reduced motion the cards sit as a fully visible static row. */
+        @media (prefers-reduced-motion: no-preference) {
+            .testimonial-track { animation: testimonialScroll 20s linear infinite; }
+            .testimonial-track:hover { animation-play-state: paused; }
         }
 
         @media (max-width: 768px) {
@@ -2394,6 +2523,29 @@
             el.textContent = 'Copied!';
             setTimeout(() => el.textContent = orig, 1500);
         }
+    </script>
+    <script>
+        // Scroll reveals: CSS scroll-timelines where supported; IntersectionObserver otherwise.
+        // The .io class (which hides .reveal pre-scroll) is only added when JS runs —
+        // no-JS visitors and crawlers get the full static page.
+        (function() {
+            if (CSS.supports("animation-timeline: view()")) return;
+            if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+            document.documentElement.classList.add("io");
+            var o = new IntersectionObserver(function(es) {
+                es.forEach(function(e) {
+                    if (e.isIntersecting) { e.target.classList.add("in"); o.unobserve(e.target); }
+                });
+            }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+            document.querySelectorAll(".reveal").forEach(function(el) { o.observe(el); });
+        })();
+        // Reduced motion: demo video becomes click-to-play with controls instead of an autoplaying loop.
+        (function () {
+            var v = document.querySelector('.clip-video');
+            if (v && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                v.removeAttribute('autoplay'); v.removeAttribute('loop'); v.controls = true; v.pause();
+            }
+        })();
     </script>
     <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "7cc598fdc7194b468b34990f49c3d87f"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

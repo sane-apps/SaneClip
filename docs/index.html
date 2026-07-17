@@ -1645,6 +1645,7 @@
                 <a href="https://saneapps.com" class="logo-family">Part of the SaneApps family</a>
             </div>
             <div class="nav-links">
+                <a href="#watch">Watch</a>
                 <a href="#features">Features</a>
                 <a href="#ios">iOS App</a>
                 <a href="#compare">Compare</a>
@@ -1666,6 +1667,7 @@
     <div id="mobileNav" class="mobile-nav">
         <button class="mobile-nav-close" onclick="toggleMobileNav()" aria-label="Close menu">&times;</button>
         <p class="mobile-nav-section">Navigation</p>
+        <a href="#watch" onclick="toggleMobileNav()">Watch</a>
         <a href="#features" onclick="toggleMobileNav()">Features</a>
         <a href="#ios" onclick="toggleMobileNav()">iOS App</a>
         <a href="#compare" onclick="toggleMobileNav()">Compare</a>
@@ -1752,6 +1754,40 @@
                 <p class="clip-video-caption">Real capture, no mockups &mdash; copy anything, then click an older clip to paste it right back.</p>
             </div>
         </div>
+    </section>
+
+    <!-- Watch: the pitch demo (click-to-play, self-hosted, no autoplay; reduced-motion-safe by design) -->
+    <section id="watch" style="padding: 72px 0 10px; scroll-margin-top: 110px;">
+        <style>
+            #watch .watch-wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; text-align: center; }
+            #watch .watch-kicker { font-size: 14px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+            #watch h2 { font-size: clamp(26px, 3vw, 38px); margin: 0 0 10px; color: var(--text-primary); }
+            #watch .watch-sub { margin: 0 0 22px; font-size: 15px; color: var(--text-primary); }
+            #watch video { width: 100%; max-width: 960px; aspect-ratio: 16/9; height: auto; background: #0a0a0f; border-radius: 14px; border: 1px solid rgba(0, 153, 255, 0.35); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); display: block; margin: 0 auto; }
+            #watch .watch-after { margin: 18px 0 0; font-size: 14.5px; color: var(--text-primary); }
+            #watch .watch-after a { color: var(--accent); text-decoration: none; font-weight: 700; }
+        </style>
+        <div class="watch-wrap">
+            <p class="watch-kicker">See it in action</p>
+            <h2>Watch the 1-minute demo</h2>
+            <p class="watch-sub">Clipboard history, quick-paste, and Touch ID privacy &mdash; with the real popup on screen.</p>
+            <video controls preload="metadata" poster="demo/saneclip-pitch-poster.jpg" playsinline width="1920" height="1080" aria-label="SaneClip pitch video: a clipboard that forgets, then a real screen capture of the history popup quick-pasting an older clip, the Touch ID and encryption feature set, and the one-time price">
+                <source src="demo/saneclip-pitch.mp4" type="video/mp4">
+            </video>
+            <p class="watch-after">Sold? <a href="/download" data-cta="download_trial_watch">Start the full Pro trial</a> &mdash; 14 days free, no credit card required.</p>
+        </div>
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "VideoObject",
+          "name": "SaneClip demo — the only clipboard manager with Touch ID protection",
+          "description": "SaneClip remembers everything you copy: saved, searchable, one click to paste back. Touch ID protection, history encrypted at rest, on-device by default. Real capture, no mockups.",
+          "thumbnailUrl": "https://saneclip.com/demo/saneclip-pitch-poster.jpg",
+          "contentUrl": "https://saneclip.com/demo/saneclip-pitch.mp4",
+          "uploadDate": "2026-07-17",
+          "duration": "PT57S"
+        }
+        </script>
     </section>
 
     <section class="ios-companion" id="ios">

@@ -270,6 +270,27 @@ struct HistoryWindowTests {
         #expect(historyWindowSource.contains("historyAuthSatisfied("))
     }
 
+    @Test("Search History opens protected history only after the auth gate")
+    func searchHistoryEntryPointUsesAuthGate() throws {
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+        let functionRange = try #require(
+            appSource.range(
+                of: #"@objc func focusHistorySearch\(\) \{[\s\S]*?\n    \}"#,
+                options: .regularExpression
+            )
+        )
+        let functionSource = String(appSource[functionRange])
+
+        #expect(functionSource.contains("if popover.isShown"))
+        #expect(functionSource.contains("withHistoryAuth { [weak self] in"))
+        #expect(functionSource.contains("self.showHistoryPopover()"))
+        #expect(functionSource.contains("self.requestHistorySearchFocus()"))
+        #expect(!functionSource.contains("if !popover.isShown {\n            showHistoryPopover()"))
+    }
+
     @Test("Floating history is a non-activating panel: paste lands in the target app without a focus steal")
     func floatingWindowPasteReturnsFocus() throws {
         let historyWindowSource = try String(

@@ -671,9 +671,18 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func focusHistorySearch() {
-        if !popover.isShown {
-            showHistoryPopover()
+        if popover.isShown {
+            requestHistorySearchFocus()
+            return
         }
+        withHistoryAuth { [weak self] in
+            guard let self else { return }
+            self.showHistoryPopover()
+            self.requestHistorySearchFocus()
+        }
+    }
+
+    private func requestHistorySearchFocus() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             NotificationCenter.default.post(name: .historySearchShortcutRequested, object: nil)
         }

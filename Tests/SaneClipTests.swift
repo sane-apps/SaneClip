@@ -601,6 +601,18 @@ struct SaneClipTests {
         #expect(!developmentSource.contains("npx wrangler r2 object put"))
     }
 
+    @Test("App Store metadata describes the current App Store lane")
+    func appStoreMetadataDescribesCurrentAppStoreLane() throws {
+        let manifest = try String(
+            contentsOf: projectRootURL().appendingPathComponent(".saneprocess"),
+            encoding: .utf8
+        )
+
+        #expect(manifest.contains("Improves history-lock authentication reliability and overall stability."))
+        #expect(!manifest.contains("Improves history focus after pasting with keep-open enabled"))
+        #expect(manifest.contains("No external checkout links or license keys are used in the App Store build."))
+    }
+
     @Test("Mac builds regenerate a Setapp-ready app icon")
     func macBuildRegeneratesSetappReadyAppIcon() throws {
         let projectSource = try String(

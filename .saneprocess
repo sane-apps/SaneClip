@@ -193,7 +193,7 @@ appstore:
         Touch ID history lock, AES-GCM history encryption at rest and encrypted sync payloads before upload,
         paste as plain text, smart paste, text transforms, paste stack, snippets, item notes, clipboard rules, and export/import.
       keywords: "clipboard,copy paste,history,snippets,touch id,security,productivity,mac utility"
-      whats_new: "Improves history focus after pasting with keep-open enabled and keeps compact history controls stable across window sizes."
+      whats_new: "Improves history-lock authentication reliability and overall stability."
       marketing_url: "https://saneclip.com"
     ios:
       subtitle: "Clipboard History + Widgets"

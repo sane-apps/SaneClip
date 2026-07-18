@@ -138,7 +138,9 @@ stateDiagram-v2
 
 - **Single source of truth**: `.saneprocess` in the project root.
 - **Build/test**: `./scripts/SaneMaster.rb verify` (no raw xcodebuild).
-- **Release**: `./scripts/SaneMaster.rb release` (delegates to SaneProcess `release.sh`).
+- **Release**: run `./scripts/SaneMaster.rb release_preflight`, then
+  `./scripts/SaneMaster.rb appstore_preflight` for App Store lanes, then the
+  guarded SaneProcess `release.sh --full --version --notes --deploy` pipeline.
 - **Direct channel**:
   - DMGs uploaded to Cloudflare R2 (not committed to GitHub)
   - Sparkle feed configured in `SaneClip/Info.plist`

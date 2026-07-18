@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [2.3.21] - 2026-07-18
 
-Improves direct-license validation so the SaneApps five-app bundle activates SaneClip Pro for valid direct Mac purchases.
+Improves direct-license validation so the SaneApps Bundle activates SaneClip Pro for valid direct Mac purchases.
 
 ---
 
@@ -144,12 +144,6 @@ Improves password protection so generated passwords copied from browser extensio
 ## [2.3.5] - 2026-05-19
 
 Fixes license-key paste reliability in activation and settings.
-
----
-
-## [2.3.4] - 2026-05-12
-
-Fixes Capture Text after the macOS screen picker and moves clipboard history to Cmd-Shift-Control-Y.
 
 ---
 

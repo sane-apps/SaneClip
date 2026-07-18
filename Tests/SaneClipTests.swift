@@ -601,6 +601,23 @@ struct SaneClipTests {
         #expect(!developmentSource.contains("npx wrangler r2 object put"))
     }
 
+    @Test("Public bundle copy is consistent and avoids unverified claims")
+    func publicBundleCopyIsConsistentAndVerifiable() throws {
+        let repoRoot = projectRootURL()
+        let websiteSource = try String(contentsOf: repoRoot.appendingPathComponent("docs/index.html"), encoding: .utf8)
+        let readmeSource = try String(contentsOf: repoRoot.appendingPathComponent("README.md"), encoding: .utf8)
+        let changelogSource = try String(contentsOf: repoRoot.appendingPathComponent("CHANGELOG.md"), encoding: .utf8)
+
+        #expect(websiteSource.contains("Get the SaneApps Bundle for $49.99 once"))
+        #expect(readmeSource.contains("SaneApps Bundle"))
+        #expect(changelogSource.contains("SaneApps Bundle activates SaneClip Pro"))
+        #expect(!websiteSource.contains("Everything Bundle"))
+        #expect(!websiteSource.contains("only</em> clipboard manager"))
+        #expect(!websiteSource.contains("1,800+ Downloads/Month"))
+        #expect(websiteSource.contains("<section class=\"comparison\" id=\"compare\" hidden>"))
+        #expect(websiteSource.contains("data-legacy-testimonials=\"unpublished\" hidden"))
+    }
+
     @Test("App Store metadata describes the current App Store lane")
     func appStoreMetadataDescribesCurrentAppStoreLane() throws {
         let manifest = try String(

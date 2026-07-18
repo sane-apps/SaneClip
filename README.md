@@ -2,7 +2,7 @@
 
 # 🔐 SaneClip
 
-### The Only Clipboard Manager That Takes Privacy Seriously
+### A Clipboard Manager That Takes Privacy Seriously
 
 **Privacy-first clipboard history · On-device by default · No personal-content upload · Full Pro for 14 days, then pay once**
 

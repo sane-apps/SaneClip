@@ -137,7 +137,7 @@ DON'T: Use placeholder or tautology assertions (`#expect(true)`)
 
 ### #8: BUG FOUND? WRITE IT DOWN
 
-DO: Document bugs in TodoWrite immediately
+DO: Document bugs in `SESSION_HANDOFF.md` and shared AgentMemory immediately
 DON'T: Try to remember bugs or skip documentation
 
 ### #9: NEW FILE? GEN THAT PILE
@@ -206,7 +206,8 @@ This is the standard protocol for investigating problems. Used by Rule #3, Circu
 mcp__agentmemory__memory_smart_search query: "SaneClip clipboard"
 ```
 
-Use Serena for project-scoped long-form notes. The legacy `mcp__memory__*`
+Use Serena only for code navigation. Record durable shared facts in AgentMemory
+and current project state in `SESSION_HANDOFF.md`. The legacy `mcp__memory__*`
 namespace is retired.
 
 ### Research Output -> Plan

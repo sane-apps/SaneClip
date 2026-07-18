@@ -245,7 +245,7 @@
 
             <div class="faq-item">
                 <h3>How do I grant Accessibility permissions?</h3>
-                <p>SaneClip needs Accessibility access to paste content into other apps. On first launch or when you click <strong>Request Accessibility Access</strong>, macOS should prompt SaneClip directly. If macOS does not finish the request inline, open <strong>System Settings &gt; Privacy &amp; Security &gt; Accessibility</strong> and enable SaneClip there.</p>
+                <p>In the direct Mac build, Accessibility enables one-click paste into other apps. On first launch or when you click <strong>Request Accessibility Access</strong>, macOS should prompt SaneClip directly. If macOS does not finish the request inline, open <strong>System Settings &gt; Privacy &amp; Security &gt; Accessibility</strong> and enable SaneClip there. The Mac App Store build uses the normal manual-paste flow and does not show this request.</p>
             </div>
 
             <div class="faq-item">
@@ -285,12 +285,12 @@
 
             <div class="faq-item">
                 <h3>How do I export or back up my data?</h3>
-                <p>On Mac, go to <strong>Settings > General > Data</strong> to export or import your clipboard history as JSON. You can also export and import your settings from <strong>Settings > General > Backup & Restore</strong>. On iPhone and iPad, open <strong>Settings > Export Data</strong> or <strong>Settings > Import Data</strong>.</p>
+                <p>On Mac, go to <strong>Settings > General > Data</strong> to export or import your clipboard history as JSON. You can also export and import your settings from <strong>Settings > General > Backup & Restore</strong>. On iPhone and iPad, save the current clipboard item through the Share sheet or the pending save card in History; iCloud sync then keeps saved history available on your own devices. The iPhone and iPad companion does not include JSON export or import controls.</p>
             </div>
 
             <div class="faq-item">
                 <h3>How do I reset SaneClip completely?</h3>
-                <p>Quit SaneClip, then delete the folder at <code>~/Library/Application Support/SaneClip/</code>. This removes all history and settings. Relaunch the app to start fresh.</p>
+                <p>For the direct download, quit SaneClip, then delete <code>~/Library/Application Support/SaneClip/</code>. This removes direct-build history and settings. The Mac App Store version uses a separate sandbox container; do not manually delete that container. Contact <a href="mailto:hi@saneapps.com">hi@saneapps.com</a> for its supported reset path.</p>
             </div>
 
             <hr>

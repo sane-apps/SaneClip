@@ -605,6 +605,7 @@ struct SaneClipTests {
     func publicBundleCopyIsConsistentAndVerifiable() throws {
         let repoRoot = projectRootURL()
         let websiteSource = try String(contentsOf: repoRoot.appendingPathComponent("docs/index.html"), encoding: .utf8)
+        let supportSource = try String(contentsOf: repoRoot.appendingPathComponent("docs/support.html"), encoding: .utf8)
         let readmeSource = try String(contentsOf: repoRoot.appendingPathComponent("README.md"), encoding: .utf8)
         let changelogSource = try String(contentsOf: repoRoot.appendingPathComponent("CHANGELOG.md"), encoding: .utf8)
 
@@ -616,6 +617,10 @@ struct SaneClipTests {
         #expect(!websiteSource.contains("1,800+ Downloads/Month"))
         #expect(websiteSource.contains("<section class=\"comparison\" id=\"compare\" hidden>"))
         #expect(websiteSource.contains("data-legacy-testimonials=\"unpublished\" hidden"))
+        #expect(!supportSource.contains("Settings > Export Data"))
+        #expect(!supportSource.contains("Settings > Import Data"))
+        #expect(supportSource.contains("The iPhone and iPad companion does not include JSON export or import controls."))
+        #expect(supportSource.contains("In the direct Mac build, Accessibility enables one-click paste"))
     }
 
     @Test("App Store metadata describes the current App Store lane")

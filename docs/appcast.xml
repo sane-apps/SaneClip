@@ -5,7 +5,27 @@
     <link>https://saneclip.com/appcast.xml</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
-                                    <item>
+                                            <item>
+            <title>2.3.21</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Sat, 18 Jul 2026 17:27:46 -0400</pubDate>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Adds valid SaneApps Bundle activation for SaneClip Pro, strengthens History Lock authentication, and improves direct-install safety.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.21.zip"
+                       sparkle:version="2321"
+                       sparkle:shortVersionString="2.3.21"
+                       length="5228562"
+                       type="application/octet-stream"
+                       sparkle:edSignature="gHNW3a1k9alL2BddOMZiMjzDC57fqP0zpuWd0DRL/1yMo6mLwAq4ffJ7gO/oX0JQWixeTdltshSeA/OJHthvAw=="/>
+        </item>
+<item>
             <title>2.3.20</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Thu, 09 Jul 2026 01:01:21 -0400</pubDate>

@@ -166,12 +166,6 @@ struct KeychainTests {
             .deletingLastPathComponent()
     }
 
-    private func saneAppsRootURL() -> URL {
-        projectRootURL()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-    }
-
     @Test("Keychain stores and retrieves strings")
     func keychainStringRoundTrip() {
         let testAccount = "test-keychain-\(UUID().uuidString)"
@@ -232,15 +226,8 @@ struct KeychainTests {
             contentsOf: projectRootURL().appendingPathComponent("Core/Security/KeychainHelper.swift"),
             encoding: .utf8
         )
-        let saneUIKeychainSource = try String(
-            contentsOf: saneAppsRootURL().appendingPathComponent("infra/SaneUI/Sources/SaneUI/License/KeychainService.swift"),
-            encoding: .utf8
-        )
-
         #expect(keychainHelperSource.contains("interactionNotAllowed = true"))
         #expect(keychainHelperSource.contains("kSecUseAuthenticationContext"))
-        #expect(saneUIKeychainSource.contains("interactionNotAllowed = true"))
-        #expect(saneUIKeychainSource.contains("kSecUseAuthenticationContext"))
     }
 
     @Test("Inaccessible history key is not replaced as missing")

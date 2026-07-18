@@ -367,7 +367,12 @@ class CustomerUIActionSweep
     out, status = Open3.capture2e(SANEMASTER, 'customer_ui_contract', '--json', '--no-exit')
     raise "customer_ui_contract failed before receipt write: #{out}" unless status.success?
 
-    JSON.parse(out)
+    # SaneMaster emits a workflow receipt before JSON command output. Parse the
+    # JSON document rather than assuming its first byte is the opening brace.
+    json = out.lines.drop_while { |line| line.lstrip !~ /\A\{/ }.join
+    raise "customer_ui_contract returned no JSON report: #{out}" if json.empty?
+
+    JSON.parse(json)
   end
 
   def verify_all_actions_have_results!

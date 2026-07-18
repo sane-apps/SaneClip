@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.21] - 2026-07-18
+
+Improves direct-license validation so the SaneApps five-app bundle activates SaneClip Pro for valid direct Mac purchases.
+
+---
+
 ## [2.3.20] - 2026-07-09
 
 Fixes keep-open fixed history pastes so the next selected clip goes back into the app you were using instead of landing in SaneClip or doing nothing.

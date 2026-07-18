@@ -40,7 +40,7 @@ Product roster (canonical): macOS = SaneHosts, SaneClip, SaneClick, SaneSales, S
 
 - Canonical route: run `ruby scripts/SaneMaster.rb verify` on the Mac Mini (build + tests).
 - Local Xcode builds on the Air are an explicitly-approved fallback only.
-- Release: `bash ~/SaneApps/infra/SaneProcess/scripts/release.sh --project <path> --full` (ships ZIPs).
+- Release: run `./scripts/SaneMaster.rb release_preflight`, then `./scripts/SaneMaster.rb appstore_preflight` for App Store lanes, then `bash ~/SaneApps/infra/SaneProcess/scripts/release.sh --project <path> --full --version X.Y.Z --notes "..." --deploy`. The release script publishes the signed ZIP, appcast, website, and Homebrew update through the guarded pipeline.
 - Homebrew/distribution policy lives in the SaneProcess docs (`~/SaneApps/infra/SaneProcess/DEVELOPMENT.md`); the tap at `~/SaneApps/homebrew-tap` is a live release channel updated by release.sh.
 
 ## App Icon Rule (CRITICAL)

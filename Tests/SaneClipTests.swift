@@ -587,6 +587,20 @@ struct SaneClipTests {
         #expect(SaneAppMover.privilegedMoveScript.contains("quoted form of destinationPath"))
     }
 
+    @Test("Release documentation uses the guarded end-to-end pipeline")
+    func releaseDocumentationUsesGuardedPipeline() throws {
+        let repoRoot = projectRootURL()
+        let agentsSource = try String(contentsOf: repoRoot.appendingPathComponent("AGENTS.md"), encoding: .utf8)
+        let developmentSource = try String(contentsOf: repoRoot.appendingPathComponent("DEVELOPMENT.md"), encoding: .utf8)
+
+        #expect(agentsSource.contains("release_preflight"))
+        #expect(agentsSource.contains("--version X.Y.Z --notes \"...\" --deploy"))
+        #expect(developmentSource.contains("./scripts/SaneMaster.rb release_preflight"))
+        #expect(developmentSource.contains("./scripts/SaneMaster.rb appstore_preflight"))
+        #expect(developmentSource.contains("--project \"$(pwd)\" --full --version X.Y.Z --notes \"...\" --deploy"))
+        #expect(!developmentSource.contains("npx wrangler r2 object put"))
+    }
+
     @Test("Mac builds regenerate a Setapp-ready app icon")
     func macBuildRegeneratesSetappReadyAppIcon() throws {
         let projectSource = try String(

@@ -420,15 +420,16 @@ Use SaneMaster for macOS builds/tests. Xcode Tools MCP handles build/test/previe
 ## Release Process
 
 ```bash
-# 1. Build, sign, notarize, create DMG (unified SaneProcess script)
-./scripts/SaneMaster.rb release
+# 1. Sign a current direct-release readiness receipt.
+./scripts/SaneMaster.rb release_preflight
 
-# 2. Upload DMG to Cloudflare R2 (the only hosted DMG)
-npx wrangler r2 object put saneclip-downloads/SaneClip-X.Y.Z.dmg \
-  --file=releases/SaneClip-X.Y.Z.dmg --content-type="application/octet-stream" --remote
+# 2. For App Store lanes, also sign the App Store receipt.
+./scripts/SaneMaster.rb appstore_preflight
 
-# 3. Update appcast.xml (Sparkle)
-# (Use the project-specific post-release process if present)
+# 3. Publish the complete signed ZIP/Appcast/site/Homebrew release through the
+# canonical pipeline. Do not upload R2 objects or edit the appcast manually.
+bash ~/SaneApps/infra/SaneProcess/scripts/release.sh \
+  --project "$(pwd)" --full --version X.Y.Z --notes "..." --deploy
 ```
 
 **Remember:** Release uses `com.saneclip.app` bundle ID. Debug uses `com.saneclip.dev`.

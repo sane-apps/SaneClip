@@ -662,6 +662,32 @@ struct SaneClipTests {
         #expect(downloadSource.contains("fetch('/appcast.xml'"))
     }
 
+    @Test("Public release links and metadata use the project marketing version")
+    func publicReleaseLinksAndMetadataUseProjectMarketingVersion() throws {
+        let repoRoot = projectRootURL()
+        let projectSource = try String(contentsOf: repoRoot.appendingPathComponent("project.yml"), encoding: .utf8)
+        let releaseVersions = projectSource
+            .split(separator: "\n")
+            .compactMap { line -> String? in
+                guard line.contains("MARKETING_VERSION:") else { return nil }
+                return line
+                    .split(separator: ":", maxSplits: 1)[1]
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+            }
+        let releaseVersion = try #require(releaseVersions.first)
+        let indexSource = try String(contentsOf: repoRoot.appendingPathComponent("docs/index.html"), encoding: .utf8)
+        let downloadSource = try String(contentsOf: repoRoot.appendingPathComponent("docs/download.html"), encoding: .utf8)
+        let readmeSource = try String(contentsOf: repoRoot.appendingPathComponent("README.md"), encoding: .utf8)
+
+        #expect(releaseVersions.allSatisfy { $0 == releaseVersion })
+        #expect(indexSource.contains("\"softwareVersion\": \"\(releaseVersion)\""))
+        #expect(indexSource.contains("SaneClip-\(releaseVersion).zip"))
+        #expect(downloadSource.contains("SaneClip-\(releaseVersion).zip"))
+        #expect(readmeSource.contains("Current macOS Direct Download: v\(releaseVersion)"))
+        #expect(readmeSource.contains("go.saneapps.com/buy/bundle"))
+    }
+
     @Test("iPhone settings restore the App Store screenshot accent lane")
     func iPhoneSettingsSourceMatchesScreenshotLane() throws {
         let repoRoot = projectRootURL()

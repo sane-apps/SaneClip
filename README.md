@@ -12,7 +12,7 @@
 [![Pricing](https://img.shields.io/badge/Pricing-14--day_trial_%2B_%2414.99_Pro-green?style=flat-square)](https://saneclip.com)
 [![Listed on macOS apps list](https://img.shields.io/badge/Listed%20on-macOS--apps--list%20(40k%E2%98%85)-black?style=flat-square)](https://github.com/serhii-londar/open-source-mac-os-apps)
 
-> **⭐ Star this repo if you find it useful!** · **[⬇️ Start a free 14-day Pro trial](https://saneclip.com/download)** · **[💰 Buy Pro for $14.99 once](https://go.saneapps.com/buy/saneclip?ref=github-readme)**
+> **⭐ Star this repo if you find it useful!** · **[⬇️ Start a free 14-day Pro trial](https://saneclip.com/download)** · **[💰 Buy Pro for $14.99 once](https://go.saneapps.com/buy/saneclip?ref=github-readme)** · **[📦 Get the $49.99 SaneApps Bundle](https://go.saneapps.com/buy/bundle?ref=saneclip-github-readme)**
 
 <img src="docs/images/screenshot-popover.png" alt="SaneClip Screenshot" width="600">
 
@@ -57,11 +57,12 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ---
 
-## 🆕 Current macOS Direct Download: v2.3.16
+## 🆕 Current macOS Direct Download: v2.3.21
 
 **Current direct-download release (July 2026)**
 
 - ✅ Starts Mac users with a free 14-day Pro trial, then requires Pro for continued use
+- ✅ Accepts a valid direct SaneApps five-app bundle license as a SaneClip Pro unlock
 - ✅ Keeps only one SaneClip copy running so duplicate launches do not fight over clipboard history
 - ✅ Pastes from the floating history window back into your app without focus stealing or first-click misses
 - ✅ Keeps the Pro floating history window steady in keep-open mode instead of flickering closed and open
@@ -79,7 +80,7 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ## 🧾 Full Pro for 14 Days + Pay Once
 
-The Mac app starts with 14 days of Pro access. After the trial, Pro is required and remains a one-time $14.99 purchase. The iPhone/iPad companion remains a separate free App Store download that uses your iCloud account for sync.
+The Mac app starts with 14 days of Pro access. After the trial, Pro is required and remains a one-time $14.99 purchase. A valid direct [SaneApps Bundle](https://go.saneapps.com/buy/bundle?ref=saneclip-readme-pricing) license also unlocks SaneClip Pro. The iPhone/iPad companion remains a separate free App Store download that uses your iCloud account for sync.
 
 ### Pro includes
 - Unlimited history
@@ -248,6 +249,8 @@ See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) for full details.
 
 **[Buy Pro ($14.99 once)](https://go.saneapps.com/buy/saneclip?ref=github-readme)** for OCR capture, unlimited history, Touch ID lock, encryption-at-rest, smarter paste, snippets, and advanced rules.
 
+Need more than one direct Mac Pro app? **[Get the SaneApps Bundle ($49.99 once)](https://go.saneapps.com/buy/bundle?ref=saneclip-readme-install)** and activate SaneClip with the same valid direct bundle license.
+
 ### Install
 
 ```bash
@@ -379,7 +382,7 @@ SaneClip is available in two versions with different capabilities:
 
 > **Why the difference?** The Mac App Store version runs in Apple's sandbox, which blocks simulated keyboard events (used for auto-paste). Instead, the App Store version copies items to your clipboard and shows a notification — just press Cmd+V to paste. All other features work identically.
 
-**Direct download:** [Start the free 14-day Pro trial at saneclip.com/download](https://saneclip.com/download) · [Buy Pro for $14.99 once](https://go.saneapps.com/buy/saneclip?ref=github-readme) — includes Sparkle auto-updates.
+**Direct download:** [Start the free 14-day Pro trial at saneclip.com/download](https://saneclip.com/download) · [Buy Pro for $14.99 once](https://go.saneapps.com/buy/saneclip?ref=github-readme) · [Get the SaneApps Bundle for $49.99 once](https://go.saneapps.com/buy/bundle?ref=saneclip-readme-direct) — includes Sparkle auto-updates.
 
 ---
 

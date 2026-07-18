@@ -14,6 +14,19 @@ enum SaneAppMover {
         URL(fileURLWithPath: "/usr/bin/osascript")
     }
 
+    static let privilegedMoveScript = """
+    on run argv
+        if (count of argv) is not 2 then error "Expected source and destination paths"
+        set sourcePath to item 1 of argv
+        set destinationPath to item 2 of argv
+        do shell script "/bin/rm -rf " & quoted form of destinationPath & " && /bin/mv " & quoted form of sourcePath & " " & quoted form of destinationPath with administrator privileges
+    end run
+    """
+
+    static func privilegedMoveArguments(sourcePath: String, destinationPath: String) -> [String] {
+        ["-e", privilegedMoveScript, "--", sourcePath, destinationPath]
+    }
+
     @MainActor
     @discardableResult
     static func moveToApplicationsFolderIfNeeded(prompt: Prompt) -> Bool {
@@ -51,13 +64,9 @@ enum SaneAppMover {
         }
 
         if !moved {
-            let escapedSourcePath = appPath.replacingOccurrences(of: "'", with: "'\\''")
-            let escapedDestinationPath = destinationPath.replacingOccurrences(of: "'", with: "'\\''")
-            let script = "do shell script \"rm -rf '\(escapedDestinationPath)' && mv '\(escapedSourcePath)' '\(escapedDestinationPath)'\" with administrator privileges"
-
             let osa = Process()
             osa.executableURL = osascriptExecutableURL
-            osa.arguments = ["-e", script]
+            osa.arguments = privilegedMoveArguments(sourcePath: appPath, destinationPath: destinationPath)
             do {
                 try osa.run()
                 osa.waitUntilExit()

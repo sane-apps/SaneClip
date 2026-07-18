@@ -568,6 +568,25 @@ struct SaneClipTests {
         #expect(resolvedPackages.contains("\"revision\" : \"\(saneUIRevision)\""))
     }
 
+    @Test("Privileged app mover passes filesystem paths as AppleScript arguments")
+    func privilegedAppMoverDoesNotInterpolateFilesystemPaths() {
+        let hostilePath = #"/tmp/SaneClip\"; do shell script \"id\".app"#
+        let destinationPath = "/Applications/SaneClip.app"
+        let arguments = SaneAppMover.privilegedMoveArguments(
+            sourcePath: hostilePath,
+            destinationPath: destinationPath
+        )
+
+        #expect(arguments[0] == "-e")
+        #expect(arguments[1] == SaneAppMover.privilegedMoveScript)
+        #expect(arguments[2] == "--")
+        #expect(arguments[3] == hostilePath)
+        #expect(arguments[4] == destinationPath)
+        #expect(!SaneAppMover.privilegedMoveScript.contains(hostilePath))
+        #expect(SaneAppMover.privilegedMoveScript.contains("quoted form of sourcePath"))
+        #expect(SaneAppMover.privilegedMoveScript.contains("quoted form of destinationPath"))
+    }
+
     @Test("Mac builds regenerate a Setapp-ready app icon")
     func macBuildRegeneratesSetappReadyAppIcon() throws {
         let projectSource = try String(

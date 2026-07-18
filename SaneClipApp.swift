@@ -681,22 +681,48 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Biometric Authentication
 
+    nonisolated static func historyAuthenticationPolicy(
+        biometricsAvailable: Bool,
+        deviceOwnerAuthenticationAvailable: Bool
+    ) -> LAPolicy? {
+        if biometricsAvailable {
+            return .deviceOwnerAuthenticationWithBiometrics
+        }
+        if deviceOwnerAuthenticationAvailable {
+            return .deviceOwnerAuthentication
+        }
+        return nil
+    }
+
     func authenticateWithBiometrics(completion: @escaping @Sendable (Bool) -> Void) {
         let context = LAContext()
-        var error: NSError?
+        var biometricsError: NSError?
+        let biometricsAvailable = context.canEvaluatePolicy(
+            .deviceOwnerAuthenticationWithBiometrics,
+            error: &biometricsError
+        )
+        var deviceOwnerAuthenticationError: NSError?
+        let deviceOwnerAuthenticationAvailable = context.canEvaluatePolicy(
+            .deviceOwnerAuthentication,
+            error: &deviceOwnerAuthenticationError
+        )
 
-        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            context.evaluatePolicy(
-                .deviceOwnerAuthenticationWithBiometrics,
-                localizedReason: "Authenticate to view clipboard history"
-            ) { success, _ in
-                DispatchQueue.main.async {
-                    completion(success)
-                }
+        guard let policy = Self.historyAuthenticationPolicy(
+            biometricsAvailable: biometricsAvailable,
+            deviceOwnerAuthenticationAvailable: deviceOwnerAuthenticationAvailable
+        ) else {
+            // A configured history lock must never silently become unlocked.
+            completion(false)
+            return
+        }
+
+        context.evaluatePolicy(
+            policy,
+            localizedReason: "Authenticate to view clipboard history"
+        ) { success, _ in
+            DispatchQueue.main.async {
+                completion(success)
             }
-        } else {
-            // No biometrics available, allow access
-            completion(true)
         }
     }
 

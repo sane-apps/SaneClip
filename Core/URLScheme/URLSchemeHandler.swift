@@ -162,7 +162,8 @@ final class URLSchemeHandler {
             return false
         }
 
-        // Destructive commands require Touch ID only for Pro users who enabled it.
+        // Destructive commands require Touch ID or the device password for Pro
+        // users who enabled history protection.
         if command.requiresConfirmation,
            ClipboardManager.shared?.licenseService?.isPro == true,
            SettingsModel.shared.requireTouchID {
@@ -192,23 +193,35 @@ final class URLSchemeHandler {
 
     // MARK: - Biometric Authentication
 
-    /// Synchronous biometric authentication for URL scheme commands.
-    /// Uses a semaphore to block until Touch ID completes since URL scheme
-    /// handlers need a synchronous return value.
+    /// Synchronous device-owner authentication for URL scheme commands. Uses a
+    /// semaphore because URL scheme handlers need a synchronous return value.
     private func authenticateSync() -> Bool {
         let context = LAContext()
-        var error: NSError?
+        var biometricsError: NSError?
+        let biometricsAvailable = context.canEvaluatePolicy(
+            .deviceOwnerAuthenticationWithBiometrics,
+            error: &biometricsError
+        )
+        var deviceOwnerAuthenticationError: NSError?
+        let deviceOwnerAuthenticationAvailable = context.canEvaluatePolicy(
+            .deviceOwnerAuthentication,
+            error: &deviceOwnerAuthenticationError
+        )
 
-        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
-            // No biometrics available — allow access (same as popover behavior)
-            return true
+        guard let policy = SaneClipAppDelegate.historyAuthenticationPolicy(
+            biometricsAvailable: biometricsAvailable,
+            deviceOwnerAuthenticationAvailable: deviceOwnerAuthenticationAvailable
+        ) else {
+            // A configured protection setting must fail closed when the Mac
+            // cannot authenticate its owner.
+            return false
         }
 
         let semaphore = DispatchSemaphore(value: 0)
         let success = LockedBool(false)
 
         context.evaluatePolicy(
-            .deviceOwnerAuthenticationWithBiometrics,
+            policy,
             localizedReason: "Authenticate to allow external clipboard access"
         ) { result, _ in
             success.set(result)

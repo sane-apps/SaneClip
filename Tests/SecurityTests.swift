@@ -1,11 +1,35 @@
 import CloudKit
 import Foundation
+import LocalAuthentication
 @testable import SaneClip
 import Testing
 
 // MARK: - URL Scheme Security Tests
 
 struct URLSchemeSecurityTests {
+    @Test("History protection requires an available device-owner authentication policy")
+    func historyProtectionDoesNotFailOpenWhenBiometricsAreUnavailable() {
+        #expect(
+            SaneClipAppDelegate.historyAuthenticationPolicy(
+                biometricsAvailable: true,
+                deviceOwnerAuthenticationAvailable: true
+            )?.rawValue == LAPolicy.deviceOwnerAuthenticationWithBiometrics.rawValue
+        )
+        #expect(
+            SaneClipAppDelegate.historyAuthenticationPolicy(
+                biometricsAvailable: false,
+                deviceOwnerAuthenticationAvailable: true
+            )?.rawValue == LAPolicy.deviceOwnerAuthentication.rawValue
+        )
+        #expect(
+            SaneClipAppDelegate.historyAuthenticationPolicy(
+                biometricsAvailable: false,
+                deviceOwnerAuthenticationAvailable: false
+            ) == nil
+        )
+
+    }
+
     @Test("URL scheme parses copy command")
     func parseCommandCopy() throws {
         let url = try #require(URL(string: "saneclip://copy?text=Hello%20World"))

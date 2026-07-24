@@ -187,6 +187,55 @@ actions:
   - Keep-open paste keeps the floating panel and fixed popover visible, clears key
     status before synthetic Cmd+V, and requests front/key restore after direct-build
     paste succeeds.
+- id: on-device-ai-text-actions
+  title: On-device AI previews text transformations without changing history
+  surfaces:
+  - Text clip context menu
+  - On-device AI preview sheet
+  steps:
+  - Open a representative text clip's context menu.
+  - Choose Rewrite under AI — On Device, observe loading and a generated result,
+    then Copy it.
+  - Choose Summarize and Cancel its preview.
+  - Verify cancellation during loading plus unavailable, failure, empty, and
+    oversized states with deterministic state tests.
+  assertions:
+  - The menu clearly states that macOS 26 or later is required.
+  - Empty and oversized clips fail before model availability or generation work.
+  - Copy writes only the generated text to the pasteboard and never changes history.
+  - Cancel and unavailable states leave the source clip unchanged.
+  evidence:
+  - Mini source/test guard for Foundation Models availability, bounded input, and preview states
+  - Clipboard-history screenshot fixture for the source action surface
+  required_proof_level: runtime_visual
+  required_evidence_types:
+  - mini_runtime
+  - mini_click
+  - screenshot
+  - fixture
+  - log
+  historical_failure_classes:
+  - menu_entry_missing
+  - data_loss_or_unexpected_mutation
+  - layout_visual_regression
+  - external_integration_stub
+  - docs_promise_drift
+  - activation_noop
+  functional_state:
+    description: Seeded text clipboard history on a macOS 26 Apple Intelligence-capable Mini.
+    setup_steps:
+    - Load a deterministic text clip before opening the context menu.
+    - Keep the source history fixture unchanged after Copy or Cancel.
+    fixture_paths:
+    - Tests/Fixtures/customer-ui/clipboard-history/
+  user_inputs:
+  - Choose Rewrite and Copy its generated result.
+  - Choose Summarize and cancel its preview.
+  expected_outputs:
+  - Supported systems show a private generated preview.
+  - Deterministic state tests cover unsupported, not-ready, failed, empty, and
+    oversized requests.
+  - Clipboard history remains unchanged.
 - id: paste-stack-actions
   title: Paste Stack can add, paste, reorder, rename, note, undo, pause, and clear
     items

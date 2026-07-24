@@ -17,6 +17,13 @@ class CustomerUIActionSweep
   MANIFEST_PATH = File.join(PROJECT_ROOT, 'Tests', 'CustomerUIActions.yml')
   SANEMASTER = File.join(PROJECT_ROOT, 'scripts', 'SaneMaster.rb')
   APP_NAME = 'SaneClip'
+  AI_RUNTIME_TRAVERSAL_PATH = File.join(
+    PROJECT_ROOT,
+    'outputs',
+    'customer-ui',
+    'ai-proof',
+    'runtime-traversal.json'
+  )
 
   ACTION_GUARDS = {
     'status-menu-dock-core-actions' => [
@@ -48,6 +55,18 @@ class CustomerUIActionSweep
       ['UI/History/ImageCapturePreviewSheet.swift', 'Copy OCR Text'],
       ['Tests/HistoryWindowTests.swift', 'Floating keep-open keeps history visible while clearing key status'],
       ['Tests/HistoryWindowTests.swift', 'Fixed keep-open makes popover non-transient before paste and requests focus restore']
+    ],
+    'on-device-ai-text-actions' => [
+      ['UI/History/ClipboardItemRow.swift', 'Menu("AI — On Device (macOS 26+)")'],
+      ['UI/History/AITextTransformPreviewSheet.swift', 'Working entirely on this Mac…'],
+      ['UI/History/AITextTransformPreviewSheet.swift', 'Button("Copy")'],
+      ['UI/History/AITextTransformPreviewSheet.swift', 'Button("Cancel")'],
+      ['Core/TextTransformService.swift', 'static let maximumUTF8ByteCount = 2_000'],
+      ['Core/ClipboardManager.swift', 'func copyTextWithoutPaste('],
+      ['project.yml', 'MARKETING_VERSION: "2.3.22"'],
+      ['Core/TextTransformService.swift', 'tools: []'],
+      ['Tests/ClipboardTransformsTests.swift', 'AI preview rejects oversized clips before availability or generation'],
+      ['Tests/ClipboardTransformsTests.swift', 'AI Copy writes the chosen result without changing history']
     ],
     'paste-stack-actions' => [
       ['UI/History/HistoryPasteStackPanel.swift', 'Text("Paste Stack")'],
@@ -156,6 +175,7 @@ class CustomerUIActionSweep
     'status-menu-dock-core-actions' => 'docs/images/screenshot-menu.png',
     'history-search-filter-navigation' => 'docs/images/appstore-mac-popover.png',
     'history-item-row-actions' => 'outputs/capture-renders/glenn-1012-keep-open-pin-visible-before-paste.png',
+    'on-device-ai-text-actions' => 'outputs/customer-ui/ai-proof/ai-result-preview.png',
     'paste-stack-actions' => 'outputs/capture-renders/glenn-1012-floating-reopened-merge-queue-retains-3.png',
     'capture-screenshot-text-actions' => 'docs/images/appstore-mac-settings.png',
     'settings-general-security-history-actions' => 'outputs/capture-renders/glenn-1013-pause-countdown-visible-while-idle.png',
@@ -169,6 +189,7 @@ class CustomerUIActionSweep
 
   EXTERNAL_BOUNDARIES = {
     'capture-screenshot-text-actions' => 'ScreenCaptureKit picker and Screen Recording permission require a human/system permission surface; this sweep verifies menu, shortcut, permission-copy, service, OCR, and preview fixtures only.',
+    'on-device-ai-text-actions' => 'Foundation Models availability depends on macOS 26, Apple Intelligence eligibility, enablement, and model readiness; live Rewrite/Copy and Summarize/Cancel are paired with deterministic unavailable/failure/input-state tests.',
     'settings-general-security-history-actions' => 'Touch ID, selected-app panels, update checks, and import/export are verified through safe first-surface source/test guards, not destructive user-data mutation.',
     'sync-settings-actions' => 'CloudKit network completion is external; this sweep verifies the sync UI, reset confirmation, and deterministic sync coordinator tests.',
     'ios-widget-extension-actions' => 'iOS device, extension, and widget runtime are separate fixtures; this sweep verifies shipped source and tests from the Mini repo checkout.'
@@ -193,6 +214,7 @@ class CustomerUIActionSweep
       ensure_manifest!
       verify_source_and_test_guards
       collect_screenshots
+      verify_ai_runtime_traversal!
       write_runtime_artifacts
       build_action_results
       verify_all_actions_have_results!
@@ -257,6 +279,57 @@ class CustomerUIActionSweep
     @transcript << "screenshot_fixtures=#{@screenshots.join(', ')}"
   end
 
+  def verify_ai_runtime_traversal!
+    raise "Missing live AI traversal receipt: #{AI_RUNTIME_TRAVERSAL_PATH}" unless File.file?(AI_RUNTIME_TRAVERSAL_PATH)
+
+    receipt = JSON.parse(File.read(AI_RUNTIME_TRAVERSAL_PATH))
+    required_truths = [
+      receipt.dig('rewrite', 'menu_visible'),
+      receipt.dig('rewrite', 'loading_observed'),
+      receipt.dig('rewrite', 'result_observed'),
+      receipt.dig('rewrite', 'copy_clicked'),
+      receipt.dig('rewrite', 'pasteboard_matches_result'),
+      receipt.dig('rewrite', 'original_history_unchanged'),
+      receipt.dig('summarize', 'cancel_clicked'),
+      receipt['running_saneclip_processes'] == 1,
+      receipt.dig('rewrite', 'generated_history_rows_after_copy') == 0
+    ]
+    raise 'Live AI traversal receipt is incomplete' unless required_truths.all?
+    sensitive_keys = %w[fixture result pasteboard source_text generated_text pasteboard_after_copy result_observed_text]
+    serialized_keys = JSON.generate(receipt).downcase
+    if sensitive_keys.any? { |key| serialized_keys.include?("\"#{key}\"") }
+      raise 'Live AI traversal receipt must not persist prompt, result, or pasteboard text'
+    end
+    raise 'Live AI traversal version mismatch' unless receipt['version'] == project_version('MARKETING_VERSION')
+    raise 'Live AI traversal build mismatch' unless receipt['build'] == project_version('CURRENT_PROJECT_VERSION')
+    raise 'Live AI traversal source mismatch' unless receipt['source_sha256'] == ai_runtime_source_digest
+    executable = File.join(receipt.fetch('installed_app'), 'Contents', 'MacOS', APP_NAME)
+    raise 'Live AI traversal installed executable is missing' unless File.file?(executable)
+    executable_digest = Digest::SHA256.file(executable).hexdigest
+    unless executable_digest == receipt.fetch('installed_executable_sha256')
+      raise 'Live AI traversal installed executable digest mismatch'
+    end
+
+    screenshot = File.join(PROJECT_ROOT, receipt.fetch('screenshot'))
+    raise 'Live AI traversal screenshot is missing' unless valid_screenshot?(screenshot)
+    digest = Digest::SHA256.file(screenshot).hexdigest
+    raise 'Live AI traversal screenshot digest mismatch' unless digest == receipt.fetch('screenshot_sha256')
+
+    generated_at = Time.iso8601(receipt.fetch('generated_at'))
+    receipt_age = Time.now.utc - generated_at
+    raise 'Live AI traversal receipt timestamp is in the future' if receipt_age < -300
+    raise 'Live AI traversal receipt is older than 24 hours' if receipt_age > 86_400
+
+    @artifacts[:ai_runtime_traversal] = relative(AI_RUNTIME_TRAVERSAL_PATH)
+    @transcript << "live_ai_traversal=#{@artifacts[:ai_runtime_traversal]} ok"
+  end
+
+  def ai_runtime_source_digest
+    guards = ACTION_GUARDS.fetch('on-device-ai-text-actions')
+    payload = guards.map { |path, _expected| "#{path}\n#{read_file(path)}" }.join("\n")
+    Digest::SHA256.hexdigest(payload)
+  end
+
   def write_runtime_artifacts
     FileUtils.mkdir_p(@artifact_dir)
 
@@ -318,7 +391,7 @@ class CustomerUIActionSweep
       end
       @action_results[action_id] = {
         coverage_status: 'covered',
-        completion_scope: 'structured_coverage_only',
+        completion_scope: action_completion_scope(action_id),
         proof_level: action.fetch('required_proof_level'),
         functional_state: {
           status: 'established',
@@ -393,7 +466,15 @@ class CustomerUIActionSweep
       when 'mini_runtime'
         evidence_items << evidence('mini_runtime', "Mini runtime metadata for #{action_id}", path: @artifacts.fetch(:mini_runtime))
       when 'mini_click'
-        raise "#{action_id}: mini_click evidence requires real UI automation and is not produced by this sweep"
+        if action_id == 'on-device-ai-text-actions'
+          evidence_items << evidence(
+            'mini_click',
+            'Live Mini Rewrite/Copy and Summarize/Cancel traversal',
+            path: @artifacts.fetch(:ai_runtime_traversal)
+          )
+        else
+          raise "#{action_id}: mini_click evidence requires real UI automation and is not produced by this sweep"
+        end
       when 'screenshot'
         evidence_items << evidence('screenshot', "Mini visual proof for #{action_id}", path: screenshot_for(action_id))
       when 'fixture'
@@ -417,13 +498,22 @@ class CustomerUIActionSweep
   end
 
   def workflow_proof(action_id, action, evidence_items)
+    live = action_completion_scope(action_id) == 'live_runtime_traversal'
     {
       runner: relative(__FILE__),
-      outcome: "#{action['title']} covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof",
-      completion_scope: 'structured_coverage_only',
+      outcome: if live
+                 "#{action['title']} covered by live Mini interaction plus deterministic state tests"
+               else
+                 "#{action['title']} covered by structured Mini source, visual, fixture, and runtime evidence; not live click/paste completion proof"
+               end,
+      completion_scope: action_completion_scope(action_id),
       steps_covered: Array(action['steps']),
       artifacts: evidence_items.map { |item| item[:path] }.compact
     }
+  end
+
+  def action_completion_scope(action_id)
+    action_id == 'on-device-ai-text-actions' ? 'live_runtime_traversal' : 'structured_coverage_only'
   end
 
   def functional_state_detail(action)

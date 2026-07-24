@@ -28,7 +28,7 @@ struct HistoryColorAndStackTests {
             "UI/History/HistoryFooterView.swift",
             "UI/History/ClipboardHistoryView.swift",
             "UI/History/ClipPreviewPane.swift",
-            "UI/History/HistoryPasteStackPanel.swift",
+            "UI/History/HistoryPasteStackPanel.swift"
         ]
         let forbidden = ["(.teal)", "(.orange)", "(.green)", "(.yellow)",
                          "Color.teal", "Color.orange", "Color.green", "Color.yellow"]
@@ -191,12 +191,20 @@ struct HistoryColorAndStackTests {
         #expect(source.contains("Socket.gethostname"))
         #expect(source.contains("mini_click evidence requires real UI automation"))
         #expect(source.contains("coverage_status: 'covered'"))
-        #expect(source.contains("completion_scope: 'structured_coverage_only'"))
+        #expect(source.contains("completion_scope: action_completion_scope(action_id)"))
+        #expect(source.contains("action_id == 'on-device-ai-text-actions' ? 'live_runtime_traversal' : 'structured_coverage_only'"))
         #expect(source.contains("covered_assertions: Array(action['expected_outputs'])"))
         #expect(source.contains("steps_covered: Array(action['steps'])"))
         #expect(!source.contains("output_assertions: Array(action['expected_outputs'])"))
         #expect(!source.contains("steps_completed: Array(action['steps'])"))
-        #expect(!manifest.contains("mini_click"))
+        #expect(manifest.components(separatedBy: "- mini_click").count - 1 == 1)
+        #expect(source.contains("action_id == 'on-device-ai-text-actions'"))
+        #expect(source.contains("Live AI traversal screenshot digest mismatch"))
+        #expect(source.contains("Live AI traversal receipt is older than 24 hours"))
+        #expect(source.contains("Live AI traversal receipt timestamp is in the future"))
+        #expect(source.contains("Live AI traversal source mismatch"))
+        #expect(source.contains("Live AI traversal installed executable digest mismatch"))
+        #expect(source.contains("Live AI traversal receipt must not persist prompt, result, or pasteboard text"))
         #expect(!manifest.contains("full_runtime_completion"))
         #expect(manifest.contains("mini_runtime"))
         #expect(manifest.contains("keeps floating and fixed history visible"))

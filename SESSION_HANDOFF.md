@@ -1,32 +1,42 @@
 # Session Handoff - SaneClip
 
-## Current State (2026-07-18)
+## Current State (2026-07-24)
 
-SaneClip `2.3.21` is the active release candidate for the direct and App Store
-lanes. The candidate adds valid direct-license recognition for the public
-SaneApps five-app bundle without changing the App Store purchase path.
+SaneClip `2.3.22` is the active direct-download and App Store candidate. It adds
+optional on-device Rewrite, Summarize, and Extract Key Points previews for text
+clips on macOS 26+ Apple Intelligence-capable Macs, plus a cross-channel
+single-instance guard.
 
-- Bundle checkout: `https://go.saneapps.com/buy/bundle` ($49.99 one-time).
-- Direct license matching uses the published SaneUI revision and accepts a
-  verified SaneApps bundle only when the server-validated product name includes
-  `SaneClip`.
-- History-lock authentication now fails closed: Touch ID, device-owner
-  authentication, or no unlock. It never silently opens protected history.
-- The direct app mover passes source and destination paths to AppleScript as
-  arguments, preventing path-text injection into privileged shell commands.
-- App Store metadata now accurately describes authentication reliability and
-  continues to state that App Store builds use no external checkout or license
-  keys.
-- The shared release pipeline updates the Homebrew cask macOS requirement from
-  `.saneprocess` (SaneClip 14.0 maps to Sonoma), alongside version and SHA.
+- AI input is limited to 2,000 UTF-8 bytes before model availability or
+  generation work, so token-dense Unicode cannot bypass the bound.
+- Each action uses a fresh Foundation Models session with no tools. Static
+  policy stays in `Instructions`; only the selected clip is the `Prompt`.
+- Generated text remains transient until Copy. Copy changes the pasteboard but
+  not clipboard history; Cancel changes nothing. The removed Replace path must
+  not return without a new persistence and recovery design.
+- Direct, Debug, App Store, and Setapp bundle IDs are one logical app family.
+  The oldest launch survives; PID is only the deterministic tie/fallback.
+- Public copy explicitly states the macOS 26, eligible Mac, Apple Intelligence
+  enablement, and model-readiness requirements.
 
 ## Evidence
 
-- Candidate verification: `./scripts/SaneMaster.rb verify --timeout 900
-  --no-grant-permissions` passed **228 tests in 13 suites** on the Mini on
-  2026-07-18.
-- Shared SaneProcess release guardrails passed **231/231** after the Homebrew
-  macOS synchronization fix.
+- Candidate verification passed **241 tests in 13 suites** on the Mini; workflow
+  receipt `bfbe7c59f65200970ee5863b648db584`.
+- The 13-action customer UI workflow/contract passed against the current
+  privacy-safe AI traversal schema. The live proof binds the current source,
+  installed executable, and clean synthetic screenshot without storing prompt,
+  result, or pasteboard text; workflow receipt
+  `27d24b0d9938194c948a003bd1f51bbf`.
+- Fresh Developer ID Release build, canonical install, and launch passed;
+  receipt `dab21a9ee1d2813ca1e3056371a4d415`.
+- Fresh visual smoke passed with clean workspace evidence; receipt
+  `cef4f878e6bac901a595a467fbca7923`.
+- Direct release preflight passed with expected pre-publish warnings; receipt
+  `b945864086075c03b03fbbc52a5f463a`.
+- The shared SaneProcess dedupe flow now unregisters recoverable SaneClip copies
+  already in Trash before re-registering `/Applications/SaneClip.app`; its
+  focused test suite passed 5/5.
 - A generated `.sane/customer_ui_action_receipt.json` is runtime evidence only;
   do not commit it. Regenerate it after any customer-facing source change.
 - Existing lint warnings remain non-blocking technical debt: `SaneClipApp.swift`
@@ -45,7 +55,9 @@ edit the Homebrew cask manually.
 ./scripts/SaneMaster.rb release_preflight
 ./scripts/SaneMaster.rb appstore_preflight
 bash ~/SaneApps/infra/SaneProcess/scripts/release.sh \
-  --project "$(pwd)" --full --version 2.3.21 --notes "..." --deploy
+  --project "$(pwd)" --full --version 2.3.22 \
+  --notes "Adds optional private on-device text previews on eligible macOS 26 Macs and prevents parallel SaneClip runtime channels." \
+  --deploy
 ```
 
 After publish, read back the live ZIP, appcast, website download route, bundle

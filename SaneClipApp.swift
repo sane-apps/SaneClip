@@ -105,6 +105,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        guard !terminateDuplicateIfNeeded() else { return }
         appLogger.info("SaneClip starting...")
         NSApp.appearance = NSAppearance(named: .darkAqua)
 

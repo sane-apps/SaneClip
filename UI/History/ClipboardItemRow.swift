@@ -25,6 +25,7 @@ struct ClipboardItemRow: View {
     @State private var editNote = ""
     @State private var showCollectionSheet = false
     @State private var showImagePreviewSheet = false
+    @State private var aiTextTransformRequest: AITextTransformRequest?
     @State private var customCollection = ""
 
     private func lockedMenuTitle(_ title: String) -> String {
@@ -335,8 +336,19 @@ struct ClipboardItemRow: View {
                 onToggleMergeQueue?()
             }
 
-            // Text transform options (only for text content) — Pro only
-            if case .text = item.content {
+            // Text transform options (only for text content)
+            if case let .text(text) = item.content {
+                Menu("AI — On Device (macOS 26+)") {
+                    ForEach(AITextAction.allCases) { action in
+                        Button(action.displayName) {
+                            aiTextTransformRequest = AITextTransformRequest(
+                                action: action,
+                                sourceText: text
+                            )
+                        }
+                    }
+                }
+
                 if isPro {
                     Menu("Paste As...") {
                         ForEach(TextTransform.allCases, id: \.self) { transform in
@@ -534,6 +546,12 @@ struct ClipboardItemRow: View {
         }
         .sheet(isPresented: $showImagePreviewSheet) {
             ImageCapturePreviewSheet(item: item, clipboardManager: clipboardManager)
+        }
+        .sheet(item: $aiTextTransformRequest) { request in
+            AITextTransformPreviewSheet(
+                request: request,
+                clipboardManager: clipboardManager
+            )
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityDescription)

@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.22] - 2026-07-24
+
+Adds optional on-device Rewrite, Summarize, and Extract Key Points actions for text clips. They require macOS 26 or later, an eligible Apple Intelligence Mac, Apple Intelligence enabled, and the on-device model ready. Results open in a private preview with explicit Copy or Cancel controls and never replace clipboard history.
+
+Prevents Developer ID, Debug, App Store, and Setapp builds from monitoring the clipboard at the same time.
+
+---
+
 ## [2.3.21] - 2026-07-18
 
 Improves direct-license validation so the SaneApps Bundle activates SaneClip Pro for valid direct Mac purchases.

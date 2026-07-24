@@ -71,6 +71,12 @@ SaneClip is a macOS clipboard manager that captures clipboard history, applies r
 2. SnippetManager expands placeholders.
 3. ClipboardManager writes expanded text to pasteboard.
 
+### On-Device AI Text Preview
+1. A text clip's `AI — On Device (macOS 26+)` menu creates a transient request for Rewrite, Summarize, or Extract Key Points.
+2. `TextTransformService` conservatively rejects empty input and input over 2,000 UTF-8 bytes before checking the macOS 26 Foundation Models availability state. Bounding encoded bytes instead of user-perceived characters prevents emoji, combining marks, and other token-dense text from bypassing the safety limit while leaving room within Apple's 4,096-token context for instructions and the response. It then creates a fresh `LanguageModelSession` with no tools. Static action policy is supplied as `Instructions`; the selected clip alone is supplied as `Prompt`.
+3. The result stays in the preview sheet until the customer explicitly chooses Copy or Cancel. Copy writes the result to the pasteboard without changing clipboard history; Cancel changes nothing.
+4. No prompt, response, transcript, debug context, content length, or generated result is persisted or logged by this flow.
+
 ## State Machines
 
 ### Clipboard Capture Pipeline
@@ -133,6 +139,7 @@ stateDiagram-v2
 - Uses LocalAuthentication for Touch ID gating.
 - Excludes transient clipboard types and known password manager bundle IDs.
 - Network requests are optional (webhooks, Sparkle updates).
+- Foundation Models text actions run through Apple's on-device system model with no tools, network request, downloaded model, or background analysis. They add no TCC permission, Info.plist usage description, privacy-manifest collected-data type, or required-reason API category. Existing onboarding and permission screens therefore remain unchanged; model availability is explained in the transient preview.
 
 ## Build and Release Truth
 

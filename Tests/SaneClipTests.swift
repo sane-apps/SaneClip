@@ -388,31 +388,71 @@ struct SaneClipTests {
         #expect(!HistoryShortcutGate.shouldFocusSearch(firstResponderIsTextInput: true))
     }
 
-    @Test("Single-instance guard uses a pid tiebreak so exactly one instance survives")
+    @Test("Single-instance guard keeps the oldest app and uses PID only for ties")
     func singleInstanceGuardLogic() {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let earlier = now.addingTimeInterval(-10)
+        let later = now.addingTimeInterval(10)
+
         // Only instance running → never quit (no false positive that would stop
         // the app from launching at all).
-        #expect(SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: 100, otherPIDs: []) == false)
+        #expect(
+            SaneClipAppDelegate.shouldTerminateAsDuplicate(
+                selfPID: 100,
+                selfLaunchDate: now,
+                otherInstances: []
+            ) == false
+        )
 
-        // A pre-existing instance always has a lower pid → the new launch quits.
-        #expect(SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: 500, otherPIDs: [100]) == true)
-        // We hold the lowest pid → we are the canonical instance, we stay.
-        #expect(SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: 100, otherPIDs: [500]) == false)
+        // Launch date, not PID ordering, identifies the pre-existing instance.
+        #expect(
+            SaneClipAppDelegate.shouldTerminateAsDuplicate(
+                selfPID: 10,
+                selfLaunchDate: now,
+                otherInstances: [(pid: Int32(90_000), launchDate: earlier)]
+            )
+        )
+        #expect(
+            !SaneClipAppDelegate.shouldTerminateAsDuplicate(
+                selfPID: 90_000,
+                selfLaunchDate: now,
+                otherInstances: [(pid: Int32(10), launchDate: later)]
+            )
+        )
 
         // The mutual-suicide race: two copies launched at the same instant each
-        // see the other. Exactly ONE (the lowest pid) survives — never both
+        // see the other. Exactly ONE (the lowest PID tiebreak) survives — never both
         // quit, never both stay.
         let a: Int32 = 100, b: Int32 = 200
-        let aQuits = SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: a, otherPIDs: [b])
-        let bQuits = SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: b, otherPIDs: [a])
+        let aQuits = SaneClipAppDelegate.shouldTerminateAsDuplicate(
+            selfPID: a,
+            selfLaunchDate: now,
+            otherInstances: [(pid: b, launchDate: now)]
+        )
+        let bQuits = SaneClipAppDelegate.shouldTerminateAsDuplicate(
+            selfPID: b,
+            selfLaunchDate: now,
+            otherInstances: [(pid: a, launchDate: now)]
+        )
         #expect(aQuits == false)
         #expect(bQuits == true)
         #expect(aQuits != bQuits) // exactly one survivor
 
-        // Three-way race: only the single lowest pid survives.
-        #expect(SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: 10, otherPIDs: [20, 30]) == false)
-        #expect(SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: 20, otherPIDs: [10, 30]) == true)
-        #expect(SaneClipAppDelegate.shouldTerminateAsDuplicate(selfPID: 30, otherPIDs: [10, 20]) == true)
+        // Missing dates still retain a deterministic single survivor.
+        #expect(
+            !SaneClipAppDelegate.shouldTerminateAsDuplicate(
+                selfPID: 10,
+                selfLaunchDate: nil,
+                otherInstances: [(pid: 20, launchDate: nil), (pid: 30, launchDate: nil)]
+            )
+        )
+        #expect(
+            SaneClipAppDelegate.shouldTerminateAsDuplicate(
+                selfPID: 20,
+                selfLaunchDate: nil,
+                otherInstances: [(pid: 10, launchDate: nil), (pid: 30, launchDate: nil)]
+            )
+        )
 
         // The XCTest host is a separate executable, not a peer app instance.
         #expect(SaneClipAppDelegate.isRunningUnderTestHost(
@@ -420,6 +460,57 @@ struct SaneClipTests {
         ))
         #expect(SaneClipAppDelegate.isRunningUnderTestHost(environment: ["XCTestSessionIdentifier": "abc"]))
         #expect(!SaneClipAppDelegate.isRunningUnderTestHost(environment: [:]))
+
+        #expect(SaneClipAppDelegate.isSaneClipBundleIdentifier("com.saneclip.app"))
+        #expect(SaneClipAppDelegate.isSaneClipBundleIdentifier("com.saneclip.dev"))
+        #expect(SaneClipAppDelegate.isSaneClipBundleIdentifier("com.saneclip.app-setapp"))
+        #expect(!SaneClipAppDelegate.isSaneClipBundleIdentifier("com.saneclick.SaneClick"))
+        #expect(!SaneClipAppDelegate.isSaneClipBundleIdentifier(nil))
+    }
+
+    @Test("Single-instance arbitration runs before setup and repeats after Launch Services registration")
+    func singleInstanceLifecycleCoverage() throws {
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+        let guardSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipAppDelegate+SingleInstance.swift"),
+            encoding: .utf8
+        )
+
+        let launchStart = try #require(appSource.range(of: "func applicationDidFinishLaunching"))
+        let setupStart = try #require(
+            appSource.range(of: "setupApp()", range: launchStart.lowerBound ..< appSource.endIndex)
+        )
+        let launchPrefix = appSource[launchStart.lowerBound ..< setupStart.lowerBound]
+        #expect(launchPrefix.contains("guard !terminateDuplicateIfNeeded() else { return }"))
+        #expect(guardSource.contains("func applicationWillFinishLaunching"))
+        #expect(guardSource.contains("_ = terminateDuplicateIfNeeded()"))
+        #expect(guardSource.contains("let activationResult = Self.activateExistingInstance()"))
+        #expect(guardSource.contains("guard activationResult != .noSurvivor else"))
+        #expect(guardSource.contains("survivorAfterAttempt?.isTerminated == false ? .survivorStillRunning : .noSurvivor"))
+    }
+
+    @Test("Xcode Run uses the canonical Developer ID Release configuration")
+    func xcodeRunUsesSignedReleaseRuntime() throws {
+        let projectSource = try String(
+            contentsOf: URL(fileURLWithPath: #filePath)
+                .deletingLastPathComponent()
+                .deletingLastPathComponent()
+                .appendingPathComponent("project.yml"),
+            encoding: .utf8
+        )
+
+        let saneClipScheme = try #require(projectSource.range(of: "  SaneClip:\n"))
+        let nextScheme = projectSource.range(
+            of: "\n  SaneClip-AppStore:",
+            range: saneClipScheme.upperBound..<projectSource.endIndex
+        )
+        let schemeEnd = nextScheme?.lowerBound ?? projectSource.endIndex
+        let schemeSource = projectSource[saneClipScheme.lowerBound..<schemeEnd]
+        #expect(schemeSource.contains("run:\n      config: Release"))
+        #expect(!schemeSource.contains("run:\n      config: Debug"))
     }
 
     @Test("Manual update fallback only triggers for actionable Sparkle failures")
@@ -479,7 +570,7 @@ struct SaneClipTests {
         #expect(urls.map(\.path) == [
             "/tmp/saneclip-home/Library/Caches/com.saneclip.app/org.sparkle-project.Sparkle/Launcher",
             "/tmp/saneclip-home/Library/Caches/com.saneclip.app/org.sparkle-project.Sparkle/Installation",
-            "/tmp/saneclip-home/Library/Caches/com.saneclip.app/org.sparkle-project.Sparkle/PersistentDownloads",
+            "/tmp/saneclip-home/Library/Caches/com.saneclip.app/org.sparkle-project.Sparkle/PersistentDownloads"
         ])
     }
 
@@ -930,7 +1021,7 @@ struct SaneClipTests {
             "PRIVACY.md",
             "docs/privacy.html",
             "docs/guides.html",
-            "docs/how-to-automate-clipboard-webhooks-mac.html",
+            "docs/how-to-automate-clipboard-webhooks-mac.html"
         ]
 
         for path in checkedPaths {
@@ -1212,7 +1303,7 @@ struct SaneClipTests {
 
         let payload: [String: Any] = [
             "version": 1,
-            "openHistoryAtCursor": true,
+            "openHistoryAtCursor": true
         ]
         let exported = try JSONSerialization.data(withJSONObject: payload)
 
@@ -1235,7 +1326,7 @@ struct SaneClipTests {
 
         let payload: [String: Any] = [
             "version": 1,
-            "showMenuBarIcon": false,
+            "showMenuBarIcon": false
         ]
         settings.showInDock = true
         settings.showMenuBarIcon = true
@@ -1314,7 +1405,7 @@ struct SaneClipTests {
         let payload: [String: Any] = [
             "version": 1,
             "autoOCRCapturedScreenshots": false,
-            "captureOCRLanguage": CaptureOCRLanguage.spanish.rawValue,
+            "captureOCRLanguage": CaptureOCRLanguage.spanish.rawValue
         ]
         settings.autoOCRCapturedScreenshots = true
         settings.captureOCRLanguage = .automatic
@@ -1330,7 +1421,7 @@ struct SaneClipTests {
         #expect(exported["captureOCRLanguage"] as? String == CaptureOCRLanguage.spanish.rawValue)
 
         let legacyPayload: [String: Any] = [
-            "captureOCRLanguage": CaptureOCRLanguage.englishUS.displayName,
+            "captureOCRLanguage": CaptureOCRLanguage.englishUS.displayName
         ]
         try settings.importSettings(from: JSONSerialization.data(withJSONObject: legacyPayload))
         #expect(settings.captureOCRLanguage == .englishUS)
@@ -1638,7 +1729,7 @@ struct SaneClipTests {
         let rsaKey = [
             "-----BEGIN RSA", "PRIVATE KEY-----",
             "MIIEowIBAAKCAQEA...",
-            "-----END RSA", "PRIVATE KEY-----",
+            "-----END RSA", "PRIVATE KEY-----"
         ].joined(separator: " ")
         #expect(detector.detect(in: rsaKey).contains(.privateKey))
 
@@ -1965,7 +2056,7 @@ struct SaneClipTests {
         let pendingIDs = SyncCoordinator.pendingSaveRecordIDs(
             from: [
                 .saveRecord(saveID),
-                .deleteRecord(deleteID),
+                .deleteRecord(deleteID)
             ]
         )
 
@@ -1999,7 +2090,7 @@ struct SaneClipTests {
 
         let plist: [String: Any] = [
             "CFBundleIdentifier": "com.example.fake",
-            "CFBundleName": "Fake",
+            "CFBundleName": "Fake"
         ]
         let plistData = try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
         try plistData.write(to: plistURL)
@@ -2362,7 +2453,7 @@ struct SaneClipTests {
             "UI/Settings/SettingsView.swift",
             "UI/Settings/SnippetsSettingsView.swift",
             "UI/Settings/StorageStatsView.swift",
-            "Core/Sync/SyncSettingsView.swift",
+            "Core/Sync/SyncSettingsView.swift"
         ]
         let disallowedSubstrings = [
             ".font(.caption)",
@@ -2371,7 +2462,7 @@ struct SaneClipTests {
             ".foregroundStyle(.tertiary)",
             ".font(.system(size: 9)",
             ".font(.system(size: 10)",
-            ".font(.system(size: 11)",
+            ".font(.system(size: 11)"
         ]
 
         for relativePath in settingsFiles {
@@ -2721,7 +2812,7 @@ struct SaneClipTests {
                 name: "KeyboardShortcuts",
                 url: "https://github.com/sindresorhus/KeyboardShortcuts",
                 text: "MIT License"
-            ),
+            )
         ]
         try renderPNG(
             ZStack {
@@ -2989,7 +3080,7 @@ struct SaneClipTests {
             "glenn-994-bug3-rules-before-toggle.png",
             "glenn-994-bug3-rules-after-toggle.png",
             "glenn-994-basic-floating-window-pro-gated.png",
-            "glenn-994-pro-floating-window-toggle.png",
+            "glenn-994-pro-floating-window-toggle.png"
         ]
         for filename in requiredScreenshots {
             #expect(FileManager.default.fileExists(atPath: outputDir.appendingPathComponent(filename).path))
@@ -3093,15 +3184,13 @@ struct SaneClipTests {
     private func screenshotOutputDirectory() -> String? {
         if let rawOutputDir = ProcessInfo.processInfo.environment["SANECLIP_SCREENSHOT_DIR"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
-            !rawOutputDir.isEmpty
-        {
+            !rawOutputDir.isEmpty {
             return rawOutputDir
         }
 
         if let hintedOutputDir = try? String(contentsOf: screenshotOutputHintFile, encoding: .utf8)
             .trimmingCharacters(in: .whitespacesAndNewlines),
-            !hintedOutputDir.isEmpty
-        {
+            !hintedOutputDir.isEmpty {
             return hintedOutputDir
         }
 

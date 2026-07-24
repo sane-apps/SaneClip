@@ -12,6 +12,7 @@
 		07E5B0329FCDA90108EC8A8E /* SharedClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB6B85899467ECE68DDCE6E /* SharedClipboardItem.swift */; };
 		07EBD6613F07245138A3332A /* TextTransformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEA795AFED8797FFAE0DD3E /* TextTransformService.swift */; };
 		0C2CEBB417A79D79D2194FF7 /* SaneClipAppDelegate+Menus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122CA02DCD5F4E29C0FFF748 /* SaneClipAppDelegate+Menus.swift */; };
+		0F6D7CA4567B3F852972EF80 /* AITextTransformPreviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CF0E7491EE41C58486B0F76 /* AITextTransformPreviewSheet.swift */; };
 		0FC838A6FB6D18A900B0B5F0 /* HistoryEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82FA89438430FB80B145A7C5 /* HistoryEncryption.swift */; };
 		113E5DCC28CDB39825FDF84D /* PinnedClipsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A06A5E6F4A48C14D539ABD91 /* PinnedClipsWidget.swift */; };
 		11C057866C754D7A2608EDC3 /* ClipPreviewPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = F560B0784EFB8FB01A368261 /* ClipPreviewPane.swift */; };
@@ -190,6 +191,7 @@
 		F65E7C1FC3DA96F5B644D77A /* SearchClipsIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44529FCAA8809428979A60BC /* SearchClipsIntent.swift */; };
 		F6C0F161CBEAFA2C67714A57 /* DiagnosticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29612677A8240D0E5F68DAAF /* DiagnosticsService.swift */; };
 		F903EA3E74F83ADB70AC45F1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF3C7603DE7E07A2AC7D3C74 /* Assets.xcassets */; };
+		F9B6C76751E54A9291527232 /* AITextTransformPreviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CF0E7491EE41C58486B0F76 /* AITextTransformPreviewSheet.swift */; };
 		FB023FB9283A573C5E3BD4CB /* ClipboardItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352F7E56F26119F6981AEFB2 /* ClipboardItemRow.swift */; };
 		FD7351718B82AD9E811A7457 /* UpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED712A386E53DB95657DAB2 /* UpdateService.swift */; };
 		FDD144B1AFB419C804989B70 /* SyncSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08983A3D7903ACF79993349 /* SyncSettingsView.swift */; };
@@ -350,6 +352,7 @@
 		9381D3ACF3CE661318DF305D /* WebhookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookService.swift; sourceTree = "<group>"; };
 		9613B8818EB56DB927C1A423 /* CaptureOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureOCRService.swift; sourceTree = "<group>"; };
 		96D8AACBEE2BC4471F934DC2 /* SaneClipIOSDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SaneClipIOSDebug.entitlements; sourceTree = "<group>"; };
+		9CF0E7491EE41C58486B0F76 /* AITextTransformPreviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITextTransformPreviewSheet.swift; sourceTree = "<group>"; };
 		9D173D2DA10721E6687FE836 /* IntentRuntimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentRuntimeTests.swift; sourceTree = "<group>"; };
 		9DBD4FED60D446DFDA669D6A /* DirectDistributionSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectDistributionSupport.swift; sourceTree = "<group>"; };
 		9E776995068A491A32269B2E /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -554,6 +557,7 @@
 		69BCB2544EE5E14D64C7050A /* History */ = {
 			isa = PBXGroup;
 			children = (
+				9CF0E7491EE41C58486B0F76 /* AITextTransformPreviewSheet.swift */,
 				581B9D70FB3BBB83D6583386 /* ClipboardHistoryView.swift */,
 				352F7E56F26119F6981AEFB2 /* ClipboardItemRow.swift */,
 				90B701CACA4EC03D66AAFEFF /* ClipboardItemRowMetadata.swift */,
@@ -1105,6 +1109,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0F6D7CA4567B3F852972EF80 /* AITextTransformPreviewSheet.swift in Sources */,
 				A712578147519AE5096B2F66 /* AutoPurgeService.swift in Sources */,
 				B0B8D913624A4E8023971397 /* BrandColors.swift in Sources */,
 				8E8726EFD712EF53789A2CB3 /* CaptureOCRService.swift in Sources */,
@@ -1181,6 +1186,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F9B6C76751E54A9291527232 /* AITextTransformPreviewSheet.swift in Sources */,
 				5DC8E283BF2B6BE71C2BEDED /* AutoPurgeService.swift in Sources */,
 				74554CCC6E39DFED46437C7C /* BrandColors.swift in Sources */,
 				AF2CDF1ECA917FA212A56B84 /* CaptureOCRService.swift in Sources */,
@@ -1293,7 +1299,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1303,7 +1309,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -1321,11 +1327,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp.widgets";
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;
@@ -1341,12 +1347,12 @@
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShareDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1362,12 +1368,12 @@
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShare.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip iOS Share App Store";
@@ -1447,11 +1453,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;
@@ -1466,7 +1472,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1474,7 +1480,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -1487,11 +1493,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1595,7 +1601,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1603,7 +1609,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -1622,7 +1628,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_PREVIEWS = YES;
@@ -1633,7 +1639,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC -D SETAPP";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp";
 				PRODUCT_NAME = SaneClip;
@@ -1650,12 +1656,12 @@
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShare.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1690,7 +1696,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1699,7 +1705,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip iOS Widgets App Store";
@@ -1714,11 +1720,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1804,11 +1810,11 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip Widgets Developer ID";
@@ -1822,11 +1828,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1925,11 +1931,11 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp.widgets";
 				PRODUCT_NAME = SaneClipWidgets;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip Setapp Widgets Developer ID";
@@ -1947,7 +1953,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOSDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -1956,7 +1962,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -1973,7 +1979,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1983,7 +1989,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2003,7 +2009,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_PREVIEWS = YES;
@@ -2014,7 +2020,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC -D SETAPP";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp";
 				PRODUCT_NAME = SaneClip;
@@ -2034,7 +2040,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_PREVIEWS = YES;
@@ -2045,7 +2051,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2066,7 +2072,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_PREVIEWS = YES;
@@ -2077,7 +2083,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
@@ -2097,7 +2103,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_PREVIEWS = YES;
@@ -2109,7 +2115,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				OTHER_SWIFT_FLAGS = "-D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2130,7 +2136,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -2140,7 +2146,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2156,7 +2162,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -2165,7 +2171,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2204,7 +2210,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -2214,7 +2220,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2229,7 +2235,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2237,7 +2243,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2257,7 +2263,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_PREVIEWS = YES;
@@ -2268,7 +2274,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
@@ -2285,7 +2291,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -2295,7 +2301,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				OTHER_SWIFT_FLAGS = "-D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2314,7 +2320,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -2324,7 +2330,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2341,7 +2347,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -2350,7 +2356,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -2449,7 +2455,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2457,7 +2463,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2496,7 +2502,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -2506,7 +2512,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2522,7 +2528,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -2530,7 +2536,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -2543,7 +2549,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2551,7 +2557,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2568,11 +2574,11 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip Widgets Mac App Store";
@@ -2650,7 +2656,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgetsDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -2659,7 +2665,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2676,11 +2682,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2321;
+				CURRENT_PROJECT_VERSION = 2322;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.21;
+				MARKETING_VERSION = 2.3.22;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;

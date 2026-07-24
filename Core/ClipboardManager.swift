@@ -1624,6 +1624,28 @@ class ClipboardManager {
         saveHistory()
     }
 
+    /// Copy generated text without pasting or changing history.
+    @discardableResult
+    func copyTextWithoutPaste(
+        _ text: String,
+        notifyUser: Bool = false,
+        pasteboard: NSPasteboard = .general
+    ) -> Bool {
+        guard !text.isEmpty else { return false }
+        pasteboard.clearContents()
+        guard pasteboard.setString(text, forType: .string) else { return false }
+        selfWriteChangeCount = pasteboard.changeCount
+
+        SettingsModel.shared.pasteSound.play()
+        #if APP_STORE
+            if notifyUser {
+                showCopiedNotification()
+            }
+        #endif
+
+        return true
+    }
+
     /// Copy item to clipboard without triggering paste (Cmd+V)
     func copyWithoutPaste(item: ClipboardItem, notifyUser: Bool = false) {
         let pasteboard = NSPasteboard.general

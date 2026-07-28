@@ -57,10 +57,12 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ---
 
-## 🆕 Current macOS Direct Download: v2.3.22
+## 🆕 Current macOS Direct Download: v2.3.23
 
 **Current direct-download release (July 2026)**
 
+- ✅ Keeps image history lighter in memory with on-disk thumbnails and full originals only when needed
+- ✅ Cleans up leftover Sparkle updater helpers after automatic update checks
 - ✅ Starts Mac users with a free 14-day Pro trial, then requires Pro for continued use
 - ✅ Accepts a valid direct SaneApps five-app bundle license as a SaneClip Pro unlock
 - ✅ Adds optional private Rewrite, Summarize, and Extract Key Points previews on macOS 26+ Macs that support Apple Intelligence; generated text is copied only when you choose Copy

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.23] - 2026-07-28
+
+Keeps image history lighter in memory by storing thumbnails in RAM and loading full originals only when needed. Also cleans up leftover Sparkle updater helpers after automatic update checks.
+
+---
+
 ## [2.3.22] - 2026-07-24
 
 Adds optional on-device Rewrite, Summarize, and Extract Key Points actions for text clips. They require macOS 26 or later, an eligible Apple Intelligence Mac, Apple Intelligence enabled, and the on-device model ready. Results open in a private preview with explicit Copy or Cancel controls and never replace clipboard history.

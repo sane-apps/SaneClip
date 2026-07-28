@@ -600,6 +600,50 @@ struct SaneClipTests {
         #expect(staleFolders.allSatisfy { !fileManager.fileExists(atPath: $0.path) })
     }
 
+    @Test("Sparkle orphan helper detection only matches this app's cached Updater.app")
+    func sparkleOrphanUpdaterDetectionIsScoped() {
+        let ours = URL(
+            fileURLWithPath: "/Users/sj/Library/Caches/com.saneclip.app/org.sparkle-project.Sparkle/Launcher/abc/Updater.app",
+            isDirectory: true
+        )
+        let pipit = URL(
+            fileURLWithPath: "/Users/sj/Library/Caches/com.pxkan.pipit2/org.sparkle-project.Sparkle/Launcher/abc/Updater.app",
+            isDirectory: true
+        )
+        let unrelated = URL(fileURLWithPath: "/Applications/SaneClip.app", isDirectory: true)
+
+        #expect(
+            SparkleCacheMaintenance.isOrphanedSparkleUpdaterApp(
+                bundleURL: ours,
+                bundleIdentifier: "com.saneclip.app"
+            )
+        )
+        #expect(
+            !SparkleCacheMaintenance.isOrphanedSparkleUpdaterApp(
+                bundleURL: pipit,
+                bundleIdentifier: "com.saneclip.app"
+            )
+        )
+        #expect(
+            !SparkleCacheMaintenance.isOrphanedSparkleUpdaterApp(
+                bundleURL: unrelated,
+                bundleIdentifier: "com.saneclip.app"
+            )
+        )
+    }
+
+    @Test("Sparkle launch path clears idle helpers without a duplicate immediate background check")
+    func sparkleLaunchAvoidsDuplicateBackgroundCheck() throws {
+        let source = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/Services/UpdateService.swift"),
+            encoding: .utf8
+        )
+        #expect(source.contains("Cleared stale Sparkle cache artifacts at launch"))
+        #expect(source.contains("terminateOrphanedSparkleHelpers"))
+        #expect(source.contains("cleanupIdleSparkleHelpers(reason: \"no update available\")"))
+        #expect(!source.contains("updater.checkForUpdatesInBackground()"))
+    }
+
     @Test("Sandboxed direct build enables Sparkle installer launcher service")
     func sparkleInstallerLauncherServiceEnabledInInfoPlist() throws {
         let repoRoot = URL(fileURLWithPath: #filePath)

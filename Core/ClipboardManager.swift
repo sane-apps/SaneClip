@@ -857,11 +857,11 @@ class ClipboardManager {
         saveHistory()
         logFirstValueActionIfNeeded()
 
-        #if ENABLE_SYNC
-            // Queue the new item for iCloud sync
+            #if ENABLE_SYNC
+            // Queue the new item for iCloud sync (full-res for images, not RAM thumbnails)
             let shared = SharedClipboardItem(
                 id: item.id,
-                content: item.sharedContent,
+                content: sharedContent(for: item),
                 timestamp: item.timestamp,
                 sourceAppBundleID: item.sourceAppBundleID,
                 sourceAppName: item.sourceAppName,
@@ -906,8 +906,9 @@ class ClipboardManager {
         let didWrite: Bool = switch item.content {
         case let .text(string):
             pasteboard.setString(string, forType: .string)
-        case let .image(image):
-            if let tiffData = image.tiffRepresentation {
+        case .image:
+            if let image = fullResolutionImage(for: item),
+               let tiffData = image.tiffRepresentation {
                 pasteboard.setData(tiffData, forType: .tiff)
             } else {
                 false
@@ -1472,7 +1473,7 @@ class ClipboardManager {
             SyncCoordinator.shared.queueItemForSync(
                 SharedClipboardItem(
                     id: item.id,
-                    content: item.sharedContent,
+                    content: sharedContent(for: item),
                     timestamp: item.timestamp,
                     sourceAppBundleID: item.sourceAppBundleID,
                     sourceAppName: item.sourceAppName,
@@ -1654,8 +1655,9 @@ class ClipboardManager {
         switch item.content {
         case let .text(string):
             pasteboard.setString(string, forType: .string)
-        case let .image(image):
-            if let tiffData = image.tiffRepresentation {
+        case .image:
+            if let image = fullResolutionImage(for: item),
+               let tiffData = image.tiffRepresentation {
                 pasteboard.setData(tiffData, forType: .tiff)
             }
         }
@@ -1691,7 +1693,8 @@ class ClipboardManager {
     }
 
     func exportImageAsPNG(item: ClipboardItem) {
-        guard case let .image(image) = item.content,
+        guard case .image = item.content,
+              let image = fullResolutionImage(for: item),
               let data = pngData(for: image) else { return }
 
         let panel = NSSavePanel()
@@ -2224,11 +2227,91 @@ class ClipboardManager {
         return NSImage(data: decoded)
     }
 
+    private func originalImageFilename(for id: UUID) -> String {
+        "\(id.uuidString).png"
+    }
+
+    private func thumbnailFilename(for id: UUID) -> String {
+        "\(id.uuidString).jpg"
+    }
+
+    private func originalImageExists(for id: UUID) -> Bool {
+        FileManager.default.fileExists(
+            atPath: imageDataDirectory.appendingPathComponent(originalImageFilename(for: id)).path
+        )
+    }
+
+    private func thumbnailExists(for id: UUID) -> Bool {
+        FileManager.default.fileExists(
+            atPath: thumbnailsDirectory.appendingPathComponent(thumbnailFilename(for: id)).path
+        )
+    }
+
+    /// Prefer on-disk original PNG so paste/export/sync stay full-res while history keeps thumbnails in RAM.
+    func fullResolutionImage(for item: ClipboardItem) -> NSImage? {
+        guard case let .image(fallback) = item.content else { return nil }
+        if let original = loadOriginalImageData(filename: originalImageFilename(for: item.id)) {
+            return original
+        }
+        return fallback
+    }
+
+    /// Sync payload uses full-resolution image bytes when available on disk.
+    func sharedContent(for item: ClipboardItem) -> SharedClipboardContent {
+        switch item.content {
+        case let .text(string):
+            return .text(string)
+        case .image:
+            let filename = originalImageFilename(for: item.id)
+            let fileURL = imageDataDirectory.appendingPathComponent(filename)
+            if let data = try? Data(contentsOf: fileURL),
+               let decoded = try? assetDataForReading(data),
+               let image = NSImage(data: decoded) {
+                return .imageData(
+                    decoded,
+                    width: Int(image.size.width),
+                    height: Int(image.size.height)
+                )
+            }
+            return item.sharedContent
+        }
+    }
+
+    /// After assets are on disk, keep only ≤200px thumbnails resident in history/pins/stack.
+    private func demoteInMemoryImagesToThumbnails() {
+        func demoted(_ item: ClipboardItem) -> ClipboardItem {
+            guard case .image = item.content,
+                  originalImageExists(for: item.id),
+                  let thumb = loadThumbnail(filename: thumbnailFilename(for: item.id))
+            else {
+                return item
+            }
+            return ClipboardItem(
+                id: item.id,
+                content: .image(thumb),
+                timestamp: item.timestamp,
+                sourceAppBundleID: item.sourceAppBundleID,
+                sourceAppName: item.sourceAppName,
+                pasteCount: item.pasteCount,
+                title: item.title,
+                tags: item.tags,
+                collection: item.collection,
+                note: item.note,
+                ocrText: item.ocrText
+            )
+        }
+
+        history = history.map(demoted)
+        pinnedItems = pinnedItems.map(demoted)
+        pasteStack = pasteStack.map(demoted)
+    }
+
     func saveHistory() {
         guard persistenceEnabled else { return }
         ensurePinnedItemsPersistedInHistory()
 
-        // Save text items directly; save image items as downsized thumbnails on disk
+        // Save text items directly. For images: reuse on-disk originals/thumbnails when present
+        // so thumbnail-only in-memory items never overwrite full-resolution PNGs.
         let savedItems = history.compactMap { item -> SavedClipboardItem? in
             switch item.content {
             case let .text(string):
@@ -2246,8 +2329,16 @@ class ClipboardManager {
                     ocrText: item.ocrText
                 )
             case let .image(image):
-                let thumbnailFilename = saveThumbnail(image: image, id: item.id)
-                let originalFilename = saveOriginalImageData(image: image, id: item.id)
+                let thumbnailFilename: String? = if thumbnailExists(for: item.id) {
+                    self.thumbnailFilename(for: item.id)
+                } else {
+                    saveThumbnail(image: image, id: item.id)
+                }
+                let originalFilename: String? = if originalImageExists(for: item.id) {
+                    self.originalImageFilename(for: item.id)
+                } else {
+                    saveOriginalImageData(image: image, id: item.id)
+                }
                 guard thumbnailFilename != nil || originalFilename != nil else { return nil }
                 return SavedClipboardItem(
                     id: item.id,
@@ -2280,6 +2371,9 @@ class ClipboardManager {
             // Save pinned item IDs separately
             let pinnedIDs = pinnedItems.map(\.id.uuidString)
             UserDefaults.standard.set(pinnedIDs, forKey: "pinnedItemIDs")
+
+            // Drop full-res bitmaps from RAM now that disk assets are durable.
+            demoteInMemoryImagesToThumbnails()
 
             // Update widget data
             updateWidgetData()
@@ -2377,9 +2471,9 @@ class ClipboardManager {
             history = items.compactMap { saved -> ClipboardItem? in
                 let note = saved.note?.isEmpty == true ? nil : saved.note
 
-                // Image item: load thumbnail from disk
-                if let originalFilename = saved.imageDataFilename,
-                   let image = loadOriginalImageData(filename: originalFilename) {
+                // Prefer thumbnails in RAM; load full originals only on paste/export/sync.
+                if let thumbnailFilename = saved.imageThumbnailFilename,
+                   let image = loadThumbnail(filename: thumbnailFilename) {
                     return ClipboardItem(
                         id: saved.id,
                         content: .image(image),
@@ -2395,8 +2489,8 @@ class ClipboardManager {
                     )
                 }
 
-                if let thumbnailFilename = saved.imageThumbnailFilename,
-                   let image = loadThumbnail(filename: thumbnailFilename) {
+                if let originalFilename = saved.imageDataFilename,
+                   let image = loadOriginalImageData(filename: originalFilename) {
                     return ClipboardItem(
                         id: saved.id,
                         content: .image(image),

@@ -87,6 +87,18 @@ import SaneUI
 
             return "bundlePath=\(bundlePath) writable=\(writable) owner=\(owner):\(group) mode=\(permissionsString) sparkleCaches=\(presentFolders)"
         }
+
+        /// True for Sparkle's cached Updater.app helpers under our app's Caches folder.
+        /// These can linger after a routine "up to date" check and waste RAM until quit.
+        static func isOrphanedSparkleUpdaterApp(
+            bundleURL: URL,
+            bundleIdentifier: String
+        ) -> Bool {
+            let path = bundleURL.path
+            guard path.contains("/\(bundleIdentifier)/") else { return false }
+            guard path.contains("/\(sparkleCacheFolder)/Launcher/") else { return false }
+            return path.hasSuffix("/Updater.app") || path.contains("/Updater.app/")
+        }
     }
 
     @MainActor
@@ -121,13 +133,29 @@ import SaneUI
 
         override init() {
             super.init()
+            // Clear leftover Launcher/Installation caches before Sparkle starts so a
+            // previous interrupted update cannot leave Updater.app helpers parked.
+            let removedCaches = Self.clearStaleSparkleArtifacts()
+            if removedCaches.isEmpty {
+                updateLogger.info("No stale Sparkle cache artifacts found at launch")
+            } else {
+                updateLogger.info(
+                    "Cleared stale Sparkle cache artifacts at launch: \(removedCaches.joined(separator: ","), privacy: .public)"
+                )
+            }
+            let terminated = Self.terminateOrphanedSparkleHelpers()
+            if terminated > 0 {
+                updateLogger.info("Terminated \(terminated) orphaned Sparkle updater helper(s) at launch")
+            }
+
             updaterController = SPUStandardUpdaterController(
                 startingUpdater: true,
                 updaterDelegate: self,
                 userDriverDelegate: nil
             )
             configureUpdatePolicy()
-            updaterController?.updater.checkForUpdatesInBackground()
+            // startingUpdater already schedules automatic checks; avoid a second
+            // immediate background check that can leave Updater.app lingering.
             updateLogger.info("Sparkle updater initialized")
         }
 
@@ -139,6 +167,7 @@ import SaneUI
             } else {
                 updateLogger.info("Cleared stale Sparkle cache artifacts before manual update check: \(removedCaches.joined(separator: ","), privacy: .public)")
             }
+            _ = Self.terminateOrphanedSparkleHelpers()
             updaterController?.checkForUpdates(nil)
         }
 
@@ -161,6 +190,7 @@ import SaneUI
             // pollutes the customer's diagnostics with fake errors on every check.
             if Self.isRoutineNoUpdate(error) {
                 updateLogger.info("Sparkle: no update available (up to date)")
+                Self.cleanupIdleSparkleHelpers(reason: "no update available")
                 return
             }
 
@@ -180,6 +210,36 @@ import SaneUI
         nonisolated static func isRoutineNoUpdate(_ error: NSError) -> Bool {
             error.domain == SUSparkleErrorDomain
                 && SparkleErrorCode(rawValue: Int32(error.code)) == .noUpdate
+        }
+
+        nonisolated static func cleanupIdleSparkleHelpers(reason: String) {
+            let terminated = terminateOrphanedSparkleHelpers()
+            let removedCaches = clearStaleSparkleArtifacts()
+            if terminated > 0 || !removedCaches.isEmpty {
+                updateLogger.info(
+                    "Sparkle idle cleanup (\(reason, privacy: .public)): terminated=\(terminated) cleared=\(removedCaches.joined(separator: ","), privacy: .public)"
+                )
+            }
+        }
+
+        /// Quit cached Sparkle Updater.app helpers for this bundle after idle cycles.
+        @discardableResult
+        nonisolated static func terminateOrphanedSparkleHelpers(
+            bundleIdentifier: String = Bundle.main.bundleIdentifier ?? "com.saneclip.app",
+            runningApplications: [NSRunningApplication] = NSWorkspace.shared.runningApplications
+        ) -> Int {
+            var terminated = 0
+            for app in runningApplications {
+                guard let bundleURL = app.bundleURL else { continue }
+                guard SparkleCacheMaintenance.isOrphanedSparkleUpdaterApp(
+                    bundleURL: bundleURL,
+                    bundleIdentifier: bundleIdentifier
+                ) else { continue }
+                if app.terminate() {
+                    terminated += 1
+                }
+            }
+            return terminated
         }
 
         private func presentManualDownloadFallback() {

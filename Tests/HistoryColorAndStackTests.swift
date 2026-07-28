@@ -96,6 +96,42 @@ struct HistoryColorAndStackTests {
         #expect(urlSchemeSource.contains("clipboardManager.paste(item: item)"))
     }
 
+    @Test("Image history keeps thumbnails in RAM and resolves full-resolution images on demand")
+    func fullResolutionImagePathsAreWired() throws {
+        let managerSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/ClipboardManager.swift"),
+            encoding: .utf8
+        )
+        let previewSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/History/ImageCapturePreviewSheet.swift"),
+            encoding: .utf8
+        )
+        let syncSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/Sync/SyncCoordinator.swift"),
+            encoding: .utf8
+        )
+
+        #expect(managerSource.contains("Prefer thumbnails in RAM"))
+        #expect(managerSource.contains("demoteInMemoryImagesToThumbnails()"))
+        #expect(managerSource.contains("fullResolutionImage(for:"))
+        #expect(managerSource.contains("func sharedContent(for item: ClipboardItem)"))
+        #expect(previewSource.contains("clipboardManager.fullResolutionImage(for: item)"))
+        #expect(managerSource.contains("originalImageExists(for: item.id)"))
+        #expect(managerSource.contains("thumbnailExists(for: item.id)"))
+        #expect(syncSource.contains("manager.sharedContent(for: item)"))
+        // Guard against regressing to original-first load on launch.
+        let loadMarker = "Prefer thumbnails in RAM"
+        let loadIdx = managerSource.range(of: loadMarker)?.lowerBound
+        let originalLoad = managerSource.range(of: "loadOriginalImageData(filename: originalFilename)")
+        let thumbLoad = managerSource.range(of: "loadThumbnail(filename: thumbnailFilename)")
+        #expect(loadIdx != nil)
+        #expect(thumbLoad != nil && originalLoad != nil)
+        if let thumbLoad, let originalLoad, let loadIdx {
+            #expect(thumbLoad.lowerBound > loadIdx)
+            #expect(thumbLoad.lowerBound < originalLoad.lowerBound)
+        }
+    }
+
     @Test("Pause capture countdown invalidates from the monitor timer, not only pasteboard changes")
     @MainActor
     func pauseCaptureCountdownTicksWithoutPasteboardChange() {

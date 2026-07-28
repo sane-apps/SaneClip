@@ -7,10 +7,7 @@ struct ImageCapturePreviewSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     private var image: NSImage? {
-        if case let .image(image) = item.content {
-            return image
-        }
-        return nil
+        clipboardManager.fullResolutionImage(for: item)
     }
 
     private var ocrText: String {

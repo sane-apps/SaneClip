@@ -385,7 +385,7 @@
                 return manager.history.map { item in
                     SharedClipboardItem(
                         id: item.id,
-                        content: item.sharedContent,
+                        content: manager.sharedContent(for: item),
                         timestamp: item.timestamp,
                         sourceAppBundleID: item.sourceAppBundleID,
                         sourceAppName: item.sourceAppName,
@@ -674,7 +674,7 @@
 
                 let shared = SharedClipboardItem(
                     id: item.id,
-                    content: item.sharedContent,
+                    content: manager.sharedContent(for: item),
                     timestamp: item.timestamp,
                     sourceAppBundleID: item.sourceAppBundleID,
                     sourceAppName: item.sourceAppName,

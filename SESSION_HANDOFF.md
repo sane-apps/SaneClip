@@ -1,11 +1,30 @@
 # Session Handoff - SaneClip
 
-## Current State (2026-07-24)
+## Current State (2026-07-30)
 
-SaneClip `2.3.22` is the active direct-download and App Store candidate. It adds
+SaneClip `2.3.23` is the current source and appcast lane. The Lemon Squeezy
+hosted file still reports `2.3.22`; do not claim hosted-file parity or mutate
+that dashboard without explicit approval. The current app adds
 optional on-device Rewrite, Summarize, and Extract Key Points previews for text
 clips on macOS 26+ Apple Intelligence-capable Macs, plus a cross-channel
 single-instance guard.
+
+### 2026-07-30 verification boundary
+
+- An old editor-shortcut research lock was independently certified
+  `RESOLVED`: fix commit `18815ce3c690f3c9163ca709eaa4e42bb8c70300`
+  is tested and shipped through 2.3.23. Gate receipt:
+  `eae26beb38ddb14a`.
+- Canonical Mini verification passed twice: 244 tests in 13 suites with
+  receipts `e9e5b738bec9b5f527640d9a59556cb7` and
+  `fc1eda7fb2e8033aace8d9d5f39285a9`.
+- Both supported environment attempts failed to create the requested Glenn
+  render files. Stop retrying until the Xcode test-host render path is fixed.
+- Customer UI contract receipt `4c6b26ce0aef93fdd9d6b612b48a5d66`
+  is red: the receipt/source binding is stale, render and runtime artifacts
+  are missing, and `on-device-ai-text-actions` has no fresh result.
+- No live AI mutation, release preflight, App Store preflight, upload, or
+  release ran. The source/tests are green; release proof is not.
 
 - AI input is limited to 2,000 UTF-8 bytes before model availability or
   generation work, so token-dense Unicode cannot bypass the bound.
@@ -55,7 +74,7 @@ edit the Homebrew cask manually.
 ./scripts/SaneMaster.rb release_preflight
 ./scripts/SaneMaster.rb appstore_preflight
 bash ~/SaneApps/infra/SaneProcess/scripts/release.sh \
-  --project "$(pwd)" --full --version 2.3.22 \
+  --project "$(pwd)" --full --version 2.3.23 \
   --notes "Adds optional private on-device text previews on eligible macOS 26 Macs and prevents parallel SaneClip runtime channels." \
   --deploy
 ```

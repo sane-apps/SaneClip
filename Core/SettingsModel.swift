@@ -368,7 +368,10 @@ class SettingsModel {
     }
 
     private func applyDockVisibility() {
-        NSApp.setActivationPolicy(showInDock ? .regular : .accessory)
+        // Route through SaneActivationPolicy so XCTest host runs no-op instead of
+        // flipping the real SaneClip test-host to .regular (which leaves ghost Dock
+        // tiles on the Mini after abrupt test teardown).
+        SaneActivationPolicy.applyPolicy(showDockIcon: showInDock)
     }
 
     // MARK: - Settings Export/Import

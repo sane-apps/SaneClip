@@ -1476,6 +1476,32 @@ struct SaneClipTests {
         #expect(SettingsModel.defaultShowInDock == false)
     }
 
+    @Test("Dock visibility uses SaneActivationPolicy so XCTest hosts cannot leave ghost Dock tiles")
+    func dockVisibilityRoutesThroughSharedActivationPolicy() throws {
+        let settingsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/SettingsModel.swift"),
+            encoding: .utf8
+        )
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+        let settingsWindowSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/SettingsWindowController.swift"),
+            encoding: .utf8
+        )
+        let updateSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("Core/Services/UpdateService.swift"),
+            encoding: .utf8
+        )
+
+        #expect(settingsSource.contains("SaneActivationPolicy.applyPolicy(showDockIcon: showInDock)"))
+        #expect(!settingsSource.contains("NSApp.setActivationPolicy(showInDock ? .regular : .accessory)"))
+        #expect(appSource.contains("SaneActivationPolicy.applyInitialPolicy(showDockIcon: SettingsModel.shared.showInDock)"))
+        #expect(settingsWindowSource.contains("SaneActivationPolicy.restorePolicy(showDockIcon: SettingsModel.shared.showInDock)"))
+        #expect(updateSource.contains("SaneActivationPolicy.restorePolicy(showDockIcon: SettingsModel.shared.showInDock)"))
+    }
+
     @Test("Clipboard history export imports through the same JSON model")
     @MainActor
     func clipboardHistoryExportImportRoundTrip() throws {

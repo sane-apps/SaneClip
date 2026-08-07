@@ -220,6 +220,11 @@ import SaneUI
                     "Sparkle idle cleanup (\(reason, privacy: .public)): terminated=\(terminated) cleared=\(removedCaches.joined(separator: ","), privacy: .public)"
                 )
             }
+            // Updater.app helpers can force a Dock tile; re-enforce accessory/regular
+            // after they quit so tiles do not accumulate across automatic checks.
+            Task { @MainActor in
+                SaneActivationPolicy.restorePolicy(showDockIcon: SettingsModel.shared.showInDock)
+            }
         }
 
         /// Quit cached Sparkle Updater.app helpers for this bundle after idle cycles.
@@ -261,6 +266,7 @@ import SaneUI
             if alert.runModal() == .alertFirstButtonReturn {
                 NSWorkspace.shared.open(url)
             }
+            SaneActivationPolicy.restorePolicy(showDockIcon: SettingsModel.shared.showInDock)
         }
 
         nonisolated static func shouldOfferManualDownloadFallback(for error: NSError, updateCheck: SPUUpdateCheck) -> Bool {

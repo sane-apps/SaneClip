@@ -11,6 +11,7 @@ enum SettingsWindowController {
     }
 
     private static var window: NSWindow?
+    private static var windowDelegate: SettingsWindowDelegate?
     private static var pendingAction: PendingAction?
     static var licenseService: LicenseService?
     static var presentedWindow: NSWindow? {
@@ -41,6 +42,10 @@ enum SettingsWindowController {
         // Standard window - glass effect handled in SwiftUI view
         newWindow.hasShadow = true
 
+        let delegate = SettingsWindowDelegate()
+        windowDelegate = delegate
+        newWindow.delegate = delegate
+
         window = newWindow
         newWindow.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
@@ -66,5 +71,13 @@ enum SettingsWindowController {
                 .preferredColorScheme(.dark)
         )
         return NSHostingController(rootView: settingsView)
+    }
+}
+
+/// Restores the user's Dock preference after settings closes, in case Sparkle or
+/// another modal path temporarily forced `.regular` and left a ghost Dock tile.
+private final class SettingsWindowDelegate: NSObject, NSWindowDelegate {
+    func windowWillClose(_: Notification) {
+        SaneActivationPolicy.restorePolicy(showDockIcon: SettingsModel.shared.showInDock)
     }
 }

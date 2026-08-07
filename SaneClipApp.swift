@@ -144,6 +144,10 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         }
 
         setupApp()
+        // Re-enforce Dock policy with retries after Launch Services registration.
+        // Raw setActivationPolicy at launch can lose a race and leave a ghost tile
+        // when tests or Sparkle briefly force .regular on this accessory app.
+        SaneActivationPolicy.applyInitialPolicy(showDockIcon: SettingsModel.shared.showInDock)
         initializeSyncOnLaunch()
         SetappIntegration.logPurchaseType()
         if hasSeenWelcome {

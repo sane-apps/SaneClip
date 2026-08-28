@@ -63,7 +63,7 @@ class CustomerUIActionSweep
       ['UI/History/AITextTransformPreviewSheet.swift', 'Button("Cancel")'],
       ['Core/TextTransformService.swift', 'static let maximumUTF8ByteCount = 2_000'],
       ['Core/ClipboardManager.swift', 'func copyTextWithoutPaste('],
-      ['project.yml', 'MARKETING_VERSION: "2.3.23"'],
+      ['project.yml', 'MARKETING_VERSION: "2.3.24"'],
       ['Core/TextTransformService.swift', 'tools: []'],
       ['Tests/ClipboardTransformsTests.swift', 'AI preview rejects oversized clips before availability or generation'],
       ['Tests/ClipboardTransformsTests.swift', 'AI Copy writes the chosen result without changing history']

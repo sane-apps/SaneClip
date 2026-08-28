@@ -57,7 +57,7 @@ SaneClip is the **first clipboard manager** built with security as the foundatio
 
 ---
 
-## 🆕 Current macOS Direct Download: v2.3.23
+## 🆕 Current macOS Direct Download: v2.3.24
 
 **Current direct-download release (July 2026)**
 

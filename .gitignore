@@ -209,3 +209,6 @@ project.yml.bak
 scripts/*.swift
 fastlane/
 training_data/
+
+# runtime customer UI evidence (do not commit)
+.sane/customer_ui_action_receipt.json

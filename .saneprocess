@@ -242,9 +242,9 @@ appstore:
         supports_captions: false
         supports_audio_descriptions: false
   screenshots:
-    macos: docs/images/appstore-mac-*.png
-    ios: docs/images/screenshot-ios-*-dark.png
-    ipad: docs/images/screenshot-ipad-*-dark.png
+    macos: docs/images/appstore-mac-popover.png
+    ios: docs/images/screenshot-ios-{history,pinned}-dark.png
+    ipad: docs/images/screenshot-ipad-{history,pinned}-dark.png
   strip_frameworks:
     - Sparkle.framework
   contact:

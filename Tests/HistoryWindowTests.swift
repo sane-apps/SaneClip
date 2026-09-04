@@ -24,7 +24,7 @@ struct HistoryWindowTests {
 
         let payload: [String: Any] = [
             "version": 1,
-            "useFloatingHistoryWindow": true,
+            "useFloatingHistoryWindow": true
         ]
         let exported = try JSONSerialization.data(withJSONObject: payload)
 
@@ -246,6 +246,17 @@ struct HistoryWindowTests {
         #expect(!SaneClipAppDelegate.historyAuthSatisfied(
             requiresAuth: true, lastAuth: now.addingTimeInterval(-31), gracePeriod: 30, now: now
         ))
+    }
+
+    @Test("URL scheme history entry opens the popover through the auth gate")
+    func urlSchemeHistoryEntryOpensPopover() throws {
+        let appSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+        #expect(appSource.contains("name: .showHistory,"))
+        #expect(appSource.contains("handleShowHistoryNotification"))
+        #expect(appSource.contains("self?.showPopover()"))
     }
 
     @Test("Hotkey toggle and Dock reopen route through the Touch ID auth gate")

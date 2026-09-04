@@ -61,17 +61,20 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     #if APP_STORE
         let licenseService = LicenseService(
             appName: "SaneClip",
-            purchaseBackend: .appStore(productID: "com.saneclip.app.pro.unlock")
+            purchaseBackend: .appStore(productID: "com.saneclip.app.pro.unlock"),
+            keychain: NonBlockingKeychainService.appLicenseKeychain()
         )
     #elseif SETAPP
         let licenseService = LicenseService(
             appName: "SaneClip",
-            purchaseBackend: .setapp
+            purchaseBackend: .setapp,
+            keychain: NonBlockingKeychainService.appLicenseKeychain()
         )
     #else
         let licenseService = LicenseService(
             appName: "SaneClip",
             checkoutURL: LicenseService.directCheckoutURL(appSlug: "saneclip"),
+            keychain: NonBlockingKeychainService.appLicenseKeychain(),
             proTrial: .init(storageKeyPrefix: "saneclip.pro_trial")
         )
     #endif
@@ -445,6 +448,14 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             name: .reopenHistoryAfterPaste,
             object: nil
         )
+        // URL-scheme entry (saneclip://history) posts .showHistory; without
+        // this observer that path silently did nothing.
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleShowHistoryNotification),
+            name: .showHistory,
+            object: nil
+        )
         NSWorkspace.shared.notificationCenter.addObserver(
             self,
             selector: #selector(handleWorkspaceDidActivateApplication(_:)),
@@ -673,6 +684,13 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         SettingsWindowController.schedulePendingAction(.excludedAppPicker)
         SettingsWindowController.open(tab: .general)
         NotificationCenter.default.post(name: .settingsAddExcludedAppRequested, object: nil)
+    }
+
+    /// URL-scheme history entry: same auth-gated popover path
+    /// as the menu-bar click. The posting thread is not guaranteed to be
+    /// main, so hop explicitly before touching UI.
+    @objc private func handleShowHistoryNotification() {
+        DispatchQueue.main.async { [weak self] in self?.showPopover() }
     }
 
     @objc func focusHistorySearch() {

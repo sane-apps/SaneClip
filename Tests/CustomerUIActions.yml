@@ -362,10 +362,10 @@ actions:
   - OCR text and screenshot sidecars flow into history and preview controls when capture
     fixtures are present.
 - id: settings-general-security-history-actions
-  title: General settings update startup, appearance, security, history, capture,
+  title: Settings pages update startup, clipboard, privacy, history, capture,
     update, and import/export behavior
   surfaces:
-  - Settings General tab
+  - Settings General, Clipboard, Privacy, and History tabs
   - Login item and Dock controls
   - Security controls
   - History controls
@@ -373,7 +373,7 @@ actions:
   - Software update controls
   - Import and export panels
   steps:
-  - Open General settings.
+  - Open General, Clipboard, Privacy, and History settings in sidebar order.
   - Toggle login item, Dock icon, menu bar icon, paste sound, sensitive-data protection,
     Touch ID, encryption, excluded apps, history size, expiry, capture limits, capture
     pause/resume, update checks, import, and export where safe.
@@ -390,7 +390,7 @@ actions:
   evidence:
   - Mini source/test guard for settings controls, panel helpers, and existing settings
     tests
-  - Settings General screenshot fixture
+  - Clean screenshots of General, Clipboard, Privacy, and History, including scroll coverage
   required_proof_level: runtime_visual
   required_evidence_types:
   - mini_runtime
@@ -417,7 +417,7 @@ actions:
     fixture_paths:
     - Tests/Fixtures/customer-ui/clipboard-history/
   user_inputs:
-  - Open General settings.
+  - Open General, Clipboard, Privacy, and History settings in sidebar order.
   - Toggle login item, Dock icon, menu bar icon, paste sound, sensitive-data protection,
     Touch ID, encryption, excluded apps, history size, expiry, capture limits, capture
     pause/resume, update checks, import, and export where safe.

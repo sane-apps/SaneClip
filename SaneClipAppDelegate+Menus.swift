@@ -100,32 +100,19 @@ extension SaneClipAppDelegate {
     }
 
     private func settingsMenuItems() -> [NSMenuItem] {
-        var items: [NSMenuItem] = [
-            settingsMenuItem(title: String(localized: "General"), action: #selector(openGeneralSettings), key: "1"),
-            settingsMenuItem(title: String(localized: "Shortcuts"), action: #selector(openShortcutsSettings), key: "2")
-        ]
-
-        #if ENABLE_SYNC
-            items.append(settingsMenuItem(title: String(localized: "Sync"), action: #selector(openSyncSettings), key: "3"))
-            items.append(settingsMenuItem(title: String(localized: "Snippets"), action: #selector(openSnippetsSettings), key: "4"))
-            items.append(settingsMenuItem(title: String(localized: "Storage"), action: #selector(openStorageSettings), key: "5"))
-            items.append(settingsMenuItem(title: String(localized: "License"), action: #selector(openLicenseSettings), key: "6"))
-            items.append(settingsMenuItem(title: String(localized: "About"), action: #selector(openAboutSettings), key: "7"))
-        #else
-            items.append(settingsMenuItem(title: String(localized: "Snippets"), action: #selector(openSnippetsSettings), key: "3"))
-            items.append(settingsMenuItem(title: String(localized: "Storage"), action: #selector(openStorageSettings), key: "4"))
-            items.append(settingsMenuItem(title: String(localized: "License"), action: #selector(openLicenseSettings), key: "5"))
-            items.append(settingsMenuItem(title: String(localized: "About"), action: #selector(openAboutSettings), key: "6"))
-        #endif
-
-        return items
+        SettingsView.SettingsTab.allCases.enumerated().map { index, tab in
+            let item = NSMenuItem(title: tab.title, action: #selector(openSettingsTabFromMenu(_:)), keyEquivalent: String(index + 1))
+            item.keyEquivalentModifierMask = [.command]
+            item.representedObject = tab.rawValue
+            item.target = self
+            return item
+        }
     }
 
-    private func settingsMenuItem(title: String, action: Selector, key: String) -> NSMenuItem {
-        let item = NSMenuItem(title: title, action: action, keyEquivalent: key)
-        item.keyEquivalentModifierMask = [.command]
-        item.target = self
-        return item
+    @objc private func openSettingsTabFromMenu(_ sender: NSMenuItem) {
+        guard let value = sender.representedObject as? String,
+              let tab = SettingsView.SettingsTab(rawValue: value) else { return }
+        SettingsWindowController.open(tab: tab)
     }
 
     func buildContextMenu() -> NSMenu {

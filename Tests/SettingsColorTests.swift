@@ -109,7 +109,7 @@ struct SettingsColorTests {
         // Text stays white for contrast; the excluded-app status icon retains
         // its semantic color. Keep these separate so icons do not dim labels.
         let general = try String(
-            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/ClipboardSettingsView.swift"),
             encoding: .utf8
         )
         let excluded = try String(

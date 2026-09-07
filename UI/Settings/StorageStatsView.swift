@@ -44,7 +44,6 @@ struct StorageStatsView: View {
                 )
             }
 
-            Spacer()
         }
         .foregroundStyle(.white)
         .onAppear { calculateStats() }
@@ -133,6 +132,7 @@ private struct StatCard: View {
                 .font(.callout.weight(.medium))
                 .foregroundStyle(clipReadableSecondary)
         }
+        .frame(height: 76)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
         .background(

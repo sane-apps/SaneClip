@@ -2211,6 +2211,11 @@ struct SaneClipTests {
 
     @Test("SettingsView command-digit mapping follows sidebar order")
     func settingsViewCommandDigitMapping() {
+        var expected: [SettingsView.SettingsTab] = [.general, .clipboard, .snippets, .shortcuts, .history, .privacy]
+        // The app target owns ENABLE_SYNC; the test target does not inherit it.
+        if let sync = SettingsView.SettingsTab(rawValue: "Sync") { expected.append(sync) }
+        expected += [.license, .about]
+        #expect(SettingsView.SettingsTab.allCases == expected)
         for (index, tab) in SettingsView.SettingsTab.allCases.enumerated() {
             #expect(SettingsView.tab(forShortcutIndex: index) == tab)
         }
@@ -2262,9 +2267,13 @@ struct SaneClipTests {
         #expect(!settingsSource.contains("struct GlassGroupBoxStyle"))
         #expect(generalSettingsSource.contains("SaneLanguageSettingsRow()"))
         #expect(generalSettingsSource.contains("SaneClipSettingsCopy.menuBarIconListTitle"))
-        #expect(generalSettingsSource.contains("SaneClipSettingsCopy.removeButtonTitle"))
+        let clipboardSettingsSource = try String(
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/ClipboardSettingsView.swift"),
+            encoding: .utf8
+        )
+        #expect(clipboardSettingsSource.contains("SaneClipSettingsCopy.removeButtonTitle"))
         #expect(settingsSource.contains("typealias ClipActionButtonStyle = SaneUI.SaneActionButtonStyle"))
-        #expect(generalSettingsSource.contains(".buttonStyle(ClipActionButtonStyle())"))
+        #expect(clipboardSettingsSource.contains(".buttonStyle(ClipActionButtonStyle())"))
         #expect(excludedAppsSource.contains("ClipActionButtonStyle(prominent: exists, compact: true)"))
         #expect(generalSettingsSource.contains("Image(nsImage: popupSymbolImage(settings.menuBarIcon))"))
         #expect(generalSettingsActionsSource.contains("hierarchicalColor: .white"))
@@ -2285,7 +2294,7 @@ struct SaneClipTests {
             encoding: .utf8
         )
         let settingsSource = try String(
-            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/ClipboardSettingsView.swift"),
             encoding: .utf8
         )
         let shortcutsSource = try String(
@@ -2446,7 +2455,7 @@ struct SaneClipTests {
             encoding: .utf8
         )
         let settingsSource = try String(
-            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/ClipboardSettingsView.swift"),
             encoding: .utf8
         )
 
@@ -2520,7 +2529,7 @@ struct SaneClipTests {
         #expect(supportHTMLSource.contains("Request Accessibility Access"))
         #expect(supportHTMLSource.contains("If you also enable Pro history encryption"))
         #expect(encryptGuideSource.contains("AES-256-GCM Encryption (Pro)"))
-        #expect(encryptGuideSource.contains("Open Settings &gt; Security and enable History Encryption"))
+        #expect(encryptGuideSource.contains("Open Settings &gt; Privacy &gt; Security and enable Encrypt history at rest"))
         #expect(!encryptGuideSource.contains("Always On"))
         #expect(websiteSource.contains("How SaneClip Stacks Up"))
         #expect(websiteSource.contains("Here's how SaneClip Pro compares."))
@@ -2608,7 +2617,7 @@ struct SaneClipTests {
     @Test("History and settings surfaces expose unlimited retention and smart clear")
     func historyAndSettingsExposeUnlimitedAndSmartClear() throws {
         let settingsSource = try String(
-            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/HistorySettingsView.swift"),
             encoding: .utf8
         )
         let historySource = try String(
@@ -2779,7 +2788,7 @@ struct SaneClipTests {
             ZStack {
                 renderBackdrop.opacity(0.3)
                     .ignoresSafeArea()
-                GeneralSettingsView(licenseService: nil)
+                GeneralSettingsView()
             }
             .preferredColorScheme(.dark)
             .frame(width: 1000, height: 760),
@@ -2808,7 +2817,7 @@ struct SaneClipTests {
             ZStack(alignment: .topLeading) {
                 renderBackdrop.opacity(0.3)
                     .ignoresSafeArea()
-                GeneralSettingsView(licenseService: previewHistoryLicenseService)
+                HistorySettingsView(licenseService: previewHistoryLicenseService)
             }
             .preferredColorScheme(.dark)
             .frame(width: 1000, height: 1900),
@@ -3251,7 +3260,7 @@ struct SaneClipTests {
             renderBackdrop.opacity(0.3)
                 .ignoresSafeArea()
             VStack(alignment: .leading, spacing: 0) {
-                GeneralSettingsView(licenseService: license)
+                ClipboardSettingsView(licenseService: license)
                     .frame(maxWidth: 560, alignment: .leading)
                 Spacer(minLength: 0)
             }

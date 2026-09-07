@@ -39,7 +39,9 @@ struct ExcludedAppsInline: View {
         VStack(spacing: 0) {
             // Header row
             HStack {
-                Text("Excluded Apps")
+                Text("Quick Add")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white)
                 Spacer()
                 Button("Add App...") {
                     focusedKeyboardTarget = .addButton

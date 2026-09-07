@@ -16,7 +16,10 @@
         var body: some View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    CompactSection("Sync", icon: "arrow.triangle.2.circlepath.icloud", iconColor: SaneSettingsIconSemantic.sync.color) {
+                    Text(String(localized: "Sync"))
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(.white)
+                    CompactSection("iCloud", icon: "arrow.triangle.2.circlepath.icloud", iconColor: SaneSettingsIconSemantic.sync.color) {
                         CompactToggle(
                             label: "iCloud Sync",
                             icon: "arrow.triangle.2.circlepath.icloud",

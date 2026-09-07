@@ -15,7 +15,10 @@ struct ShortcutsSettingsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
+            VStack(alignment: .leading, spacing: 24) {
+                Text(String(localized: "Shortcuts"))
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(.white)
                 CompactSection("Main Shortcuts") {
                     CompactRow("Show Clipboard History") {
                         HStack(spacing: 8) {

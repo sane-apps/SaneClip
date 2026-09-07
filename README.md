@@ -182,6 +182,8 @@ Add SaneClip widgets to your desktop or Notification Center:
 
 ### Data Management
 
+Open **Settings → History** for limits, backups and storage usage. Password protection, encryption and excluded apps are in **Settings → Privacy**.
+
 - **📤 Export History** — Export to JSON with timestamps and metadata
 - **📥 Import History** — Import previously exported history
 - **⚙️ Settings Sync** — Backup or transfer settings to another Mac

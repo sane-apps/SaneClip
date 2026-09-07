@@ -30,26 +30,32 @@ struct SettingsView: View {
 
     enum SettingsTab: String, SaneSettingsTab {
         case general = "General"
-        case shortcuts = "Shortcuts"
-        #if ENABLE_SYNC
-        case sync = "Sync"
-        #endif
+        case clipboard = "Clipboard"
         case snippets = "Snippets"
-        case storage = "Storage"
+        case shortcuts = "Shortcuts"
+        case history = "History"
+        case privacy = "Privacy"
+        #if ENABLE_SYNC
+            case sync = "Sync"
+        #endif
         case license = "License"
         case about = "About"
 
-        var id: String { rawValue }
+        var id: String {
+            rawValue
+        }
 
         var title: String {
             switch self {
             case .general: SaneSettingsStrings.generalTabTitle
             case .shortcuts: SaneSettingsStrings.shortcutsTabTitle
             #if ENABLE_SYNC
-            case .sync: SaneSettingsStrings.syncTabTitle
+                case .sync: SaneSettingsStrings.syncTabTitle
             #endif
             case .snippets: SaneSettingsStrings.snippetsTabTitle
-            case .storage: SaneSettingsStrings.storageTabTitle
+            case .history: String(localized: "History")
+            case .clipboard: String(localized: "Clipboard")
+            case .privacy: String(localized: "Privacy")
             case .license: SaneSettingsStrings.licenseTabTitle
             case .about: SaneSettingsStrings.aboutTabTitle
             }
@@ -60,10 +66,12 @@ struct SettingsView: View {
             case .general: "gear"
             case .shortcuts: "keyboard"
             #if ENABLE_SYNC
-            case .sync: "arrow.triangle.2.circlepath.icloud"
+                case .sync: "arrow.triangle.2.circlepath.icloud"
             #endif
             case .snippets: "text.quote"
-            case .storage: "chart.pie"
+            case .history: "clock.arrow.circlepath"
+            case .clipboard: "doc.on.clipboard"
+            case .privacy: "hand.raised"
             case .license: "key"
             case .about: "info.circle"
             }
@@ -74,10 +82,12 @@ struct SettingsView: View {
             case .general: SaneSettingsIconSemantic.general.color
             case .shortcuts: SaneSettingsIconSemantic.shortcuts.color
             #if ENABLE_SYNC
-            case .sync: SaneSettingsIconSemantic.sync.color
+                case .sync: SaneSettingsIconSemantic.sync.color
             #endif
             case .snippets: SaneSettingsIconSemantic.content.color
-            case .storage: SaneSettingsIconSemantic.storage.color
+            case .history: SaneSettingsIconSemantic.storage.color
+            case .clipboard: SaneSettingsIconSemantic.content.color
+            case .privacy: SaneSettingsIconSemantic.license.color
             case .license: SaneSettingsIconSemantic.license.color
             case .about: SaneSettingsIconSemantic.about.color
             }
@@ -93,23 +103,26 @@ struct SettingsView: View {
         SaneSettingsContainer(defaultTab: .general, selection: $selectedTab, windowSizing: .embedded) { tab in
             switch tab {
             case .general:
-                GeneralSettingsView(licenseService: licenseService)
+                GeneralSettingsView()
             case .shortcuts:
                 ShortcutsSettingsView(licenseService: licenseService)
             #if ENABLE_SYNC
-            case .sync:
-                SyncSettingsView()
+                case .sync:
+                    SyncSettingsView()
             #endif
             case .snippets:
                 SnippetsSettingsView(licenseService: licenseService)
                     .padding(20)
-            case .storage:
-                StorageStatsView()
-                    .padding(20)
+            case .history:
+                HistorySettingsView(licenseService: licenseService)
+            case .clipboard:
+                ClipboardSettingsView(licenseService: licenseService)
+            case .privacy:
+                PrivacySettingsView(licenseService: licenseService)
             case .license:
                 Group {
                     if let licenseService {
-                        ScrollView(.vertical, showsIndicators: false) {
+                        ScrollView(.vertical, showsIndicators: true) {
                             VStack(alignment: .leading, spacing: 0) {
                                 LicenseSettingsView(licenseService: licenseService, style: .panel)
                                     .frame(maxWidth: 420, alignment: .leading)
@@ -118,8 +131,6 @@ struct SettingsView: View {
                             .frame(maxWidth: .infinity, alignment: .topLeading)
                             .padding(20)
                         }
-                    } else {
-                        EmptyView()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -148,7 +159,6 @@ struct SettingsView: View {
         return SettingsTab.allCases[index]
     }
 
-    @ViewBuilder
     private var settingsKeyboardShortcuts: some View {
         ZStack {
             ForEach(Array(SettingsTab.allCases.enumerated()), id: \.element.id) { index, tab in

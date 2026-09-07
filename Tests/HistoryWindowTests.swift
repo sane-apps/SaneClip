@@ -41,7 +41,7 @@ struct HistoryWindowTests {
             encoding: .utf8
         )
         let settingsSource = try String(
-            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/ClipboardSettingsView.swift"),
             encoding: .utf8
         )
 
@@ -499,7 +499,7 @@ struct HistoryWindowTests {
             encoding: .utf8
         )
         let generalSettings = try String(
-            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
+            contentsOf: projectRootURL().appendingPathComponent("UI/Settings/ClipboardSettingsView.swift"),
             encoding: .utf8
         )
         let rowSource = try String(
@@ -531,7 +531,7 @@ struct HistoryWindowTests {
         #expect(historyView.contains("shortcutHint: quickPasteHint(for: index)"))
         // Filter row scrolls instead of clipping.
         #expect(filterBar.contains("ScrollView(.horizontal, showsIndicators: false)"))
-        // Floating-window toggle is discoverable in General settings.
+        // Floating-window toggle is discoverable in Clipboard settings.
         #expect(generalSettings.contains("Open history as a resizable floating window"))
         // Drag-out affordance on hover for non-pinned rows.
         #expect(rowSource.contains("showsDragAffordance: isHovering && isPro && !isPinned"))

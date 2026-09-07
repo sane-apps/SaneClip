@@ -669,7 +669,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     #endif
 
     @objc func openStorageSettings() {
-        SettingsWindowController.open(tab: .storage)
+        SettingsWindowController.open(tab: .history)
     }
 
     @objc func openLicenseSettings() {
@@ -683,7 +683,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
     @objc func requestExcludedAppPicker() {
         appLogger.info("Settings command requested excluded app picker")
         SettingsWindowController.schedulePendingAction(.excludedAppPicker)
-        SettingsWindowController.open(tab: .general)
+        SettingsWindowController.open(tab: .privacy)
         NotificationCenter.default.post(name: .settingsAddExcludedAppRequested, object: nil)
     }
 

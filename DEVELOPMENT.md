@@ -363,8 +363,10 @@ SaneClip/
 | ClipboardItem | Core/Models/ClipboardItem.swift | Individual clipboard entry model |
 | SettingsModel | Core/SettingsModel.swift | User preferences persistence |
 | AppDelegate | SaneClipApp.swift | Menu bar setup, popover management |
-| SettingsView | UI/Settings/SettingsView.swift | Settings window UI |
+| SettingsView | UI/Settings/SettingsView.swift | Sidebar order and Command-1–9 routing shared with the native Settings menu |
 | OnboardingView | UI/Onboarding/OnboardingView.swift | First-launch wizard |
+
+Settings pages have separate owners: General handles startup, menu bar, language and updates; Clipboard handles pasting, capture and rules; History handles limits, backups and statistics; Privacy handles authentication and excluded apps. Snippets uses a flat searchable list with inline categories and Copy/Paste/Edit actions. Keep SettingsTab.allCases in customer task order: General, Clipboard, Snippets, Shortcuts, History, Privacy, Sync, License, About. The native menu derives its order from that enum; do not duplicate numbered shortcuts.
 
 ## Menu Bar App Notes
 

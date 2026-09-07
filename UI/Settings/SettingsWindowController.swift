@@ -34,12 +34,12 @@ enum SettingsWindowController {
         newWindow.title = "SaneClip Settings"
         newWindow.appearance = NSAppearance(named: .darkAqua)
         newWindow.styleMask = [.titled, .closable, .resizable]
-        newWindow.contentMinSize = NSSize(width: 760, height: 500)
-        newWindow.setContentSize(NSSize(width: 760, height: 500))
+        newWindow.contentMinSize = NSSize(width: 760, height: 600)
+        newWindow.setContentSize(NSSize(width: 760, height: 600))
         newWindow.center()
         newWindow.isReleasedWhenClosed = false
 
-        // Standard window - glass effect handled in SwiftUI view
+        // Standard window; shared SaneUI styles the content.
         newWindow.hasShadow = true
 
         let delegate = SettingsWindowDelegate()

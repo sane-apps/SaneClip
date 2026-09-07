@@ -690,7 +690,12 @@ struct SaneClipTests {
             encoding: .utf8
         )
 
-        let saneUIRevision = "60176f30007e0f931195785aa769e4ef5172f7ee"
+        let lock = try #require(JSONSerialization.jsonObject(with: Data(resolvedPackages.utf8)) as? [String: Any])
+        let pins = try #require(lock["pins"] as? [[String: Any]])
+        let saneUIPin = try #require(pins.first { $0["identity"] as? String == "saneui" })
+        let state = try #require(saneUIPin["state"] as? [String: Any])
+        let saneUIRevision = try #require(state["revision"] as? String)
+        #expect(saneUIRevision.count == 40 && saneUIRevision.allSatisfy(\.isHexDigit))
         #expect(projectSource.contains("url: https://github.com/sane-apps/SaneUI.git"))
         #expect(projectSource.contains("revision: \(saneUIRevision)"))
         #expect(!projectSource.contains("path: ../../infra/SaneUI"))

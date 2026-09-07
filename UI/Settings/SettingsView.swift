@@ -132,7 +132,7 @@ struct SettingsView: View {
                 )
             }
         }
-        .frame(minWidth: 760, idealWidth: 760, minHeight: 500, idealHeight: 500)
+        .frame(minWidth: 760, idealWidth: 760, minHeight: 600, idealHeight: 600)
         .background(settingsKeyboardShortcuts)
         .onExitCommand {
             SettingsWindowController.close()

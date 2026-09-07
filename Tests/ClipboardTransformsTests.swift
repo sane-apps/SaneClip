@@ -68,17 +68,19 @@ private actor ControlledAITextGenerator: AITextGenerating {
 
 @MainActor
 private func waitForPreviewToSettle(_ model: AITextTransformPreviewModel) async {
-    for _ in 0 ..< 200 {
+    let deadline = ContinuousClock.now.advanced(by: .seconds(2))
+    while ContinuousClock.now < deadline {
         guard model.isLoading else { return }
-        await Task.yield()
+        try? await Task.sleep(for: .milliseconds(10))
     }
     Issue.record("AI preview did not settle")
 }
 
 private func waitForGenerationToStart(_ generator: ControlledAITextGenerator) async {
-    for _ in 0 ..< 200 {
+    let deadline = ContinuousClock.now.advanced(by: .seconds(2))
+    while ContinuousClock.now < deadline {
         if await generator.hasStarted() { return }
-        await Task.yield()
+        try? await Task.sleep(for: .milliseconds(10))
     }
     Issue.record("Fake AI generation did not start")
 }

@@ -120,14 +120,19 @@
             CompactDivider()
 
             CompactRow(labels.checkFrequencyLabel) {
-                Picker("", selection: $checkFrequency) {
-                    ForEach(SaneSparkleCheckFrequency.allCases) { frequency in
-                        Text(frequency.title(labels: labels)).tag(frequency)
+                if isAvailable && automaticallyChecks {
+                    Picker("", selection: $checkFrequency) {
+                        ForEach(SaneSparkleCheckFrequency.allCases) { frequency in
+                            Text(frequency.title(labels: labels)).tag(frequency)
+                        }
                     }
+                    .pickerStyle(.segmented)
+                    .frame(width: 170)
+                } else {
+                    Text(checkFrequency.title(labels: labels))
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.white)
                 }
-                .pickerStyle(.segmented)
-                .frame(width: 170)
-                .disabled(!isAvailable || !automaticallyChecks)
             }
             .help(labels.checkFrequencyHelp)
 

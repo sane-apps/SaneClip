@@ -6,8 +6,8 @@ import SaneUI
 import SwiftUI
 
 let settingsLogger = Logger(subsystem: "com.saneclip.app", category: "Settings")
-let clipReadableSecondary = Color.white.opacity(0.88)
-let clipReadableMuted = Color.white.opacity(0.78)
+let clipReadableSecondary = Color.white
+let clipReadableMuted = Color.white
 let clipReadableMonospace = Color.white.opacity(0.92)
 
 typealias ClipActionButtonStyle = SaneUI.SaneActionButtonStyle

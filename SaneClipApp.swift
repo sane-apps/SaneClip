@@ -292,6 +292,7 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
 
         let window = NSWindow(contentViewController: NSHostingController(rootView: rootView))
         window.title = "SaneClip Trial Ended"
+        window.isReleasedWhenClosed = false
         window.setContentSize(NSSize(width: 560, height: 680))
         window.center()
         window.makeKeyAndOrderFront(nil)

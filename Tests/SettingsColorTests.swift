@@ -104,12 +104,10 @@ struct SettingsColorTests {
         )
     }
 
-    @Test("Settings permission/existence status greens route through the semanticSuccess token")
-    func settingsStatusIndicatorsUseSemanticSuccess() throws {
-        // The two status indicators (screen-recording granted, excluded-app
-        // exists) are the legitimate place a green belongs — but it must be the
-        // named status token, not raw `.green`, so it stays consistent with the
-        // rest of the app and can be re-themed in one place.
+    @Test("Settings status text stays readable and status icons use the shared token")
+    func settingsStatusIndicatorsStayReadable() throws {
+        // Text stays white for contrast; the excluded-app status icon retains
+        // its semantic color. Keep these separate so icons do not dim labels.
         let general = try String(
             contentsOf: projectRootURL().appendingPathComponent("UI/Settings/GeneralSettingsView.swift"),
             encoding: .utf8
@@ -118,7 +116,9 @@ struct SettingsColorTests {
             contentsOf: projectRootURL().appendingPathComponent("UI/Settings/ExcludedAppsSettingsView.swift"),
             encoding: .utf8
         )
-        #expect(general.contains("Color.semanticSuccess"))
+        let permissionText = try #require(general.components(separatedBy: "Text(screenCapturePermissionGranted").dropFirst().first)
+            .components(separatedBy: "Button(")[0]
+        #expect(permissionText.contains(".foregroundStyle(.white)"))
         #expect(excluded.contains("Color.semanticSuccess"))
     }
 

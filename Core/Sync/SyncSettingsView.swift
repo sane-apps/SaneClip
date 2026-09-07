@@ -3,7 +3,7 @@
     import SaneUI
     import SwiftUI
 
-    private let syncReadableSecondary = Color.white.opacity(0.88)
+    private let syncReadableSecondary = Color.white
 
     struct SyncSettingsView: View {
         @State private var coordinator = SyncCoordinator.shared
@@ -27,8 +27,7 @@
                         Text("Share clipboard history across your Apple devices")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(syncReadableSecondary)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.92)
+                            .fixedSize(horizontal: false, vertical: true)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 12)
                             .padding(.bottom, 12)
@@ -45,7 +44,7 @@
                         }
                     }
 
-                    CompactSection("Status", icon: "chart.pie", iconColor: SaneSettingsIconSemantic.storage.color) {
+                    CompactSection("Activity", icon: "chart.pie", iconColor: SaneSettingsIconSemantic.storage.color) {
                         diagnosticsRow("Local Items", value: "\(coordinator.localItemCount)", icon: "doc.on.clipboard")
 
                         if let remoteItemCount = coordinator.remoteItemCount {
@@ -120,7 +119,7 @@
                         CompactDivider()
                         infoRow("Uses your private iCloud storage — no third-party servers", icon: "icloud", color: Color.clipBlue)
                         CompactDivider()
-                        infoRow("Images are synced as compressed PNG data", icon: "photo", color: syncReadableSecondary)
+                        infoRow("Images sync with your text clips", icon: "photo", color: syncReadableSecondary)
                     }
                 }
                 .padding(20)

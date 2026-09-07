@@ -503,7 +503,7 @@ struct GeneralSettingsView: View {
                                 ? SaneClipSettingsCopy.screenRecordingGrantedStatus
                                 : SaneClipSettingsCopy.screenRecordingMissingStatus)
                                 .font(.system(size: 13, weight: .semibold))
-                                .foregroundStyle(screenCapturePermissionGranted ? Color.semanticSuccess : .white)
+                                .foregroundStyle(.white)
 
                             Button(SaneClipSettingsCopy.openScreenRecordingSettingsButtonTitle) {
                                 ScreenCapturePermissionService.openSettings()

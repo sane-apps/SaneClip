@@ -9,7 +9,7 @@ build:
   xcodegen: true
 
 tests:
-  unit_dir: SaneClipTests
+  unit_dir: Tests
   unit_target: SaneClipTests
 
 release:

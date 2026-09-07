@@ -46,6 +46,7 @@ struct StorageStatsView: View {
 
             Spacer()
         }
+        .foregroundStyle(.white)
         .onAppear { calculateStats() }
     }
 

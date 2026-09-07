@@ -89,6 +89,54 @@ struct NonBlockingKeychainServiceTests {
         }
     }
 
+    @Test("A 2.3.23 paid cache survives upgrade and a later unavailable keychain")
+    @MainActor
+    func paidCacheSurvivesUpgradeAndUnavailableKeychain() throws {
+        let suite = "tests.saneclip.upgrade.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let validationDate = Date().addingTimeInterval(-3 * 86400)
+        let priorKeychain = FastStub()
+        priorKeychain.strings = [
+            "license_key": "synthetic-upgrade-license",
+            "license_email": "upgrade@example.invalid",
+            "last_validation": ISO8601DateFormatter().string(from: validationDate)
+        ]
+        let savedCache = priorKeychain.strings
+        defaults.set(Date().addingTimeInterval(-20 * 86400).timeIntervalSince1970,
+                     forKey: "saneclip.pro_trial.started_at")
+
+        let upgraded = LicenseService(
+            appName: "SaneClip",
+            purchaseBackend: .direct(checkoutURL: try #require(URL(string: "https://saneclip.com"))),
+            keychain: NonBlockingKeychainService(wrapping: priorKeychain, timeout: 0.1),
+            proTrial: .init(storageKeyPrefix: "saneclip.pro_trial"),
+            userDefaults: defaults
+        )
+        upgraded.checkCachedLicense()
+        #expect(upgraded.isLicensed)
+        #expect(upgraded.isPro)
+        #expect(upgraded.licenseEmail == "upgrade@example.invalid")
+        #expect(!upgraded.shouldShowExpiredTrialGate)
+        #expect(priorKeychain.strings == savedCache)
+
+        let reopenedDefaults = try #require(UserDefaults(suiteName: suite))
+        let relaunched = LicenseService(
+            appName: "SaneClip",
+            purchaseBackend: .direct(checkoutURL: try #require(URL(string: "https://saneclip.com"))),
+            keychain: NonBlockingKeychainService(wrapping: HangingStub(), timeout: 0.05),
+            proTrial: .init(storageKeyPrefix: "saneclip.pro_trial"),
+            userDefaults: reopenedDefaults
+        )
+        let start = Date()
+        relaunched.checkCachedLicense()
+        #expect(Date().timeIntervalSince(start) < 1)
+        #expect(relaunched.isLicensed)
+        #expect(relaunched.isPro)
+        #expect(relaunched.licenseEmail == "upgrade@example.invalid")
+        #expect(!relaunched.shouldShowExpiredTrialGate)
+    }
+
     @Test("inner errors propagate instead of degrading to nil")
     func innerErrorsPropagate() {
         let keychain = NonBlockingKeychainService(wrapping: ThrowingStub(), timeout: 2)

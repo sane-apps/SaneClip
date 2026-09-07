@@ -62,9 +62,10 @@ struct SnippetsSettingsView: View {
 
             // Search bar
             HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(clipReadableSecondary)
-                TextField("Search snippets...", text: $searchText)
+                Label("Search", systemImage: "magnifyingglass")
+                    .foregroundStyle(.white)
+                TextField("", text: $searchText)
+                    .accessibilityLabel("Search snippets")
                     .textFieldStyle(.plain)
                 if !searchText.isEmpty {
                     Button(action: { searchText = "" }, label: {
@@ -87,8 +88,10 @@ struct SnippetsSettingsView: View {
                         searchText.isEmpty
                             ? "Create snippets to quickly paste common text"
                             : "Try a different search"
-                    )
+                    ).foregroundStyle(.white)
                 )
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List(selection: $selectedSnippet) {
                     ForEach(filteredSnippetSections) { section in
@@ -143,7 +146,9 @@ struct SnippetsSettingsView: View {
 
             // Footer with add button
             HStack {
-                Text("\(snippetManager.snippets.count) snippets")
+                Text(searchText.isEmpty
+                    ? "\(snippetManager.snippets.count) snippets"
+                    : "\(filteredSnippets.count) of \(snippetManager.snippets.count) snippets")
                     .font(.callout.weight(.medium))
                     .foregroundStyle(clipReadableSecondary)
 
@@ -172,6 +177,7 @@ struct SnippetsSettingsView: View {
                 })
                 .buttonStyle(ClipActionButtonStyle())
                 .controlSize(.small)
+                .accessibilityLabel("Add Snippet")
             }
             .padding(8)
         }
@@ -272,16 +278,7 @@ struct SnippetRow: View {
             HStack {
                 Text(snippet.name)
                     .font(.headline)
-
-                if let category = snippet.category?.trimmingCharacters(in: .whitespacesAndNewlines),
-                   !category.isEmpty {
-                    Text(category)
-                        .font(.system(size: 13, weight: .semibold))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.blue.opacity(0.2))
-                        .cornerRadius(4)
-                }
+                    .foregroundStyle(.white)
 
                 Spacer()
 
@@ -323,8 +320,8 @@ private struct SnippetUsageHint: View {
             Label("Copy here for manual Command-V paste.", systemImage: "doc.on.clipboard")
         }
         .font(.system(size: 13, weight: .medium))
-        .foregroundStyle(.white.opacity(0.92))
-        .lineLimit(2)
+        .foregroundStyle(.white)
+        .fixedSize(horizontal: false, vertical: true)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
@@ -341,9 +338,9 @@ private struct SnippetSectionHeader: View {
             Image(systemName: title == "Email" ? "envelope.fill" : "folder.fill")
                 .font(.system(size: 11, weight: .semibold))
             Text(title)
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 13, weight: .semibold))
             Text("\(count)")
-                .font(.system(size: 12, weight: .bold))
+                .font(.system(size: 13, weight: .bold))
                 .padding(.horizontal, 6)
                 .padding(.vertical, 1)
                 .background(Color.white.opacity(0.14))
@@ -460,11 +457,15 @@ struct SnippetEditorSheet: View {
                 }
             }
             .formStyle(.grouped)
+            .scrollContentBackground(.hidden)
+            .scrollIndicators(.visible)
 
             HStack {
                 Button("Cancel") {
                     onCancel()
                 }
+                .buttonStyle(ClipActionButtonStyle())
+                .accessibilityLabel("Cancel")
                 .keyboardShortcut(.cancelAction)
 
                 Spacer()
@@ -472,12 +473,16 @@ struct SnippetEditorSheet: View {
                 Button("Save") {
                     saveSnippet()
                 }
+                .buttonStyle(SaneActionButtonStyle(prominent: true))
+                .accessibilityLabel("Save Snippet")
                 .keyboardShortcut(.defaultAction)
                 .disabled(name.isEmpty || template.isEmpty)
             }
         }
         .padding()
-        .frame(minWidth: 500, minHeight: 450)
+        .frame(minWidth: 500, minHeight: 520)
+        .foregroundStyle(.white)
+        .background(SaneGradientBackground())
         .onAppear {
             if let existingSnippet = snippet {
                 name = existingSnippet.name

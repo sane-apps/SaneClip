@@ -690,7 +690,7 @@ struct SaneClipTests {
             encoding: .utf8
         )
 
-        let saneUIRevision = "7f87b04bd74c6903a34e715ff46adf583d854f87"
+        let saneUIRevision = "60176f30007e0f931195785aa769e4ef5172f7ee"
         #expect(projectSource.contains("url: https://github.com/sane-apps/SaneUI.git"))
         #expect(projectSource.contains("revision: \(saneUIRevision)"))
         #expect(!projectSource.contains("path: ../../infra/SaneUI"))
@@ -864,7 +864,7 @@ struct SaneClipTests {
         #expect(downloadSource.contains("fetch('/appcast.xml'"))
     }
 
-    @Test("Public release links and metadata use the project marketing version")
+    @Test("Public release links follow the published appcast while the next version is prepared")
     func publicReleaseLinksAndMetadataUseProjectMarketingVersion() throws {
         let repoRoot = projectRootURL()
         let projectSource = try String(contentsOf: repoRoot.appendingPathComponent("project.yml"), encoding: .utf8)
@@ -877,12 +877,17 @@ struct SaneClipTests {
                     .trimmingCharacters(in: .whitespacesAndNewlines)
                     .trimmingCharacters(in: CharacterSet(charactersIn: "\""))
             }
-        let releaseVersion = try #require(releaseVersions.first)
+        let candidateVersion = try #require(releaseVersions.first)
+        let appcast = try XMLDocument(contentsOf: repoRoot.appendingPathComponent("docs/appcast.xml"))
+        let enclosure = try #require(appcast.nodes(forXPath: "/rss/channel/item[1]/enclosure").first as? XMLElement)
+        let releaseVersion = try #require(enclosure.attribute(forName: "sparkle:shortVersionString")?.stringValue)
+        #expect(!releaseVersion.isEmpty)
+        #expect(candidateVersion.compare(releaseVersion, options: .numeric) != .orderedAscending)
         let indexSource = try String(contentsOf: repoRoot.appendingPathComponent("docs/index.html"), encoding: .utf8)
         let downloadSource = try String(contentsOf: repoRoot.appendingPathComponent("docs/download.html"), encoding: .utf8)
         let readmeSource = try String(contentsOf: repoRoot.appendingPathComponent("README.md"), encoding: .utf8)
 
-        #expect(releaseVersions.allSatisfy { $0 == releaseVersion })
+        #expect(releaseVersions.allSatisfy { $0 == candidateVersion })
         #expect(indexSource.contains("\"softwareVersion\": \"\(releaseVersion)\""))
         #expect(indexSource.contains("SaneClip-\(releaseVersion).zip"))
         #expect(downloadSource.contains("SaneClip-\(releaseVersion).zip"))

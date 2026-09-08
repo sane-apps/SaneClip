@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.24] - 2026-09-08
+
+Nine-tab Settings, on-device Rewrite and Summarize, and clearer license recovery.
+
+---
+
 ## [2.3.23] - 2026-07-28
 
 Keeps image history lighter in memory by storing thumbnails in RAM and loading full originals only when needed. Also cleans up leftover Sparkle updater helpers after automatic update checks.

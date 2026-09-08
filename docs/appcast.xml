@@ -5,7 +5,27 @@
     <link>https://saneclip.com/appcast.xml</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
-                                                            <item>
+                                                                    <item>
+            <title>2.3.24</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Tue, 08 Sep 2026 14:43:31 -0400</pubDate>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Nine-tab Settings, on-device Rewrite and Summarize, and clearer license recovery.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.24.zip"
+                       sparkle:version="2324"
+                       sparkle:shortVersionString="2.3.24"
+                       length="5330255"
+                       type="application/octet-stream"
+                       sparkle:edSignature="zaZDTuUAy9LbsgOIATwbMjyMGTk4rsJ1/oo3N+52HE00biZhDWDGIoJtMzGeAUiL87dDD56fZLTEOE2jOlKdBQ=="/>
+        </item>
+<item>
             <title>2.3.23</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Tue, 28 Jul 2026 01:19:07 -0400</pubDate>

@@ -2,7 +2,7 @@
 
 > [README](README.md) · [ARCHITECTURE](ARCHITECTURE.md) · [DEVELOPMENT](DEVELOPMENT.md) · [PRIVACY](PRIVACY.md) · [SECURITY](SECURITY.md)
 
-**Version 1.1** | Last updated: 2026-01-24
+**Version 1.2** | Last updated: 2026-09-08
 
 > **SINGLE SOURCE OF TRUTH** for all Developers and AI Agents.
 
@@ -43,6 +43,10 @@ Real failures from past sessions. Don't repeat them.
 | **Wrong bundle ID** | Used `.dev` in release context, broke signing | Check bundle ID table below |
 | **tccutil on wrong ID** | Reset permissions for production bundle | NEVER reset `.app` bundle |
 | **Generic screenshots accepted as proof** | Glenn's exact screenshots showed footer, edit-sheet, and toggle bugs, but the first pass leaned on unrelated/generic visual proof and missed two states. | For each customer screenshot, render or capture the same state after the fix; save claim-mapped screenshots and add a targeted regression test per claim. |
+| **Peekaboo see --app on Clip history** | Combined `see --app/--pid` keeps layer 0. History NSPopover is layer 25; menus are layer 101. The tool reports a 64×64 minimized window and misses the popover. | Dump ids with `/usr/bin/python3` + Quartz. Capture with `peekaboo see --window-id ID --no-elements` inside `mini-gui-run.sh`. |
+| **Guessed Rewrite click** | Clicked Paste As / Transform (UPPERCASE). Rewrite never opened. Extra clicks dismissed every Clip window. NSMenu `--snapshot` clicks return SNAPSHOT_STALE. | Photograph the submenu. AI is the 5th context-menu row. Rewrite is first in the small ~142×82 AI menu. Click `peekaboo click --at X,Y --global --foreground --no-auto-focus`. |
+| **Typed into history search** | Search filled with a sentinel. List showed No Results while the footer still said 50 items. | Never type in search without pixel proof of rows. Relaunch to clear `@State`. |
+| **pbcopy during Clip GUI** | Universal Clipboard injected the string into the other machine's Clip history. | Do not pbcopy/pbpaste. Read Mini pasteboard via AppKit and store hashes only. |
 
 **The #1 differentiator**: Skimming this SOP = 5/10 sessions. Internalizing it = 8+/10.
 
@@ -73,6 +77,7 @@ Real failures from past sessions. Don't repeat them.
 3. **Use SaneMaster for builds/tests** - never raw `xcodebuild`
 4. **Self-rate after every task** - Rate yourself 1-10 on SOP adherence (see Self-Rating section)
 
+
 **Key Commands:**
 ```bash
 xcodegen generate              # After creating new files
@@ -80,6 +85,20 @@ xcodegen generate              # After creating new files
 ./scripts/SaneMaster.rb test_mode  # Build + launch + logs
 ./scripts/SaneMaster.rb logs --follow
 ```
+
+---
+
+## History popover and on-device AI GUI proof
+
+Canonical Mini path (Peekaboo 4.3.3, verified 2026-09-08). Full detail: `~/SaneApps/infra/SaneProcess/scripts/mini/SCREENSHOT_TOOLS.md`.
+
+1. Run Peekaboo inside `mini-gui-run.sh`. Raw ssh see/click is the wrong TCC identity.
+2. Dump SaneClip windows with `/usr/bin/python3` + Quartz (Homebrew python3 has no Quartz).
+3. Observe popover/menus with `peekaboo see --window-id ID --no-elements --json --path FILE --no-remote`.
+4. Do not click from `see --app` or from an NSMenu snapshot. Snapshot clicks on layer 101 menus return SNAPSHOT_STALE.
+5. Click measured global pixels: `peekaboo click --at X,Y --global --foreground --no-auto-focus`.
+6. AI is the 5th context-menu row. Photograph the submenu before Rewrite. The Rewrite sheet is 520×420.
+7. Write `outputs/customer-ui/ai-proof/runtime-traversal.json` with booleans and hashes only. No prompt, result, or pasteboard text.
 
 ---
 

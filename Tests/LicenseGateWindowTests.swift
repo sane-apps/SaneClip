@@ -31,7 +31,15 @@ struct LicenseGateWindowTests {
         license.checkCachedLicense()
         try #require(license.hasExpiredProTrial)
         let window = NSWindow(contentViewController: NSHostingController(
-            rootView: LicenseGateView(licenseService: license, appIcon: "list.clipboard.fill")
+            rootView: LicenseGateView(
+                licenseService: license,
+                appIcon: "list.clipboard.fill",
+                sinceTrialUpdates: [
+                    "Nine-tab Settings",
+                    "On-device Rewrite and Summarize",
+                    "Compact snippet library"
+                ]
+            )
         ))
         window.isReleasedWhenClosed = false
         window.title = "SaneClip Trial Ended — Regression"

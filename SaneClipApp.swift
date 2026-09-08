@@ -276,7 +276,15 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let rootView = LicenseGateView(licenseService: licenseService, appIcon: "list.clipboard.fill")
+        let rootView = LicenseGateView(
+            licenseService: licenseService,
+            appIcon: "list.clipboard.fill",
+            sinceTrialUpdates: [
+                "Nine-tab Settings",
+                "On-device Rewrite and Summarize",
+                "Compact snippet library"
+            ]
+        )
             .preferredColorScheme(.dark)
             .onChange(of: licenseService.isLicensed) { _, licensed in
                 guard licensed else { return }

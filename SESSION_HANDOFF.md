@@ -1,3 +1,26 @@
+# Session handoff — 2026-09-08 AI traversal
+
+- Live Mini Rewrite/Copy and Summarize/Cancel passed on signed 2.3.24 (2324), PID 47937.
+- Receipt: `outputs/customer-ui/ai-proof/runtime-traversal.json` (verified against sweep guards).
+- Working GUI path: `peekaboo see --window-id --no-elements` then `peekaboo click --at X,Y --global --foreground --no-auto-focus` via `mini-gui-run.sh`.
+- SOP updated: Clip `DEVELOPMENT.md` and `infra/SaneProcess/scripts/mini/SCREENSHOT_TOOLS.md`.
+- Do not use `see --app` for the history popover (layer 25). Do not snapshot-click NSMenu (SNAPSHOT_STALE). Do not pbcopy.
+
+## 2026-09-07 14:27 ET — Nine-tab Settings on main; public 2.3.24 not cleared
+
+- ChatGPT stopped after committing `b65142e` and launching the signed build. Remaining work was visual proof of that binary, push, and ship.
+- Inspected all nine Settings tabs on the signed 2.3.24 build (PID 83409, live log `20260907T181617Z-20260907-83182-rsuyiy`): General, Clipboard, Snippets, Shortcuts, History, Privacy, Sync, License, About. Contrast/hierarchy hold; Snippets is compact; Privacy is complete; pink Donate hearts; no leftover build-number; License shows Licensed. Scrollable bottoms on General/History/Sync are expected, not clipping of the primary controls.
+- Shots: `outputs/customer-ui/portfolio-20260907/committed-{General,Clipboard,Snippets,Shortcuts,History,Privacy,Sync,License,About}.png`
+- Pushed `6feb828..b65142e` to origin/main after pre-push 252/15. Air fast-forwarded to `b65142e`. Dirty website/.saneprocess files were not included.
+- `release_preflight` RED (`c4e412e2232b7d8c316a263f1b87191d`): stale customer-UI contract pointing at missing July 18 sweep artifacts, settings workflow not bound to current source, on-device AI receipt stale, upgrade-path fingerprint stale. Appcast/Homebrew still 2.3.23 vs source 2.3.24 (expected before publish). No `release.sh --deploy`, no Lemon file replace.
+
+## 2026-09-07 10:24 ET — SaneClip fixes published to main
+
+- SaneClip main6feb8286796b7fb607f8e787f2cbd4aeaec7f36d is pushed. Pre-push canonical Mini verify passed252 tests/15 suites, workflow9ba533ec9d90bb871c1c86c4557c26d0. Commit includes cached-paid-license and closable-gate regression, shared60176f3, settings readability/layout and published-appcast test.
+- Air fast-forwarded from2c69a20 to the same main. Fourteen pending native files matched Mini exactly before sync. The divergent untested Air-only KeychainHelper prototype is retained in named stash portfolio-saneclip-air-before-main-20260907, with all prior dirty work; canonical Mini implementation is now active on Air. Pending pink website edits and upgrade-proof config were reapplied.
+- Real Mini Rewrite/Copy and Summarize/Cancel passed with actual Foundation Models generation. Source-bound proof: apps/SaneClip/outputs/customer-ui/portfolio-20260907/ai-runtime-proof.json. Original50 clips/all41 sandbox files restored exactly and original clipboard restored; runtime stopped normally.
+- Shared unsigned monitor/proof runner changes and Clip upgrade config remain pending publication. AI diagnostic logs and website/App Store metadata remain separate dirty work. This is a source push, not a public release; full portfolio goal and remaining release/action checks stay open.
+
 ## 2026-09-07 10:21 ET — Live on-device AI and data restoration verified
 
 - Signed Release2.3.24/2324 workflow ebd385947c6082905bb70cbf35e8804d: actual clipboard capture, search, Rewrite generation/Copy, and Summarize generation/Cancel passed on Mini. Rewrite completed in about8 seconds. Copy exactly matched preview and did not change any saved-history file. Cancel closed the preview without changing clipboard or storage.

@@ -13,6 +13,12 @@ tests:
   unit_target: SaneClipTests
 
 release:
+  upgrade_path_test:
+    scheme: SaneClip
+    test_selector: SaneClipTests/NonBlockingKeychainServiceTests/paidCacheSurvivesUpgradeAndUnavailableKeychain()
+    from_version: "2.3.23"
+    timeout_seconds: 180
+    unsigned_tests: true
   team_id: M78L6FXD48
   signing_identity: "Developer ID Application"
   dist_host: dist.saneclip.com
@@ -182,28 +188,31 @@ appstore:
   metadata:
     macos:
       subtitle: "Private Clipboard Manager"
-      promotional_text: "Free clipboard history with privacy-first defaults: no clipboard-content upload to SaneApps, optional iCloud sync, and Pro encryption."
+      promotional_text: "Free clipboard history with privacy-first defaults. One Mac purchase includes the free iPhone and iPad companion. Optional Pro unlocks advanced Mac tools."
       description: >-
         SaneClip is a free Mac clipboard manager with a core included feature set and an optional one-time Pro unlock.
+        One Mac purchase includes the free iPhone and iPad companion; the companion is not a separate sale.
         The free download includes clipboard history for up to 50 items, standard paste, search, source-aware filtering,
         pinning, screenshot capture into history, excluded apps, auto-delete, the free iPhone and iPad companion app with
         optional iCloud sync through your own iCloud account, no clipboard-content upload to SaneApps servers,
         and privacy-first defaults.
-        The optional Pro unlock adds OCR capture for text grabs and searchable screenshot sidecars, unlimited history,
+        The optional Pro unlock on Mac adds OCR capture for text grabs and searchable screenshot sidecars, unlimited history,
         Touch ID history lock, AES-GCM history encryption at rest and encrypted sync payloads before upload,
         paste as plain text, smart paste, text transforms, paste stack, snippets, item notes, clipboard rules, and export/import.
       keywords: "clipboard,copy paste,history,snippets,touch id,security,productivity,mac utility"
-      whats_new: "Improves history-lock authentication reliability and overall stability."
+      whats_new: "One Mac purchase includes the free iPhone and iPad companion. Improves history-lock authentication reliability and overall stability."
       marketing_url: "https://saneclip.com"
     ios:
       subtitle: "Clipboard History + Widgets"
-      promotional_text: "Search, pin, and reuse synced clipboard history on iPhone and iPad. Sync uses your own iCloud account, not a SaneApps server."
+      promotional_text: "Free iPhone and iPad companion included with a Mac purchase. Search, pin, and reuse clipboard history with private iCloud sync."
       description: >-
-        SaneClip brings your clipboard history from Mac to iPhone and iPad with iCloud sync through your own account, fast search, pinning, and clean widgets.
-        Browse your recent clips, copy them again in one tap, save new text and links from the Share Sheet, and keep important items pinned across devices.
-        Clipboard contents are never sent to SaneApps servers. Pro adds encryption and more advanced workflows, including encrypted sync payloads before upload when History Encryption is enabled.
-      keywords: "clipboard,copy paste,history,widgets,icloud,snippets,productivity,notes"
-      whats_new: "Improves shared history reliability and keeps the companion app aligned with the current SaneClip stability release."
+        SaneClip on iPhone and iPad is the free companion to the Mac app. One Mac purchase covers this companion.
+        It is not a separate sale, and there is no Pro purchase on iPhone or iPad.
+        Browse clipboard history from your Mac, copy clips again in one tap, pin important items, save text and links from the Share Sheet, and keep widgets up to date.
+        Sync uses your own iCloud account, not a SaneApps server. Clipboard contents are never sent to SaneApps servers.
+        The companion stays focused on history, search, pinning, widgets, and private iCloud sync.
+      keywords: "clipboard,copy paste,history,widgets,icloud,productivity,notes"
+      whats_new: "The iPhone and iPad companion is free and included with a Mac purchase. History, search, pinning, widgets, and private iCloud sync remain the focus."
       marketing_url: "https://saneclip.com"
   review_notes: "SaneClip is a freemium App Store app. Basic is free in the App Store build. SaneClip Pro Unlock is an optional one-time non-consumable StoreKit in-app purchase. No external checkout links or license keys are used in the App Store build."
   iap:

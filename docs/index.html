@@ -13,8 +13,8 @@
   <meta property="og:title" content="SaneClip — Secure Clipboard Manager for Mac">
   <meta property="og:description" content="Clipboard manager for Mac. Start a free 14-day Pro trial for OCR capture, Touch ID history lock, AES-256 encryption, smart paste, snippets, and unlimited history.">
   <meta property="og:url" content="https://saneclip.com">
-  <meta property="og:image" content="https://saneclip.com/images/og-image.png?v=20260616-card">
-  <meta property="og:image:secure_url" content="https://saneclip.com/images/og-image.png?v=20260616-card">
+  <meta property="og:image" content="https://saneclip.com/images/og-image-20260827.png?v=20260827-card">
+  <meta property="og:image:secure_url" content="https://saneclip.com/images/og-image-20260827.png?v=20260827-card">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -23,12 +23,12 @@
   <meta name="twitter:url" content="https://saneclip.com">
   <meta name="twitter:title" content="SaneClip — Secure Clipboard Manager for Mac">
   <meta name="twitter:description" content="Clipboard manager for Mac. Start a free 14-day Pro trial for OCR capture, Touch ID history lock, AES-256 encryption, smart paste, snippets, and unlimited history.">
-  <meta name="twitter:image" content="https://saneclip.com/images/og-image.png?v=20260616-card">
+  <meta name="twitter:image" content="https://saneclip.com/images/og-image-20260827.png?v=20260827-card">
   <meta name="twitter:image:alt" content="SaneClip preview card for private Mac clipboard history">
     <meta property="og:site_name" content="SaneClip">
     <meta property="og:locale" content="en_US">
-    <meta name="twitter:site" content="@saneapps">
-    <meta name="twitter:creator" content="@saneapps">
+    <meta name="twitter:site" content="@MrSaneApps">
+    <meta name="twitter:creator" content="@MrSaneApps">
     <meta name="keywords" content="clipboard manager, macos, clipboard history, touch id, paste, copy, mac clipboard, clipboard app, pasteboard, copy paste manager, macos sequoia, best clipboard manager">
     <meta name="author" content="Mr. Sane">
     <meta name="robots" content="index, follow">
@@ -223,17 +223,8 @@
         .nav-links a.btn-primary:hover {
             color: #ffffff;
         }
-
-        .btn-donate {
-            padding: 10px 20px !important;
-            color: #ffffff !important;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .btn-donate svg {
-            margin-right: 6px;
-        }
+        .btn-donate { padding: 10px 20px !important; color: #ffffff !important; display: inline-flex; align-items: center; }
+        .btn-donate svg { margin-right: 6px; }
 
         /* Buttons */
         .btn {
@@ -679,104 +670,6 @@
             color: var(--accent);
         }
 
-        /* Cross-Sell Section */
-        .more-apps {
-            padding: 80px 0;
-            background: linear-gradient(180deg, transparent, rgba(0, 153, 255, 0.03));
-        }
-
-        .more-apps h2 {
-            text-align: center;
-            margin-bottom: 12px;
-        }
-
-        .more-apps-subtitle {
-            text-align: center;
-            color: var(--text-secondary);
-            margin-bottom: 48px;
-            font-size: 1.1rem;
-        }
-
-        .more-apps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 24px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .app-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 28px;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.3s ease;
-            display: block;
-        }
-
-        .app-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--accent);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .app-card-header {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 14px;
-        }
-
-        .app-card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            object-fit: contain;
-        }
-
-        .app-card-name {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .app-card-tagline {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 16px;
-        }
-
-        .app-card-cta {
-            color: var(--accent);
-            font-weight: 500;
-            font-size: 0.9375rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .app-card:hover .app-card-cta {
-            gap: 10px;
-        }
-
-        .more-apps-hub {
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .more-apps-hub a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-
-        .more-apps-hub a:hover {
-            color: var(--accent);
-        }
-
         /* Footer */
         footer {
             padding: 60px 0 40px;
@@ -824,6 +717,22 @@
         .footer-copy {
             color: var(--text-secondary);
             font-size: 0.95rem;
+        }
+
+
+        .footer-family {
+            margin: 16px 0 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .footer-family a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .footer-family a:hover {
+            color: var(--accent);
         }
 
         /* Responsive */
@@ -877,6 +786,41 @@
         }
 
         /* Clickable Feature Cards */
+
+        details.more-features {
+            margin-top: var(--phi-lg);
+        }
+        details.more-features > summary,
+        details.compare-details > summary {
+            cursor: pointer;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 1.05rem;
+            list-style: none;
+            padding: 12px 0;
+        }
+        details.more-features > summary::-webkit-details-marker,
+        details.compare-details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details.more-features > summary::after,
+        details.compare-details > summary::after {
+            content: " +";
+            font-weight: 500;
+        }
+        details.more-features[open] > summary::after,
+        details.compare-details[open] > summary::after {
+            content: " –";
+        }
+        details.compare-details {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 4px 24px 24px;
+            background: var(--bg-card);
+        }
+        details.more-features .feature-grid {
+            margin-top: 20px;
+        }
         a.feature-card {
             text-decoration: none;
             color: inherit;
@@ -1283,9 +1227,6 @@
                 min-width: 560px;
             }
 
-            .more-apps-grid {
-                grid-template-columns: 1fr;
-            }
 
             .hero-screenshot-intro {
                 margin-bottom: 16px;
@@ -1657,13 +1598,10 @@
                 <a href="#watch">Watch</a>
                 <a href="#features">Features</a>
                 <a href="#ios">iOS App</a>
-                <a href="#features">Features</a>
                 <a href="/guides.html">Guides</a>
                 <a href="https://github.com/sane-apps/SaneClip">GitHub</a>
-                <a href="#support" class="btn btn-primary btn-donate">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" style="margin-right: 4px;">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                    </svg>
+                <a href="https://github.com/sponsors/MrSaneApps" class="btn btn-primary btn-donate" target="_blank" rel="noopener" data-cta="donate">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#ea4aaa" stroke="#ffffff" stroke-width="1.5" style="margin-right: 6px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                     Donate
                 </a>
             </div>
@@ -1675,49 +1613,33 @@
 
     <div id="mobileNav" class="mobile-nav">
         <button class="mobile-nav-close" onclick="toggleMobileNav()" aria-label="Close menu">&times;</button>
-        <p class="mobile-nav-section">Navigation</p>
+<p class="mobile-nav-section">Navigation</p>
         <a href="#watch" onclick="toggleMobileNav()">Watch</a>
         <a href="#features" onclick="toggleMobileNav()">Features</a>
         <a href="#ios" onclick="toggleMobileNav()">iOS App</a>
-        <a href="#features" onclick="toggleMobileNav()">Features</a>
         <a href="/guides.html" onclick="toggleMobileNav()">Guides</a>
         <a href="https://github.com/sane-apps/SaneClip">GitHub</a>
-        <a href="#support" onclick="toggleMobileNav()">Donate</a>
-        <p class="mobile-nav-section">More SaneApps</p>
-        <a href="https://sanehosts.com" data-cta="cross_sell_sanehosts_mobile">SaneHosts &mdash; Ad &amp; Tracker Blocker</a>
-        <a href="https://saneclick.com" data-cta="cross_sell_saneclick_mobile">SaneClick &mdash; Finder Actions</a>
-        <a href="https://saneapps.com" data-cta="cross_sell_saneapps_mobile">See all SaneApps &rarr;</a>
+        <a href="https://saneapps.com" data-cta="cross_sell_saneapps_mobile">SaneApps</a>
         <a href="/download" class="mobile-nav-cta" data-cta="download_trial">Start Full Pro Trial</a>
     </div>
 
     <section class="hero">
         <div class="container">
             <h1 class="animate-in delay-1">Bring <em>Sanity</em> to your Clipboard</h1>
-            <p class="subtitle animate-in delay-2">Clipboard history protected with Touch ID or your Mac password.</p>
-            <p class="subtitle animate-in delay-3" style="margin-top: -8px;">Mac app with a free iPhone &amp; iPad companion.</p>
-            <div class="trust-badges animate-in delay-4">
-                <span>&#128187; Built for private clipboard history</span>
-                <a href="privacy.html" style="color: inherit; text-decoration: none;">&#128737;&#65039; Privacy by Design</a>
-                <span>&#128274; On-Device by Default &middot; &#128176; No Subscriptions &middot; &#128269; 100% Transparent Code</span>
-            </div>
-            <div class="animate-in delay-4" style="max-width: 760px; margin: 0 auto 22px; padding: 14px 18px; border: 1px solid var(--border); border-radius: 12px; background: rgba(92, 232, 255, 0.08);">
-                <p style="color: var(--text-primary); font-weight: 700; margin: 0 0 5px;">New in 2.3.23: lighter image history</p>
-                <p style="color: var(--text-secondary); font-size: 0.92rem; margin: 0;">Clipboard image history keeps thumbnails in memory and loads full originals only when you paste, export, or sync. Automatic update checks also clean up leftover updater helpers.</p>
-            </div>
-            <div class="animate-in delay-5" style="margin: 12px auto 14px; text-align: center;">
+            <p class="subtitle animate-in delay-2">Touch ID-protected clipboard history for Mac, with a free iPhone companion.</p>
+            <div class="animate-in delay-3" style="margin: 4px auto 28px; text-align: center;">
                 <a href="/download" class="pricing-cta pricing-cta-pro" style="display: inline-flex; align-items: center; justify-content: center; width: auto; min-width: 240px;" data-cta="download_trial">Start Full Pro Trial</a>
-                <p style="color: var(--text-muted); font-size: 0.92rem; margin: 12px 0 6px;">Full Pro for 14 days. No credit card required. Pro is required after trial.</p>
+                <p style="color: var(--text-muted); font-size: 0.92rem; margin: 12px 0 6px;">14 days, no credit card.</p>
                 <a href="https://go.saneapps.com/buy/saneclip?ref=website-hero" style="color: var(--accent); font-weight: 700; text-decoration: none;" data-cta="buy_pro">Buy Pro now — $14.99 once</a>
             </div>
-            <!-- Hero: the pitch video front and center, pricing right beside it. -->
-            <div class="hero-watch-grid animate-in delay-5" id="watch" style="scroll-margin-top: 110px;">
-                <div class="hero-watch-video">
-                    <video controls preload="metadata" poster="demo/saneclip-pitch-poster.jpg" playsinline width="1920" height="1080" aria-label="SaneClip pitch video: a clipboard that forgets, then a real screen capture of the history popup quick-pasting an older clip, the Touch ID and encryption feature set, and the one-time price">
-                        <source src="demo/saneclip-pitch.mp4" type="video/mp4">
-                    </video>
-                    <p class="watch-after">The 1-minute demo &mdash; real popup on screen, no mockups.</p>
+
+            <div class="hero-stage animate-in delay-4">
+                <div class="hero-screenshot">
+                    <img src="images/screenshot-popover.png" alt="SaneClip clipboard history">
                 </div>
-            <div id="pricing" style="scroll-margin-top: 120px;">
+            </div>
+
+            <div id="pricing" class="animate-in delay-5" style="scroll-margin-top: 120px; margin-top: 28px;">
                 <div class="hero-pricing-grid" style="max-width: 520px; grid-template-columns: 1fr;">
                     <div class="pricing-card featured">
                         <p class="pricing-label">Pro — $14.99 once</p>
@@ -1745,7 +1667,6 @@
                     <a href="https://setapp.com/apps/saneclip" class="setapp-link" data-cta="setapp_saneclip" target="_blank" rel="noopener">Get SaneClip on Setapp</a>
                 </div>
             </div>
-            </div>
             <p class="animate-in delay-5 hero-pricing-footer" style="color: var(--text-muted); font-size: 0.85rem; margin-top: var(--phi-sm); margin-bottom: 36px;"><code style="background: var(--bg-card); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer;" onclick="copyToClipboard(this)" title="Click to copy">brew install --cask sane-apps/tap/saneclip</code></p>
             <div class="animate-in delay-5" style="max-width: 780px; margin: 0 auto 34px; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: rgba(92, 232, 255, 0.08); text-align: center;">
                 <p style="color: var(--text-primary); font-weight: 700; margin-bottom: 6px;">Buying more than one SaneApps Mac app?</p>
@@ -1755,17 +1676,11 @@
             </div>
             <p class="system-requirements animate-in delay-4" style="color: var(--text-secondary); font-size: 0.9375rem; margin-top: 10px; margin-bottom: 40px;">Requires macOS 14.0 (Sonoma) or later</p>
 
-            <!-- Demo Preview - Actual Screenshot -->
-            <div class="hero-screenshot-intro animate-in delay-5">
-                <p class="hero-screenshot-eyebrow">Live Preview</p>
-                <h2 class="hero-screenshot-title">See SaneClip in action</h2>
-                <p class="hero-screenshot-copy">Search your history, filter by source, pin important clips — then detach it all into a floating, resizable window and drag clips straight into other apps.</p>
-                <p class="hero-screenshot-note">Real screenshot from SaneClip on macOS.</p>
-            </div>
-            <div class="hero-stage animate-in delay-5">
-                <div class="hero-screenshot">
-                    <img src="images/screenshot-popover.png" alt="SaneClip clipboard history">
-                </div>
+            <div class="hero-watch-video animate-in delay-5" id="watch" style="scroll-margin-top: 110px; max-width: 860px; margin: 10px auto 0;">
+                <video controls preload="metadata" poster="demo/saneclip-pitch-poster.jpg" playsinline width="1920" height="1080" aria-label="SaneClip pitch video: a clipboard that forgets, then a real screen capture of the history popup quick-pasting an older clip, the Touch ID and encryption feature set, and the one-time price">
+                    <source src="demo/saneclip-pitch.mp4" type="video/mp4">
+                </video>
+                <p class="watch-after">The 1-minute demo &mdash; real popup on screen, no mockups.</p>
             </div>
 
         </div>
@@ -1837,10 +1752,7 @@
         <div class="container">
             <h2 class="section-title reveal">Everything you need. Nothing you don't.</h2>
             <p class="section-subtitle reveal">A clipboard manager that respects your privacy and stays out of your way.</p>
-            <div class="feature-grid">
-                <!-- === ROW 1: UNIQUE TO SANECLIP (featured glow) === -->
-
-                <!-- Touch ID Lock -->
+                        <div class="feature-grid">
                 <a href="#" onclick="openLightbox('images/screenshot-popover.png', 'Touch ID Protection — Biometric security for your clipboard history'); return false" class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1852,7 +1764,6 @@
                     <p>Lock your clipboard history with <strong>Touch ID or your Mac password</strong>.</p>
                 </a>
 
-                <!-- Strong Encryption -->
                 <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1863,7 +1774,6 @@
                     <p>Your clipboard history is <strong>encrypted at rest</strong>. Keys stored in your Mac's secure storage. Even if someone copies your files, they can't read your data.</p>
                 </div>
 
-                <!-- Sensitive Data Detection -->
                 <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1875,9 +1785,6 @@
                     <p>Automatically detects <strong>credit cards, SSNs, security tokens, passwords, and private keys</strong>. Auto-purges them on a schedule you control.</p>
                 </div>
 
-                <!-- === ROW 2: UNIQUE TO SANECLIP (featured glow) === -->
-
-                <!-- OCR Capture -->
                 <a href="#" onclick="openLightbox('images/screenshot-popover.png', 'OCR Capture — Grab text from screenshots and save searchable sidecars'); return false" class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1893,7 +1800,31 @@
                     <p>Capture text from windows and screenshots, then keep the recognized text attached as a <strong>searchable sidecar</strong> in your clipboard history.</p>
                 </a>
 
-                <!-- Password Manager Safe -->
+                <a href="#" onclick="openLightbox('images/screenshot-popover.png', 'Search &amp; History — Find anything you ever copied or captured'); return false" class="feature-card reveal">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+                    <h3>Search &amp; Unlimited History</h3>
+                    <p>Stores everything you copy — text and images. <strong>Search instantly</strong> by content, OCR sidecars, source app, and pinned status.</p>
+                </a>
+
+                <div class="feature-card reveal">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 12l2 2 4-4"/>
+                            <circle cx="12" cy="12" r="10"></circle>
+                        </svg>
+                    </div>
+                    <h3>Private by Design</h3>
+                    <p><strong>On-device by default.</strong> Clipboard contents never go to SaneApps servers. Optional iCloud sync uses your own account, and encrypted sync payloads stay unreadable to SaneApps when History Encryption is enabled. 100% Transparent Code.</p>
+                </div>
+            </div>
+            <details class="more-features">
+                <summary>Show more features</summary>
+                <div class="feature-grid">
                 <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1905,7 +1836,6 @@
                     <p>Automatically ignores copies from <strong>1Password, LastPass, Dashlane, Bitwarden</strong>, and other password managers. Your secrets never enter the history.</p>
                 </div>
 
-                <!-- Source-Aware Colors -->
                 <a href="#" onclick="openLightbox('images/screenshot-floating-colorful.png', 'Source App Tracking — Every app gets its own color, not just Apple apps'); return false" class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1920,7 +1850,6 @@
                     <p>Every clip shows <strong>which app it came from</strong> — and every app gets its own color, <strong>not just Apple apps</strong>. Scan your history visually — no reading required.</p>
                 </a>
 
-                <!-- Clipboard Rules -->
                 <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1931,7 +1860,6 @@
                     <p><strong>Auto-strip tracking params</strong> from URLs (utm_*, fbclid). Auto-trim whitespace, normalize line endings, clean duplicate spaces. Copies arrive clean.</p>
                 </div>
 
-                <!-- Floating History Window -->
                 <a href="#" onclick="openLightbox('images/screenshot-floating-wide.png', 'Floating History Window — Detach, resize, and keep it wherever you work'); return false" class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1944,7 +1872,6 @@
                     <p><strong>Detach your history from the menu bar</strong> into a floating window. Resize it from compact strip to command center — it remembers its size and position between sessions.</p>
                 </a>
 
-                <!-- Drag & Drop Out -->
                 <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1957,9 +1884,6 @@
                     <p><strong>Drag any clip straight out of your history</strong> into Mail, Notes, Pages — any app. Text lands as text, images as images. No copy-switch-paste dance.</p>
                 </div>
 
-                <!-- === ROW 3: UNIQUE TO SANECLIP === -->
-
-                <!-- Automation -->
                 <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1971,19 +1895,6 @@
                     <p><strong>Quick Actions</strong> for Shortcuts. <strong>URL schemes and App Intents</strong> open history, search clips, copy text, and run confirmed clipboard actions from your workflows.</p>
                 </div>
 
-                <!-- Private by Design -->
-                <div class="feature-card reveal">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M9 12l2 2 4-4"/>
-                            <circle cx="12" cy="12" r="10"></circle>
-                        </svg>
-                    </div>
-                    <h3>Private by Design</h3>
-                    <p><strong>On-device by default.</strong> Clipboard contents never go to SaneApps servers. Optional iCloud sync uses your own account, and encrypted sync payloads stay unreadable to SaneApps when History Encryption is enabled. 100% Transparent Code.</p>
-                </div>
-
-                <!-- Auto-Expire -->
                 <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -1995,19 +1906,6 @@
                     <p>Old items auto-delete after 1h, 24h, or 7d. Sensitive data purges faster. <strong>Pinned items never expire.</strong> Exclude apps entirely.</p>
                 </div>
 
-                <!-- Search & Unlimited History -->
-                <a href="#" onclick="openLightbox('images/screenshot-popover.png', 'Search &amp; History — Find anything you ever copied or captured'); return false" class="feature-card reveal">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                    </div>
-                    <h3>Search &amp; Unlimited History</h3>
-                    <p>Stores everything you copy — text and images. <strong>Search instantly</strong> by content, OCR sidecars, source app, and pinned status.</p>
-                </a>
-
-                <!-- Keyboard Shortcuts -->
                 <a href="#" onclick="openLightbox('images/screenshot-shortcuts.png', 'Lightning Shortcuts — Global hotkeys for instant access'); return false" class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -2019,7 +1917,6 @@
                     <p><strong>&#8984;&#8679;&#8963;Y</strong> opens history at your menu bar icon or mouse cursor (your choice). <strong>&#8984;&#8963;1-9</strong> pastes instantly. Inside the window: <strong>arrows, Home/End, PageUp/Down, P to pin, Return to paste</strong>. Vim-style navigation. No mouse needed. All shortcuts customizable.</p>
                 </a>
 
-                <!-- Pin Items & Snippets -->
                 <a href="#" onclick="openLightbox('images/screenshot-snippets.png', 'Pins &amp; Snippets — Keep important text and reusable workflows always accessible'); return false" class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -2031,7 +1928,6 @@
                     <p>Pin frequently-used text. Create <strong>reusable snippets</strong> with placeholders like <code>{{date}}</code> and <code>{{time}}</code> that auto-expand.</p>
                 </a>
 
-                <!-- Paste Stack -->
                 <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -2043,7 +1939,6 @@
                     <p>Queue multiple items, paste in order with <strong>&#8984;&#8963;V</strong>. FIFO or LIFO. Perfect for filling forms or batch operations.</p>
                 </div>
 
-                <!-- Text Transforms -->
                 <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -2056,7 +1951,6 @@
                     <p>Paste as <strong>UPPERCASE</strong>, lowercase, Title Case, trimmed, reversed, or <strong>formatted text</strong>. Strip HTML or Markdown. Smart paste auto-detects content type.</p>
                 </div>
 
-                <!-- Export & Import -->
                 <div class="feature-card reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -2068,13 +1962,16 @@
                     <h3>Export &amp; Import</h3>
                     <p>Export your clipboard history to JSON. Import from backups with merge or replace. <strong>Your data, portable and yours.</strong></p>
                 </div>
-            </div>
+                </div>
+            </details>
+
         </div>
     </section>
 
     <section class="comparison" id="compare" hidden>
         <div class="container">
-            <h2 class="section-title reveal">How SaneClip Stacks Up</h2>
+            <details class="compare-details">
+            <summary>How SaneClip Stacks Up</summary>
             <p class="section-subtitle reveal">I built what I wished existed. Here's how SaneClip Pro compares.</p>
             <p class="section-subtitle reveal" style="margin-top: -10px; font-size: 0.95rem;">This table reflects SaneClip Pro. Download starts full Pro for 14 days, then Pro is required to continue.</p>
             <div class="comparison-table-wrapper reveal">
@@ -2284,6 +2181,7 @@
                     </tbody>
                 </table>
             </div>
+            </details>
         </div>
     </section>
 
@@ -2296,8 +2194,8 @@
                 <span>Thank you. — Mr. Sane</span>
             </p>
             <a href="https://github.com/sponsors/MrSaneApps" class="btn btn-primary github-sponsor-btn reveal" target="_blank" rel="noopener">
-                <svg height="16" viewBox="0 0 16 16" width="16" fill="currentColor" style="margin-right: 8px;">
-                    <path d="M4.25 2.5c-1.336 0-2.75 1.164-2.75 3 0 2.15 1.58 4.144 3.365 5.682A20.565 20.565 0 008 13.393a20.561 20.561 0 003.135-2.211C12.92 9.644 14.5 7.65 14.5 5.5c0-1.836-1.414-3-2.75-3-1.373 0-2.609.986-3.029 2.456a.75.75 0 01-1.442 0C6.859 3.486 5.623 2.5 4.25 2.5zM8 14.25l-.345.666-.002-.001-.006-.003-.018-.01a7.643 7.643 0 01-.31-.17 22.075 22.075 0 01-3.434-2.414C2.045 10.731 0 8.35 0 5.5 0 2.836 2.086 1 4.25 1 5.797 1 7.153 1.802 8 3.02 8.847 1.802 10.203 1 11.75 1 13.914 1 16 2.836 16 5.5c0 2.85-2.045 5.231-3.885 6.818a22.08 22.08 0 01-3.744 2.584l-.018.01-.006.003h-.002L8 14.25z"/>
+                <svg stroke="#ffffff" stroke-width="1.5" height="16" viewBox="0 0 24 24" width="16" fill="#ea4aaa" style="margin-right: 8px;">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                 </svg>
                 Sponsor on GitHub
             </a>
@@ -2338,40 +2236,13 @@
         </div>
     </section>
 
-    <section class="more-apps">
-        <div class="container">
-            <h2 class="section-title reveal">More from SaneApps</h2>
-            <p class="more-apps-subtitle reveal">Simple Mac utilities that respect your time and privacy.</p>
-            <div class="more-apps-grid">
-                <a href="https://sanehosts.com" class="app-card reveal" data-cta="cross_sell_sanehosts_card">
-                    <div class="app-card-header">
-                        <img src="images/sanehosts-icon.png" alt="SaneHosts" class="app-card-icon">
-                        <div class="app-card-name">SaneHosts</div>
-                    </div>
-                    <p class="app-card-tagline">Block ads and trackers across your Mac with a simple local app.</p>
-                    <span class="app-card-cta">Learn more →</span>
-                </a>
-                <a href="https://saneclick.com" class="app-card reveal" data-cta="cross_sell_saneclick_card">
-                    <div class="app-card-header">
-                        <img src="images/saneclick-icon.png" alt="SaneClick" class="app-card-icon">
-                        <div class="app-card-name">SaneClick</div>
-                    </div>
-                    <p class="app-card-tagline">Add useful right-click actions for Finder. Convert files, run scripts, and stay local-first.</p>
-                    <span class="app-card-cta">Learn more →</span>
-                </a>
-            </div>
-            <div class="more-apps-hub reveal">
-                <a href="https://saneapps.com" data-cta="cross_sell_saneapps_hub">See all apps at saneapps.com →</a>
-            </div>
-        </div>
-    </section>
 
         <section class="sustainability">
         <div class="container">
             <div class="sustainability-card reveal">
-                <h2 style="font-family: 'Playfair Display', serif; font-size: 2.25rem; margin-bottom: 20px;">&#128269; Transparent Code + Sustainable</h2>
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 2.25rem; margin-bottom: 20px;">Start with 14 days of Pro</h2>
                 <div class="sustainability-body">
-                    <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 30px;">Download starts 14 days of Pro. After the trial, keep Pro with a one-time purchase.</p>
+                    <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 30px;">Download starts full Pro for 14 days. After the trial, keep Pro with a one-time purchase.</p>
                     <div class="sustainability-options">
                         <a href="/download" class="sustainability-option">
                             <h4>Start Full Pro Trial</h4>
@@ -2501,11 +2372,11 @@
                 <a href="support.html">Help</a>
                 <a href="mailto:hi@saneapps.com">Contact</a>
                 <a href="https://polyformproject.org/licenses/shield/1.0.0">PolyForm Shield License</a>
-                <a href="https://github.com/sponsors/MrSaneApps"><svg height="12" viewBox="0 0 16 16" width="12" fill="#ea4aaa" style="vertical-align: -1px; margin-right: 3px;"><path d="M4.25 2.5c-1.336 0-2.75 1.164-2.75 3 0 2.15 1.58 4.144 3.365 5.682A20.565 20.565 0 008 13.393a20.561 20.561 0 003.135-2.211C12.92 9.644 14.5 7.65 14.5 5.5c0-1.836-1.414-3-2.75-3-1.373 0-2.609.986-3.029 2.456a.75.75 0 01-1.442 0C6.859 3.486 5.623 2.5 4.25 2.5zM8 14.25l-.345.666-.002-.001-.006-.003-.018-.01a7.643 7.643 0 01-.31-.17 22.075 22.075 0 01-3.434-2.414C2.045 10.731 0 8.35 0 5.5 0 2.836 2.086 1 4.25 1 5.797 1 7.153 1.802 8 3.02 8.847 1.802 10.203 1 11.75 1 13.914 1 16 2.836 16 5.5c0 2.85-2.045 5.231-3.885 6.818a22.08 22.08 0 01-3.744 2.584l-.018.01-.006.003h-.002L8 14.25z"/></svg>Sponsor</a>
+                <a href="https://github.com/sponsors/MrSaneApps"><svg height="12" viewBox="0 0 24 24" width="12" fill="#ea4aaa" style="vertical-align: -1px; margin-right: 3px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Sponsor</a>
                 <a href="https://saneapps.com">SaneApps</a>
             </div>
-            <p class="footer-copy">Made with ❤️ in America by Mr. Sane &middot; &copy; 2026 SaneApps</p>
-            <p style="color: var(--text-secondary); font-size: 0.9375rem; margin-top: 12px;">"Built for a Sound Mind" · <a href="https://saneapps.com" style="color: var(--text-secondary);">saneapps.com</a></p>
+            <p class="footer-copy">Made with ❤️ in America by Mr. Sane &middot; &copy; 2026 SaneApps &middot; "Built for a Sound Mind"</p>
+            <p class="footer-family">More from SaneApps: <a href="https://sanehosts.com">SaneHosts</a> · <a href="https://saneclick.com">SaneClick</a> · <a href="https://saneapps.com">saneapps.com</a></p>
         </div>
     </footer>
 

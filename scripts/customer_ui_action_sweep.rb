@@ -74,7 +74,7 @@ class CustomerUIActionSweep
       ['UI/History/HistoryPasteStackPanel.swift', 'clipboardManager.movePasteStackItemToTop(id: item.id)'],
       ['UI/History/HistoryPasteStackPanel.swift', 'clipboardManager.updateItemTitle(id: item.id, title: stackTitleDraft)'],
       ['UI/History/HistoryPasteStackPanel.swift', 'clipboardManager.undoLastPasteFromStack()'],
-      ['UI/Settings/GeneralSettingsView.swift', 'SaneClipSettingsCopy.pasteStackNewestFirstLabel'],
+      ['UI/Settings/ClipboardSettingsView.swift', 'SaneClipSettingsCopy.pasteStackNewestFirstLabel'],
       ['Tests/HistoryColorAndStackTests.swift', 'Merge queue selection is shared state so it survives history view recreation']
     ],
     'capture-screenshot-text-actions' => [
@@ -92,13 +92,13 @@ class CustomerUIActionSweep
     'settings-general-security-history-actions' => [
       ['UI/Settings/GeneralSettingsView.swift', 'SaneLoginItemToggle()'],
       ['UI/Settings/GeneralSettingsView.swift', 'SaneDockIconToggle(showDockIcon:'],
-      ['UI/Settings/GeneralSettingsView.swift', 'SaneClipSettingsCopy.detectPasswordsLabel'],
-      ['UI/Settings/GeneralSettingsView.swift', 'SaneClipSettingsCopy.touchIDLabel'],
-      ['UI/Settings/GeneralSettingsView.swift', 'SaneClipSettingsCopy.encryptHistoryLabel'],
-      ['UI/Settings/GeneralSettingsView.swift', 'ExcludedAppsInline('],
       ['UI/Settings/GeneralSettingsView.swift', 'SaneSparkleRow('],
-      ['UI/Settings/GeneralSettingsView+Actions.swift', 'exportHistory()'],
-      ['UI/Settings/GeneralSettingsView+Actions.swift', 'importHistory()'],
+      ['UI/Settings/PrivacySettingsView.swift', 'SaneClipSettingsCopy.detectPasswordsLabel'],
+      ['UI/Settings/PrivacySettingsView.swift', 'SaneClipSettingsCopy.touchIDLabel'],
+      ['UI/Settings/PrivacySettingsView.swift', 'SaneClipSettingsCopy.encryptHistoryLabel'],
+      ['UI/Settings/PrivacySettingsView.swift', 'ExcludedAppsInline('],
+      ['UI/Settings/HistorySettingsView.swift', 'exportHistory()'],
+      ['UI/Settings/HistorySettingsView.swift', 'importHistory()'],
       ['Tests/HistoryColorAndStackTests.swift', 'Pause capture countdown invalidates from the monitor timer, not only pasteboard changes']
     ],
     'settings-shortcuts-actions' => [
@@ -111,7 +111,7 @@ class CustomerUIActionSweep
       ['Tests/SaneClipTests.swift', 'History shortcut default uses reliable Command Shift Control Y shortcut']
     ],
     'snippets-management-actions' => [
-      ['UI/Settings/SnippetsSettingsView.swift', 'TextField("Search snippets...", text: $searchText)'],
+      ['UI/Settings/SnippetsSettingsView.swift', '.accessibilityLabel("Search snippets")'],
       ['UI/Settings/SnippetsSettingsView.swift', 'Button("Paste Now")'],
       ['UI/Settings/SnippetsSettingsView.swift', 'Button("Copy for Manual Paste")'],
       ['UI/Settings/SnippetsSettingsView.swift', 'Button("Duplicate")'],
@@ -178,11 +178,11 @@ class CustomerUIActionSweep
     'on-device-ai-text-actions' => 'outputs/customer-ui/ai-proof/ai-result-preview.png',
     'paste-stack-actions' => 'outputs/capture-renders/glenn-1012-floating-reopened-merge-queue-retains-3.png',
     'capture-screenshot-text-actions' => 'docs/images/appstore-mac-settings.png',
-    'settings-general-security-history-actions' => 'outputs/capture-renders/glenn-1013-pause-countdown-visible-while-idle.png',
-    'settings-shortcuts-actions' => 'docs/images/screenshot-shortcuts.png',
-    'snippets-management-actions' => 'docs/images/screenshot-snippets.png',
-    'storage-stats-actions' => 'docs/images/screenshot-storage.png',
-    'sync-settings-actions' => 'docs/images/product-hunt-gallery-02.png',
+    'settings-general-security-history-actions' => 'outputs/customer-ui/portfolio-20260907/committed-General.png',
+    'settings-shortcuts-actions' => 'outputs/customer-ui/portfolio-20260907/committed-Shortcuts.png',
+    'snippets-management-actions' => 'outputs/customer-ui/portfolio-20260907/committed-Snippets.png',
+    'storage-stats-actions' => 'outputs/customer-ui/portfolio-20260907/committed-History.png',
+    'sync-settings-actions' => 'outputs/customer-ui/portfolio-20260907/committed-Sync.png',
     'onboarding-permission-pro-gates' => 'docs/images/product-hunt-gallery-03.png',
     'ios-widget-extension-actions' => 'docs/images/screenshot-ios-history-dark.png'
   }.freeze
@@ -339,15 +339,24 @@ class CustomerUIActionSweep
       host: Socket.gethostname,
       app: APP_NAME,
       runner: relative(__FILE__),
-      note: 'Structured Mini source, fixture, screenshot, and runtime metadata. This is not live click/paste completion proof.',
+      proof_type: 'mixed_source_and_runtime',
+      note: 'Mini source guards plus observed screenshot digests. Live Rewrite/Copy and Summarize/Cancel are in runtime-traversal.json. Other actions are structured coverage, not live click completion.',
+      live_ai_traversal: relative(AI_RUNTIME_TRAVERSAL_PATH),
+      running_saneclip_processes: `pgrep -x SaneClip`.to_s.lines.map(&:strip).reject(&:empty?).length,
       actions: @action_ids.map do |action_id|
         action = @manifest_actions.fetch(action_id)
+        shot = screenshot_for(action_id)
+        shot_abs = File.join(PROJECT_ROOT, shot)
         {
           id: action_id,
           surfaces: Array(action['surfaces']),
           inputs: Array(action['user_inputs']),
           expected_outputs: Array(action['expected_outputs']),
-          screenshot: screenshot_for(action_id)
+          screenshot: shot,
+          observed_screenshot_sha256: Digest::SHA256.file(shot_abs).hexdigest,
+          observed_screenshot_bytes: File.size(shot_abs),
+          source_guards_verified: ACTION_GUARDS.fetch(action_id).length,
+          completion_scope: action_completion_scope(action_id)
         }
       end
     )

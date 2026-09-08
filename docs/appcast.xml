@@ -5,7 +5,27 @@
     <link>https://saneclip.com/appcast.xml</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
-                                                                    <item>
+                                                                            <item>
+            <title>2.3.25</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Tue, 08 Sep 2026 18:42:16 -0400</pubDate>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Keeps a paid unlock in place after an update, so you do not have to enter your license key again.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.25.zip"
+                       sparkle:version="2325"
+                       sparkle:shortVersionString="2.3.25"
+                       length="5330368"
+                       type="application/octet-stream"
+                       sparkle:edSignature="O1r/a0awQVlBt2fAG2GihMUtqhlsB6MdvFnar+z/+0VB1veINLsnaxl7abrlueYIi8bgNjg0QhOdkP8/4JEpAA=="/>
+        </item>
+<item>
             <title>2.3.24</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Tue, 08 Sep 2026 14:43:31 -0400</pubDate>

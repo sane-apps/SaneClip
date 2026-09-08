@@ -16,7 +16,7 @@ release:
   upgrade_path_test:
     scheme: SaneClip
     test_selector: SaneClipTests/NonBlockingKeychainServiceTests/paidCacheSurvivesUpgradeAndUnavailableKeychain()
-    from_version: "2.3.23"
+    from_version: "2.3.24"
     timeout_seconds: 180
     unsigned_tests: true
   team_id: M78L6FXD48

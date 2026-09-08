@@ -4,7 +4,8 @@ import SaneUI
 import Testing
 
 /// Guards the launch-hang fix: a SecurityServer stall must never block the
-/// caller — reads degrade to nil (free/trial fallback), writes throw.
+/// caller. Reads and writes throw `timedOut` inside the bound so LicenseService
+/// can keep a paid unlock instead of minting a new trial.
 @Suite("NonBlockingKeychainService")
 struct NonBlockingKeychainServiceTests {
     private final class FastStub: KeychainServiceProtocol, @unchecked Sendable {
@@ -69,12 +70,16 @@ struct NonBlockingKeychainServiceTests {
         #expect(try keychain.string(forKey: "k2") == nil)
     }
 
-    @Test("stalled read returns nil inside the bound")
-    func stalledReadDegradesToNil() throws {
+    @Test("stalled read throws timedOut inside the bound")
+    func stalledReadThrowsTimedOut() {
         let keychain = NonBlockingKeychainService(wrapping: HangingStub(), timeout: 0.1)
         let start = Date()
-        #expect(try keychain.string(forKey: "k") == nil)
-        #expect(try keychain.bool(forKey: "b") == nil)
+        #expect(throws: NonBlockingKeychainError.timedOut(operation: "string(k)")) {
+            try keychain.string(forKey: "k")
+        }
+        #expect(throws: NonBlockingKeychainError.timedOut(operation: "bool(b)")) {
+            try keychain.bool(forKey: "b")
+        }
         #expect(Date().timeIntervalSince(start) < 2)
     }
 
@@ -135,6 +140,30 @@ struct NonBlockingKeychainServiceTests {
         #expect(relaunched.isPro)
         #expect(relaunched.licenseEmail == "upgrade@example.invalid")
         #expect(!relaunched.shouldShowExpiredTrialGate)
+    }
+
+    @Test("A first launch with an unavailable keychain does not mint a new trial")
+    @MainActor
+    func unavailableKeychainDoesNotMintANewTrial() throws {
+        let suite = "tests.saneclip.unavailable.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+
+        let relaunched = LicenseService(
+            appName: "SaneClip",
+            purchaseBackend: .direct(checkoutURL: try #require(URL(string: "https://saneclip.com"))),
+            keychain: NonBlockingKeychainService(wrapping: HangingStub(), timeout: 0.05),
+            proTrial: .init(storageKeyPrefix: "saneclip.pro_trial"),
+            userDefaults: defaults
+        )
+        let start = Date()
+        relaunched.checkCachedLicense()
+        #expect(Date().timeIntervalSince(start) < 1)
+        #expect(!relaunched.isLicensed)
+        #expect(!relaunched.isPro)
+        #expect(!relaunched.isProTrialActive)
+        #expect(!relaunched.shouldShowExpiredTrialGate)
+        #expect(defaults.object(forKey: "saneclip.pro_trial.started_at") == nil)
     }
 
     @Test("inner errors propagate instead of degrading to nil")

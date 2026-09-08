@@ -12,12 +12,13 @@ import SaneUI
 /// the app never finishes launching (spindump: `applicationDidFinishLaunching`
 /// -> `checkCachedLicense` -> `KeychainService.string` -> `SecItemCopyMatching`).
 ///
-/// Every operation runs on a background queue with a bounded wait. Reads that
-/// time out return `nil`, so the license layer falls back to free/trial mode
-/// and launch completes. Writes/deletes that time out throw; every call site
-/// in the pinned LicenseService already tolerates that via `try?`/`do-catch`
-/// plus its UserDefaults mirror. A timed-out operation keeps running in the
-/// background and still lands if SecurityServer eventually answers.
+/// Every operation runs on a background queue with a bounded wait. Reads and
+/// writes that time out throw `timedOut` so launch can finish without treating
+/// a stalled SecurityServer as "no license" (that path used to mint a fresh
+/// 14-day trial for paying customers). LicenseService then applies sticky
+/// unlock if one exists and does not start a new trial. A timed-out operation
+/// keeps running in the background and still lands if SecurityServer eventually
+/// answers.
 final class NonBlockingKeychainService: KeychainServiceProtocol, Sendable {
     private let inner: KeychainServiceProtocol
     private let timeout: TimeInterval
@@ -71,8 +72,6 @@ final class NonBlockingKeychainService: KeychainServiceProtocol, Sendable {
         switch run(operation: operation, work: work) {
         case .success(let value):
             return value
-        case .failure(NonBlockingKeychainError.timedOut):
-            return nil
         case .failure(let error):
             throw error
         }

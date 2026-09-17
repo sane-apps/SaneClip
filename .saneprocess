@@ -263,7 +263,7 @@ website: true
 website_domain: saneclip.com
 
 setapp:
-  enabled: true
+  enabled: false
   app_id: "1847"
   version_id: "47647"
   scheme: SaneClipSetapp

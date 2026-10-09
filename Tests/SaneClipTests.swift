@@ -770,7 +770,7 @@ struct SaneClipTests {
             encoding: .utf8
         )
 
-        #expect(manifest.contains("Improves history-lock authentication reliability and overall stability."))
+        #expect(manifest.contains("Keeps image previews small in memory, and still opens the original picture when you paste. Keeps the original of a pinned picture when synced history is trimmed."))
         #expect(!manifest.contains("Improves history focus after pasting with keep-open enabled"))
         #expect(manifest.contains("No external checkout links or license keys are used in the App Store build."))
     }

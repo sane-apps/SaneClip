@@ -5,7 +5,27 @@
     <link>https://saneclip.com/appcast.xml</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
-                                                                            <item>
+                                                                                    <item>
+            <title>2.3.26</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Fri, 09 Oct 2026 17:02:05 -0400</pubDate>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>Keeps image previews small in memory, and still opens the original picture when you paste. Keeps the original of a pinned picture when synced history is trimmed.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.26.zip"
+                       sparkle:version="2326"
+                       sparkle:shortVersionString="2.3.26"
+                       length="5287178"
+                       type="application/octet-stream"
+                       sparkle:edSignature="2kwEGTkn/R368mYc4MQiGB8jsJt5n91W/pzckZ0AOyjy7rCAYmpcQE/ZnJ9wD5mMzf6il3S4abHrW/3bl+QvBA=="/>
+        </item>
+<item>
             <title>2.3.25</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Tue, 08 Sep 2026 18:42:16 -0400</pubDate>

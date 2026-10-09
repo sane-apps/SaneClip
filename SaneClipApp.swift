@@ -122,6 +122,8 @@ class SaneClipAppDelegate: NSObject, NSApplicationDelegate {
         #endif
 
         #if !APP_STORE && !SETAPP
+            SaneClipDirectSupport.install()
+
             if let testFeedOverride = UpdateService.testFeedOverride() {
                 UserDefaults.standard.set(testFeedOverride, forKey: "SUFeedURL")
                 appLogger.info("Using test Sparkle feed override: \(testFeedOverride, privacy: .public)")

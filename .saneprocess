@@ -173,7 +173,7 @@ appstore:
   product_id: "com.saneclip.app.pro.unlock"
   scheme: SaneClip-AppStore
   configuration: Release-AppStore
-  platforms: [macos, ios]
+  platforms: [macos]
   ios_scheme: SaneClipIOS
   category: public.app-category.productivity
   age_rating: "4+"
@@ -200,7 +200,7 @@ appstore:
         Touch ID history lock, AES-GCM history encryption at rest and encrypted sync payloads before upload,
         paste as plain text, smart paste, text transforms, paste stack, snippets, item notes, clipboard rules, and export/import.
       keywords: "clipboard,copy paste,history,snippets,touch id,security,productivity,mac utility"
-      whats_new: "One Mac purchase includes the free iPhone and iPad companion. Improves history-lock authentication reliability and overall stability."
+      whats_new: "Keeps image previews small in memory, and still opens the original picture when you paste. Keeps the original of a pinned picture when synced history is trimmed."
       marketing_url: "https://saneclip.com"
     ios:
       subtitle: "Clipboard History + Widgets"

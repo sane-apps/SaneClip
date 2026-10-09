@@ -5,8 +5,9 @@
 - Isolated test storage no longer writes the customer's pin list, paste stack, or widget cache.
 - `./scripts/SaneMaster.rb verify --timeout 2700` passed 255/255 on 2026-10-09, including "A missing thumbnail does not keep the full image in history" and "Synced trim keeps a pinned image's original file". Log: `outputs/saneclip-verify-20261009-c.log`.
 - Direct 2.3.25 is already on the appcast. This behavior change is `3e7fa4f` and is not published. `release_preflight` on 2026-10-09 passed the upgrade-path proof (`outputs/upgrade_path_behavioral_receipt.json`, paid cache from 2.3.24) and blocked on two customer-UI receipt checks: source fingerprint stale, receipt older than 12 hours.
-- The sweep will not accept the 2026-09-08 `outputs/customer-ui/ai-proof/runtime-traversal.json`. It must be under 24 hours, match this source, and match the installed app. This Mini has no `~/Library/Application Support/GenerativeModels` directory, so a live Rewrite/Summarize receipt cannot be completed honestly. Do not invent one.
-- App Store upload still stops on the donation-string audit below. Do not strip shared SaneUI donate UI without the owner's A/B choice.
+- Live Rewrite and Summarize ran on this Mini on 2026-10-09. The receipt is `outputs/customer-ui/ai-proof/runtime-traversal.json`. Enhanced Siri assets are unrelated. SystemLanguageModel answered Rewrite.
+- Direct customers still get the support button. That title and the sponsors URL live in `DirectDistributionSupport.swift`, which the App Store build does not compile. Shared SaneUI shows the button only after the app installs that copy. SaneClip pins SaneUI `48c1ded`.
+- This App Store ship is Mac only. The empty iOS 2.3.21 draft stays unsent. The 2026-10-03 A/B note below is the old choice. The owner asked for the fixed Mac build on the store, so the direct-only file is the path that landed.
 
 # 2026-10-03 overnight (Claude, Mini) — why SaneClip is not current on the App Store
 

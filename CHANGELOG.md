@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.26] - 2026-10-09
+
+Keeps image previews small in memory, and still opens the original picture when you paste. Keeps the original of a pinned picture when synced history is trimmed.
+
+---
+
 ## [2.3.25] - 2026-09-08
 
 Keeps a paid unlock in place after an update, so you do not have to enter your license key again.

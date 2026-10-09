@@ -2282,6 +2282,22 @@ struct SaneClipTests {
         #expect(settingsSource.contains("SaneAboutView("))
         #expect(!settingsSource.contains("mailto:hi@saneapps.com"))
         #expect(!directSupportSource.contains("struct SaneSparkleRow"))
+        #expect(directSupportSource.contains("#if os(macOS) && !APP_STORE && !SETAPP"))
+        #expect(directSupportSource.contains("https://github.com/sponsors/MrSaneApps"))
+        #expect(directSupportSource.contains("buttonTitle: \"Donate\""))
+        #expect(directSupportSource.contains("buttonHelp: \"Donate on GitHub Sponsors\""))
+        let appSourceForDirectSupport = try String(
+            contentsOf: projectRootURL().appendingPathComponent("SaneClipApp.swift"),
+            encoding: .utf8
+        )
+        let launch = appSourceForDirectSupport.components(separatedBy: "func applicationDidFinishLaunching").dropFirst().first ?? ""
+        let installAt = launch.range(of: "SaneClipDirectSupport.install()")
+        let gateAt = launch.range(of: "presentExpiredTrialGateIfNeeded()")
+        #expect(installAt != nil)
+        #expect(gateAt != nil)
+        if let installAt, let gateAt {
+            #expect(installAt.lowerBound < gateAt.lowerBound)
+        }
         #expect(!iosSettingsSource.contains("mailto:hi@saneapps.com"))
         #expect(iosSettingsSource.contains("githubRepo: \"SaneClip\""))
         #expect(!iosSettingsSource.contains("githubRepo: \"sane-apps/SaneClip\""))

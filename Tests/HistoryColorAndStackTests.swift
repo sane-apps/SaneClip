@@ -479,6 +479,121 @@ struct HistoryColorAndStackTests {
         #expect(manager.history.contains { $0.id == items[3].id })
     }
 
+    @Test("A missing thumbnail does not keep the full image in history")
+    @MainActor
+    func missingThumbnailLoadsAsThumbnailAndKeepsOriginal() throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("saneclip-mem-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let images = root.appendingPathComponent("images", isDirectory: true)
+        try FileManager.default.createDirectory(at: images, withIntermediateDirectories: true)
+
+        let id = UUID()
+        let originalURL = images.appendingPathComponent("\(id.uuidString).png")
+        let original = try pngData(width: 800, height: 600)
+        try original.write(to: originalURL)
+
+        let saved = SavedClipboardItem(
+            id: id,
+            text: "[Image]",
+            timestamp: Date(),
+            imageDataFilename: "\(id.uuidString).png"
+        )
+        let historyURL = root.appendingPathComponent("history.json")
+        try JSONEncoder().encode([saved]).write(to: historyURL)
+
+        let manager = ClipboardManager(
+            startMonitoring: false,
+            loadPersistedState: true,
+            persistenceEnabled: true,
+            storageDirectory: root
+        )
+        let loaded = try #require(manager.history.first { $0.id == id })
+        guard case let .image(resident) = loaded.content else {
+            Issue.record("loaded item is not an image")
+            return
+        }
+        let full = try #require(manager.fullResolutionImage(for: loaded))
+        let residentLong = max(resident.size.width, resident.size.height)
+        let fullLong = max(full.size.width, full.size.height)
+        // Thumbnail drawing is 200pt. A retina JPEG reload can report pixels, so
+        // allow up to 3x and still require it to be smaller than the original.
+        #expect(residentLong <= 600)
+        #expect(residentLong < fullLong)
+        #expect(fullLong >= 800)
+        let originalNow = try Data(contentsOf: originalURL)
+        #expect(originalNow == original)
+        let thumbURL = root.appendingPathComponent("thumbnails").appendingPathComponent("\(id.uuidString).jpg")
+        #expect(FileManager.default.fileExists(atPath: thumbURL.path))
+        var record = try Data(contentsOf: historyURL)
+        if HistoryEncryption.isEncrypted(record) {
+            record = try HistoryEncryption.decrypt(record)
+        }
+        let decoded = try JSONDecoder().decode([SavedClipboardItem].self, from: record)
+        #expect(decoded.first?.imageThumbnailFilename == "\(id.uuidString).jpg")
+        #expect(decoded.first?.imageDataFilename == "\(id.uuidString).png")
+
+        let reloaded = ClipboardManager(
+            startMonitoring: false,
+            loadPersistedState: true,
+            persistenceEnabled: true,
+            storageDirectory: root
+        )
+        let again = try #require(reloaded.history.first { $0.id == id })
+        guard case let .image(againImage) = again.content else {
+            Issue.record("reloaded item is not an image")
+            return
+        }
+        #expect(max(againImage.size.width, againImage.size.height) <= 600)
+        #expect(max(againImage.size.width, againImage.size.height) < fullLong)
+        let originalAfterReload = try Data(contentsOf: originalURL)
+        #expect(originalAfterReload == original)
+    }
+
+    @Test("Synced trim keeps a pinned image's original file")
+    @MainActor
+    func syncedTrimKeepsPinnedOriginal() throws {
+            let previousLimit = SettingsModel.shared.maxHistorySize
+            SettingsModel.shared.maxHistorySize = 2
+            defer { SettingsModel.shared.maxHistorySize = previousLimit }
+
+            let root = FileManager.default.temporaryDirectory
+                .appendingPathComponent("saneclip-sync-\(UUID().uuidString)", isDirectory: true)
+            defer { try? FileManager.default.removeItem(at: root) }
+            let images = root.appendingPathComponent("images", isDirectory: true)
+            try FileManager.default.createDirectory(at: images, withIntermediateDirectories: true)
+
+            let pinnedID = UUID()
+            let victimID = UUID()
+            let pinnedOriginal = try pngData(width: 800, height: 400)
+            let victimOriginal = try pngData(width: 640, height: 480)
+            let pinnedURL = images.appendingPathComponent("\(pinnedID.uuidString).png")
+            let victimURL = images.appendingPathComponent("\(victimID.uuidString).png")
+            try pinnedOriginal.write(to: pinnedURL)
+            try victimOriginal.write(to: victimURL)
+
+            let manager = ClipboardManager(
+                startMonitoring: false,
+                loadPersistedState: false,
+                persistenceEnabled: true,
+                storageDirectory: root
+            )
+            manager.licenseService = makeForcedProLicense()
+            let pinned = ClipboardItem(id: pinnedID, content: .image(try solidImage(width: 20, height: 20)))
+            let victim = ClipboardItem(id: victimID, content: .image(try solidImage(width: 20, height: 20)))
+            manager.history = [victim, pinned]
+            manager.pinnedItems = [pinned]
+            manager.history.insert(ClipboardItem(content: .text("newer")), at: 0)
+            manager.insertSyncedItem(ClipboardItem(content: .text("synced")))
+
+            #expect(manager.history.contains { $0.id == pinnedID })
+            #expect(manager.pinnedItems.contains { $0.id == pinnedID })
+            #expect(!manager.history.contains { $0.id == victimID })
+            let pinnedNow = try Data(contentsOf: pinnedURL)
+            #expect(pinnedNow == pinnedOriginal)
+            #expect(!FileManager.default.fileExists(atPath: victimURL.path))
+        }
+
     @MainActor
     private func makeForcedProLicense() -> LicenseService {
         setenv("SANEAPPS_FORCE_PRO_MODE", "1", 1)
@@ -490,5 +605,39 @@ struct HistoryColorAndStackTests {
         service.checkCachedLicense()
         unsetenv("SANEAPPS_FORCE_PRO_MODE")
         return service
+    }
+
+    private func pngData(width: Int, height: Int) throws -> Data {
+        guard let rep = NSBitmapImageRep(
+            bitmapDataPlanes: nil,
+            pixelsWide: width,
+            pixelsHigh: height,
+            bitsPerSample: 8,
+            samplesPerPixel: 4,
+            hasAlpha: true,
+            isPlanar: false,
+            colorSpaceName: .deviceRGB,
+            bytesPerRow: width * 4,
+            bitsPerPixel: 32
+        ), let pixels = rep.bitmapData else {
+            throw NSError(domain: "SaneClipTests", code: 1)
+        }
+        let count = width * height
+        for index in 0 ..< count {
+            pixels[index * 4] = 220
+            pixels[index * 4 + 1] = 20
+            pixels[index * 4 + 2] = 20
+            pixels[index * 4 + 3] = 255
+        }
+        guard let data = rep.representation(using: .png, properties: [:]) else {
+            throw NSError(domain: "SaneClipTests", code: 2)
+        }
+        return data
+    }
+
+    private func solidImage(width: CGFloat, height: CGFloat) throws -> NSImage {
+        let data = try pngData(width: Int(width), height: Int(height))
+        let image = try #require(NSImage(data: data))
+        return image
     }
 }

@@ -166,6 +166,9 @@ class ClipboardManager {
     }
 
     private let persistenceEnabled: Bool
+    /// Test-only root. Production stays on Application Support.
+    private let storageDirectoryOverride: URL?
+    private var usesIsolatedStorage: Bool { storageDirectoryOverride != nil }
     private let logger = Logger(subsystem: "com.saneclip.app", category: "ClipboardManager")
 
     var isCapturePaused: Bool {
@@ -206,8 +209,14 @@ class ClipboardManager {
     // Security: Bundle IDs to ignore (password managers)
     private let ignoredBundleIDs = ClipboardManager.knownPasswordManagerBundleIDs
 
-    init(startMonitoring: Bool = true, loadPersistedState: Bool = true, persistenceEnabled: Bool = true) {
+    init(
+        startMonitoring: Bool = true,
+        loadPersistedState: Bool = true,
+        persistenceEnabled: Bool = true,
+        storageDirectory: URL? = nil
+    ) {
         self.persistenceEnabled = persistenceEnabled
+        self.storageDirectoryOverride = storageDirectory
         lastChangeCount = NSPasteboard.general.changeCount
         if startMonitoring {
             self.startMonitoring()
@@ -1495,18 +1504,12 @@ class ClipboardManager {
             guard !history.contains(where: { $0.id == item.id }) else { return }
             history.insert(item, at: 0)
 
-            // Trim to max size, cleaning up thumbnails for removed items
+            // Same pin and paste-stack rescue as a local trim. Deleting a pinned
+            // image's files here makes the next save replace the original with
+            // the in-memory thumbnail.
             let syncLimit = effectiveHistoryLimit() ?? (maxHistorySize > 0 ? maxHistorySize : nil)
-            if let syncLimit, history.count > syncLimit {
-                let removed = history.suffix(from: syncLimit)
-                let removedIDs = Set(removed.map(\.id))
-                for removedItem in removed {
-                    if case .image = removedItem.content {
-                        deleteImageAssets(id: removedItem.id)
-                    }
-                }
-                history = Array(history.prefix(syncLimit))
-                mergeQueueIDs.subtract(removedIDs)
+            if let syncLimit {
+                trimHistory(to: syncLimit, saveAfterTrim: false)
             }
 
             saveHistory()
@@ -1903,13 +1906,13 @@ class ClipboardManager {
     }
 
     private func savePasteStack() {
-        guard persistenceEnabled else { return }
+        guard persistenceEnabled, !usesIsolatedStorage else { return }
         let ids = pasteStack.map(\.id.uuidString)
         UserDefaults.standard.set(ids, forKey: "pasteStackIDs")
     }
 
     private func loadPasteStack() {
-        guard let ids = UserDefaults.standard.array(forKey: "pasteStackIDs") as? [String] else {
+        guard !usesIsolatedStorage, let ids = UserDefaults.standard.array(forKey: "pasteStackIDs") as? [String] else {
             pasteStack = []
             return
         }
@@ -2083,27 +2086,29 @@ class ClipboardManager {
 
     // MARK: - Persistence
 
-    private var historyFileURL: URL {
+    private var appStorageDirectory: URL {
+        if let storageDirectoryOverride {
+            try? FileManager.default.createDirectory(at: storageDirectoryOverride, withIntermediateDirectories: true)
+            return storageDirectoryOverride
+        }
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let appFolder = appSupport.appendingPathComponent("SaneClip", isDirectory: true)
         try? FileManager.default.createDirectory(at: appFolder, withIntermediateDirectories: true)
-        return appFolder.appendingPathComponent("history.json")
+        return appFolder
+    }
+
+    private var historyFileURL: URL {
+        appStorageDirectory.appendingPathComponent("history.json")
     }
 
     private var thumbnailsDirectory: URL {
-        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let dir = appSupport
-            .appendingPathComponent("SaneClip", isDirectory: true)
-            .appendingPathComponent("thumbnails", isDirectory: true)
+        let dir = appStorageDirectory.appendingPathComponent("thumbnails", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }
 
     private var imageDataDirectory: URL {
-        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let dir = appSupport
-            .appendingPathComponent("SaneClip", isDirectory: true)
-            .appendingPathComponent("images", isDirectory: true)
+        let dir = appStorageDirectory.appendingPathComponent("images", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }
@@ -2368,15 +2373,18 @@ class ClipboardManager {
 
             try data.write(to: historyFileURL, options: [.atomic, .completeFileProtection])
 
-            // Save pinned item IDs separately
-            let pinnedIDs = pinnedItems.map(\.id.uuidString)
-            UserDefaults.standard.set(pinnedIDs, forKey: "pinnedItemIDs")
+            // Isolated test storage must not rewrite the customer's pin list.
+            if !usesIsolatedStorage {
+                let pinnedIDs = pinnedItems.map(\.id.uuidString)
+                UserDefaults.standard.set(pinnedIDs, forKey: "pinnedItemIDs")
+            }
 
             // Drop full-res bitmaps from RAM now that disk assets are durable.
             demoteInMemoryImagesToThumbnails()
 
-            // Update widget data
-            updateWidgetData()
+            if !usesIsolatedStorage {
+                updateWidgetData()
+            }
         } catch {
             logger.error("Failed to save history: \(error.localizedDescription)")
         }
@@ -2468,6 +2476,7 @@ class ClipboardManager {
             }
 
             let items = try JSONDecoder().decode([SavedClipboardItem].self, from: data)
+            var repairedMissingThumbnail = false
             history = items.compactMap { saved -> ClipboardItem? in
                 let note = saved.note?.isEmpty == true ? nil : saved.note
 
@@ -2491,9 +2500,13 @@ class ClipboardManager {
 
                 if let originalFilename = saved.imageDataFilename,
                    let image = loadOriginalImageData(filename: originalFilename) {
+                    let resident = residentThumbnail(from: image, id: saved.id)
+                    if resident !== image {
+                        repairedMissingThumbnail = true
+                    }
                     return ClipboardItem(
                         id: saved.id,
-                        content: .image(image),
+                        content: .image(resident),
                         timestamp: saved.timestamp,
                         sourceAppBundleID: saved.sourceAppBundleID,
                         sourceAppName: saved.sourceAppName,
@@ -2528,10 +2541,16 @@ class ClipboardManager {
                 )
             }
 
-            // Restore pinned items from saved IDs
-            if let pinnedIDs = UserDefaults.standard.stringArray(forKey: "pinnedItemIDs") {
+            // Restore pinned items from saved IDs. Isolated tests keep their own pins.
+            if !usesIsolatedStorage, let pinnedIDs = UserDefaults.standard.stringArray(forKey: "pinnedItemIDs") {
                 let pinnedUUIDs = Set(pinnedIDs.compactMap { UUID(uuidString: $0) })
                 pinnedItems = history.filter { pinnedUUIDs.contains($0.id) }
+            }
+
+            // A missing thumbnail used to leave the full PNG in history until some
+            // later save. Write the thumbnail now and keep only that image resident.
+            if repairedMissingThumbnail {
+                saveHistory()
             }
 
             // If license service is already available, enforce tier limits immediately.
@@ -2539,6 +2558,20 @@ class ClipboardManager {
         } catch {
             logger.error("Failed to load history: \(error.localizedDescription)")
         }
+    }
+
+    /// Thumbnail for RAM when the JPEG is missing. Returns the original image
+    /// only when the thumbnail cannot be written.
+    private func residentThumbnail(from image: NSImage, id: UUID) -> NSImage {
+        if let existing = loadThumbnail(filename: thumbnailFilename(for: id)) {
+            return existing
+        }
+        guard let filename = saveThumbnail(image: image, id: id),
+              let thumb = loadThumbnail(filename: filename)
+        else {
+            return image
+        }
+        return thumb
     }
 
     private func effectiveHistoryLimit() -> Int? {
@@ -2552,7 +2585,12 @@ class ClipboardManager {
 
     /// Internal (not private) so the paste-stack trim-protection can be tested.
     func enforceHistoryLimitIfNeeded(saveAfterTrim: Bool = true) {
-        guard let effectiveMax = effectiveHistoryLimit(), history.count > effectiveMax else { return }
+        guard let effectiveMax = effectiveHistoryLimit() else { return }
+        trimHistory(to: effectiveMax, saveAfterTrim: saveAfterTrim)
+    }
+
+    private func trimHistory(to limit: Int, saveAfterTrim: Bool) {
+        guard history.count > limit else { return }
 
         // Paste-stack items AND pinned items must survive the trim: the stack is
         // persisted by id, and a pin is an explicit "keep this". Evicting either
@@ -2560,9 +2598,9 @@ class ClipboardManager {
         // launch. The pinnedItems filter below assumed a guard the trim omitted.
         let protectedIDs = Set(pasteStack.map(\.id)).union(pinnedItems.map(\.id))
 
-        let kept = Array(history.prefix(effectiveMax))
+        let kept = Array(history.prefix(limit))
         let keptIDs = Set(kept.map(\.id))
-        let overflow = history.suffix(from: effectiveMax)
+        let overflow = history.suffix(from: limit)
         let removedIDs = Set(overflow.filter { !protectedIDs.contains($0.id) }.map(\.id))
 
         for item in overflow where !protectedIDs.contains(item.id) {

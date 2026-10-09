@@ -1,3 +1,23 @@
+# 2026-10-09 (Grok, Mini) — image memory fix, verify 255/255, direct 2.3.26 next
+
+- `loadHistory` kept a full-size image in memory when the thumbnail file was missing. It now writes the thumbnail and keeps that in history. The original PNG stays on disk.
+- A synced trim deleted a pinned image's files, and the next save wrote the small preview over the original. Trim now uses the same pin and paste-stack rescue as a local trim.
+- Isolated test storage no longer writes the customer's pin list, paste stack, or widget cache.
+- `./scripts/SaneMaster.rb verify --timeout 2700` passed 255/255 on 2026-10-09, including "A missing thumbnail does not keep the full image in history" and "Synced trim keeps a pinned image's original file". Log: `outputs/saneclip-verify-20261009-c.log`.
+- Direct 2.3.25 is already on the appcast. This behavior change ships as 2.3.26. App Store upload still stops on the donation-string audit below. Do not strip shared SaneUI donate UI without the owner's A/B choice.
+
+# 2026-10-03 overnight (Claude, Mini) — why SaneClip is not current on the App Store
+
+App Store: iOS 2.3.20, macOS 2.3.17. Direct release: 2.3.25. ASC also holds unsent drafts iOS 2.3.21 and macOS 2.3.24 (PREPARE_FOR_SUBMISSION).
+The 2.3.25 App Store lane was skipped because `appstore_preflight` failed (10 issues on 2026-09-08). Rerun 2026-10-03:
+- Tests: FIXED upstream — `verify` passes 253/253.
+- OWNER DECISION NEEDED — donation markers in the Mac App Store binary: the Donate button/copy and GitHub Sponsors strings come from shared SaneUI (`License/LicenseGateView.swift`, `License/WelcomeGateView.swift`). The App Store build hides them at runtime, but the strings are compiled in and the artifact audit scans the binary. Options:
+  A) Split donation UI into its own SaneUI library product that App Store targets do not link (cleanest; strings absent).
+  B) SwiftPM package trait (e.g. `AppStore`) that compiles the donation views out with `#if`.
+  Either touches every app that uses SaneUI, so it needs your call.
+- Minor: during `verify` (2026-10-03 00:44) macOS logged a non-fatal ExcUserFault (EXC_GUARD, GUARD_TYPE_USER) in Apple's `nsattributedstringagent`, responsible process SaneClip — the HTML-to-attributed-string path used by the strip-HTML/table tests. Tests still passed; watch for it in customer crash reports.
+- Paperwork the next session can do once B/A lands: retarget or clear the 2.3.21/2.3.24 drafts to 2.3.25, configure iOS screenshot glob + storefront receipts (ViaPatrum's `scripts/storefront_gate.rb` is a working iOS template), fresh customer-UI QA receipt, then `release.sh ... --version 2.3.25` App Store lane.
+
 # Session handoff — 2026-09-08 AI traversal
 
 - Live Mini Rewrite/Copy and Summarize/Cancel passed on signed 2.3.24 (2324), PID 47937.

@@ -1,6 +1,7 @@
 import Social
 import UIKit
 import UniformTypeIdentifiers
+import WidgetKit
 
 /// Share Extension that receives content from other apps and saves to SaneClip's shared container
 class ShareViewController: SLComposeServiceViewController {
@@ -182,6 +183,8 @@ class ShareViewController: SLComposeServiceViewController {
 
         try? widgetContainer.save()
         try? fullContainer.save()
+        PendingSyncUploadIDs.mark(widgetItem.id)
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     private func addImageToHistory(data: Data, width: Int, height: Int) {
@@ -248,6 +251,8 @@ class ShareViewController: SLComposeServiceViewController {
 
         try? widgetContainer.save()
         try? fullContainer.save()
+        PendingSyncUploadIDs.mark(id)
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     private struct ImportedShareImage {

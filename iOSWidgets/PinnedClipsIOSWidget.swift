@@ -9,12 +9,12 @@ struct PinnedClipsIOSProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (PinnedClipsIOSEntry) -> Void) {
-        let items = loadPinnedItems(limit: itemCount(for: context.family))
+        let items = visibleItems(limit: itemCount(for: context.family), isPreview: context.isPreview)
         completion(PinnedClipsIOSEntry(date: .now, items: items))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<PinnedClipsIOSEntry>) -> Void) {
-        let items = loadPinnedItems(limit: itemCount(for: context.family))
+        let items = visibleItems(limit: itemCount(for: context.family), isPreview: false)
         let entry = PinnedClipsIOSEntry(date: .now, items: items)
 
         let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: .now) ?? .now
@@ -33,11 +33,13 @@ struct PinnedClipsIOSProvider: TimelineProvider {
         }
     }
 
-    private func loadPinnedItems(limit: Int) -> [WidgetClipboardItem] {
-        guard let container = WidgetDataContainer.load() else {
-            return Self.sampleItems
-        }
-        return Array(container.pinnedItems.prefix(limit))
+    private func visibleItems(limit: Int, isPreview: Bool) -> [WidgetClipboardItem] {
+        WidgetTimelineSelection.items(
+            stored: WidgetDataContainer.load()?.pinnedItems,
+            limit: limit,
+            isPreview: isPreview,
+            samples: Self.sampleItems
+        )
     }
 
     static let sampleItems: [WidgetClipboardItem] = [
@@ -59,7 +61,7 @@ struct PinnedClipsIOSProvider: TimelineProvider {
         ),
         WidgetClipboardItem(
             id: UUID(),
-            preview: "API_KEY=...",
+            preview: "Weekly standup notes",
             timestamp: Date().addingTimeInterval(-259200),
             isPinned: true,
             sourceAppName: "Terminal",

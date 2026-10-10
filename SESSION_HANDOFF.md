@@ -1,3 +1,19 @@
+# 2026-10-10 (Grok, Mini) — iPhone 2.3.26 screens are ready, not submitted yet
+
+- Mac 2.3.26 stays on its lane. Do not upload another Mac build and do not run `release.sh`.
+- iOS archive is `outputs/artifacts/2326/SaneClip-iOS.xcarchive`, version 2.3.26 build 2326, Release-AppStore. Unsigned units after the pending-upload fix: 260/260 in `outputs/ios-sync-unit-20261010T0325Z.log`.
+- A phone save is marked for one iCloud upload. Older history is not sent back, so a clip the Mac already deleted stays deleted. Widgets show sample text only in the gallery. Share Sheet saves reload widgets.
+- iPhone store shots are `docs/images/screenshot-ios-{history,pinned,settings}-dark.png` at 1320x2868. Settings shows version 2.3.26. A normal launch stays on "No Clips Yet" (`outputs/ios-runtime-proof/iphone-empty.png`). Onboarding is `outputs/ios-runtime-proof/iphone-onboarding.png`.
+- 13-inch iPad shots are `docs/images/screenshot-ipad-{history,pinned,settings}-dark.png` at 2064x2752. The tab bar is full width. Settings rows use the iPad width. The lower half is empty because the list is short. Empty launch is `outputs/ios-runtime-proof/ipad-empty.png`. Onboarding is `outputs/ios-runtime-proof/ipad-onboarding.png`.
+- Inspected those six store shots and both empty and onboarding frames at original size on 2026-10-09. No clipped controls, no phone-width column, no sample clips on a normal launch.
+
+# 2026-10-09 (Grok, Mini) — Mac App Store 2.3.26 is in review
+
+- Mac App Store `6758898132` version 2.3.26, build 2326, is `WAITING_FOR_REVIEW`. Build id `2783a0af-b91d-4488-a046-8627341089df` is attached. The iOS 2.3.21 draft was not sent.
+- Direct download is live: `https://dist.saneclip.com/updates/SaneClip-2.3.26.zip`. GitHub release `v2.3.26` and the saneclip.com appcast are on 2.3.26.
+- Lemon Squeezy hosted file for variant `1228215` was still 2.3.25 when the release checker ran. That replacement is a dashboard action at `https://app.lemonsqueezy.com/products/779223`. Do not rerun the full release for that item.
+- Source on origin is `3c5d65a`. The App Store binary has no Donate wording. The direct build still does.
+
 # 2026-10-09 (Grok, Mini) — image memory fix, verify 255/255, direct 2.3.26 next
 
 - `loadHistory` kept a full-size image in memory when the thumbnail file was missing. It now writes the thumbnail and keeps that in history. The original PNG stays on disk.

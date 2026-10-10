@@ -1,5 +1,22 @@
 import Foundation
 
+/// Chooses widget rows. Sample text is only for the widget gallery preview.
+enum WidgetTimelineSelection {
+    static func items<T>(
+        stored: [T]?,
+        limit: Int,
+        isPreview: Bool,
+        samples: [T]
+    ) -> [T] {
+        let cappedLimit = max(0, limit)
+        if isPreview {
+            return Array(samples.prefix(cappedLimit))
+        }
+        guard let stored else { return [] }
+        return Array(stored.prefix(cappedLimit))
+    }
+}
+
 /// Lightweight clipboard item model for widget display
 /// Shared between main app and widget extension via App Group container
 struct WidgetClipboardItem: Codable, Identifiable {
@@ -117,6 +134,53 @@ struct IOSHistoryDataContainer: Codable {
         }
         let data = try JSONEncoder().encode(self)
         try data.write(to: url)
+    }
+}
+
+/// Ids saved on this phone that still need one upload.
+/// Existing history is not backfilled, so a clip the Mac already deleted stays deleted.
+enum PendingSyncUploadIDs {
+    static let key = "pendingSyncUploadItemIDs"
+
+    static func adding(_ itemID: UUID, to existing: [String], limit: Int = 400) -> [String] {
+        var stored = existing
+        let id = itemID.uuidString
+        stored.removeAll { $0 == id }
+        stored.append(id)
+        let cappedLimit = max(1, limit)
+        if stored.count > cappedLimit {
+            stored.removeFirst(stored.count - cappedLimit)
+        }
+        return stored
+    }
+
+    static func removing(_ itemID: UUID, from existing: [String]) -> [String] {
+        let id = itemID.uuidString
+        return existing.filter { $0 != id }
+    }
+
+    static func mark(
+        _ itemID: UUID,
+        defaults: UserDefaults? = UserDefaults(suiteName: SharedClipboardCachePrivacy.appGroupSuiteName)
+    ) {
+        guard let defaults else { return }
+        let existing = defaults.stringArray(forKey: key) ?? []
+        defaults.set(adding(itemID, to: existing), forKey: key)
+    }
+
+    static func clear(
+        _ itemID: UUID,
+        defaults: UserDefaults? = UserDefaults(suiteName: SharedClipboardCachePrivacy.appGroupSuiteName)
+    ) {
+        guard let defaults else { return }
+        let existing = defaults.stringArray(forKey: key) ?? []
+        defaults.set(removing(itemID, from: existing), forKey: key)
+    }
+
+    static func ids(
+        defaults: UserDefaults? = UserDefaults(suiteName: SharedClipboardCachePrivacy.appGroupSuiteName)
+    ) -> Set<UUID> {
+        Set((defaults?.stringArray(forKey: key) ?? []).compactMap(UUID.init(uuidString:)))
     }
 }
 

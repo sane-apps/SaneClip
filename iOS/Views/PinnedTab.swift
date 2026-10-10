@@ -18,7 +18,7 @@ struct PinnedTab: View {
                     EmptyStateView(
                         icon: "pin.slash",
                         title: "No Pinned Clips",
-                        message: "Pin items on your Mac to access them quickly here.",
+                        message: "Pins you save here stay on this device.",
                         accentColor: .pinnedOrange
                     )
                 } else {

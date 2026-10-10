@@ -112,6 +112,7 @@ extension ClipboardHistoryViewModel {
         var savedIDs: [UUID] = []
         for item in importedItems.reversed() where insertClipboardItem(item) {
             savedIDs.append(item.id)
+            PendingSyncUploadIDs.mark(item.id)
 
             #if ENABLE_SYNC
                 SyncCoordinator.shared.queueItemForSync(item)

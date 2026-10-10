@@ -67,22 +67,44 @@ class ClipboardHistoryViewModel: ObservableObject {
         }
 
         private func mergeFromSync(_ coordinator: SyncCoordinator) {
-            let syncedItems = coordinator.syncedItems
-            guard !syncedItems.isEmpty else { return }
+            let deletedIDs = coordinator.consumeDeletedSyncedItemIDs()
+            var baseHistory = history
+            var basePinned = pinnedItems
+            if isShowingDemoData, !coordinator.syncedItems.isEmpty || !deletedIDs.isEmpty {
+                baseHistory = []
+                basePinned = []
+                isShowingDemoData = false
+            }
 
-            clearDemoDataIfNeeded()
-
-            let existingIDs = Set(history.map(\.id))
-            let newItems = syncedItems.filter { !existingIDs.contains($0.id) }
-
-            if !newItems.isEmpty {
-                history.append(contentsOf: newItems)
-                history.sort { $0.timestamp > $1.timestamp }
+            let merged = SyncCoordinator.mergingRemoteItems(
+                history: baseHistory,
+                pinned: basePinned,
+                incoming: coordinator.syncedItems,
+                deletedIDs: deletedIDs
+            )
+            if merged.didChange {
+                history = merged.history
+                pinnedItems = merged.pinned
                 saveToWidgetContainer()
             }
 
             if let syncDate = coordinator.lastSyncDate {
                 lastSyncTime = syncDate
+            }
+        }
+
+        /// Uploads clips this phone marked when they were saved. Older history stays local.
+        func queueUnsyncedLocalItems() {
+            let coordinator = SyncCoordinator.shared
+            guard coordinator.isSyncEnabled else { return }
+
+            let pendingIDs = PendingSyncUploadIDs.ids()
+            for item in history where SyncCoordinator.shouldQueuePendingUpload(
+                itemID: item.id,
+                pendingIDs: pendingIDs,
+                uploadedIDs: coordinator.uploadedItemIDs
+            ) {
+                coordinator.queueItemForSync(item)
             }
         }
 

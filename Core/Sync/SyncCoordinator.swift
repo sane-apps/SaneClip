@@ -44,6 +44,8 @@
             /// On iOS, synced items received from other devices are stored here.
             /// The ClipboardHistoryViewModel observes this array.
             var syncedItems: [SharedClipboardItem] = []
+            private var pendingDeletedSyncedItemIDs: Set<UUID> = []
+            private(set) var uploadedItemIDs: Set<UUID> = []
         #endif
 
         enum SyncStatus: String {
@@ -93,6 +95,7 @@
         #endif
         nonisolated private static let containerIdentifier = "iCloud.com.saneclip.app"
         nonisolated private static let initialLocalSeedPendingKey = "syncInitialLocalSeedPending"
+        nonisolated private static let uploadedItemIDsKey = "syncUploadedItemIDs"
         nonisolated private static let lastRunAppVersionKey = "syncLastRunAppVersion"
         nonisolated private static let staleIOSBootstrapResetVersion = "2.2.6"
 
@@ -146,6 +149,10 @@
             super.init()
             isSyncEnabled = savedEnabled
             isInitialLocalSeedPending = UserDefaults.standard.bool(forKey: Self.initialLocalSeedPendingKey)
+            #if os(iOS)
+                let storedUploads = UserDefaults.standard.stringArray(forKey: Self.uploadedItemIDsKey) ?? []
+                uploadedItemIDs = Set(storedUploads.compactMap(UUID.init(uuidString:)))
+            #endif
             if savedEnabled, Self.hasCloudKitCapability {
                 startSync()
             } else if savedEnabled {
@@ -299,6 +306,60 @@
             pendingRecordCount: Int
         ) -> Bool {
             !isInitialLocalSeedPending || pendingRecordCount == 0
+        }
+
+        /// Applies remote adds and deletes to the phone's lists.
+        /// An empty incoming list still removes deleted ids. A deleted id is not added back.
+        nonisolated static func mergingRemoteItems(
+            history: [SharedClipboardItem],
+            pinned: [SharedClipboardItem],
+            incoming: [SharedClipboardItem],
+            deletedIDs: Set<UUID>
+        ) -> (history: [SharedClipboardItem], pinned: [SharedClipboardItem], didChange: Bool) {
+            var history = history
+            var pinned = pinned
+            var didChange = false
+
+            if !deletedIDs.isEmpty {
+                let historyCount = history.count
+                let pinnedCount = pinned.count
+                history.removeAll { deletedIDs.contains($0.id) }
+                pinned.removeAll { deletedIDs.contains($0.id) }
+                didChange = history.count != historyCount || pinned.count != pinnedCount
+            }
+
+            let existingIDs = Set(history.map(\.id))
+            let newItems = incoming.filter { item in
+                !existingIDs.contains(item.id) && !deletedIDs.contains(item.id)
+            }
+            if !newItems.isEmpty {
+                history.append(contentsOf: newItems)
+                history.sort { $0.timestamp > $1.timestamp }
+                didChange = true
+            }
+
+            return (history, pinned, didChange)
+        }
+
+        /// Only clips marked at save time are uploaded later.
+        /// An empty mark list must not send the phone's old history back to iCloud.
+        nonisolated static func shouldQueuePendingUpload(
+            itemID: UUID,
+            pendingIDs: Set<UUID>,
+            uploadedIDs: Set<UUID>
+        ) -> Bool {
+            pendingIDs.contains(itemID) && !uploadedIDs.contains(itemID)
+        }
+
+        nonisolated static func uploadedIDList(existing: [String], newID: String, limit: Int = 400) -> [String] {
+            var stored = existing
+            stored.removeAll { $0 == newID }
+            stored.append(newID)
+            let cappedLimit = max(1, limit)
+            if stored.count > cappedLimit {
+                stored.removeFirst(stored.count - cappedLimit)
+            }
+            return stored
         }
 
         nonisolated static func shouldResetSyncState(forDeletedZoneIDs zoneIDs: [CKRecordZone.ID]) -> Bool {
@@ -615,6 +676,7 @@
                 #if os(iOS)
                     if let savedID = UUID(uuidString: saved.recordID.recordName) {
                         pendingIOSItemsByID.removeValue(forKey: savedID)
+                        rememberUploadedItemID(savedID)
                     }
                 #endif
             }
@@ -848,8 +910,27 @@
                 }
             #else
                 syncedItems.removeAll { $0.id == itemID }
+                pendingDeletedSyncedItemIDs.insert(itemID)
+                uploadedItemIDs.remove(itemID)
+                PendingSyncUploadIDs.clear(itemID)
             #endif
         }
+
+        #if os(iOS)
+            func consumeDeletedSyncedItemIDs() -> Set<UUID> {
+                let ids = pendingDeletedSyncedItemIDs
+                pendingDeletedSyncedItemIDs.removeAll()
+                return ids
+            }
+
+            private func rememberUploadedItemID(_ itemID: UUID) {
+                let existing = UserDefaults.standard.stringArray(forKey: Self.uploadedItemIDsKey) ?? []
+                let stored = Self.uploadedIDList(existing: existing, newID: itemID.uuidString)
+                UserDefaults.standard.set(stored, forKey: Self.uploadedItemIDsKey)
+                uploadedItemIDs = Set(stored.compactMap(UUID.init(uuidString:)))
+                PendingSyncUploadIDs.clear(itemID)
+            }
+        #endif
 
         enum PostBootstrapSeedFollowUp {
             case none

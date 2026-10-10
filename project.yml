@@ -119,7 +119,7 @@ schemes:
     run:
       config: Debug
     archive:
-      config: Release
+      config: Release-AppStore
 
 targets:
   SaneClip:

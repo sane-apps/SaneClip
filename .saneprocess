@@ -173,7 +173,7 @@ appstore:
   product_id: "com.saneclip.app.pro.unlock"
   scheme: SaneClip-AppStore
   configuration: Release-AppStore
-  platforms: [macos]
+  platforms: [macos, ios]
   ios_scheme: SaneClipIOS
   category: public.app-category.productivity
   age_rating: "4+"
@@ -224,7 +224,7 @@ appstore:
     macos: >-
       SaneClip for macOS is a freemium Mac App Store app. Basic is free in the App Store build and includes clipboard history for up to 50 items, standard paste, search, filtering, pinning, screenshot capture into history, excluded apps, auto-delete, optional private iCloud sync, and privacy-first defaults. Pro is purchased in the App Store as a one-time non-consumable in-app purchase and unlocks OCR capture, unlimited history, Touch ID lock, encryption, paste tools, paste stack, snippets, notes, rules, and export/import. No external checkout or license keys are used in this build. The standard App Review flow does not require Accessibility or Apple Events permissions. To test Basic: copy text in TextEdit or Safari, open history with Cmd+Shift+Control+Y, select the item, then paste manually with Cmd+V. Screenshot capture is available in Basic; OCR is a visible locked Pro surface. To find the durable purchase path after onboarding, open Settings > License and tap Unlock Pro or Restore Purchases.
     ios: >-
-      SaneClip for iPhone and iPad is a free companion app, and Basic is free. It includes synced clipboard history, search, pinning, widgets, and Share Sheet saving; it does not offer a separate iOS purchase or paid digital content. The optional Pro unlock is a one-time App Store in-app purchase made only in the macOS app through Settings > License; it is not sold in the iPhone or iPad app. There is no external checkout and no website checkout. There are no license keys in this build. The app does not request Accessibility, Apple Events, camera, microphone, or location permissions. Fastest review path: launch and leave onboarding visible, then inspect the history and settings flow before tapping Continue. If no synced history exists, built-in demo history is shown for review.
+      SaneClip for iPhone and iPad is a free companion app, and Basic is free. It includes synced clipboard history, search, pinning, widgets, and Share Sheet saving; it does not offer a separate iOS purchase or paid digital content. The optional Pro unlock is a one-time App Store in-app purchase made only in the macOS app through Settings > License; it is not sold in the iPhone or iPad app. There is no external checkout and no website checkout. There are no license keys in this build. The app does not request Accessibility, Apple Events, camera, microphone, or location permissions. Fastest review path: launch and leave onboarding visible, then inspect the history and settings flow before tapping Continue. If no synced history exists, the history list is empty until a clip is saved on this iPhone, saved from the Share Sheet, or synced from the Mac. The app does not show sample clipboard text.
   accessibility_declarations:
     publish: true
     families:
@@ -252,6 +252,12 @@ appstore:
         supports_audio_descriptions: false
   screenshots:
     macos: docs/images/appstore-mac-popover.png
+    ios: docs/images/screenshot-ios-*-dark.png
+    ipad: docs/images/screenshot-ipad-*-dark.png
+    ios_receipt: outputs/app-review-current-source/iphone-storefront-receipt.json
+    ipad_receipt: outputs/app-review-current-source/ipad-release-receipt.json
+    ipad_gate_receipt: outputs/app-review-current-source/ipad-release-receipt.json
+    ipad_visual_verdict: outputs/app-review-current-source/ipad-visual-verdict.json
   strip_frameworks:
     - Sparkle.framework
   contact:

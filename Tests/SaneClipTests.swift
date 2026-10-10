@@ -2093,6 +2093,112 @@ struct SaneClipTests {
         )
     }
 
+    @Test("Remote sync removes a deleted clip even when no new clips arrive")
+    func remoteSyncRemovesDeletedClipWhenIncomingIsEmpty() throws {
+        let kept = try SharedClipboardItem(
+            id: #require(UUID(uuidString: "11111111-1111-1111-1111-111111111111")),
+            content: .text("kept")
+        )
+        let removed = try SharedClipboardItem(
+            id: #require(UUID(uuidString: "22222222-2222-2222-2222-222222222222")),
+            content: .text("removed")
+        )
+
+        let merged = SyncCoordinator.mergingRemoteItems(
+            history: [kept, removed],
+            pinned: [removed],
+            incoming: [],
+            deletedIDs: [removed.id]
+        )
+
+        #expect(merged.didChange)
+        #expect(merged.history.map(\.id) == [kept.id])
+        #expect(merged.pinned.isEmpty)
+    }
+
+    @Test("Remote sync does not add a clip that was deleted in the same batch")
+    func remoteSyncDoesNotRestoreDeletedClip() throws {
+        let item = try SharedClipboardItem(
+            id: #require(UUID(uuidString: "33333333-3333-3333-3333-333333333333")),
+            content: .text("gone")
+        )
+
+        let merged = SyncCoordinator.mergingRemoteItems(
+            history: [item],
+            pinned: [],
+            incoming: [item],
+            deletedIDs: [item.id]
+        )
+
+        #expect(merged.history.isEmpty)
+        #expect(merged.didChange)
+    }
+
+    @Test("Only clips marked at save time are queued again")
+    func pendingUploadQueueSkipsOldAndUploadedClips() throws {
+        let pendingID = try #require(UUID(uuidString: "44444444-4444-4444-4444-444444444444"))
+        let oldID = try #require(UUID(uuidString: "55555555-5555-5555-5555-555555555555"))
+        let uploadedID = try #require(UUID(uuidString: "66666666-6666-6666-6666-666666666666"))
+
+        #expect(SyncCoordinator.shouldQueuePendingUpload(
+            itemID: pendingID,
+            pendingIDs: [pendingID, uploadedID],
+            uploadedIDs: [uploadedID]
+        ))
+        #expect(!SyncCoordinator.shouldQueuePendingUpload(
+            itemID: oldID,
+            pendingIDs: [pendingID],
+            uploadedIDs: []
+        ))
+        #expect(!SyncCoordinator.shouldQueuePendingUpload(
+            itemID: uploadedID,
+            pendingIDs: [uploadedID],
+            uploadedIDs: [uploadedID]
+        ))
+        #expect(PendingSyncUploadIDs.adding(pendingID, to: []) == [pendingID.uuidString])
+        #expect(PendingSyncUploadIDs.removing(pendingID, from: [pendingID.uuidString]).isEmpty)
+    }
+
+    @Test("Uploaded id list keeps the newest ids and drops the oldest")
+    func uploadedIDListTrimsOldest() {
+        let stored = SyncCoordinator.uploadedIDList(
+            existing: ["a", "b", "c"],
+            newID: "b",
+            limit: 3
+        )
+        #expect(stored == ["a", "c", "b"])
+
+        let trimmed = SyncCoordinator.uploadedIDList(
+            existing: ["a", "b", "c"],
+            newID: "d",
+            limit: 3
+        )
+        #expect(trimmed == ["b", "c", "d"])
+    }
+
+    @Test("Widget timelines use sample rows only in the gallery preview")
+    func widgetTimelineUsesSamplesOnlyForPreview() {
+        let samples = ["sample"]
+        #expect(WidgetTimelineSelection.items(
+            stored: nil,
+            limit: 3,
+            isPreview: false,
+            samples: samples
+        ).isEmpty)
+        #expect(WidgetTimelineSelection.items(
+            stored: nil,
+            limit: 3,
+            isPreview: true,
+            samples: samples
+        ) == samples)
+        #expect(WidgetTimelineSelection.items(
+            stored: ["one", "two"],
+            limit: 1,
+            isPreview: false,
+            samples: samples
+        ) == ["one"])
+    }
+
     @Test("SyncCoordinator allows remote deletions once initial seed is clear")
     func syncCoordinatorAllowsRemoteDeletesAfterInitialSeed() {
         #expect(

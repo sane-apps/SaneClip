@@ -76,9 +76,11 @@ struct ContentView: View {
     }
 
     private func startForegroundSync() async {
+        viewModel.loadFromSharedContainer()
         #if ENABLE_SYNC
             viewModel.beginAutomaticSync()
             await viewModel.refreshFromSyncIfEnabled()
+            viewModel.queueUnsyncedLocalItems()
         #endif
     }
 

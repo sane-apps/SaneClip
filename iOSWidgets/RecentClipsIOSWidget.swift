@@ -9,12 +9,12 @@ struct RecentClipsIOSProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (RecentClipsIOSEntry) -> Void) {
-        let items = loadRecentItems(limit: itemCount(for: context.family))
+        let items = visibleItems(limit: itemCount(for: context.family), isPreview: context.isPreview)
         completion(RecentClipsIOSEntry(date: .now, items: items))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<RecentClipsIOSEntry>) -> Void) {
-        let items = loadRecentItems(limit: itemCount(for: context.family))
+        let items = visibleItems(limit: itemCount(for: context.family), isPreview: false)
         let entry = RecentClipsIOSEntry(date: .now, items: items)
 
         let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: .now) ?? .now
@@ -33,11 +33,13 @@ struct RecentClipsIOSProvider: TimelineProvider {
         }
     }
 
-    private func loadRecentItems(limit: Int) -> [WidgetClipboardItem] {
-        guard let container = WidgetDataContainer.load() else {
-            return Self.sampleItems
-        }
-        return Array(container.recentItems.prefix(limit))
+    private func visibleItems(limit: Int, isPreview: Bool) -> [WidgetClipboardItem] {
+        WidgetTimelineSelection.items(
+            stored: WidgetDataContainer.load()?.recentItems,
+            limit: limit,
+            isPreview: isPreview,
+            samples: Self.sampleItems
+        )
     }
 
     static let sampleItems: [WidgetClipboardItem] = [

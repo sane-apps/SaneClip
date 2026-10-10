@@ -633,6 +633,29 @@ targets:
           CODE_SIGN_ENTITLEMENTS: iOS/SaneClipIOS.entitlements
           INFOPLIST_KEY_AppStoreProductID: com.saneclip.app.pro.unlock
           OTHER_SWIFT_FLAGS: "-D APP_STORE -D ENABLE_SYNC"
+    postBuildScripts:
+      - name: Repair Setapp resource bundle
+        basedOnDependencyAnalysis: false
+        script: |
+          APP_BUNDLE_PATH="${TARGET_BUILD_DIR}/${WRAPPER_NAME}"
+          if [ ! -d "${APP_BUNDLE_PATH}" ]; then
+            exit 0
+          fi
+          find "${APP_BUNDLE_PATH}" -type d -name '*.bundle' | while IFS= read -r bundle; do
+            plist="${bundle}/Info.plist"
+            [ -f "${plist}" ] || continue
+            exec_name="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "${plist}" 2>/dev/null || true)"
+            [ -n "${exec_name}" ] || continue
+            if [ ! -e "${bundle}/${exec_name}" ]; then
+              /usr/libexec/PlistBuddy -c 'Delete :CFBundleExecutable' "${plist}"
+              package_type="$(/usr/libexec/PlistBuddy -c 'Print :CFBundlePackageType' "${plist}" 2>/dev/null || true)"
+              if [ "${package_type}" != "BNDL" ]; then
+                /usr/libexec/PlistBuddy -c 'Delete :CFBundlePackageType' "${plist}" 2>/dev/null || true
+                /usr/libexec/PlistBuddy -c 'Add :CFBundlePackageType string BNDL' "${plist}"
+              fi
+              echo "Removed CFBundleExecutable from ${bundle#${APP_BUNDLE_PATH}/}"
+            fi
+          done
 
   # iOS Widgets
   SaneClipIOSWidgets:

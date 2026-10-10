@@ -854,6 +854,7 @@
 				FBAE4074C0CA19FA004BF6BD /* Resources */,
 				20E37CD5F2F6A381524F3068 /* Frameworks */,
 				127440FBA2DFFC86A28382F6 /* Embed Foundation Extensions */,
+				F17A0C4E9B2D48A1C6E5D073 /* Repair Setapp resource bundle */,
 			);
 			buildRules = (
 			);
@@ -1028,6 +1029,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		F17A0C4E9B2D48A1C6E5D073 /* Repair Setapp resource bundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Repair Setapp resource bundle";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "APP_BUNDLE_PATH=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\nif [ ! -d \"${APP_BUNDLE_PATH}\" ]; then\n  exit 0\nfi\nfind \"${APP_BUNDLE_PATH}\" -type d -name '*.bundle' | while IFS= read -r bundle; do\n  plist=\"${bundle}/Info.plist\"\n  [ -f \"${plist}\" ] || continue\n  exec_name=\"$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' \"${plist}\" 2>/dev/null || true)\"\n  [ -n \"${exec_name}\" ] || continue\n  if [ ! -e \"${bundle}/${exec_name}\" ]; then\n    /usr/libexec/PlistBuddy -c 'Delete :CFBundleExecutable' \"${plist}\"\n    package_type=\"$(/usr/libexec/PlistBuddy -c 'Print :CFBundlePackageType' \"${plist}\" 2>/dev/null || true)\"\n    if [ \"${package_type}\" != \"BNDL\" ]; then\n      /usr/libexec/PlistBuddy -c 'Delete :CFBundlePackageType' \"${plist}\" 2>/dev/null || true\n      /usr/libexec/PlistBuddy -c 'Add :CFBundlePackageType string BNDL' \"${plist}\"\n    fi\n    echo \"Removed CFBundleExecutable from ${bundle#${APP_BUNDLE_PATH}/}\"\n  fi\ndone\n";
+		};
 		5CC7E86915A9DEDF13CC7A72 /* Run SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;

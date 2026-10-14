@@ -1,6 +1,8 @@
-# 2026-10-10 (Grok, Mini) — iPhone 2.3.26 screens are ready, not submitted yet
+# 2026-10-10 (Grok, Mini) — iPhone 2.3.26 is in review
 
+- iOS App Store `6758898132` version 2.3.26, build 2326, is `WAITING_FOR_REVIEW`. Version id `de07c5c2-5f64-449a-81fe-400ba3194ae3`. Submission `bfff361d-3932-4676-895d-f2ed3cf453ea`. Build id `5513fd47-01a1-4447-b084-0cf3a525aac1` is attached. The live iOS version on sale remains 2.3.20.
 - Mac 2.3.26 stays on its lane. Do not upload another Mac build and do not run `release.sh`.
+- The first upload was refused because the Setapp resource bundle named an executable it does not contain. Commit `197c234` removes that name when the file is absent. The uploaded package is that commit.
 - iOS archive is `outputs/artifacts/2326/SaneClip-iOS.xcarchive`, version 2.3.26 build 2326, Release-AppStore. Unsigned units after the pending-upload fix: 260/260 in `outputs/ios-sync-unit-20261010T0325Z.log`.
 - A phone save is marked for one iCloud upload. Older history is not sent back, so a clip the Mac already deleted stays deleted. Widgets show sample text only in the gallery. Share Sheet saves reload widgets.
 - iPhone store shots are `docs/images/screenshot-ios-{history,pinned,settings}-dark.png` at 1320x2868. Settings shows version 2.3.26. A normal launch stays on "No Clips Yet" (`outputs/ios-runtime-proof/iphone-empty.png`). Onboarding is `outputs/ios-runtime-proof/iphone-onboarding.png`.

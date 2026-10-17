@@ -32,6 +32,8 @@
 - Home: https://saneclip.com/
 - Download / trial: https://saneclip.com/download
 - Clipboard managers compared: https://saneclip.com/mac-clipboard-manager-alternatives.html
+- Paste alternative (Paste vs SaneClip): https://saneclip.com/paste-alternative-mac.html
+- Pastebot alternative (Pastebot 3 vs SaneClip): https://saneclip.com/pastebot-alternative-mac.html
 - All guides: https://saneclip.com/guides.html
 - See clipboard history on Mac: https://saneclip.com/how-to-see-clipboard-history-mac.html
 - Lock history with Touch ID: https://saneclip.com/how-to-protect-clipboard-history-touch-id-mac.html

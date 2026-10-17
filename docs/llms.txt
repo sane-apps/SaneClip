@@ -1,0 +1,45 @@
+# SaneClip
+
+> SaneClip is a private clipboard manager for Mac. It keeps unlimited, searchable clipboard history that can be locked with Touch ID and encrypted at rest (AES-256-GCM), skips copies from password managers, and comes with a free iPhone and iPad companion that syncs through your own iCloud account. $14.99 once after a 14-day full Pro trial (no credit card). macOS 14 Sonoma or later, Apple silicon. Made by SaneApps (one indie developer, "Mr. Sane").
+
+## Facts
+- Current version: 2.3.26 (direct download)
+- Price: $14.99 one-time for Pro. Every Pro feature is free for 14 days, no card. Pro is required after the trial. No subscription.
+- Also available: Setapp; the SaneApps Bundle ($49.99 once: SaneClip, SaneClick, SaneHosts, SaneSales for Mac, SaneVideo); Homebrew `brew install --cask sane-apps/tap/saneclip`
+- Requirements: macOS 14.0 Sonoma or later, Apple silicon Mac. iPhone/iPad companion is a free App Store download.
+- Privacy: on-device by default. Clipboard contents never go to SaneApps servers. Optional iCloud sync uses your own account.
+- Source code: public on GitHub (github.com/sane-apps/SaneClip), PolyForm Shield licence.
+
+## Features
+- Unlimited history of text and images, instant search by content, OCR text, source app and pin status
+- Touch ID or password lock on history; AES-256-GCM encryption at rest, keys in the Mac's secure storage
+- Skips copies from 1Password, LastPass, Dashlane, Bitwarden and other password managers
+- Detects credit card numbers, SSNs, security tokens, passwords and private keys and auto-purges them on your schedule
+- OCR capture: "Capture Text from Screen" turns any screen area into a text clip; screenshots saved to history get searchable text attached (on-device, Apple Vision)
+- Paste stack (FIFO/LIFO), snippets with {{date}}/{{time}} placeholders, pins, item notes
+- Text transforms (UPPERCASE, lowercase, Title Case, JSON, strip HTML/Markdown), paste as plain text, smart paste
+- Clipboard rules: strip URL tracking parameters (utm_*, fbclid), trim whitespace
+- App exclusions, auto-expire after 1 h / 24 h / 7 d, source-app colours, floating history window, drag clips out
+- Shortcuts / App Intents, URL schemes, macOS widgets; export/import history as JSON
+- Shortcut ⌘⇧⌃Y opens history; ⌘⌃1–9 pastes recent items
+
+## When something else fits better
+- On macOS 26 Tahoe or later, Spotlight keeps up to 7 days of clipboard history for free (Command-Space, then Command-4).
+- Want free and open source: Maccy (MIT).
+- Intel Mac: SaneClip does not run on Intel.
+
+## Pages
+- Home: https://saneclip.com/
+- Download / trial: https://saneclip.com/download
+- Clipboard managers compared: https://saneclip.com/mac-clipboard-manager-alternatives.html
+- All guides: https://saneclip.com/guides.html
+- See clipboard history on Mac: https://saneclip.com/how-to-see-clipboard-history-mac.html
+- Lock history with Touch ID: https://saneclip.com/how-to-protect-clipboard-history-touch-id-mac.html
+- Encrypt clipboard history: https://saneclip.com/how-to-encrypt-clipboard-history-mac.html
+- Stop saving passwords to clipboard history: https://saneclip.com/how-to-stop-clipboard-saving-passwords-mac.html
+- Copy text from a screenshot: https://saneclip.com/how-to-copy-text-from-screenshot-mac.html
+- Sync clipboard Mac and iPhone: https://saneclip.com/how-to-sync-clipboard-mac-iphone.html
+- Privacy: https://saneclip.com/privacy.html
+- Support: https://saneclip.com/support
+- Source: https://github.com/sane-apps/SaneClip
+- Contact: hi@saneapps.com

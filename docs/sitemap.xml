@@ -92,7 +92,7 @@
   </url>
   <url>
     <loc>https://saneclip.com/how-to-see-clipboard-history-mac.html</loc>
-    <lastmod>2026-06-16</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -149,5 +149,17 @@
     <lastmod>2026-06-16</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://saneclip.com/mac-clipboard-manager-alternatives.html</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://saneclip.com/how-to-copy-text-from-screenshot-mac.html</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

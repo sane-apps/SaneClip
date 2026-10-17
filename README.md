@@ -414,20 +414,22 @@ Looking at alternatives? Here's how SaneClip stacks up:
 | **AES-256 Encryption** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **Touch ID Protection** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **Sensitive Data Detection** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Password Manager Safety** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Password Manager Safety** | ✅ | ✅ | ✅ | — | — |
 | **Clipboard Rules** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **URL Schemes & Shortcuts** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Siri Shortcuts & Widgets** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| App Exclusions | ✅ | ✅ | ✅ | ❌ | ❌ |
+| **URL Schemes & Shortcuts** | ✅ | — | ❌ | ✅ (Shortcuts + CLI) | ❌ |
+| **Siri Shortcuts & Widgets** | ✅ | — | ❌ | — | ❌ |
+| App Exclusions | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Source App Colors | ✅ | ✅ | ❌ | ✅ | ❌ |
 | Text Transforms | ✅ | ❌ | ❌ | ✅ | ❌ |
 | Paste Stack | ✅ | ❌ | ❌ | ✅ | ❌ |
 | Snippets & Placeholders | ✅ | ✅ | ❌ | ✅ | ❌ |
-| iOS Companion App | ✅ Free | ✅ Paid | ❌ | ❌ | ❌ |
+| iOS Companion App | ✅ Free | ✅ (in every plan) | ❌ | ❌ | ❌ |
 | iCloud Sync | ✅ | ✅ | ❌ | ✅ | ❌ |
 | 100% Transparent Code | ✅ | ❌ | ✅ | ❌ | ❌ |
-| 100% Private | ✅ | ❌ | ✅ | ✅ | ✅ |
-| **Price** | **$14.99** | $30/yr | Free | $13 | Free |
+| 100% Private | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Price** | **$14.99** | $29.99/yr or Lifetime | Free | $39 (incl. 1 yr updates) | Free |
+
+<sub>Competitor facts checked on each company's own page, 17 Oct 2026. — = not stated publicly. Full comparison: https://saneclip.com/mac-clipboard-manager-alternatives.html</sub>
 
 **Bottom line:** SaneClip combines strong privacy controls, automation, OCR capture, and a free companion app in a way the usual clipboard managers still do not.
 

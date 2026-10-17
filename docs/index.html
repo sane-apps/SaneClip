@@ -2186,6 +2186,85 @@
         </div>
     </section>
 
+    <!-- FAQ (visible copy and FAQPage JSON-LD come from one list; keep them in sync) -->
+    <style>
+.home-faq { padding: 72px 0; }
+.home-faq .faq-list { max-width: 760px; margin: 0 auto; }
+.home-faq .faq-item { border: 1px solid var(--border-subtle); border-radius: 10px; background: rgba(255,255,255,0.02); padding: 14px 18px; margin-bottom: 12px; text-align: left; }
+.home-faq .faq-item summary { cursor: pointer; color: var(--text-primary); font-weight: 600; }
+.home-faq .faq-item p { margin: 10px 0 0; color: var(--text-secondary); line-height: 1.6; }
+.home-faq .faq-item a { color: var(--accent); }
+</style>
+    <section class="home-faq" id="faq">
+        <div class="container">
+            <h2 class="section-title">Questions</h2>
+            <div class="faq-list">
+            <details class="faq-item"><summary>How much does SaneClip cost?</summary><p>$14.99 once for Pro. Every Pro feature is free for 14 days with no credit card; after that Pro is required. There's no subscription. SaneClip is also on Setapp and in the $49.99 SaneApps Bundle.</p></details>
+            <details class="faq-item"><summary>What do I need to run SaneClip?</summary><p>macOS 14 Sonoma or later on an Apple silicon Mac. The iPhone and iPad companion is a free App Store download.</p></details>
+            <details class="faq-item"><summary>Doesn't macOS already have clipboard history?</summary><p>On macOS 26 Tahoe and later, Spotlight keeps up to 7 days of clipboard history (Command-Space, then Command-4). SaneClip adds unlimited history, a Touch ID lock, AES-256-GCM encryption at rest, password-manager skipping, OCR capture, a paste stack and snippets. <a href="mac-clipboard-manager-alternatives.html">See the full comparison</a>.</p></details>
+            <details class="faq-item"><summary>Does my clipboard leave my Mac?</summary><p>Not to SaneApps. History stays on your Mac by default. Optional sync to the iPhone app uses your own iCloud account, and with History Encryption on, the synced data is unreadable to SaneApps.</p></details>
+            <details class="faq-item"><summary>Does SaneClip save passwords I copy?</summary><p>No. It skips copies from 1Password, LastPass, Dashlane, Bitwarden and other password managers, and it detects card numbers, SSNs, tokens and private keys and purges them on a schedule you set.</p></details>
+            <details class="faq-item"><summary>Can I see the source code?</summary><p>Yes. It's on GitHub at <a href="https://github.com/sane-apps/SaneClip">github.com/sane-apps/SaneClip</a> under the PolyForm Shield licence.</p></details>
+            </div>
+        </div>
+    </section>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How much does SaneClip cost?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "$14.99 once for Pro. Every Pro feature is free for 14 days with no credit card; after that Pro is required. There's no subscription. SaneClip is also on Setapp and in the $49.99 SaneApps Bundle."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What do I need to run SaneClip?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "macOS 14 Sonoma or later on an Apple silicon Mac. The iPhone and iPad companion is a free App Store download."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Doesn't macOS already have clipboard history?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "On macOS 26 Tahoe and later, Spotlight keeps up to 7 days of clipboard history (Command-Space, then Command-4). SaneClip adds unlimited history, a Touch ID lock, AES-256-GCM encryption at rest, password-manager skipping, OCR capture, a paste stack and snippets. <a href=\"mac-clipboard-manager-alternatives.html\">See the full comparison<\/a>."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does my clipboard leave my Mac?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Not to SaneApps. History stays on your Mac by default. Optional sync to the iPhone app uses your own iCloud account, and with History Encryption on, the synced data is unreadable to SaneApps."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does SaneClip save passwords I copy?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. It skips copies from 1Password, LastPass, Dashlane, Bitwarden and other password managers, and it detects card numbers, SSNs, tokens and private keys and purges them on a schedule you set."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I see the source code?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. It's on GitHub at <a href=\"https://github.com/sane-apps/SaneClip\">github.com/sane-apps/SaneClip<\/a> under the PolyForm Shield licence."
+      }
+    }
+  ]
+}
+    </script>
+
     <section class="support" id="support">
         <div class="container">
             <h2 class="section-title reveal">Support SaneClip</h2>

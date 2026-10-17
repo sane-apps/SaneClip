@@ -212,3 +212,6 @@ training_data/
 
 # runtime customer UI evidence (do not commit)
 .sane/customer_ui_action_receipt.json
+
+# Internal notes (not for the public repo)
+SESSION_HANDOFF.md

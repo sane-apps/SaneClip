@@ -49,6 +49,7 @@
 - How to Paste Plain Text on Mac: https://saneclip.com/how-to-paste-plain-text-mac
 - How to Pin Text Snippets on Mac: https://saneclip.com/how-to-pin-text-snippets-mac
 - How to Lock Your Clipboard History with Touch ID: https://saneclip.com/how-to-protect-clipboard-history-touch-id-mac
+- How to Rewrite and Summarize Copied Text on Mac: https://saneclip.com/how-to-rewrite-summarize-copied-text-mac
 - How to See Clipboard History on Mac: https://saneclip.com/how-to-see-clipboard-history-mac
 - How to See Which App Copied Text to Your Clipboard: https://saneclip.com/how-to-see-which-app-copied-text-mac
 - How to Stop Your Clipboard Manager from Saving Passwords: https://saneclip.com/how-to-stop-clipboard-saving-passwords-mac

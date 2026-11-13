@@ -749,7 +749,7 @@ struct SaneClipTests {
         let readmeSource = try String(contentsOf: repoRoot.appendingPathComponent("README.md"), encoding: .utf8)
         let changelogSource = try String(contentsOf: repoRoot.appendingPathComponent("CHANGELOG.md"), encoding: .utf8)
 
-        #expect(websiteSource.contains("Get the SaneApps Bundle for $49.99 once"))
+        #expect(websiteSource.contains("Get the SaneApps Bundle for $34.99 once"))
         #expect(readmeSource.contains("SaneApps Bundle"))
         #expect(changelogSource.contains("SaneApps Bundle activates SaneClip Pro"))
         #expect(!websiteSource.contains("Everything Bundle"))

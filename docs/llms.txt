@@ -5,7 +5,7 @@
 ## Facts
 - Current version: 2.3.26 (direct download)
 - Price: $14.99 one-time for Pro. Every Pro feature is free for 14 days, no card. Pro is required after the trial. No subscription.
-- Also available: Setapp; the SaneApps Bundle ($49.99 once: SaneClip, SaneClick, SaneHosts, SaneSales for Mac, SaneVideo); Homebrew `brew install --cask sane-apps/tap/saneclip`
+- Also available: Setapp; the SaneApps Bundle ($34.99 once: unlocks SaneClip, SaneClick and SaneHosts; SaneSales and SaneVideo are free); Homebrew `brew install --cask sane-apps/tap/saneclip`
 - Requirements: macOS 14.0 Sonoma or later, Apple silicon Mac. iPhone/iPad companion is a free App Store download.
 - Privacy: on-device by default. Clipboard contents never go to SaneApps servers. Optional iCloud sync uses your own account.
 - Source code: public on GitHub (github.com/sane-apps/SaneClip), PolyForm Shield licence.

@@ -11,16 +11,17 @@
 - Source code: public on GitHub (github.com/sane-apps/SaneClip), PolyForm Shield licence.
 
 ## Features
-- Unlimited history of text and images, instant search by content, OCR text, source app and pin status
+- Unlimited history of text and images, instant search by content, OCR text, notes and tags
 - Touch ID or password lock on history; AES-256-GCM encryption at rest, keys in the Mac's secure storage
 - Skips copies from 1Password, LastPass, Dashlane, Bitwarden and other password managers
-- Detects credit card numbers, SSNs, security tokens, passwords and private keys and auto-purges them on your schedule
+- Skips text that looks like a password (on by default) and copies that apps mark as concealed
 - OCR capture: "Capture Text from Screen" turns any screen area into a text clip; screenshots saved to history get searchable text attached (on-device, Apple Vision)
-- Paste stack (FIFO/LIFO), snippets with {{date}}/{{time}} placeholders, pins, item notes
+- Paste stack (FIFO/LIFO) that can record copies as you make them, snippets with {{date}}/{{time}} placeholders, pins, item notes
 - Text transforms (UPPERCASE, lowercase, Title Case, JSON, strip HTML/Markdown), paste as plain text, smart paste
 - Clipboard rules: strip URL tracking parameters (utm_*, fbclid), trim whitespace
-- App exclusions, auto-expire after 1 h / 24 h / 7 d, source-app colours, floating history window, drag clips out
+- App exclusions, auto-expire after 1 h / 24 h / 7 d / 30 d, source-app colours, floating history window, drag clips out
 - Shortcuts / App Intents, URL schemes, macOS widgets; export/import history as JSON
+- On-device Rewrite, Summarize and Extract Key Points for text clips (macOS 26 or later with Apple Intelligence on; results open in a preview)
 - Shortcut ⌘⇧⌃Y opens history; ⌘⌃1–9 pastes recent items
 
 ## When something else fits better
@@ -34,13 +35,28 @@
 - Clipboard managers compared: https://saneclip.com/mac-clipboard-manager-alternatives.html
 - Paste alternative (Paste vs SaneClip): https://saneclip.com/paste-alternative-mac.html
 - Pastebot alternative (Pastebot 3 vs SaneClip): https://saneclip.com/pastebot-alternative-mac.html
-- All guides: https://saneclip.com/guides.html
-- See clipboard history on Mac: https://saneclip.com/how-to-see-clipboard-history-mac.html
-- Lock history with Touch ID: https://saneclip.com/how-to-protect-clipboard-history-touch-id-mac.html
-- Encrypt clipboard history: https://saneclip.com/how-to-encrypt-clipboard-history-mac.html
-- Stop saving passwords to clipboard history: https://saneclip.com/how-to-stop-clipboard-saving-passwords-mac.html
-- Copy text from a screenshot: https://saneclip.com/how-to-copy-text-from-screenshot-mac.html
-- Sync clipboard Mac and iPhone: https://saneclip.com/how-to-sync-clipboard-mac-iphone.html
+- All guides: https://saneclip.com/guides
+- How to Access Mac Clipboard History on iPhone: https://saneclip.com/how-to-access-clipboard-history-iphone
+- How to Auto-Delete Clipboard History on Mac: https://saneclip.com/how-to-auto-delete-clipboard-history-mac
+- How to Automate Your Clipboard with URL Schemes: https://saneclip.com/how-to-automate-clipboard-webhooks-mac
+- How to Export and Back Up Clipboard History on Mac: https://saneclip.com/how-to-backup-clipboard-history-mac
+- How to Copy Text from a Screenshot or Image on Mac: https://saneclip.com/how-to-copy-text-from-screenshot-mac
+- Text Snippets and Templates on Mac: https://saneclip.com/how-to-create-text-snippets-templates-mac
+- How to Keep Sensitive Data Out of Your Clipboard History: https://saneclip.com/how-to-detect-sensitive-data-clipboard-mac
+- How to Encrypt Your Clipboard History on Mac: https://saneclip.com/how-to-encrypt-clipboard-history-mac
+- How to Exclude Apps from Clipboard History on Mac: https://saneclip.com/how-to-exclude-apps-clipboard-history-mac
+- How to Paste Multiple Items in Order on Mac: https://saneclip.com/how-to-paste-multiple-items-mac
+- How to Paste Plain Text on Mac: https://saneclip.com/how-to-paste-plain-text-mac
+- How to Pin Text Snippets on Mac: https://saneclip.com/how-to-pin-text-snippets-mac
+- How to Lock Your Clipboard History with Touch ID: https://saneclip.com/how-to-protect-clipboard-history-touch-id-mac
+- How to See Clipboard History on Mac: https://saneclip.com/how-to-see-clipboard-history-mac
+- How to See Which App Copied Text to Your Clipboard: https://saneclip.com/how-to-see-which-app-copied-text-mac
+- How to Stop Your Clipboard Manager from Saving Passwords: https://saneclip.com/how-to-stop-clipboard-saving-passwords-mac
+- How to Strip URL Tracking Parameters Automatically: https://saneclip.com/how-to-strip-url-tracking-mac
+- How to Sync Clipboard History Between Mac and iPhone: https://saneclip.com/how-to-sync-clipboard-mac-iphone
+- How to Transform Text Case Instantly: https://saneclip.com/how-to-transform-text-case-mac
+- Clipboard Keyboard Shortcuts on Mac: https://saneclip.com/how-to-use-clipboard-keyboard-shortcuts-mac
+- How to Use Clipboard Siri Shortcuts and Widgets on Mac: https://saneclip.com/how-to-use-clipboard-siri-shortcuts-mac
 - Privacy: https://saneclip.com/privacy.html
 - Support: https://saneclip.com/support
 - Source: https://github.com/sane-apps/SaneClip

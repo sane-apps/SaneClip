@@ -6,12 +6,12 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How to Detect Sensitive Data in Your Clipboard on Mac</title>
-    <meta name="description" content="Credit cards, SSNs, API keys, and passwords slip into your clipboard constantly. Learn how to automatically detect and purge sensitive data from clipboard history.">
+    <title>How to Keep Sensitive Data Out of Mac Clipboard History</title>
+    <meta name="description" content="Passwords, card numbers and API keys end up in clipboard history. SaneClip skips password managers and password-like text, and auto-deletes the rest.">
     <link rel="canonical" href="https://saneclip.com/how-to-detect-sensitive-data-clipboard-mac">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="How to Detect Sensitive Data in Your Clipboard on Mac">
-  <meta property="og:description" content="Credit cards, SSNs, API keys, and passwords slip into your clipboard constantly. Learn how to automatically detect and purge sensitive data from clipboard history.">
+  <meta property="og:title" content="How to Keep Sensitive Data Out of Mac Clipboard History">
+  <meta property="og:description" content="Passwords, card numbers and API keys end up in clipboard history. SaneClip skips password managers and password-like text, and auto-deletes the rest.">
   <meta property="og:url" content="https://saneclip.com/how-to-detect-sensitive-data-clipboard-mac">
   <meta property="og:image" content="https://saneclip.com/images/og-image-20260827.png?v=20260827-card">
   <meta property="og:image:secure_url" content="https://saneclip.com/images/og-image-20260827.png?v=20260827-card">
@@ -21,8 +21,8 @@
   <meta property="og:image:alt" content="SaneClip preview card for private Mac clipboard history">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://saneclip.com/how-to-detect-sensitive-data-clipboard-mac">
-  <meta name="twitter:title" content="How to Detect Sensitive Data in Your Clipboard on Mac">
-  <meta name="twitter:description" content="Credit cards, SSNs, API keys, and passwords slip into your clipboard constantly. Learn how to automatically detect and purge sensitive data from clipboard history.">
+  <meta name="twitter:title" content="How to Keep Sensitive Data Out of Mac Clipboard History">
+  <meta name="twitter:description" content="Passwords, card numbers and API keys end up in clipboard history. SaneClip skips password managers and password-like text, and auto-deletes the rest.">
   <meta name="twitter:image" content="https://saneclip.com/images/og-image-20260827.png?v=20260827-card">
   <meta name="twitter:image:alt" content="SaneClip preview card for private Mac clipboard history">
     <meta name="theme-color" content="#0099ff">
@@ -35,11 +35,11 @@
   {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    "headline": "How to Detect Sensitive Data in Your Clipboard on Mac",
-    "description": "Credit cards, SSNs, API keys, and passwords slip into your clipboard constantly. Learn how to automatically detect and purge sensitive data from clipboard history.",
+    "headline": "How to Keep Sensitive Data Out of Mac Clipboard History",
+    "description": "Passwords, card numbers and API keys end up in clipboard history. SaneClip skips password managers and password-like text, and auto-deletes the rest.",
     "url": "https://saneclip.com/how-to-detect-sensitive-data-clipboard-mac",
     "image": "https://saneclip.com/images/og-image-20260827.png?v=20260827-card",
-    "dateModified": "2026-06-16",
+    "dateModified": "2026-11-12",
     "author": {
       "@type": "Person",
       "name": "Mr. Sane"
@@ -51,6 +51,64 @@
     },
     "mainEntityOfPage": "https://saneclip.com/how-to-detect-sensitive-data-clipboard-mac"
   }
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does SaneClip detect card numbers and API keys on the Mac?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Not reliably. On the Mac it skips password-manager copies and text that looks like a password. A card number or API key copied from somewhere else can still be saved, so use auto-delete, the Touch ID lock and encryption, or press Control-Shift-Command-I before you copy, and SaneClip ignores the next copy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I skip one copy without changing settings?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Press Control-Shift-Command-I before you copy. SaneClip ignores the next copy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does the iPhone app save sensitive data?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "When you save from the Share sheet or the current iPhone clipboard, the companion won't save text that looks like a card number, Social Security number, API key, private key or password."
+      }
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "SaneClip",
+      "item": "https://saneclip.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Guides",
+      "item": "https://saneclip.com/guides"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "How to Keep Sensitive Data Out of Your Clipboard History",
+      "item": "https://saneclip.com/how-to-detect-sensitive-data-clipboard-mac"
+    }
+  ]
+}
   </script>
 
     <style>
@@ -213,13 +271,18 @@
 }
 
 
+            .faq h3 { font-size: 1.1rem; margin: 24px 0 8px; color: var(--text-primary); }
+        .related { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+        .related a { color: var(--accent); text-decoration: none; padding: 10px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; }
+        .trial-note { margin-top: 16px; margin-bottom: 0; text-align: center; font-size: 0.95rem; }
+        footer a { color: var(--text-secondary); }
     </style>
 </head>
 <body>
     <nav><div class="container"><a href="index.html" class="logo"><img src="images/icon.png" alt="SaneClip app icon"> SaneClip</a><a href="guides.html" style="color: var(--text-secondary); text-decoration: none;">&larr; All Guides</a></div></nav>
     <article class="container">
-        <h1>How to Detect Sensitive Data in Your Clipboard</h1>
-        <p>You copy credit card numbers to fill out forms. You paste API keys between terminals. You copy SSH private keys from password managers. All of it ends up in your clipboard history — and stays there until you remember to delete it.</p>
+        <h1>How to Keep Sensitive Data Out of Your Clipboard History</h1>
+        <p>You copy credit card numbers to fill out forms. You paste API keys between terminals. You copy SSH private keys from password managers. All of it ends up in your clipboard history, and stays there until you remember to delete it.</p>
         <div class="option-card">
             <h2>Option 1: The Hard Way (Manual)</h2>
             <ul class="step-list">
@@ -231,16 +294,34 @@
         <div class="option-card winner-card">
             <h2>Option 2: The Sane Way (SaneClip)</h2>
             <ul class="step-list">
-                <li><span class="icon icon-check">&#10003;</span> <div><strong>Auto-Detection:</strong> SaneClip scans every copied item for credit cards (Luhn validation), SSNs, API keys (OpenAI, AWS, GitHub, Slack, Stripe, Google), passwords, SSH keys, and PGP keys.</div></li>
-                <li><span class="icon icon-check">&#10003;</span> <div><strong>Visual Flagging:</strong> Sensitive items are marked with a warning badge so you can spot them instantly in your history.</div></li>
-                <li><span class="icon icon-check">&#10003;</span> <div><strong>Auto-Purge:</strong> Set a timer — 1 minute, 5 minutes, or 1 hour — and sensitive items delete themselves automatically. No manual cleanup ever.</div></li>
+                <li><span class="icon icon-check">&#10003;</span> <div><strong>Skips password managers:</strong> Copies from 1Password, Bitwarden, LastPass, Dashlane and KeePassXC never enter history, and neither do copies an app marks as concealed.</div></li>
+                <li><span class="icon icon-check">&#10003;</span> <div><strong>Catches password-like text:</strong> With <em>Detect &amp; skip passwords</em> on (it is by default), text that looks like a password, such as one a browser extension generates, isn't saved.</div></li>
+                <li><span class="icon icon-check">&#10003;</span> <div><strong>Clears the rest on a schedule:</strong> Auto-delete clips after 1 hour, 24 hours, 7 days or 30 days, lock history with Touch ID, and encrypt it at rest (Pro).</div></li>
             </ul>
             <div class="cta-box">
                 <a href="https://go.saneapps.com/buy/saneclip?ref=website" class="btn-large">Protect Your Data - $14.99</a>
             </div>
+            <p class="trial-note">Or <a href="https://saneclip.com/download" style="color: var(--accent);">start the free 14-day trial</a>, no card needed. Needs macOS 14 or later on Apple silicon.</p>
+        </div>
+
+        <section class="faq">
+        <h2>Questions</h2>
+        <h3>Does SaneClip detect card numbers and API keys on the Mac?</h3>
+        <p>Not reliably. On the Mac it skips password-manager copies and text that looks like a password. A card number or API key copied from somewhere else can still be saved, so use auto-delete, the Touch ID lock and encryption, or press Control-Shift-Command-I before you copy, and SaneClip ignores the next copy.</p>
+        <h3>How do I skip one copy without changing settings?</h3>
+        <p>Press Control-Shift-Command-I before you copy. SaneClip ignores the next copy.</p>
+        <h3>Does the iPhone app save sensitive data?</h3>
+        <p>When you save from the Share sheet or the current iPhone clipboard, the companion won't save text that looks like a card number, Social Security number, API key, private key or password.</p>
+        </section>
+
+        <h2>Related guides</h2>
+        <div class="related">
+            <a href="how-to-stop-clipboard-saving-passwords-mac.html">Keep passwords out of history</a>
+            <a href="how-to-exclude-apps-clipboard-history-mac.html">Exclude apps from history</a>
+            <a href="how-to-auto-delete-clipboard-history-mac.html">Auto-delete old clips</a>
         </div>
     </article>
-    <footer>Made with ❤️ in America by Mr. Sane &middot; &copy; 2026 SaneApps</footer>
+    <footer><a href="index.html">Home</a> &middot; <a href="guides.html">All Guides</a><br>Made with ❤️ in America by Mr. Sane &middot; &copy; 2026 SaneApps</footer>
     <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "7cc598fdc7194b468b34990f49c3d87f"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>

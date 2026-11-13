@@ -39,7 +39,7 @@
     "description": "Your clipboard history is a wall of text with no context. Learn how to see which app each copied item came from with color-coded source tracking.",
     "url": "https://saneclip.com/how-to-see-which-app-copied-text-mac",
     "image": "https://saneclip.com/images/og-image-20260827.png?v=20260827-card",
-    "dateModified": "2026-06-16",
+    "dateModified": "2026-11-12",
     "author": {
       "@type": "Person",
       "name": "Mr. Sane"
@@ -51,6 +51,64 @@
     },
     "mainEntityOfPage": "https://saneclip.com/how-to-see-which-app-copied-text-mac"
   }
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Can I search my history by app name?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Every row shows its source app and color, and you can filter by type (text, links, code, images), date, tag or collection."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do the colors match on iPhone?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. The iPhone and iPad companion uses the same color for each app as the Mac."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What shows as the source of a screen capture?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Text and screenshots captured with SaneClip's own screen tools show as Screen Capture."
+      }
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "SaneClip",
+      "item": "https://saneclip.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Guides",
+      "item": "https://saneclip.com/guides"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "How to See Which App Copied Text to Your Clipboard",
+      "item": "https://saneclip.com/how-to-see-which-app-copied-text-mac"
+    }
+  ]
+}
   </script>
 
     <style>
@@ -213,6 +271,11 @@
 }
 
 
+            .faq h3 { font-size: 1.1rem; margin: 24px 0 8px; color: var(--text-primary); }
+        .related { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+        .related a { color: var(--accent); text-decoration: none; padding: 10px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; }
+        .trial-note { margin-top: 16px; margin-bottom: 0; text-align: center; font-size: 0.95rem; }
+        footer a { color: var(--text-secondary); }
     </style>
 </head>
 <body>
@@ -232,15 +295,33 @@
             <h2>Option 2: The Sane Way (SaneClip)</h2>
             <ul class="step-list">
                 <li><span class="icon icon-check">&#10003;</span> <div><strong>Source App Tracking:</strong> Every clip records which app was active when you copied it. See "Safari", "Slack", "Xcode", or "Messages" right on each item.</div></li>
-                <li><span class="icon icon-check">&#10003;</span> <div><strong>Color-Coded History:</strong> Each source app gets a unique color bar — Messages is green, Safari is blue, Mail is red, Terminal is orange. <strong>Every app gets its own consistent color, not just Apple apps</strong> — Chrome, Slack, VS Code, Figma, all of them — on Mac and on the iPhone/iPad companion. Scan your history visually without reading a word.</div></li>
-                <li><span class="icon icon-check">&#10003;</span> <div><strong>Filter by App:</strong> Search for clips from a specific app. Need that URL you copied in Safari yesterday? Filter by "Safari" and find it in seconds.</div></li>
+                <li><span class="icon icon-check">&#10003;</span> <div><strong>Color-Coded History:</strong> Each source app gets its own color bar. Messages and Terminal are green, Safari is blue, Mail is red. <strong>Every app gets its own consistent color, not just Apple apps:</strong> Chrome, Slack, VS Code, Figma and the rest, on Mac and on the iPhone/iPad companion. Scan your history visually without reading a word.</div></li>
+                <li><span class="icon icon-check">&#10003;</span> <div><strong>App and time on every row:</strong> Each clip shows where it came from and when, like "Safari · 2m ago". Filter by type, date, tag or collection to narrow the list.</div></li>
             </ul>
             <div class="cta-box">
                 <a href="https://go.saneapps.com/buy/saneclip?ref=website" class="btn-large">Track Your Clips - $14.99</a>
             </div>
+            <p class="trial-note">Or <a href="https://saneclip.com/download" style="color: var(--accent);">start the free 14-day trial</a>, no card needed. Needs macOS 14 or later on Apple silicon.</p>
+        </div>
+
+        <section class="faq">
+        <h2>Questions</h2>
+        <h3>Can I search my history by app name?</h3>
+        <p>No. Every row shows its source app and color, and you can filter by type (text, links, code, images), date, tag or collection.</p>
+        <h3>Do the colors match on iPhone?</h3>
+        <p>Yes. The iPhone and iPad companion uses the same color for each app as the Mac.</p>
+        <h3>What shows as the source of a screen capture?</h3>
+        <p>Text and screenshots captured with SaneClip's own screen tools show as Screen Capture.</p>
+        </section>
+
+        <h2>Related guides</h2>
+        <div class="related">
+            <a href="how-to-see-clipboard-history-mac.html">See clipboard history</a>
+            <a href="how-to-exclude-apps-clipboard-history-mac.html">Exclude apps from history</a>
+            <a href="how-to-copy-text-from-screenshot-mac.html">Copy text from a screenshot</a>
         </div>
     </article>
-    <footer>Made with ❤️ in America by Mr. Sane &middot; &copy; 2026 SaneApps</footer>
+    <footer><a href="index.html">Home</a> &middot; <a href="guides.html">All Guides</a><br>Made with ❤️ in America by Mr. Sane &middot; &copy; 2026 SaneApps</footer>
     <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "7cc598fdc7194b468b34990f49c3d87f"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>

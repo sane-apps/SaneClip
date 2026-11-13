@@ -6,12 +6,12 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaneClip — Secure Clipboard Manager for Mac</title>
-    <meta name="description" content="Clipboard manager for Mac. Start a free 14-day Pro trial for OCR capture, Touch ID history lock, AES-256 encryption, smart paste, snippets, and unlimited history.">
+    <title>SaneClip - Clipboard Manager for Mac with Touch ID Lock</title>
+    <meta name="description" content="Private clipboard manager for Mac: Touch ID lock, AES-256 encryption, OCR text capture, snippets and a paste stack. Free 14-day trial, then $14.99 once.">
     <link rel="canonical" href="https://saneclip.com">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="SaneClip — Secure Clipboard Manager for Mac">
-  <meta property="og:description" content="Clipboard manager for Mac. Start a free 14-day Pro trial for OCR capture, Touch ID history lock, AES-256 encryption, smart paste, snippets, and unlimited history.">
+  <meta property="og:title" content="SaneClip - Clipboard Manager for Mac with Touch ID Lock">
+  <meta property="og:description" content="Private clipboard manager for Mac: Touch ID lock, AES-256 encryption, OCR text capture, snippets and a paste stack. Free 14-day trial, then $14.99 once.">
   <meta property="og:url" content="https://saneclip.com">
   <meta property="og:image" content="https://saneclip.com/images/og-image-20260827.png?v=20260827-card">
   <meta property="og:image:secure_url" content="https://saneclip.com/images/og-image-20260827.png?v=20260827-card">
@@ -21,8 +21,8 @@
   <meta property="og:image:alt" content="SaneClip preview card for private Mac clipboard history">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://saneclip.com">
-  <meta name="twitter:title" content="SaneClip — Secure Clipboard Manager for Mac">
-  <meta name="twitter:description" content="Clipboard manager for Mac. Start a free 14-day Pro trial for OCR capture, Touch ID history lock, AES-256 encryption, smart paste, snippets, and unlimited history.">
+  <meta name="twitter:title" content="SaneClip - Clipboard Manager for Mac with Touch ID Lock">
+  <meta name="twitter:description" content="Private clipboard manager for Mac: Touch ID lock, AES-256 encryption, OCR text capture, snippets and a paste stack. Free 14-day trial, then $14.99 once.">
   <meta name="twitter:image" content="https://saneclip.com/images/og-image-20260827.png?v=20260827-card">
   <meta name="twitter:image:alt" content="SaneClip preview card for private Mac clipboard history">
     <meta property="og:site_name" content="SaneClip">
@@ -59,14 +59,17 @@
         },
         "downloadUrl": "https://dist.saneclip.com/updates/SaneClip-2.3.26.zip",
         "softwareVersion": "2.3.26",
-        "releaseNotes": "v2.3.23 keeps image history lighter in memory and cleans up leftover automatic-update helpers after update checks.",
+        "releaseNotes": "v2.3.26 keeps image previews small in memory, still pastes the original picture, and keeps the original of a pinned picture when synced history is trimmed.",
         "screenshot": "https://saneclip.com/images/screenshot-popover.png",
         "featureList": [
             "Touch ID Protection",
             "Strong Encryption at Rest",
-            "Sensitive Data Detection (credit cards, SSNs, security tokens)",
+            "Skips Password Managers and Password-Like Text",
             "Smart Snippets with Dynamic Placeholders",
-            "Text Transforms (UPPERCASE, Title Case, Format Text)",
+            "Text Transforms (UPPERCASE, Title Case, Format JSON)",
+            "On-Device Rewrite, Summarize and Extract Key Points (macOS 26, Apple Intelligence)",
+            "OCR Text Capture from the Screen",
+            "Auto-Delete After 1 Hour to 30 Days",
             "Paste Stack (FIFO/LIFO)",
             "Clipboard Rules (strip tracking params, auto-trim)",
             "Keyboard Shortcuts (Cmd+Shift+Control+Y, Cmd+Ctrl+1-9)",
@@ -1781,8 +1784,8 @@
                             <circle cx="12" cy="12" r="3"></circle>
                         </svg>
                     </div>
-                    <h3>Sensitive Data Detection</h3>
-                    <p>Automatically detects <strong>credit cards, SSNs, security tokens, passwords, and private keys</strong>. Auto-purges them on a schedule you control.</p>
+                    <h3>Passwords Stay Out</h3>
+                    <p>Skips copies from <strong>password managers</strong>, copies marked concealed, and <strong>text that looks like a password</strong>, such as one a browser extension generates.</p>
                 </div>
 
                 <a href="#" onclick="openLightbox('images/screenshot-popover.png', 'OCR Capture — Grab text from screenshots and save searchable sidecars'); return false" class="feature-card reveal">
@@ -1808,7 +1811,7 @@
                         </svg>
                     </div>
                     <h3>Search &amp; Unlimited History</h3>
-                    <p>Stores everything you copy — text and images. <strong>Search instantly</strong> by content, OCR sidecars, source app, and pinned status.</p>
+                    <p>Stores everything you copy: text and images. <strong>Search instantly</strong> by content, OCR text, notes and tags.</p>
                 </a>
 
                 <div class="feature-card reveal">
@@ -1902,8 +1905,8 @@
                             <polyline points="12 6 12 12 16 14"></polyline>
                         </svg>
                     </div>
-                    <h3>Auto-Expire &amp; Auto-Purge</h3>
-                    <p>Old items auto-delete after 1h, 24h, or 7d. Sensitive data purges faster. <strong>Pinned items never expire.</strong> Exclude apps entirely.</p>
+                    <h3>Auto-Expire</h3>
+                    <p>Old items auto-delete after 1h, 24h, 7d or 30d. <strong>Pinned items never expire.</strong> Exclude apps entirely.</p>
                 </div>
 
                 <a href="#" onclick="openLightbox('images/screenshot-shortcuts.png', 'Lightning Shortcuts — Global hotkeys for instant access'); return false" class="feature-card reveal">
@@ -1965,6 +1968,7 @@
                 </div>
             </details>
 
+            <p style="text-align: center; margin-top: 40px; color: var(--text-secondary);">How-to guides: <a href="how-to-copy-text-from-screenshot-mac.html" style="color: var(--accent);">copy text from a screenshot</a> &middot; <a href="how-to-protect-clipboard-history-touch-id-mac.html" style="color: var(--accent);">lock history with Touch ID</a> &middot; <a href="how-to-paste-multiple-items-mac.html" style="color: var(--accent);">paste several items in order</a> &middot; <a href="guides.html" style="color: var(--accent);">all guides</a></p>
         </div>
     </section>
 
@@ -1994,10 +1998,10 @@
                                 <span class="feature-desc">History encrypted at rest on disk</span>
                             </td>
                             <td class="highlight-col"><span class="check">&#10003;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="na">&mdash;</span></td>
+                            <td><span class="na">&mdash;</span></td>
+                            <td><span class="na">&mdash;</span></td>
+                            <td><span class="na">&mdash;</span></td>
                         </tr>
                         <tr>
                             <td class="feature-name">
@@ -2005,21 +2009,10 @@
                                 <span class="feature-desc">Biometric lock on clipboard history</span>
                             </td>
                             <td class="highlight-col"><span class="check">&#10003;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                        </tr>
-                        <tr>
-                            <td class="feature-name">
-                                <span class="feature-label">Sensitive Data Detection</span>
-                                <span class="feature-desc">Flags credit cards, SSNs, API keys</span>
-                            </td>
-                            <td class="highlight-col"><span class="check">&#10003;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="na">&mdash;</span></td>
+                            <td><span class="na">&mdash;</span></td>
+                            <td><span class="na">&mdash;</span></td>
+                            <td><span class="na">&mdash;</span></td>
                         </tr>
                         <tr>
                             <td class="feature-name">
@@ -2083,7 +2076,7 @@
                                 <span class="feature-desc">Queue items, paste in FIFO/LIFO order</span>
                             </td>
                             <td class="highlight-col"><span class="check">&#10003;</span></td>
-                            <td><span class="cross">&#10007;</span></td>
+                            <td><span class="check">&#10003;</span></td>
                             <td><span class="cross">&#10007;</span></td>
                             <td><span class="check">&#10003;</span></td>
                             <td><span class="cross">&#10007;</span></td>
@@ -2203,7 +2196,7 @@
             <details class="faq-item"><summary>What do I need to run SaneClip?</summary><p>macOS 14 Sonoma or later on an Apple silicon Mac. The iPhone and iPad companion is a free App Store download.</p></details>
             <details class="faq-item"><summary>Doesn't macOS already have clipboard history?</summary><p>On macOS 26 Tahoe and later, Spotlight keeps up to 7 days of clipboard history (Command-Space, then Command-4). SaneClip adds unlimited history, a Touch ID lock, AES-256-GCM encryption at rest, password-manager skipping, OCR capture, a paste stack and snippets. <a href="mac-clipboard-manager-alternatives.html">See the full comparison</a>.</p></details>
             <details class="faq-item"><summary>Does my clipboard leave my Mac?</summary><p>Not to SaneApps. History stays on your Mac by default. Optional sync to the iPhone app uses your own iCloud account, and with History Encryption on, the synced data is unreadable to SaneApps.</p></details>
-            <details class="faq-item"><summary>Does SaneClip save passwords I copy?</summary><p>No. It skips copies from 1Password, LastPass, Dashlane, Bitwarden and other password managers, and it detects card numbers, SSNs, tokens and private keys and purges them on a schedule you set.</p></details>
+            <details class="faq-item"><summary>Does SaneClip save passwords I copy?</summary><p>No. It skips copies from 1Password, LastPass, Dashlane, Bitwarden and other password managers, and text that looks like a password. Other clips can auto-delete on a schedule you set.</p></details>
             <details class="faq-item"><summary>Can I see the source code?</summary><p>Yes. It's on GitHub at <a href="https://github.com/sane-apps/SaneClip">github.com/sane-apps/SaneClip</a> under the PolyForm Shield licence.</p></details>
             </div>
         </div>
@@ -2250,7 +2243,7 @@
       "name": "Does SaneClip save passwords I copy?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No. It skips copies from 1Password, LastPass, Dashlane, Bitwarden and other password managers, and it detects card numbers, SSNs, tokens and private keys and purges them on a schedule you set."
+        "text": "No. It skips copies from 1Password, LastPass, Dashlane, Bitwarden and other password managers, and text that looks like a password. Other clips can auto-delete on a schedule you set."
       }
     },
     {

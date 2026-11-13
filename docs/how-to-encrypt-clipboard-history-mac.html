@@ -7,11 +7,11 @@
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>How to Encrypt Clipboard History on Mac (AES-256)</title>
-    <meta name="description" content="Your clipboard history is stored in plaintext by default. Learn how to encrypt it with AES-256-GCM so no one can read your copied data — even with disk access.">
+    <meta name="description" content="Encrypt your Mac clipboard history at rest with AES-256-GCM. The key stays in your Mac&#x27;s keychain, so copied data files can&#x27;t be read without it.">
     <link rel="canonical" href="https://saneclip.com/how-to-encrypt-clipboard-history-mac">
   <meta property="og:type" content="website">
   <meta property="og:title" content="How to Encrypt Clipboard History on Mac (AES-256)">
-  <meta property="og:description" content="Your clipboard history is stored in plaintext by default. Learn how to encrypt it with AES-256-GCM so no one can read your copied data — even with disk access.">
+  <meta property="og:description" content="Encrypt your Mac clipboard history at rest with AES-256-GCM. The key stays in your Mac&#x27;s keychain, so copied data files can&#x27;t be read without it.">
   <meta property="og:url" content="https://saneclip.com/how-to-encrypt-clipboard-history-mac">
   <meta property="og:image" content="https://saneclip.com/images/og-image-20260827.png?v=20260827-card">
   <meta property="og:image:secure_url" content="https://saneclip.com/images/og-image-20260827.png?v=20260827-card">
@@ -22,7 +22,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://saneclip.com/how-to-encrypt-clipboard-history-mac">
   <meta name="twitter:title" content="How to Encrypt Clipboard History on Mac (AES-256)">
-  <meta name="twitter:description" content="Your clipboard history is stored in plaintext by default. Learn how to encrypt it with AES-256-GCM so no one can read your copied data — even with disk access.">
+  <meta name="twitter:description" content="Encrypt your Mac clipboard history at rest with AES-256-GCM. The key stays in your Mac&#x27;s keychain, so copied data files can&#x27;t be read without it.">
   <meta name="twitter:image" content="https://saneclip.com/images/og-image-20260827.png?v=20260827-card">
   <meta name="twitter:image:alt" content="SaneClip preview card for private Mac clipboard history">
     <meta name="theme-color" content="#0099ff">
@@ -36,10 +36,10 @@
     "@context": "https://schema.org",
     "@type": "TechArticle",
     "headline": "How to Encrypt Clipboard History on Mac (AES-256)",
-    "description": "Your clipboard history is stored in plaintext by default. Learn how to encrypt it with AES-256-GCM so no one can read your copied data — even with disk access.",
+    "description": "Encrypt your Mac clipboard history at rest with AES-256-GCM. The key stays in your Mac's keychain, so copied data files can't be read without it.",
     "url": "https://saneclip.com/how-to-encrypt-clipboard-history-mac",
     "image": "https://saneclip.com/images/og-image-20260827.png?v=20260827-card",
-    "dateModified": "2026-06-16",
+    "dateModified": "2026-11-12",
     "author": {
       "@type": "Person",
       "name": "Mr. Sane"
@@ -51,6 +51,64 @@
     },
     "mainEntityOfPage": "https://saneclip.com/how-to-encrypt-clipboard-history-mac"
   }
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Isn't FileVault enough?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "FileVault encrypts the whole disk, which protects your data if the Mac is lost while it's off. Once you log in, files are readable again. History Encryption keeps SaneClip's history file encrypted while you work."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I turn on encryption?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Open SaneClip Settings > Privacy and turn on Encrypt history at rest. It's a Pro feature."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens to widget previews?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "With encryption on, SaneClip clears widget and companion preview caches instead of keeping readable copies of your clips."
+      }
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "SaneClip",
+      "item": "https://saneclip.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Guides",
+      "item": "https://saneclip.com/guides"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "How to Encrypt Your Clipboard History on Mac",
+      "item": "https://saneclip.com/how-to-encrypt-clipboard-history-mac"
+    }
+  ]
+}
   </script>
 
     <style>
@@ -213,13 +271,18 @@
 }
 
 
+            .faq h3 { font-size: 1.1rem; margin: 24px 0 8px; color: var(--text-primary); }
+        .related { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+        .related a { color: var(--accent); text-decoration: none; padding: 10px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; }
+        .trial-note { margin-top: 16px; margin-bottom: 0; text-align: center; font-size: 0.95rem; }
+        footer a { color: var(--text-secondary); }
     </style>
 </head>
 <body>
     <nav><div class="container"><a href="index.html" class="logo"><img src="images/icon.png" alt="SaneClip app icon"> SaneClip</a><a href="guides.html" style="color: var(--text-secondary); text-decoration: none;">&larr; All Guides</a></div></nav>
     <article class="container">
         <h1>How to Encrypt Your Clipboard History on Mac</h1>
-        <p>Every clipboard manager stores your history on disk. Most store it as a plain JSON or SQLite file that any app — or anyone with access to your Mac — can read. Passwords, API keys, credit card numbers — all sitting there in plaintext.</p>
+        <p>A clipboard manager keeps your history in a file on your Mac. Unless that file is encrypted, any app or person with access to your account can read it, passwords, API keys and card numbers included.</p>
         <div class="option-card">
             <h2>Option 1: The Hard Way (Manual)</h2>
             <ul class="step-list">
@@ -232,7 +295,7 @@
             <h2>Option 2: The Sane Way (SaneClip)</h2>
             <ul class="step-list">
                 <li><span class="icon icon-check">&#10003;</span> <div><strong>AES-256-GCM Encryption (Pro):</strong> Turn on History Encryption in SaneClip Pro to encrypt your clipboard history at rest. Even if someone copies your data files, they get unreadable ciphertext.</div></li>
-                <li><span class="icon icon-check">&#10003;</span> <div><strong>Keychain-Stored Keys:</strong> Encryption keys live in macOS Keychain — not in a config file. Protected by your login password and Secure Enclave.</div></li>
+                <li><span class="icon icon-check">&#10003;</span> <div><strong>Keychain-Stored Keys:</strong> The encryption key lives in your Mac's keychain, not in a settings file.</div></li>
                 <li><span class="icon icon-check">&#10003;</span> <div><strong>No Plaintext Widget Mirror:</strong> In encrypted mode, SaneClip clears widget and companion preview caches instead of retaining readable clip previews in the shared container.</div></li>
                 <li><span class="icon icon-check">&#10003;</span> <div><strong>One Toggle:</strong> Open Settings &gt; Privacy &gt; Security and enable Encrypt history at rest when you want local at-rest protection.</div></li>
             </ul>
@@ -240,8 +303,25 @@
                 <a href="https://saneclip.com/download" class="btn-large">Start Full Pro Trial</a>
             </div>
         </div>
+
+        <section class="faq">
+        <h2>Questions</h2>
+        <h3>Isn't FileVault enough?</h3>
+        <p>FileVault encrypts the whole disk, which protects your data if the Mac is lost while it's off. Once you log in, files are readable again. History Encryption keeps SaneClip's history file encrypted while you work.</p>
+        <h3>How do I turn on encryption?</h3>
+        <p>Open SaneClip Settings &gt; Privacy and turn on Encrypt history at rest. It's a Pro feature.</p>
+        <h3>What happens to widget previews?</h3>
+        <p>With encryption on, SaneClip clears widget and companion preview caches instead of keeping readable copies of your clips.</p>
+        </section>
+
+        <h2>Related guides</h2>
+        <div class="related">
+            <a href="how-to-protect-clipboard-history-touch-id-mac.html">Lock history with Touch ID</a>
+            <a href="how-to-detect-sensitive-data-clipboard-mac.html">Keep sensitive data out</a>
+            <a href="how-to-backup-clipboard-history-mac.html">Export and back up history</a>
+        </div>
     </article>
-    <footer>Made with ❤️ in America by Mr. Sane &middot; &copy; 2026 SaneApps</footer>
+    <footer><a href="index.html">Home</a> &middot; <a href="guides.html">All Guides</a><br>Made with ❤️ in America by Mr. Sane &middot; &copy; 2026 SaneApps</footer>
     <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "7cc598fdc7194b468b34990f49c3d87f"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>

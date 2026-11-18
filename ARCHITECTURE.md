@@ -151,7 +151,7 @@ stateDiagram-v2
 - **Direct channel**:
   - DMGs uploaded to Cloudflare R2 (not committed to GitHub)
   - Sparkle feed configured in `SaneClip/Info.plist`
-  - Lemon Squeezy handles direct licensing
+  - Lemon Squeezy handles direct checkout; license keys are checked by the SaneApps license server (`license.saneapps.com`, from 2.3.27)
   - Direct download + Sparkle is canonical; Homebrew is optional only when intentionally published and the Basic/Pro gate is verified
 - **App Store channel**:
   - StoreKit + App Store updates
@@ -186,7 +186,7 @@ stateDiagram-v2
 - Use `./scripts/SaneMaster.rb verify` for build + tests.
 - Manual checks: clipboard capture, Touch ID prompt, widgets.
 - Channel checks:
-  - direct = Sparkle + Lemon Squeezy path
+  - direct = Sparkle + license-key path (SaneApps license server)
   - App Store = StoreKit + App Store-safe UI
   - Setapp = Setapp entitlement/update path with no Sparkle/direct-pay drift
 

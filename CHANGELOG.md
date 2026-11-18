@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [2.3.27] - 2026-11-17
+
+License checks are more reliable. A problem on the license server can no longer lock an app you paid for.
+
+---
+
 ## [2.3.26] - 2026-10-09
 
 Keeps image previews small in memory, and still opens the original picture when you paste. Keeps the original of a pinned picture when synced history is trimmed.

@@ -854,7 +854,7 @@
 				FBAE4074C0CA19FA004BF6BD /* Resources */,
 				20E37CD5F2F6A381524F3068 /* Frameworks */,
 				127440FBA2DFFC86A28382F6 /* Embed Foundation Extensions */,
-				F17A0C4E9B2D48A1C6E5D073 /* Repair Setapp resource bundle */,
+				D5B1829B21D94D8216138A9B /* Repair Setapp resource bundle */,
 			);
 			buildRules = (
 			);
@@ -1029,25 +1029,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		F17A0C4E9B2D48A1C6E5D073 /* Repair Setapp resource bundle */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Repair Setapp resource bundle";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "APP_BUNDLE_PATH=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\nif [ ! -d \"${APP_BUNDLE_PATH}\" ]; then\n  exit 0\nfi\nfind \"${APP_BUNDLE_PATH}\" -type d -name '*.bundle' | while IFS= read -r bundle; do\n  plist=\"${bundle}/Info.plist\"\n  [ -f \"${plist}\" ] || continue\n  exec_name=\"$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' \"${plist}\" 2>/dev/null || true)\"\n  [ -n \"${exec_name}\" ] || continue\n  if [ ! -e \"${bundle}/${exec_name}\" ]; then\n    /usr/libexec/PlistBuddy -c 'Delete :CFBundleExecutable' \"${plist}\"\n    package_type=\"$(/usr/libexec/PlistBuddy -c 'Print :CFBundlePackageType' \"${plist}\" 2>/dev/null || true)\"\n    if [ \"${package_type}\" != \"BNDL\" ]; then\n      /usr/libexec/PlistBuddy -c 'Delete :CFBundlePackageType' \"${plist}\" 2>/dev/null || true\n      /usr/libexec/PlistBuddy -c 'Add :CFBundlePackageType string BNDL' \"${plist}\"\n    fi\n    echo \"Removed CFBundleExecutable from ${bundle#${APP_BUNDLE_PATH}/}\"\n  fi\ndone\n";
-		};
 		5CC7E86915A9DEDF13CC7A72 /* Run SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -1085,6 +1066,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "APP_ICON_SOURCE=\"${SRCROOT}/Resources/Assets.xcassets/AppIcon.appiconset\"\nAPP_ICON_DEST=\"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AppIcon.icns\"\nAPP_BUNDLE_PATH=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\nif [ ! -d \"${APP_BUNDLE_PATH}\" ]; then\n  APP_BUNDLE_PATH=\"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}\"\nfi\nif [ -d \"${APP_ICON_SOURCE}\" ] && [ -d \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\" ]; then\n  TEMP_ICON_ROOT=\"$(mktemp -d \"${DERIVED_FILE_DIR}/SaneClipAppIcon.XXXXXX\")\"\n  TEMP_ICONSET=\"${TEMP_ICON_ROOT}/AppIcon.iconset\"\n  mkdir -p \"${TEMP_ICONSET}\"\n  cp \"${APP_ICON_SOURCE}/icon_16x16.png\" \"${TEMP_ICONSET}/icon_16x16.png\"\n  cp \"${APP_ICON_SOURCE}/icon_16x16@2x.png\" \"${TEMP_ICONSET}/icon_16x16@2x.png\"\n  cp \"${APP_ICON_SOURCE}/icon_32x32.png\" \"${TEMP_ICONSET}/icon_32x32.png\"\n  cp \"${APP_ICON_SOURCE}/icon_32x32@2x.png\" \"${TEMP_ICONSET}/icon_32x32@2x.png\"\n  cp \"${APP_ICON_SOURCE}/icon_128x128.png\" \"${TEMP_ICONSET}/icon_128x128.png\"\n  cp \"${APP_ICON_SOURCE}/icon_128x128@2x.png\" \"${TEMP_ICONSET}/icon_128x128@2x.png\"\n  cp \"${APP_ICON_SOURCE}/icon_256x256.png\" \"${TEMP_ICONSET}/icon_256x256.png\"\n  cp \"${APP_ICON_SOURCE}/icon_256x256@2x.png\" \"${TEMP_ICONSET}/icon_256x256@2x.png\"\n  cp \"${APP_ICON_SOURCE}/icon_512x512.png\" \"${TEMP_ICONSET}/icon_512x512.png\"\n  cp \"${APP_ICON_SOURCE}/icon_512x512@2x.png\" \"${TEMP_ICONSET}/icon_512x512@2x.png\"\n  iconutil -c icns \"${TEMP_ICONSET}\" -o \"${APP_ICON_DEST}\"\n  ICON_WIDTH=\"$(sips -g pixelWidth \"${APP_ICON_DEST}\" 2>/dev/null | awk '/pixelWidth:/ { print $2; exit }')\"\n  if [ \"${ICON_WIDTH:-0}\" -lt 512 ]; then\n    echo \"error: AppIcon.icns must include at least a 512px representation for Setapp upload\"\n    exit 1\n  fi\n  echo \"App icon regenerated with ${ICON_WIDTH}px maximum representation\"\nfi\n\nif [ \"$CONFIGURATION\" == \"Release-AppStore\" ]; then\n  echo \"App Store build: stripping Sparkle framework and keys...\"\n  # Remove Sparkle framework from app bundle\n  rm -rf \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework\"\n  # Strip Sparkle keys from built Info.plist\n  /usr/libexec/PlistBuddy -c \"Delete :SUFeedURL\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUPublicEDKey\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n    /usr/libexec/PlistBuddy -c \"Delete :SUEnableAutomaticChecks\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n    /usr/libexec/PlistBuddy -c \"Delete :SUEnableSystemProfiling\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n    /usr/libexec/PlistBuddy -c \"Delete :SUEnableInstallerLauncherService\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Strip NSServices (not applicable in sandbox)\n  /usr/libexec/PlistBuddy -c \"Delete :NSServices\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Strip automation-related usage descriptions (not used in App Store build)\n  /usr/libexec/PlistBuddy -c \"Delete :NSAppleEventsUsageDescription\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :NSAccessibilityUsageDescription\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  # Sparkle can still be strongly linked by SPM; weaken it to prevent launch crashes when framework is stripped.\n  WEAKEN_SCRIPT=\"${SRCROOT}/../../infra/SaneProcess/scripts/weaken_sparkle.rb\"\n  if [ -f \"${WEAKEN_SCRIPT}\" ]; then\n    find \"${APP_BUNDLE_PATH}\" -type f -path \"*/Contents/MacOS/*\" -exec ruby \"${WEAKEN_SCRIPT}\" {} \\; || exit 1\n    STRONG_SPARKLE_LINKS=\"$(find \"${APP_BUNDLE_PATH}\" -type f -path \"*/Contents/MacOS/*\" -exec sh -c 'otool -L \"$1\" 2>/dev/null | grep \"Sparkle.framework\" | grep -v \"weak\" >/dev/null && printf \"%s\\n\" \"$1\"' sh {} \\;)\"\n    if [ -n \"${STRONG_SPARKLE_LINKS}\" ]; then\n      echo \"error: Sparkle.framework is still strongly linked after stripping:\"\n      echo \"${STRONG_SPARKLE_LINKS}\"\n      exit 1\n    fi\n  fi\n  echo \"App Store build: Sparkle, NSServices, and automation-related keys removed\"\nelif [ \"$CONFIGURATION\" == \"ProdDebug-Setapp\" ] || [ \"$CONFIGURATION\" == \"Release-Setapp\" ]; then\n  echo \"Setapp build: stripping Sparkle framework and direct-store keys...\"\n  rm -rf \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework\"\n  /usr/libexec/PlistBuddy -c \"Delete :SUFeedURL\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :SUPublicEDKey\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n    /usr/libexec/PlistBuddy -c \"Delete :SUEnableAutomaticChecks\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n    /usr/libexec/PlistBuddy -c \"Delete :SUEnableSystemProfiling\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n    /usr/libexec/PlistBuddy -c \"Delete :SUEnableInstallerLauncherService\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :AppStoreProductID\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :NSAppleEventsUsageDescription\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Delete :MPSupportedArchitectures\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Add :MPSupportedArchitectures array\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n  /usr/libexec/PlistBuddy -c \"Add :MPSupportedArchitectures:0 string arm64\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n  /usr/libexec/PlistBuddy -c \"Add :MPSupportedArchitectures:1 string x86_64\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n  /usr/libexec/PlistBuddy -c \"Delete :NSUpdateSecurityPolicy\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n  /usr/libexec/PlistBuddy -c \"Add :NSUpdateSecurityPolicy dict\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n  /usr/libexec/PlistBuddy -c \"Add :NSUpdateSecurityPolicy:AllowProcesses dict\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n  /usr/libexec/PlistBuddy -c \"Add :NSUpdateSecurityPolicy:AllowProcesses:MEHY5QF425 array\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n  /usr/libexec/PlistBuddy -c \"Add :NSUpdateSecurityPolicy:AllowProcesses:MEHY5QF425:0 string com.setapp.DesktopClient.SetappAgent\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n  SETAPP_KEY_SOURCE=\"${SRCROOT}/Setapp/setappPublicKey.pem\"\n  if [ -f \"${SETAPP_KEY_SOURCE}\" ]; then\n    cp \"${SETAPP_KEY_SOURCE}\" \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/setappPublicKey.pem\"\n    echo \"Setapp build: bundled setappPublicKey.pem\"\n  else\n    echo \"warning: Setapp build missing ${SETAPP_KEY_SOURCE}\"\n  fi\n  WEAKEN_SCRIPT=\"${SRCROOT}/../../infra/SaneProcess/scripts/weaken_sparkle.rb\"\n  if [ -f \"${WEAKEN_SCRIPT}\" ]; then\n    find \"${APP_BUNDLE_PATH}\" -type f -path \"*/Contents/MacOS/*\" -exec ruby \"${WEAKEN_SCRIPT}\" {} \\; || exit 1\n    STRONG_SPARKLE_LINKS=\"$(find \"${APP_BUNDLE_PATH}\" -type f -path \"*/Contents/MacOS/*\" -exec sh -c 'otool -L \"$1\" 2>/dev/null | grep \"Sparkle.framework\" | grep -v \"weak\" >/dev/null && printf \"%s\\n\" \"$1\"' sh {} \\;)\"\n    if [ -n \"${STRONG_SPARKLE_LINKS}\" ]; then\n      echo \"error: Sparkle.framework is still strongly linked after stripping:\"\n      echo \"${STRONG_SPARKLE_LINKS}\"\n      exit 1\n    fi\n  fi\n  echo \"Setapp build: Sparkle removed, Setapp policy applied\"\nfi\n";
+		};
+		D5B1829B21D94D8216138A9B /* Repair Setapp resource bundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Repair Setapp resource bundle";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "APP_BUNDLE_PATH=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\nif [ ! -d \"${APP_BUNDLE_PATH}\" ]; then\n  exit 0\nfi\nfind \"${APP_BUNDLE_PATH}\" -type d -name '*.bundle' | while IFS= read -r bundle; do\n  plist=\"${bundle}/Info.plist\"\n  [ -f \"${plist}\" ] || continue\n  exec_name=\"$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' \"${plist}\" 2>/dev/null || true)\"\n  [ -n \"${exec_name}\" ] || continue\n  if [ ! -e \"${bundle}/${exec_name}\" ]; then\n    /usr/libexec/PlistBuddy -c 'Delete :CFBundleExecutable' \"${plist}\"\n    package_type=\"$(/usr/libexec/PlistBuddy -c 'Print :CFBundlePackageType' \"${plist}\" 2>/dev/null || true)\"\n    if [ \"${package_type}\" != \"BNDL\" ]; then\n      /usr/libexec/PlistBuddy -c 'Delete :CFBundlePackageType' \"${plist}\" 2>/dev/null || true\n      /usr/libexec/PlistBuddy -c 'Add :CFBundlePackageType string BNDL' \"${plist}\"\n    fi\n    echo \"Removed CFBundleExecutable from ${bundle#${APP_BUNDLE_PATH}/}\"\n  fi\ndone\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1351,7 +1351,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1361,7 +1361,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -1379,11 +1379,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp.widgets";
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;
@@ -1399,12 +1399,12 @@
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShareDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1420,12 +1420,12 @@
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShare.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip iOS Share App Store";
@@ -1505,11 +1505,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;
@@ -1524,7 +1524,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1532,7 +1532,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -1545,11 +1545,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1653,7 +1653,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1661,7 +1661,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -1680,7 +1680,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_PREVIEWS = YES;
@@ -1691,7 +1691,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC -D SETAPP";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp";
 				PRODUCT_NAME = SaneClip;
@@ -1708,12 +1708,12 @@
 				CODE_SIGN_ENTITLEMENTS = iOSShareExtension/SaneClipShare.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1748,7 +1748,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1757,7 +1757,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip iOS Widgets App Store";
@@ -1772,11 +1772,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1862,11 +1862,11 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip Widgets Developer ID";
@@ -1880,11 +1880,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				INFOPLIST_FILE = iOSShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.share;
 				PRODUCT_NAME = SaneClipIOSShare;
 				SDKROOT = iphoneos;
@@ -1983,11 +1983,11 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp.widgets";
 				PRODUCT_NAME = SaneClipWidgets;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip Setapp Widgets Developer ID";
@@ -2005,7 +2005,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOSDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -2014,7 +2014,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -2031,7 +2031,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -2041,7 +2041,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2061,7 +2061,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_PREVIEWS = YES;
@@ -2072,7 +2072,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC -D SETAPP";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.saneclip.app-setapp";
 				PRODUCT_NAME = SaneClip;
@@ -2092,7 +2092,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_PREVIEWS = YES;
@@ -2103,7 +2103,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2124,7 +2124,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_PREVIEWS = YES;
@@ -2135,7 +2135,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
@@ -2155,7 +2155,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_PREVIEWS = YES;
@@ -2167,7 +2167,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				OTHER_SWIFT_FLAGS = "-D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2188,7 +2188,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -2198,7 +2198,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2214,7 +2214,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -2223,7 +2223,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2262,7 +2262,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -2272,7 +2272,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2287,7 +2287,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2295,7 +2295,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2315,7 +2315,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_PREVIEWS = YES;
@@ -2326,7 +2326,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				OTHER_SWIFT_FLAGS = "-D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev;
 				PRODUCT_NAME = SaneClip;
@@ -2343,7 +2343,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -2353,7 +2353,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				OTHER_SWIFT_FLAGS = "-D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2372,7 +2372,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -2382,7 +2382,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2399,7 +2399,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/SaneClipIOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
@@ -2408,7 +2408,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -2507,7 +2507,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2515,7 +2515,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2554,7 +2554,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -2564,7 +2564,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D APP_STORE -D ENABLE_SYNC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
@@ -2580,7 +2580,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -2588,7 +2588,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app;
 				PRODUCT_NAME = SaneClip;
 				SDKROOT = iphoneos;
@@ -2601,7 +2601,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2609,7 +2609,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2626,11 +2626,11 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.app.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				PROVISIONING_PROFILE_SPECIFIER = "SaneClip Widgets Mac App Store";
@@ -2708,7 +2708,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSWidgets/SaneClipIOSWidgetsDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = iOSWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -2717,7 +2717,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.ioswidgets;
 				PRODUCT_NAME = SaneClipIOSWidgets;
 				SDKROOT = iphoneos;
@@ -2734,11 +2734,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2326;
+				CURRENT_PROJECT_VERSION = 2327;
 				DEVELOPMENT_TEAM = M78L6FXD48;
 				INFOPLIST_FILE = Widgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MARKETING_VERSION = 2.3.26;
+				MARKETING_VERSION = 2.3.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saneclip.dev.widgets;
 				PRODUCT_NAME = SaneClipWidgets;
 				SDKROOT = macosx;
@@ -2870,7 +2870,7 @@
 			repositoryURL = "https://github.com/sane-apps/SaneUI.git";
 			requirement = {
 				kind = revision;
-				revision = 48c1ded1b77a58dc129d844ee1dd4753c2386285;
+				revision = 48121e0b93c26caa09e70f597a080d59afa2a2c5;
 			};
 		};
 		9B9B0D09FDAE079B73A7A0CB /* XCRemoteSwiftPackageReference "Sparkle" */ = {

@@ -5,7 +5,27 @@
     <link>https://saneclip.com/appcast.xml</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
-                                                                                    <item>
+                                                                                            <item>
+            <title>2.3.27</title>
+            <link>https://saneclip.com/download</link>
+            <pubDate>Tue, 17 Nov 2026 20:56:20 -0500</pubDate>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description>
+                <![CDATA[
+                <h2>What's New</h2>
+                <ul>
+                <li>License checks are more reliable. A problem on the license server can no longer lock an app you paid for.</li>
+                </ul>
+                ]]>
+            </description>
+            <enclosure url="https://dist.saneclip.com/updates/SaneClip-2.3.27.zip"
+                       sparkle:version="2327"
+                       sparkle:shortVersionString="2.3.27"
+                       length="5287464"
+                       type="application/octet-stream"
+                       sparkle:edSignature="fma3gTQSCA3Sq5B60M8jXWbYb46W8RLu8sOzckR78wQMOjmrWg9bdPQVbnxds4zZYvervyjNKmkYAYE8AigJCw=="/>
+        </item>
+<item>
             <title>2.3.26</title>
             <link>https://saneclip.com/download</link>
             <pubDate>Fri, 09 Oct 2026 17:02:05 -0400</pubDate>
